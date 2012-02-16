@@ -1,0 +1,37 @@
+Code in this project is covered by the GNU General Public Licence:
+---------------------------------------------------------------------------
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+---------------------------------------------------------------------------
+
+
+Code was forked from Tomaz's Clean Quake. Changes made after the fork can be
+found in 'QMB-Version.txt'.
+
+Some code changes are from tutorials originally hosted on QuakeSrc.Org, I'm not
+sure where you can find these tutorials any more but the inside3d.org forums
+would be a good place to start.
+
+Microsoft Visual Studio was used to compile this project, the express edition
+would be a good place to start if you are having problems compiling with a
+different compiler.
+
+This code was forked to at version QMB 1.18 to become Vengeance R2 engine. At
+the time (2012/02/16) of writing this README more information about vengeance r2
+can be found at: http://entardev.wordpress.com/games/vengeance-r2/
+
+I hope you enjoy the code as much as I enjoyed working on it :)
+
+DrLabman
