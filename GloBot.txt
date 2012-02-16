@@ -1,0 +1,314 @@
+GloBot... The dumbest bot in existence... but at least he works :)
+
+First of all... as always with my tutorials its assumes you are using MSVC as compiler... cause thats the only thing i have to complie on so i cant help anyone with getting it to compile on other compilers... 
+
+This is by far the piece of code that ive released that im the most proud of... Simply by the fact that it was done 100% by me without any help... (weel ive read the QC FrikBotX source but that doesnt count) and also by the fact that as far as i know it has not been done before...
+
+This is just to show that its not hard to make an engine bot...
+
+However I never ever said this bot was smart, and it isnt, but at least its a start...
+
+If anyone enhances this and makes him smarter then feel free to send me the code and ill make additional tutorials on how to make him smarter...
+
+Now someone might ask "why the name GloBot?"
+
+Simple... There is an engine global that is called pr_global_struct that keeps track of globals that are shared between the engine and the QC... so at first i made a pr_global_bot_struct... But after i while i got so bored of typing such a long word that i wanted to short it down... And the GloBot got its name :)
+
+First off u should have donwnloaded "these" files and unzipped them into the folder where u have your source. There are 2 files in the zip: bot.c and bot.h.  I think the names explain what they do :)
+
+Next step is to include these 2 files into your project and i assume most of you know how to do that but if someone doesnt then just ask me in e-mail or in irc and ill explain.
+
+So that was step 1... Now on to make the additional changes needed to the existing source... most changes are small and in places where you most often dont change anything... so this should work on most sources out there...
+
+in host.c in the function Host_FindMaxClients change
+
+	if (svs.maxclientslimit < 4)
+		svs.maxclientslimit = 4;
+
+with
+
+	if (svs.maxclientslimit < 8)
+		svs.maxclientslimit = 8;
+
+this only ups the default allowed amount of players from 4 to 8 and is optional
+
+above the function Host_Init add
+
+void Bot_Init (void);
+
+then in the Host_Init function after
+
+	NET_Init ();
+	SV_Init ();
+
+add
+
+	Bot_Init ();
+
+and this is needed so we get the "addbot" command from the console later on.
+
+Thats it for this file...
+
+Now we move onto the next file 
+
+in host_cmd.c in the function Host_Begin_f
+
+after
+
+	host_client->spawned = true;
+
+add
+
+	host_client->edict->bot.Active = true;
+
+and thats it... wow.. this is going smooth so far right?
+
+now we move onto pr_cmds.c that has the trickiest changes in this tutorial... but ill try to explain it as good as i can...
+
+first off we go to the function PF_sprint
+
+there we add a
+
+edict_t		*ent;
+
+to the variable list
+
+and then we add this to the top of the function
+
+	ent = G_EDICT(OFS_PARM0);	
+
+	if (!ent->bot.isbot)
+	{
+	}
+
+last thing is to move all the existing code in the function to be inside the { and } so it should look something like this when done depending on if you made changes to it before
+
+void PF_sprint (void)
+{
+	char		*s;
+	client_t	*client;
+	int		entnum;
+	edict_t		*ent;
+
+	ent = G_EDICT(OFS_PARM0);	
+
+	if (!ent->bot.isbot)
+	{
+		entnum	= G_EDICTNUM(OFS_PARM0);
+		s		= PF_VarString(1);
+		
+		if (entnum < 1 || entnum > svs.maxclients)
+		{
+			Con_Printf ("tried to sprint to a non-client\n");
+			return;
+		}
+			
+		client = &svs.clients[entnum-1];
+			
+		MSG_WriteChar	(&client->message,svc_print);
+		MSG_WriteString	(&client->message, s );
+	}
+}
+
+now the exact same thing should be done to
+
+PF_centerprint, PF_stuffcmd and PF_setspawnparms
+
+one note tho... edict_t *ent; is not needed to be added to PF_setspawnparms since it already has that variable... but the isbot check is needed
+
+thats half of the stuff for this file...
+
+now if you want globot to be able to play Team Fortress then u need to add this to the top of PF_stuffcmd
+
+	static qboolean	next_is_value = false;
+
+and this to the very bottom of PF_stuffcmd
+
+	// MAD UGLY HACK TO GET TEAM FORTRESS TO WORK WITH GLOBOT
+	else
+	{
+		str = G_STRING (OFS_PARM1);
+
+		if (str[0] == 'c' &&
+			str[1] == 'o' &&
+			str[2] == 'l' &&
+			str[3] == 'o' &&
+			str[4] == 'r')
+		{
+			next_is_value = true;
+			return;
+		}
+		else if (next_is_value)
+		{
+			int		value;
+
+			Con_Printf (str);
+
+			next_is_value = false;
+
+			entnum = G_EDICTNUM(OFS_PARM0);
+			old = &svs.clients[entnum-1];
+
+			if (str[0] == '4')
+				value = 4;
+			else if (str[0] == '1' && str[1] == '1')
+				value = 11;
+			else if (str[0] == '1' && str[1] == '2')
+				value = 12;
+			else if (str[0] == '1' && str[1] == '3')
+				value = 13;
+			else
+				return;
+
+			old->colors = value * 16 + value;
+			old->edict->v.team = value + 1;
+
+		// send notification to all clients
+			MSG_WriteByte (&sv.reliable_datagram, svc_updatecolors);
+			MSG_WriteByte (&sv.reliable_datagram, old - svs.clients);
+			MSG_WriteByte (&sv.reliable_datagram, old->colors);
+		}
+	}
+	// MAD UGLY HACK TO GET TEAM FORTRESS TO WORK WITH GLOBOT
+
+this hack allows Team Fortress to change the color of the bot so the bot can play team matches... the reason we have to do this is caouse we can not give the color command directly to the bot since that would carsh him...
+
+now to the functions
+
+PF_WriteByte, PF_WriteChar, PF_WriteShort, PF_WriteLong, PF_WriteAngle, PF_WriteCoord, PF_WriteString and PF_WriteEntity
+
+in all these we only need to add
+
+	edict_t	*ent = PROG_TO_EDICT(pr_global_struct->msg_entity);
+
+	if (G_FLOAT(OFS_PARM0) == MSG_ONE && ent->bot.isbot)
+		return;
+
+at the top of all of them...
+
+So what does all this code do then? Well it simple makes it so that messages cant be sent directly to a bot. Cause if we allowed that then the engine would crash with a Cache Overflow message...
+
+now we move onto pr_edict.c to make two small changees
+
+first add 
+
+void BotInit (void);
+
+above the function ED_LoadFromFile and then at the bottom of the same function
+
+after
+
+	pr_global_struct->self = EDICT_TO_PROG(ent);
+
+we make an ugly hack and add
+
+	if (!strcmp(pr_strings + ent->v.classname, "worldspawn"))
+		BotInit ();
+
+This hack makes it so that whenever the worldspawn of a map is loaded then we Initialize the bots... note that there is a difference between Bot_Init() and BotInit()... this later one is what sets up the actuall bot... the first one only made us the "addbot" command... The reason we call this BotInit here is cause we want to initalize the bots before any entities are loaded and worldspawn is the first thing thats loaded when you load a map...
+
+now in progs.h
+
+at the top we add a 
+
+#include "bot.h"
+
+and at the top of the struct edict_s edict_t above 
+
+	qboolean	free;
+
+we add
+
+	bot_t		bot;
+
+thats it for this file... damn there's alot of small but important changes to get this thing to work isnt there? :)
+
+now we move onto server.h where we also only have one change to make
+
+after
+
+#define	DEAD_NO				0
+#define	DEAD_DYING			1
+#define	DEAD_DEAD			2
+
+we add a 
+
+#define	DEAD_RESPAWNABLE		3
+
+i have no idea why ID left this out of the engine but we need it to check if a bot is dead and ready to respawn...
+
+now in sv_phys.c we find the function SV_Physics_Client
+
+right before it we add
+
+void BotPreFrame (client_t *client);
+void BotPostFrame (client_t *client);
+
+then inside SV_Physics_Client we replace
+
+	if ( ! svs.clients[num-1].active )
+
+with
+
+	if (!svs.clients[num-1].active && !ent->bot.Active)
+
+This is done to make the bots able to use the same physics as real clients...
+
+now after
+
+	PR_ExecuteProgram (pr_global_struct->PlayerPreThink);
+
+we add
+
+	if (ent->bot.isbot)
+		BotPreFrame (&svs.clients[num-1]);
+
+and after
+
+	PR_ExecuteProgram (pr_global_struct->PlayerPostThink);
+
+we add
+
+	if (ent->bot.isbot)
+		BotPostFrame (&svs.clients[num-1]);
+
+thats it again... as i said... the changes are not big but important
+
+next file is sv_user.c where we find the function SV_RunClients
+
+before it we add
+
+/*
+==================
+SV_RunBots
+==================
+*/
+void SV_RunBots (void)
+{
+	int	i;
+	
+	for (i=0, host_client = svs.clients ; i<svs.maxclients ; i++, host_client++)
+	{
+		if (!host_client->edict->bot.isbot)
+			continue;
+
+		sv_player = host_client->edict;
+
+		if (!sv.paused && (svs.maxclients > 1 || key_dest == key_game) )
+			SV_ClientThink ();
+	}
+}
+
+and at the very bottom of SV_RunClients we add
+
+	SV_RunBots ();
+
+this is due to the fact that everything we do to a "real" client is not needed to be done for the bot
+
+and guess what... WE ARE DONE... yeah... its true... if everything has been done correctly then all we need to do is fire up a Multiplayer game and use the command "addbot" in the console...
+
+If anyone got any problems then mail me and im sure we will sort em out...
+
+Over and out from Tomas "Tomaz" Jakobsson
+
+Why are you still here reading?? GO KILL SOME BOTS

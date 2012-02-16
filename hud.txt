@@ -1,0 +1,10 @@
+Quake C Hud Control.
+
+Hud entities.
+-Have (x,y) placement
+-Have (width,height) //used with images
+-Have String //displayed if text
+-Have Texture
+-Have Alpha
+
+

@@ -1,0 +1,345 @@
+; dlltool --export-all-symbols --output-def=libpng10.def png.pic.o pngset.pic.o pngget.pic.o pngrutil.pic.o pngtrans.pic.o pngwutil.pic.o pngread.pic.o pngrio.pic.o pngwio.pic.o pngwrite.pic.o pngrtran.pic.o pngwtran.pic.o pngmem.pic.o pngerror.pic.o pngpread.pic.o pnggccrd.pic.o libpng10-rc.o libpng10-rc.o
+EXPORTS
+	png_zfree @ 1
+	ActiveMask2 @ 2 DATA
+	ActiveMaskEnd @ 3 DATA
+	HBClearMask @ 4 DATA
+	LBCarryMask @ 5 DATA
+	ShiftBpp @ 6 DATA
+	ShiftRem @ 7 DATA
+	png_IDAT @ 8 DATA
+	png_IEND @ 9 DATA
+	png_IHDR @ 10 DATA
+	png_PLTE @ 11 DATA
+	png_access_version_number @ 12
+	png_bKGD @ 13 DATA
+	png_build_gamma_table @ 14
+	png_build_grayscale_palette @ 15
+	png_cHRM @ 16 DATA
+	png_calculate_crc @ 17
+	png_check_chunk_name @ 18
+	png_check_keyword @ 19
+	png_check_sig @ 20
+	png_chunk_error @ 21
+	png_chunk_warning @ 22
+	png_combine_row @ 23
+	png_convert_from_struct_tm @ 24
+	png_convert_from_time_t @ 25
+	png_convert_to_rfc1123 @ 26
+	png_crc_error @ 27
+	png_crc_finish @ 28
+	png_crc_read @ 29
+	png_create_info_struct @ 30
+	png_create_read_struct @ 31
+	png_create_struct @ 32
+	png_create_write_struct @ 33
+	png_data_freer @ 34
+	png_decompress_chunk @ 35
+	png_default_flush @ 36
+	png_default_read_data @ 37
+	png_default_write_data @ 38
+	png_destroy_info_struct @ 39
+	png_destroy_read_struct @ 40
+	png_destroy_struct @ 41
+	png_destroy_write_struct @ 42
+	png_do_background @ 43
+	png_do_bgr @ 44
+	png_do_chop @ 45
+	png_do_dither @ 46
+	png_do_expand @ 47
+	png_do_expand_palette @ 48
+	png_do_gamma @ 49
+	png_do_gray_to_rgb @ 50
+	png_do_invert @ 51
+	png_do_pack @ 52
+	png_do_packswap @ 53
+	png_do_read_filler @ 54
+	png_do_read_interlace @ 55
+	png_do_read_invert_alpha @ 56
+	png_do_read_swap_alpha @ 57
+	png_do_read_transformations @ 58
+	png_do_rgb_to_gray @ 59
+	png_do_shift @ 60
+	png_do_strip_filler @ 61
+	png_do_swap @ 62
+	png_do_unpack @ 63
+	png_do_unshift @ 64
+	png_do_write_interlace @ 65
+	png_do_write_invert_alpha @ 66
+	png_do_write_swap_alpha @ 67
+	png_do_write_transformations @ 68
+	png_error @ 69
+	png_flush @ 70
+	png_free @ 71
+	png_free_data @ 72
+	png_gAMA @ 73 DATA
+	png_get_IHDR @ 74
+	png_get_PLTE @ 75
+	png_get_bKGD @ 76
+	png_get_bit_depth @ 77
+	png_get_cHRM @ 78
+	png_get_cHRM_fixed @ 79
+	png_get_channels @ 80
+	png_get_color_type @ 81
+	png_get_compression_buffer_size @ 82
+	png_get_compression_type @ 83
+	png_get_copyright @ 84
+	png_get_error_ptr @ 85
+	png_get_filter_type @ 86
+	png_get_gAMA @ 87
+	png_get_gAMA_fixed @ 88
+	png_get_hIST @ 89
+	png_get_header_ver @ 90
+	png_get_header_version @ 91
+	png_get_iCCP @ 92
+	png_get_image_height @ 93
+	png_get_image_width @ 94
+	png_get_int_32 @ 95
+	png_get_interlace_type @ 96
+	png_get_io_ptr @ 97
+	png_get_libpng_ver @ 98
+	png_get_oFFs @ 99
+	png_get_pCAL @ 100
+	png_get_pHYs @ 101
+	png_get_pixel_aspect_ratio @ 102
+	png_get_pixels_per_meter @ 103
+	png_get_progressive_ptr @ 104
+	png_get_rgb_to_gray_status @ 105
+	png_get_rowbytes @ 106
+	png_get_rows @ 107
+	png_get_sBIT @ 108
+	png_get_sCAL @ 109
+	png_get_sPLT @ 110
+	png_get_sRGB @ 111
+	png_get_signature @ 112
+	png_get_tIME @ 113
+	png_get_tRNS @ 114
+	png_get_text @ 115
+	png_get_uint_16 @ 116
+	png_get_uint_32 @ 117
+	png_get_unknown_chunks @ 118
+	png_get_user_chunk_ptr @ 119
+	png_get_user_transform_ptr @ 120
+	png_get_valid @ 121
+	png_get_x_offset_microns @ 122
+	png_get_x_offset_pixels @ 123
+	png_get_x_pixels_per_meter @ 124
+	png_get_y_offset_microns @ 125
+	png_get_y_offset_pixels @ 126
+	png_get_y_pixels_per_meter @ 127
+	png_hIST @ 128 DATA
+	png_handle_IEND @ 129
+	png_handle_IHDR @ 130
+	png_handle_PLTE @ 131
+	png_handle_as_unknown @ 132
+	png_handle_bKGD @ 133
+	png_handle_cHRM @ 134
+	png_handle_gAMA @ 135
+	png_handle_hIST @ 136
+	png_handle_iCCP @ 137
+	png_handle_oFFs @ 138
+	png_handle_pCAL @ 139
+	png_handle_pHYs @ 140
+	png_handle_sBIT @ 141
+	png_handle_sCAL @ 142
+	png_handle_sPLT @ 143
+	png_handle_sRGB @ 144
+	png_handle_tEXt @ 145
+	png_handle_tIME @ 146
+	png_handle_tRNS @ 147
+	png_handle_unknown @ 148
+	png_handle_zTXt @ 149
+	png_iCCP @ 150 DATA
+	png_iTXt @ 151 DATA
+	png_info_destroy @ 152
+	png_info_init @ 153
+	png_info_init_3 @ 154
+	png_init_io @ 155
+	png_init_read_transformations @ 156
+	png_libpng_ver @ 157 DATA
+	png_malloc @ 158
+	png_memcpy_check @ 159
+	png_memset_check @ 160
+	png_mmx_support @ 161
+	png_oFFs @ 162 DATA
+	png_pCAL @ 163 DATA
+	png_pHYs @ 164 DATA
+	png_pass_dsp_mask @ 165 DATA
+	png_pass_inc @ 166 DATA
+	png_pass_mask @ 167 DATA
+	png_pass_start @ 168 DATA
+	png_pass_width @ 169 DATA
+	png_pass_yinc @ 170 DATA
+	png_pass_ystart @ 171 DATA
+	png_permit_empty_plte @ 172
+	png_process_IDAT_data @ 173
+	png_process_data @ 174
+	png_process_some_data @ 175
+	png_progressive_combine_row @ 176
+	png_push_crc_finish @ 177
+	png_push_crc_skip @ 178
+	png_push_fill_buffer @ 179
+	png_push_handle_tEXt @ 180
+	png_push_handle_unknown @ 181
+	png_push_handle_zTXt @ 182
+	png_push_have_end @ 183
+	png_push_have_info @ 184
+	png_push_have_row @ 185
+	png_push_process_row @ 186
+	png_push_read_IDAT @ 187
+	png_push_read_chunk @ 188
+	png_push_read_sig @ 189
+	png_push_read_tEXt @ 190
+	png_push_read_zTXt @ 191
+	png_push_restore_buffer @ 192
+	png_push_save_buffer @ 193
+	png_read_data @ 194
+	png_read_destroy @ 195
+	png_read_end @ 196
+	png_read_filter_row @ 197
+	png_read_finish_row @ 198
+	png_read_image @ 199
+	png_read_info @ 200
+	png_read_init @ 201
+	png_read_init_2 @ 202
+	png_read_init_3 @ 203
+	png_read_png @ 204
+	png_read_push_finish_row @ 205
+	png_read_row @ 206
+	png_read_rows @ 207
+	png_read_start_row @ 208
+	png_read_transform_info @ 209
+	png_read_update_info @ 210
+	png_reset_crc @ 211
+	png_reset_zstream @ 212
+	png_sBIT @ 213 DATA
+	png_sCAL @ 214 DATA
+	png_sPLT @ 215 DATA
+	png_sRGB @ 216 DATA
+	png_save_int_32 @ 217
+	png_save_uint_16 @ 218
+	png_save_uint_32 @ 219
+	png_set_IHDR @ 220
+	png_set_PLTE @ 221
+	png_set_bKGD @ 222
+	png_set_background @ 223
+	png_set_bgr @ 224
+	png_set_cHRM @ 225
+	png_set_cHRM_fixed @ 226
+	png_set_compression_buffer_size @ 227
+	png_set_compression_level @ 228
+	png_set_compression_mem_level @ 229
+	png_set_compression_method @ 230
+	png_set_compression_strategy @ 231
+	png_set_compression_window_bits @ 232
+	png_set_crc_action @ 233
+	png_set_dither @ 234
+	png_set_error_fn @ 235
+	png_set_expand @ 236
+	png_set_filler @ 237
+	png_set_filter @ 238
+	png_set_filter_heuristics @ 239
+	png_set_flush @ 240
+	png_set_gAMA @ 241
+	png_set_gAMA_fixed @ 242
+	png_set_gamma @ 243
+	png_set_gray_1_2_4_to_8 @ 244
+	png_set_gray_to_rgb @ 245
+	png_set_hIST @ 246
+	png_set_iCCP @ 247
+	png_set_interlace_handling @ 248
+	png_set_invalid @ 249
+	png_set_invert_alpha @ 250
+	png_set_invert_mono @ 251
+	png_set_keep_unknown_chunks @ 252
+	png_set_oFFs @ 253
+	png_set_pCAL @ 254
+	png_set_pHYs @ 255
+	png_set_packing @ 256
+	png_set_packswap @ 257
+	png_set_palette_to_rgb @ 258
+	png_set_progressive_read_fn @ 259
+	png_set_read_fn @ 260
+	png_set_read_status_fn @ 261
+	png_set_read_user_chunk_fn @ 262
+	png_set_read_user_transform_fn @ 263
+	png_set_rgb_to_gray @ 264
+	png_set_rgb_to_gray_fixed @ 265
+	png_set_rows @ 266
+	png_set_sBIT @ 267
+	png_set_sCAL @ 268
+	png_set_sPLT @ 269
+	png_set_sRGB @ 270
+	png_set_sRGB_gAMA_and_cHRM @ 271
+	png_set_shift @ 272
+	png_set_sig_bytes @ 273
+	png_set_strip_16 @ 274
+	png_set_strip_alpha @ 275
+	png_set_swap @ 276
+	png_set_swap_alpha @ 277
+	png_set_tIME @ 278
+	png_set_tRNS @ 279
+	png_set_tRNS_to_alpha @ 280
+	png_set_text @ 281
+	png_set_text_2 @ 282
+	png_set_unknown_chunk_location @ 283
+	png_set_unknown_chunks @ 284
+	png_set_user_transform_info @ 285
+	png_set_write_fn @ 286
+	png_set_write_status_fn @ 287
+	png_set_write_user_transform_fn @ 288
+	png_sig @ 289 DATA
+	png_sig_cmp @ 290
+	png_squelch_warnings @ 291
+	png_start_read_image @ 292
+	png_tEXt @ 293 DATA
+	png_tIME @ 294 DATA
+	png_tRNS @ 295 DATA
+	png_warning @ 296
+	png_write_IDAT @ 297
+	png_write_IEND @ 298
+	png_write_IHDR @ 299
+	png_write_PLTE @ 300
+	png_write_bKGD @ 301
+	png_write_cHRM @ 302
+	png_write_cHRM_fixed @ 303
+	png_write_chunk @ 304
+	png_write_chunk_data @ 305
+	png_write_chunk_end @ 306
+	png_write_chunk_start @ 307
+	png_write_data @ 308
+	png_write_destroy @ 309
+	png_write_end @ 310
+	png_write_filtered_row @ 311
+	png_write_find_filter @ 312
+	png_write_finish_row @ 313
+	png_write_flush @ 314
+	png_write_gAMA @ 315
+	png_write_gAMA_fixed @ 316
+	png_write_hIST @ 317
+	png_write_iCCP @ 318
+	png_write_image @ 319
+	png_write_info @ 320
+	png_write_info_before_PLTE @ 321
+	png_write_init @ 322
+	png_write_init_2 @ 323
+	png_write_init_3 @ 324
+	png_write_oFFs @ 325
+	png_write_pCAL @ 326
+	png_write_pHYs @ 327
+	png_write_png @ 328
+	png_write_row @ 329
+	png_write_rows @ 330
+	png_write_sBIT @ 331
+	png_write_sCAL @ 332
+	png_write_sPLT @ 333
+	png_write_sRGB @ 334
+	png_write_sig @ 335
+	png_write_start_row @ 336
+	png_write_tEXt @ 337
+	png_write_tIME @ 338
+	png_write_tRNS @ 339
+	png_write_zTXt @ 340
+	png_zTXt @ 341 DATA
+	png_zalloc @ 342
+	ActiveMask @ 343 DATA

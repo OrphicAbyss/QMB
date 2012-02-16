@@ -1,0 +1,337 @@
+QMB-Version (1.18)
+
+	Min requirements:
+A 3D card which supports GL_ARB_multitexturing (this is a MUST). voodoo2's and better all support
+it so, you would have to have a very old or crappy card to not have this.
+
+I would recommend a PIII - 500 with Geforce 2, but it should work with lower specs. I use a
+PIV - 2800 with Geforce 4 Ti 4200 and get about 200 fps.
+
+	Bugs:
+No player colours.
+
+	Cvars
+show_fps (0/1)
+r_interpolate_model_animation (0/1)
+r_interpolate_model_transform (0/1)
+in_mlook (0/1)
+gl_detail (0/1/2)
+r_waterwarp (0/1)
+r_wave (0->) (scale)
+gl_fog (0/1)
+gl_conalpha (0.2->1.0)
+gl_dualwater (0/1)
+gl_shiny (0/1)
+gl_caustics (0/1)
+gl_checkleak (0/1)
+hud_red (0->255)
+hud_green (0->255)
+hud_blue (0->255)
+hud_alpha (0->255)
+r_vertexlight (0/1)
+r_skydetail (0/1)
+sv_fastswitch (0/1) <- Not working
+capture_start <filename>
+capture_stop
+capturedemo <demoname>
+r_celshading (0/1)
+r_vertexshading (0/1)
+r_outline (0/1)
+r_modeltexture (0/1)
+gl_quick_texture_reload (0/1)
+gl_24bitmaptex (0/1)
+gl_smoketrail (0/1/2)
+gl_ammoflash (0/1)
+gl_anisotropic (0->max card supports)
+gl_sincity (0/1)
+
+	Avi capture code notes:
+you will need to set the host frame rate. 15, 20 and 30 all work fine (set host_framerate to 0.0333333333 for 30 fps, or 1/X where X=the fps you want) you can use max_fps console cvar when doing a non demo capture so you can still control the game :)
+
+	Removed cvars which no longer worked or were pointless
+gl_ztrick
+r_lightmap
+r_fullbright
+r_norefresh
+gl_texsort
+gl_playermip
+gl_reporttjunctions
+gl_smoothmodels
+	Removed command
+Envmap
+
+	Credits:
+Anyone who has ever made a tute for the quake engine. Ive used a few.
+These include, lord havoc, tomaz, cheapalert, MrG, muff and others.
+Anyone who's idea i have pinched :)
+Necrophilissimo for all the quakeC stuff and some of the engine code
+BIG Special thanks to Lord Havoc for continued help.
+The water code is ripped stright from Beefquake2 big thanks to MrG
+Thanks to RandomMan for the jpeg texture loading. (even if you dont know how to code)
+Rick for a few menu and sbar bugs.
+Fuh for the "cant use 100000x10000x32 res" bug and other particle engine fixes/enhancments
+Anthony for the avi code
+And everyone else I've missed.
+Quake on people, quake on.
+
+//to do
+[15:50] [Text] [@.LordHavoc]: DrLabman: also please take a look at DP_GFX_SKINFILES
+[15:51] [Text] [@.LordHavoc]: DrLabman: for info on how to handle q3 player model .skin files
+
+QUAKE-C CHANGES:
+	moved to its own file...
+
+ENGINE CHANGES:
+	*-*Added in release 1.19
+Added cel shading/vertex shading to md3 models
+Globot appares to be broken.
+Fixed shiny metal going darker when shiny glass was in view
+Added grayscale texture loading filter
+Added gl_sincity for sin city style rendering
+
+	*-*Added in release 1.18
+Worked on blood particles.
+Changed lightning texture and fiddled with the beam particle variables
+Added sparks off the end of the lightning beam
+Fixed gib md3's do leave a blood trail
+Fixed pickup md3's to bob and rotate
+Changed the deathknight's range attack to leave a trail of yellow sparks insted of yellow blood
+Added Quad shells to md3's so they are the same as mdl's
+Changed quad texture to be blue
+Added neural network code for use in bot
+Fixed bugs with bots thinking they were walking off an ledge when they wernt
+Uped max particles to 16384 but default amount is still 8192
+Tweaked smoke particle alpha
+Fixed some issues which appared in the 2 texture unit pipeline
+Added modelflashing to md3 so that replacement pickup models can flash like bsp models can, uses model flag 256
+
+	*-*Added in release 1.17 *-* 27 Feb 2005
+Change default hud to white
+Speed up loading with textures (non-24bit now back to original loading speed)
+Larger QC runaway loop counter (1000000 insted of 100000)
+Fixed up crosshair code, now loads any image in the /textures/crosshairs/ directory up to 32 of them
+Fixed position of text on hud for fps and particle count.
+Removed java vm
+Redid bot code so they wander better when they can't see anyone, addes issues where they are attacking you and then turn around and wander off in the middle of a gun fight
+Added 32bit texture loading for picture in a wad file from /textures/wad/ or /gfx/
+Redid hud with 32bit textures from fuhquake and joequake
+Uped max particle count to 8192 (doubled)
+Used part of entars 'better fire' surgestion
+Added anisotropic filtering control
+
+	*-*Added in release 1.16 *-* 9 Aug 2004
+Damn havn't been keeping this file upto date...
+Added basic qc hud stuff.
+Added a test spheremapping on models
+Added png support
+Fixed up some texture loading code
+Fixed fullbrights so that it loads <texturename>_glow or <texturename>_luma
+	Temp fix, <texturename>_glow was loading a diffrent map texture as a fullbright, _glow now disabled
+Fixed lightning trail spawn bug, was spawning lots of lightning partilces insted of a beam
+Added support for SGIS_generate_mipmap
+Disabled cachedir stuff, not sure if we still need it
+Replaced external texture finding code, should be faster (seems to be)
+Added MD3 model loading
+Fixed crosshairs, will load upto 32 crosshairs from /quake/qmb/textures/crosshairs/crosshair*.*
+Added MD3 model interpolation
+MD3 now uses vertex arrays to draw (for non interpolated frames)
+Fixed TGA loading code is it is much faster.
+Added JVM code.
+Changed particle smoke to be gray.
+Changed particle sparks to use textured quads.
+
+*Java code changes:
+Can view cvars and set cvars
+Can print to console, centerprints, bprints and sprints
+GloBot uses a java method to choose a name
+
+	*-*Added in release 1.15
+QMB should now support any sized image which the driver supports
+Fixed the image loading so that images that dont need scaling (any image which is a power or 2, 2x2, 128x64, etc) doesnt use the scale array allowing for bigger textures.
+Changed mipmap generation from quakes defualt to the GLU's function... (could be slower...)
+Changed quakes rescaling texture function to GLU's function... (could also be slower...might be continuous memory reallocation should add back small buffer)
+Fixed bug in the particle array trashing the heap.
+Removed smoothmodels, it didnt result in any speedup on current hardware.
+Removed other verious cvars
+Added gl_quick_texture_reload (defualts to on) doesnt bother reloading a texture on map change if its already in memory (NOTE: maps with same textures names but diffrent textures will get the first loaded texture)
+Added gl_24bitmaptex (defualts to on) this turns on/off loading 24bit textures for maps
+ATI truform support
+Added fullbrights as well as glow/luma support (needs 32bit tgas to work right, doesnt support colourmap tgas yet)
+	*-*Fixed after initial release
+Added gl_smoketrail to enable or disable the HL style smoke trail 0 - particles only, 1 - HL trail only, 2 - both
+Added gl_ammoflash to enable the unreal style ammo box flashing
+Readded the caustics picture to the zip
+
+	*-*Added in release 1.14
+Fixed detail texture cooard generation.
+Fixed up the bots, the dont run into stuff as much, they still straf into it tho.
+Coop bots now work
+Added faded edges to the menus
+Added hud_alpha to control the huds alpha
+Fixed gamma (not hardware, could be a framerate killer for ppl who are fillrate limited)
+Console colour, use &cRGB where R,G and B are numbers from 0 to 9 to change to a colour and &c to reset.
+Added cel shading (based on a tute at nehe not off the qsg one)
+Added vertex shading (based on the cel shading)
+Added map outline (use with cel shading for the best effect)
+Added the ability to turn of model textures to see the shading.
+
+	*-*Added in release 1.13
+Fixed the lighting on bmodels. Added glow thingo,
+Rearranged rendering code some more for extra speed, and readability.
+All brush models goes through the new code. Fixed some bugs with detail texture drawing.
+Removed the -lm_* command line switches only rgb lightmaps supported internally
+(Note:- it will still load normal white lightmaps)
+Removed alot of pointless non-working cvars
+Added Vertex lighting mode (by request)
+Re-enabled max_fps cvar (not sure y it was commented out...)
+Alias model colour fix thanx to Lord Havoc as well as model shell interpolation.
+
+Finally got around to documenting the fact that skybox loading exists.
+Have sky textures and r_skydetail 1 to make it work.
+Sky textures go gfx/env/ with the name 'bkgtst??" where ?? is the rt, bk etc...
+
+	*-*Added in release 1.12
+Added model shells like the Q3A quad effect on players (currently not used for that yet)
+Added md2 support, will be able to replace mdl with it
+Fixed bmodels so that non lightmapped ones are now lit
+Redid the map rendering code, it now texture sorts then draws, extra speed from that.
+
+Known bug: Player skins dont get colours. I'm in the middle of replaceing the way that skins
+get coloured, and so its not working right atm.
+Known bug: Player skins tend to end up in strange places, this is to do with the way
+that player skins were coloured before.
+
+	*-*Added in release 1.11
+JPEG texture loading.
+gl_ztrick removed (only worked well for voodoo 1's)
+Renderer speedups and clean ups
+Water warp gone compleatly
+Multitexturing detail textures (on geforce3/4 (non mx) and radeons)
+Multitexturing sky (speedup)
+Fixed up some hud code, and added hud_red, hud_green, hud_blue to customize the hud colour.
+Added sv_fastswitch to allow for fast weapon switching (still needs qc work)
+	***Fast weapon switching is coming***
+More work on checkextions, and added support for most of the DP's extenions.
+	None actuall supported yet... code is done for alot of them...
+
+
+	*-*Added in release 1.10
+Changed over to my new particle system. (looks similar but will make it easier to customise)
+Added extra builtins
+	PF_sin
+	PF_cos
+	PF_sqrt
+Implemented lordhavoc's checkextensions for qc (i think)
+Changed numbering system.
+
+	*-*Added in release 1.00.09
+Added Bots.
+Fixed a bug where the bot kepted changing between best 2 weapons.
+Updated list of metel/glass textures.
+New movetype ladder.
+Added 32 Bot support. (major packet overflow issues when alive and 31 bots)
+Added more bot names.
+Added a bot respawn delay (fix for maps with a limited amount of spawn spots)
+Gl_ztrick defualts to 0 (most new 3dcards lose little if any speed to deaph buffer clearing)
+no stencil buffer and 16bit defualt on 3dfx cards
+show_fps also effects number of particles text
+Added caustics, shiny texture and show_fps to the video menu.
+New blood texture.
+
+Currently needs fixing:
+With alot of clients will cause packet overflows.
+(i dont think it crashes but still packet overflows).
+Bots are dumb. (i did mean to fix this in this release but next one hopefully)
+DO NOT USE -nomod IT WILL CRASH :)
+Added -nomod to allow qmb to be ran as a server not using the qmb mod progs.dat
+
+note to self: i should cleanup gl_rpart.c its getting complex.
+
+	*-*Added in release 1.00.08
+Added .lit support (finally) - this also fixed some coloured lighting on models
+Fixed a bug causing the splashing when entities moved from solid to empty
+Added a -nostencil to allow cards without hardware support to get a speedup
+Fixed some more lighting bugs and made overbrigt lighting only apply to dynamic lights
+Bug: tried to fix the fire particles but stuffed them more
+
+	*-*Added in release 1.00.07
+Added gl_checkleak to allow mappers to check a map for leaks, by setting gl_clear to 1 and the colour to red
+Added skyboxes (arnt used yet)
+Added the qmb mod (being worked on by Necrophilissimo
+Added stencil buffer shadows
+Doubled max poly count for models (now 2048 verts and 4096 tris)
+Added the model skin replacement naming which lordhavoc uses for darkplaces
+	so now blah.mdl the external tga/pcx for skin0 should be called
+	*blah_0.tga //tomaz way, first one looked for
+	*blah.mdl_0.tga //lordhavoc way (note that a .pcx insted of .tga works for both)
+
+Engine changes by Necrophilissimo
+QMB now the defualt -game
+New statisbar, and screen resize keys now change the hud insted
+New menu code, and vidio menu
+
+	*-*Added in release 1.00.06
+Underwater foging, from tute on quakesrc, looks ok, i'll work on it later.
+Fixed a dymanic model lighting bug.
+Refixed bounding boxes.
+Gamma now works but it halfs the frame rate, needs a better implemtation.
+-Removed gamma, too much of a proformance hit, ill work out another way.
+Removed video menu in the options menu, you couldn't use it anyway.
+Console alpha value can be controled with gl_conalpha
+Added dual layer water. Now multitextures so no proformance loss.
+Shiny glass texture and metal texture, to replace reflections, sphere map style.
+Quake3 style weapon bob.
+
+New stuff very harsh on proformance... needs work
+
+	*-*Added in release 1.00.05
+Added a second detail texture. Use gl_detail (0-off, 1-first texture, 2-second texture)
+Water warp can be turned off.
+Water waves added. (bug: on non re-vised maps, water waves can cause probs fix turn on r_novis)
+Darkened the lightmaps underwater (well used same lighting style as normal polys).
+Fixed bug where cards without gl_arb_texture_env_combine didnt get lighting.
+
+	*-*Added in release 1.00.04
+Fixed washed out static map lighting, now only dynamic lights are overbright.
+Frame and model interpolation.
+Coloured lighting now works on models :)
+Detail textures (using the ones for tomaz engine tut fixed for normal quake)
+Particle lightning trail!!
+Fixed bug where the first particle of each type didnt get killed off.
+
+	*-*Added in release 1.00.03
+Defualt res 800x600x32.
+Uped the sound sample rate to 44100.
+Fixed mouse acceleration probs under xp (might not work on 95/98/ME needs testing).
+Fixed the status bar so it now always shows.
+Stopped particle updates happening when the game was paused.
+Mouse look now saved using cvar.
+Fixed maxvelocity error bug.
+Defualted to no auto aim.
+Added cvar max_fps to set the max fps value
+Set gl_flashblend default to 0 and made the cvar save
+Replaced SGIS multitexture with ARB multitexture.
+Added trails (for blood and smoke)
+Fixed bounding boxes [unfixed caused view models to disappare]
+Dynamic coloured lights, extra lights.
+
+lost source code to version 1.00.02
+
+	*-*Added in release 1.00.01
+Particles now start inside the world
+Particles outside the world are removed
+gl_clear is now set by default and the clear color is now black (will remove cvar soon)
+Made console (almost) transparent
+
+	*-*Added first release (1.00.00)
+Particle engine moved from old version and dropped - fixed all error messages (level 3 warnings)
+Added 32-bit texture loading (needed for particle textures)
+
+
+
+	Ideas
+Interpolation on lights.
+Improved Aiming
+Convert the sound over to openal (and fix sound lags with winamp in the background)
+Look into stain maps
+Direction lighting on models (aka vertex lighting)

@@ -1,0 +1,110 @@
+NOTE; ALL ENTITES CAN BE USED WITH KEY "material" FOR MATERIAL DEFINATION UNLESS
+	OTHERWISE MENTIONED. USER CAN OVERRIDE THE DEFAULT MATERIALS OF AN ENTITY.
+
+NOTE; DON'T GET BERSERK WITH THE PARTICLE EFFECTS. USE THEM WITH CARE, AS IT IS VERY EASY
+	TO OVERFLOW THE ENGINE AND CAUSE THE WHOLE THING TO CRASH! MORE SELDOM THEY ARE,
+	THE MORE AMAZING THEY LOOK AND THE BETTER FPS WE'LL GET.
+	
+			=========================
+			 NEW ENTITIES IN QMB MOD
+			=========================
+
+===================
+ ENTITY MATERIALS:
+===================
+To use set .material of the entity into following. The effects aren't
+done yet!
+
+MAT_FLESH       = 1    // flesh
+MAT_METAL       = 2    // metal
+MAT_STONE       = 3    // stone (same as 0, only with a value)
+MAT_WOOD        = 4    // wood
+MAT_GRASS       = 5    // grass
+MAT_SNOW        = 6    // snow 
+MAT_ICE         = 7    // ice
+MAT_SOFT        = 8    // paper, furniture, etc.
+MAT_GLASS       = 9    // window glass
+MAT_ELECTRIC    = 10   // electric equipment
+MAT_NULL        = 11   // plastic etc. (no effects)
+MAT_CANMEAT     = 12   // both metal and flesh (Knights)
+MAT_SLIME	= 13   // blue, slimy thing (Spawn)
+
+
+=====================
+ LEVEL ENCHACEMENTS:
+=====================
+
+qmb
+---
+	classname:	qmb_falldmg
+	keys: 		--
+	notes: 		Add this to the map to toggle on the QMB-maps-only level
+			features, such as realistic falling damage (= falling height
+ 			based, can kill player). Checked in StartFrame. Add only
+			one, as this thing counts as an entity!
+
+func_blowaway
+-------------
+	classname:	func_blowaway
+	keys:		health ***			// entity hitpoints
+			dmg ***				// sets explosive damage
+			treshold *** 			// sets health min dmg required to trigger (0-1)
+			wait ***			// delay breaking after triggering
+			count ***			// amount of particles (0-40)
+			gib_mdl "path/filename.mdl"	// gib model
+			noise "path/filename.wav"	// breaking sound
+			message "string"		// message displayed when touched
+	notes:		None of the variables is required. Can be targeted and can have
+			targets. If using gib_mdl, the particle amount is halved for the sake
+			of overflows. Default material is MAT_STONE. If no health is set the
+			entity can only be blown by a trigger. Use treshold for rocket-blast
+			only-alike things (triggers will still do the trick).
+
+func_ladder
+-----------
+	classname:	func_ladder
+	keys:		--
+	notes:		Trigger field. To use it create one right in front of the ladder
+			brush. The climbing sound refers to the material of the trigger
+			field entity, not the brush. To climb it up just face it and
+			use jump / swim down buttons. Default material is MAT_METAL.
+
+func_rain
+---------
+	classname:	func_rain
+	keys:		count ***			// larger number, less drops
+			color ***			// raindrop colour (0 - 255)
+			noise "path/filename.wav"	// the ambient sound (looping)
+	notes:		Trigger field. The use bigger .count for large areas for sake of
+			both the FPS and the particle amount. Still under development!
+			Mixing large areas with this and the func_blowaway with high particle
+			count is NOT A GOOD IDEA! Disabled in Deathmatch (just in case).
+
+misc_decor
+----------
+	classname:	misc_decor
+	keys:		file "path/filename.mdl"	// filename of main model
+			submodel1 "path/filename.mdl"	// filename of the first submodel
+			submodel2 "path/filename.mdl"	// filename of the second submodel
+			noise "path/filename.wav"	// filename of ambient sound
+			noisevol			// ambient sound volume (0 - 1)
+			maxskins ***			// amount of animation skins
+			maxframes ***			// amount of animation frames
+			minframes ***			// start frame
+			stone ***			// SOLID_NOT or SOLID_SLIDEBOX (0/1)
+			health ***			// health
+			gib_mdl "path/filename.mdl"	// filename of the gib model
+			dmg ***				// explosion damage
+	notes:		Submodels are separate, dynamic entities, so beware the entity
+			limit and the mighty framerate God!
+
+misc_decor_static
+-----------------
+	classname:	--
+	keys:		file "path/filename.mdl"	// filename of main model
+			noise "path/filename.wav"	// filename of ambient sound
+			noisevol			// ambient sound volume (0 - 1)
+	notes:		There is no need for submodels, so if you want multiple models
+			just add another misc_static_decor with the same origin. All
+			Quake's static model entities have been converted to use this
+			entity in sake of progs.dat optimization and file-size.

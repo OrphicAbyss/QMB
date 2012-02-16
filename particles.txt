@@ -1,0 +1,45 @@
+Particles [the next step].
+
+Currently particles types are defined in the engine. This isn't as flexable as it could be.
+
+So a new way of handling particles is needed. My current idea is a tree structor. With a
+crossbar at the top and roots which are grouped by texture and sorted by blend mode.
+
+For instance:
+
+[one,one]					[alpha, one_minus_alpha]		[alpha, one_minus_src_color]
+Smoke_tex --> Blood_tex --> Chunk_tex --> Trail_tex --> Lightning_Tex -->  null
+	|				|			|				|				|
+	|				|			|				|				|
+Particle		Particle	Particle		Particle		Particle
+	|				|			|				|				|
+Particle		Particle	Particle		Particle		Particle
+	|				|			|				|				|
+Particle		Particle	Particle		Particle		Particle
+	|				|			|				|				|
+Particle		Particle	Particle		Particle		Particle
+	|				|			|				|				|
+Particle		Particle	Particle		Particle		Particle
+	|				|			|				|				|
+Particle		Particle	Particle		Particle		Particle
+	|				|			|				|				|
+  Null			  Null		  Null			  Null			  Null
+
+
+
+Basicly it would add a set of 64 (assuming 64 diffrent textured particles is enough) new 
+stucts which point to a type of particle contain a blend type and point to the next set
+of particals, the draw function would then use the blend type specified by the set pointer
+then draw the list, then do the next set and so on.
+
+This would limit the amount of state changes which can be slow on some 3dcards as well as
+texture changes.
+
+Also by sorting the set types when adding them into the set list so that all the particles
+with the same blend type come in a row, further speed gains could be made (this isnt as important
+as the other gains made).
+
+This type of structor would also allow for alot of reuse of code. For removing particles, and
+updating particles, as well as drawing particles.
+
+send comments to drlabman@planetquake.com

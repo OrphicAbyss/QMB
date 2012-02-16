@@ -1,0 +1,71 @@
+QMB:MOD VERSION HISTORY
+
+HISTORY:
+--------
+
+Featured in QMB v1.10:
+--------------------------
+  * QuakeC side support for particle bubbles
+  * shalrath's explosions are now purple (TE_EXPLOSION2)
+  * spawns bleed blue ooze, not blood
+  * no more explosion sprites (the particle explosions are enough)
+  * more material-dependant pellet/axe impact effects
+  * recoded the ladder code (no longer MOVETYPE_FLY hack - engine has new movetype)
+  * improved shellcasings (a lot)
+  * power-up pick-up message and sound are sent to all clients (in Q3 way)
+  * FIX; powerup pick-up played through CHAN_AUTO instead of CHAN_VOICE...
+  * FIX; death/wade sounds are no longer ATTN_NONE but ATTN_NORM...
+  * FIX; drowning doesn't drain armor (should this be QMB-levels-only feature?)
+  * fishes can be gibbed now, and it's quite easy
+  * FIX; player step sounds will be played when firing, screaming in pain etc.
+  * FIX; items now fire their targets on touch even if they can't be picked up
+  * FIX; the MegaHealth rotting code (still respawns like it used to)
+  * capped the maximum amount of debris (prevents packet overflows)
+  * FIX; resets punchangles on respawn
+  * func_blowaway (simple brush object that can be... well, blown away!)
+
+Featured in QMB v1.00.09
+------------------------
+  * func_rain (the basics are there, needs better particles, though)
+  * new impact effect for lavaballs
+  * FIX; correct obituary message for being fragged by Chthon
+  * improved shellcasing code
+  * body falling / landing sounds (refer to .material of the floor)
+  * added water movement sounds
+  * optimized new sound code and tweaked channels of other sounds
+
+Featured in QMB v1.00.08
+------------------------
+  * modified the gib velocities a bit
+  * func_ladder (trigger field version)
+  * qmb entity (if found the QMB-only features are active)
+  * backpacks are up in the air so they won't float through the floor
+  * delayed explo_box explosions (Quake II style)
+  * the torches etc. converted into misc_decors for sake of .dat size
+  * added misc_decor and misc_static decor entities (for mappers)
+  * radioactive containers spews out burning waste when exploding
+  * added new torch model (without flame, as it is made of particles)
+  * added support for Hipnotic's BSP rotations
+  * FIX; fixed shellcasing code (no more floating)
+  * added footstep sounds (refers to .mass and .material of the floor)
+
+Featured in QMB v1.00.06
+------------------------
+  * FIX; falling crunch will be heard even if player is cratered
+  * replaced pain sounds with damage amount based ones
+  * added 'voice' function for making sounds with priority
+  * FIX; replaced obituary with the QW version
+  * FIX; fixed fishes being worth of two monster kills
+  * added weapon switching animations (models replaced)
+  * FIX; fixed incorrect loading sounds when firing one round with super shotgun
+  * FIX; fixed the rapidfire weapon bugs in intermission
+  * FIX; door key sound overwriting issue fixed
+  * FIX; armortype saving issues fixed (parm9 is free now)
+  * FIX; resets velocity on respawn
+  * FIX; can't commit the "kill" suicide in intermissions
+  * FIX; cvar "noexit" is for deathmatch ONLY
+  * FIX; reset items and the effects in the intermission
+  * added shellcasings (for shotguns, needs a model)
+  * FIX; lightnings won't make things bleed (have you been wounded by an electric shock?)
+  * Added materials and the material checks for weapons
+  * FIX; fixed countless amount of lesser bugs by id...

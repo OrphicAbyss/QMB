@@ -1,0 +1,66 @@
+=========================================================================
+A patch to add AVI capture to modified Quake1 engines on Win32 platforms.
+=========================================================================
+
+You capture both audio and video from any resolution supported by Quake1,
+at any framerate (you don't have to be able to process in realtime),
+using any AVI codec. There is explicit support for capturing existing DEMs.
+You can capture gameplay if you like, but the audio may well sound bad
+as you play - the main aim of the code was to allow conversion of demos.
+
+An earlier version of this code has been tested on a variety of Win32
+platforms, but the version you have here has not been widely tested at
+the time of writing. Please let me know if you have problems.
+
+You will need vfw32.h to compile, and avifil32.dll et al to run.
+I assume these are available as standard on development and user Win32
+platforms respectively.
+
+
+If you just want to use capture directly rather than add it to your own
+codebase, you can just grab a recent build of the trr_engine from which the
+code has been extracted from, e.g.
+<http://prdownloads.sourceforge.net/the-rabbit-run/trr27exe.zip>
+
+
+__To patch your Quake1 codebase__
+
+Add the four files to your WinQuake project, and follow the instructions
+and example code snips in CaptureHelpers.h to wire them into your codebase.
+
+
+__Setting up console variables__
+
+ Use 'host_framerate' to set a frametime in seconds. Remember that
+ id misnamed the variable - use 'host_framerate 0.1' to set a frame
+ time of 0.1s and hence a framerate of 10fps.
+
+ Variable '_snd_mixahead' should be set to something greater than
+ host_framerate to allow the engine to generate the audio.
+
+ Use 'capture_codec' to specify an AVI fourcc codec.
+  E.g. 'capture_codec divx'.
+  The default value of "0" indicates no compression.
+
+ I recommend using a framerate that evenly divides the audio rate.
+  15fps, set with 'host_framerate 0.0666666666667', always works well for me.
+
+
+__Using console commands__
+
+ 'capture_start <filename>': begins capturing to the named file.
+
+ 'capture_stop': ends capture and writes the file.
+
+ 'capturedemo <demoname>': works like 'playdemo', but captures an
+  appropriately named AVI from the demo, and exits on completion.
+  Uses 15fps if user has not set their own fps via 'host_framerate'.
+  Designed for batch use from the command-line, along the lines of
+    glquake.exe -window -width W -height H +capture_codec CCCC
+	 +host_framerate HFR +capturedemo DEMONAME
+
+
+ --Anthony, 2002.11.28
+   <mailto:anthony@planetquake.com>
+   <http://the-rabbit-run.sourceforge.net/>
+   <http://planetquake.com/qdq/>

@@ -1,0 +1,221 @@
+# Project: WinQuake
+# Makefile created by Dev-C++ 4.9.8.9
+
+CPP  = g++.exe
+CC   = gcc.exe
+WINDRES = windres.exe
+RES  = WinQuake_private.res
+OBJ  = cl_demo.o cl_input.o cl_main.o cl_parse.o cl_tent.o sv_main.o sv_move.o sv_phys.o sv_user.o net_dgrm.o net_loop.o net_main.o net_win.o net_wins.o net_wipx.o host.o host_cmd.o bot.o pr_cmds.o pr_edict.o pr_exec.o gl_draw.o gl_hud.o gl_jpg.o gl_md3.o gl_mesh.o gl_model.o gl_pcx.o gl_png.o gl_refrag.o gl_rlight.o gl_rmain.o gl_rmisc.o gl_rpart.o gl_rsurf.o gl_screen.o gl_sprite.o gl_tga.o gl_vidnt.o gl_warp.o cd_win.o snd_dma.o snd_mem.o snd_mix.o snd_win.o chase.o cmd.o common.o conproc.o console.o crc.o cvar.o in_win.o keys.o mathlib.o menu.o sbar.o sys_win.o view.o wad.o world.o zone.o CaptureAvi.o CaptureHelpers.o $(RES)
+LINKOBJ  = cl_demo.o cl_input.o cl_main.o cl_parse.o cl_tent.o sv_main.o sv_move.o sv_phys.o sv_user.o net_dgrm.o net_loop.o net_main.o net_win.o net_wins.o net_wipx.o host.o host_cmd.o bot.o pr_cmds.o pr_edict.o pr_exec.o gl_draw.o gl_hud.o gl_jpg.o gl_md3.o gl_mesh.o gl_model.o gl_pcx.o gl_png.o gl_refrag.o gl_rlight.o gl_rmain.o gl_rmisc.o gl_rpart.o gl_rsurf.o gl_screen.o gl_sprite.o gl_tga.o gl_vidnt.o gl_warp.o cd_win.o snd_dma.o snd_mem.o snd_mix.o snd_win.o chase.o cmd.o common.o conproc.o console.o crc.o cvar.o in_win.o keys.o mathlib.o menu.o sbar.o sys_win.o view.o wad.o world.o zone.o CaptureAvi.o CaptureHelpers.o $(RES)
+LIBS =  -L"C:/Program Files/Dev-Cpp/lib" -L"./dxsdk/sdk/lib/" -mwindows -luser32 -lgdi32 -lopengl32 -lglu32 -lwsock32 -lwinmm -lcomctl32 -ldxguid -ljpeg -llibpng
+INCS =  -I"C:/Program Files/Dev-Cpp/include"  -I"./dxsdk/sdk/inc" 
+CXXINCS =  -I"C:/Program Files/Dev-Cpp/include/c++"  -I"C:/Program Files/Dev-Cpp/include/c++/mingw32"  -I"C:/Program Files/Dev-Cpp/include/c++/backward"  -I"C:/Program Files/Dev-Cpp/include"  -I"./dxsdk/sdk/inc" 
+BIN  = WinQuake.exe
+CXXFLAGS = $(CXXINCS)-D__GNUWIN32__ -mcpu=pentiumpro -D_M_IX86=600 -W -DWIN32 -DNDEBUG -D_WINDOWS -DGLQUAKE 
+CFLAGS = $(INCS)-D__GNUWIN32__ -mcpu=pentiumpro -D_M_IX86=600 -W -DWIN32 -DNDEBUG -D_WINDOWS -DGLQUAKE 
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before WinQuake.exe all-after
+
+
+clean: clean-custom
+	rm -f $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CPP) $(LINKOBJ) -o "WinQuake.exe" $(LIBS)
+
+cl_demo.o: cl_demo.c
+	$(CC) -c cl_demo.c -o cl_demo.o $(CFLAGS)
+
+cl_input.o: cl_input.c
+	$(CC) -c cl_input.c -o cl_input.o $(CFLAGS)
+
+cl_main.o: cl_main.c
+	$(CC) -c cl_main.c -o cl_main.o $(CFLAGS)
+
+cl_parse.o: cl_parse.c
+	$(CC) -c cl_parse.c -o cl_parse.o $(CFLAGS)
+
+cl_tent.o: cl_tent.c
+	$(CC) -c cl_tent.c -o cl_tent.o $(CFLAGS)
+
+sv_main.o: sv_main.c
+	$(CC) -c sv_main.c -o sv_main.o $(CFLAGS)
+
+sv_move.o: sv_move.c
+	$(CC) -c sv_move.c -o sv_move.o $(CFLAGS)
+
+sv_phys.o: sv_phys.c
+	$(CC) -c sv_phys.c -o sv_phys.o $(CFLAGS)
+
+sv_user.o: sv_user.c
+	$(CC) -c sv_user.c -o sv_user.o $(CFLAGS)
+
+net_dgrm.o: net_dgrm.c
+	$(CC) -c net_dgrm.c -o net_dgrm.o $(CFLAGS)
+
+net_loop.o: net_loop.c
+	$(CC) -c net_loop.c -o net_loop.o $(CFLAGS)
+
+net_main.o: net_main.c
+	$(CC) -c net_main.c -o net_main.o $(CFLAGS)
+
+net_win.o: net_win.c
+	$(CC) -c net_win.c -o net_win.o $(CFLAGS)
+
+net_wins.o: net_wins.c
+	$(CC) -c net_wins.c -o net_wins.o $(CFLAGS)
+
+net_wipx.o: net_wipx.c
+	$(CC) -c net_wipx.c -o net_wipx.o $(CFLAGS)
+
+host.o: host.c
+	$(CC) -c host.c -o host.o $(CFLAGS)
+
+host_cmd.o: host_cmd.c
+	$(CC) -c host_cmd.c -o host_cmd.o $(CFLAGS)
+
+bot.o: bot.c
+	$(CC) -c bot.c -o bot.o $(CFLAGS)
+
+pr_cmds.o: pr_cmds.c
+	$(CC) -c pr_cmds.c -o pr_cmds.o $(CFLAGS)
+
+pr_edict.o: pr_edict.c
+	$(CC) -c pr_edict.c -o pr_edict.o $(CFLAGS)
+
+pr_exec.o: pr_exec.c
+	$(CC) -c pr_exec.c -o pr_exec.o $(CFLAGS)
+
+gl_draw.o: gl_draw.c
+	$(CC) -c gl_draw.c -o gl_draw.o $(CFLAGS)
+
+gl_hud.o: gl_hud.c
+	$(CC) -c gl_hud.c -o gl_hud.o $(CFLAGS)
+
+gl_jpg.o: gl_jpg.c
+	$(CC) -c gl_jpg.c -o gl_jpg.o $(CFLAGS)
+
+gl_md3.o: gl_md3.c
+	$(CC) -c gl_md3.c -o gl_md3.o $(CFLAGS)
+
+gl_mesh.o: gl_mesh.c
+	$(CC) -c gl_mesh.c -o gl_mesh.o $(CFLAGS)
+
+gl_model.o: gl_model.c
+	$(CC) -c gl_model.c -o gl_model.o $(CFLAGS)
+
+gl_pcx.o: gl_pcx.c
+	$(CC) -c gl_pcx.c -o gl_pcx.o $(CFLAGS)
+
+gl_png.o: gl_png.c
+	$(CC) -c gl_png.c -o gl_png.o $(CFLAGS)
+
+gl_refrag.o: gl_refrag.c
+	$(CC) -c gl_refrag.c -o gl_refrag.o $(CFLAGS)
+
+gl_rlight.o: gl_rlight.c
+	$(CC) -c gl_rlight.c -o gl_rlight.o $(CFLAGS)
+
+gl_rmain.o: gl_rmain.c
+	$(CC) -c gl_rmain.c -o gl_rmain.o $(CFLAGS)
+
+gl_rmisc.o: gl_rmisc.c
+	$(CC) -c gl_rmisc.c -o gl_rmisc.o $(CFLAGS)
+
+gl_rpart.o: gl_rpart.c
+	$(CC) -c gl_rpart.c -o gl_rpart.o $(CFLAGS)
+
+gl_rsurf.o: gl_rsurf.c
+	$(CC) -c gl_rsurf.c -o gl_rsurf.o $(CFLAGS)
+
+gl_screen.o: gl_screen.c
+	$(CC) -c gl_screen.c -o gl_screen.o $(CFLAGS)
+
+gl_sprite.o: gl_sprite.c
+	$(CC) -c gl_sprite.c -o gl_sprite.o $(CFLAGS)
+
+gl_tga.o: gl_tga.c
+	$(CC) -c gl_tga.c -o gl_tga.o $(CFLAGS)
+
+gl_vidnt.o: gl_vidnt.c
+	$(CC) -c gl_vidnt.c -o gl_vidnt.o $(CFLAGS)
+
+gl_warp.o: gl_warp.c
+	$(CC) -c gl_warp.c -o gl_warp.o $(CFLAGS)
+
+cd_win.o: cd_win.c
+	$(CC) -c cd_win.c -o cd_win.o $(CFLAGS)
+
+snd_dma.o: snd_dma.c
+	$(CC) -c snd_dma.c -o snd_dma.o $(CFLAGS)
+
+snd_mem.o: snd_mem.c
+	$(CC) -c snd_mem.c -o snd_mem.o $(CFLAGS)
+
+snd_mix.o: snd_mix.c
+	$(CC) -c snd_mix.c -o snd_mix.o $(CFLAGS)
+
+snd_win.o: snd_win.c
+	$(CC) -c snd_win.c -o snd_win.o $(CFLAGS)
+
+chase.o: chase.c
+	$(CC) -c chase.c -o chase.o $(CFLAGS)
+
+cmd.o: cmd.c
+	$(CC) -c cmd.c -o cmd.o $(CFLAGS)
+
+common.o: common.c
+	$(CC) -c common.c -o common.o $(CFLAGS)
+
+conproc.o: conproc.c
+	$(CC) -c conproc.c -o conproc.o $(CFLAGS)
+
+console.o: console.c
+	$(CC) -c console.c -o console.o $(CFLAGS)
+
+crc.o: crc.c
+	$(CC) -c crc.c -o crc.o $(CFLAGS)
+
+cvar.o: cvar.c
+	$(CC) -c cvar.c -o cvar.o $(CFLAGS)
+
+in_win.o: in_win.c
+	$(CC) -c in_win.c -o in_win.o $(CFLAGS)
+
+keys.o: keys.c
+	$(CC) -c keys.c -o keys.o $(CFLAGS)
+
+mathlib.o: mathlib.c
+	$(CC) -c mathlib.c -o mathlib.o $(CFLAGS)
+
+menu.o: menu.c
+	$(CC) -c menu.c -o menu.o $(CFLAGS)
+
+sbar.o: sbar.c
+	$(CC) -c sbar.c -o sbar.o $(CFLAGS)
+
+sys_win.o: sys_win.c
+	$(CC) -c sys_win.c -o sys_win.o $(CFLAGS)
+
+view.o: view.c
+	$(CC) -c view.c -o view.o $(CFLAGS)
+
+wad.o: wad.c
+	$(CC) -c wad.c -o wad.o $(CFLAGS)
+
+world.o: world.c
+	$(CC) -c world.c -o world.o $(CFLAGS)
+
+zone.o: zone.c
+	$(CC) -c zone.c -o zone.o $(CFLAGS)
+
+CaptureAvi.o: CaptureAvi.cpp
+	$(CPP) -c CaptureAvi.cpp -o CaptureAvi.o $(CXXFLAGS)
+
+CaptureHelpers.o: CaptureHelpers.c
+	$(CC) -c CaptureHelpers.c -o CaptureHelpers.o $(CFLAGS)
+
+WinQuake_private.res: WinQuake_private.rc winquake.rc 
+	$(WINDRES) -i WinQuake_private.rc -I rc -o WinQuake_private.res -O coff 
