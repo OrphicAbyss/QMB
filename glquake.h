@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #pragma warning(disable : 4244)     // MIPS
 #pragma warning(disable : 4136)     // X86
 #pragma warning(disable : 4051)     // ALPHA
-  
+
 #ifdef _WIN32
 #include <windows.h>
 #define strcasecmp stricmp
@@ -283,4 +283,4 @@ extern void GL_SelectTexture (GLenum target);
 
 #define Q3MODELS 1      //Allow Q3 models in the same way as Q1 models. --> JTR
 
-void   Mod_LoadMd3Model (model_t *mod, void *buffer); 
+void   Mod_LoadMd3Model (model_t *mod, void *buffer);
