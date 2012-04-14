@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -126,7 +126,7 @@ void S_TransferStereo16 (int endtime)
  */
 
 // Use an alternative calculation for GetSoundtime
-qboolean_not_yet_declared CaptureHelper_GetSoundtime(void);
+qboolean CaptureHelper_GetSoundtime(void);
 /* in snd_dma.c:
 void GetSoundtime(void)
 {
@@ -137,7 +137,7 @@ void GetSoundtime(void)
 
     // CAPTURE <anthony@planetquake.com>
     if (CaptureHelper_GetSoundtime()) return;
-    
+
 	fullsamples = shm->samples / shm->channels;
 
     ...
@@ -146,7 +146,7 @@ void GetSoundtime(void)
  */
 
 // Check if we are capturing this frame
-qboolean_not_yet_declared CaptureHelper_IsActive(void);
+qboolean CaptureHelper_IsActive(void);
 /* in snd_dma.c:
 void S_ExtraUpdate (void)
 {
@@ -165,7 +165,7 @@ void S_ExtraUpdate (void)
 
 // To ensure good audio sync at _all_ framerates, you can also ensure
 // we do not drop very short frames:
-/* in host.c: 
+/* in host.c:
 qboolean Host_FilterTime (float time)
 {
 	realtime += time;
@@ -184,7 +184,7 @@ qboolean Host_FilterTime (float time)
 // to the client_static_t struct declaration
 /* in client.h:
 typedef struct
-{ 
+{
     ...
     ...
 	struct qsocket_s	*netcon;
@@ -192,6 +192,6 @@ typedef struct
 
     // CAPTURE <mailto:anthony@planetquake.com>
     qboolean    capturedemo;
-	
+
 } client_static_t;
  */

@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -282,7 +282,7 @@ byte *LoadTGA (char *file, int matchwidth, int matchheight)
 TARGA LOADING
 =============
 */
-typedef struct _TargaHeader 
+typedef struct _TargaHeader
 {
 	unsigned char 	id_length;
 	unsigned char	colormap_type;
@@ -328,20 +328,17 @@ int fgetLittleLong (FILE *f)
 LoadTGA
 ========
 */
-extern int filelength (FILE *f);
-
-
-byte* LoadTGA (FILE *f, char *name)
+byte* LoadTGA (FILE *f, char *name, int filesize)
 {
 	int	columns, rows, numPixels;
 	byte	*pixbuf;
-	int	row, column, filesize;
+	int		row, column;
 	byte	*image_rgba, *fin, *datafile;
 
 	targa_header.id_length = fgetc(f);
 	targa_header.colormap_type = fgetc(f);
 	targa_header.image_type = fgetc(f);
-	
+
 	targa_header.colormap_index = fgetLittleShort(f);
 	targa_header.colormap_length = fgetLittleShort(f);
 	targa_header.colormap_size = fgetc(f);
@@ -373,12 +370,12 @@ byte* LoadTGA (FILE *f, char *name)
 		return NULL;
 	}
 
-	
+
 	if (targa_header.id_length != 0)
 		fseek(f, targa_header.id_length, SEEK_CUR);  // skip TARGA image comment
-	
+
 	//file to read = total size - current position
-	filesize = filelength (f) - ftell(f);
+	filesize = filesize - ftell(f);
 
 	//read it whole image at once
 	datafile = malloc (filesize);
@@ -391,18 +388,18 @@ byte* LoadTGA (FILE *f, char *name)
 	fread(datafile, 1, filesize,f);
 	fin = datafile;
 
-	if (targa_header.image_type==2) 
+	if (targa_header.image_type==2)
 	{  // Uncompressed, RGB images
-		for(row=rows-1; row>=0; row--) 
+		for(row=rows-1; row>=0; row--)
 		{
 			pixbuf = image_rgba + row*columns*4;
-			for(column=0; column<columns; column++) 
+			for(column=0; column<columns; column++)
 			{
 				unsigned char red = 0,green = 0,blue = 0,alphabyte = 0;
-				switch (targa_header.pixel_size) 
+				switch (targa_header.pixel_size)
 				{
 					case 24:
-							
+
 							blue = *fin++;
 							green = *fin++;
 							red = *fin++;
@@ -425,19 +422,19 @@ byte* LoadTGA (FILE *f, char *name)
 			}
 		}
 	}
-	else if (targa_header.image_type==10) 
+	else if (targa_header.image_type==10)
 	{   // Runlength encoded RGB images
 		unsigned char red = 0,green = 0,blue = 0,alphabyte = 0,packetHeader,packetSize,j;
-		for(row=rows-1; row>=0; row--) 
+		for(row=rows-1; row>=0; row--)
 		{
 			pixbuf = image_rgba + row*columns*4;
-			for(column=0; column<columns; ) 
+			for(column=0; column<columns; )
 			{
 				packetHeader=*fin++;
 				packetSize = 1 + (packetHeader & 0x7f);
-				if (packetHeader & 0x80) 
+				if (packetHeader & 0x80)
 				{        // run-length packet
-					switch (targa_header.pixel_size) 
+					switch (targa_header.pixel_size)
 					{
 						case 24:
 								blue = *fin++;
@@ -452,14 +449,14 @@ byte* LoadTGA (FILE *f, char *name)
 								alphabyte = *fin++;
 								break;
 					}
-					for(j=0;j<packetSize;j++) 
+					for(j=0;j<packetSize;j++)
 					{
 						*pixbuf++=red;
 						*pixbuf++=green;
 						*pixbuf++=blue;
 						*pixbuf++=alphabyte;
 						column++;
-						if (column==columns) 
+						if (column==columns)
 						{ // run spans across rows
 							column=0;
 							if (row>0)
@@ -470,9 +467,9 @@ byte* LoadTGA (FILE *f, char *name)
 						}
 					}
 				}
-				else 
+				else
 				{	// non run-length packet
-					for(j=0;j<packetSize;j++) 
+					for(j=0;j<packetSize;j++)
 					{
 						switch (targa_header.pixel_size)
 						{
@@ -497,7 +494,7 @@ byte* LoadTGA (FILE *f, char *name)
 									break;
 						}
 						column++;
-						if (column==columns) 
+						if (column==columns)
 						{ // pixel packet run spans across rows
 							column=0;
 							if (row>0)
@@ -512,7 +509,7 @@ byte* LoadTGA (FILE *f, char *name)
 			breakOut:;
 		}
 	}
-	
+
 	image_width = columns;
 	image_height = rows;
 

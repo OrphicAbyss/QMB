@@ -17,13 +17,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #include "quakedef.h"
-#ifdef Q3MODELS
 #include "gl_md3.h"
 
 #define TEMPHACK 1
 #ifdef TEMPHACK
 extern cvar_t temp1;
 #endif
+
+extern char loadname[32];
 
 void R_MD3TagRotate (entity_t *e, model_t *tagmodel, char *tagname)
 {
@@ -90,7 +91,7 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline)
 
 	model = Mod_Extradata (e->model);
 
-	if (*(long *)model->id != MD3IDHEADER){
+	if (*(int *)model->id != MD3IDHEADER){
 		Con_Printf("MD3 bad model for: %s\n", model->filename);
 		return;
 	}
@@ -137,9 +138,9 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline)
 
 	//blend = 1;
 
-//#ifdef EXTENDQC
-//	glColor4f (l, l, l, currententity->alpha);
-//#else
+#ifdef EXTENDQC
+	glColor4f (l, l, l, currententity->alpha);
+#endif
 	if (!shell){
 		if (!outline) {
 			glColor3fv(lightcolor);
@@ -155,11 +156,11 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline)
 		R_BlendedRotateForEntity (e);
 	else
 		R_RotateForEntity (e);
-	
+
 	surf = (md3surface_mem_t *)((byte *)model + model->offs_surfaces);
 	for (i = 0; i < model->num_surfaces; i++)
 	{
-		if (*(long *)surf->id != MD3IDHEADER){
+		if (*(int *)surf->id != MD3IDHEADER){
 			Con_Printf("MD3 bad surface for: %s\n", model->filename);
 			surf = (md3surface_mem_t *)((byte *)surf + surf->offs_end);
 			continue;
@@ -215,7 +216,7 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline)
 					for (k=0; k < 3; k++){
 						//interpolated
 						vec3_t vec, normal;
-					
+
 						vec[0] = verts[tris[j].tri[k]].vec[0] * blend + vertslast[tris[j].tri[k]].vec[0] * iblend;
 						vec[1] = verts[tris[j].tri[k]].vec[1] * blend + vertslast[tris[j].tri[k]].vec[1] * iblend;
 						vec[2] = verts[tris[j].tri[k]].vec[2] * blend + vertslast[tris[j].tri[k]].vec[2] * iblend;
@@ -229,8 +230,8 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline)
 						}
 
 						if (!shell){
-							qglMTexCoord1fARB (GL_TEXTURE1_ARB, bound(0,DotProduct(shadevector,normal),1));
-							qglMTexCoord2fARB (GL_TEXTURE0_ARB, tc[tris[j].tri[k]].s, tc[tris[j].tri[k]].t);
+							qglMultiTexCoord1fARB (GL_TEXTURE1_ARB, bound(0,DotProduct(shadevector,normal),1));
+							qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, tc[tris[j].tri[k]].s, tc[tris[j].tri[k]].t);
 						}else{
 							glTexCoord2f(tc[tris[j].tri[k]].s + realtime*2, tc[tris[j].tri[k]].t + realtime*2);
 						}
@@ -247,14 +248,12 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline)
 
 	if ((r_celshading.value || r_vertexshading.value) && !outline)
 	{
-	//setup for shading
+		//setup for shading
 		GL_SelectTexture(GL_TEXTURE1_ARB);
 		glDisable(GL_TEXTURE_1D);
 		GL_SelectTexture(GL_TEXTURE0_ARB);
 	}
 }
-
-extern char loadname[32];
 
 void Mod_LoadQ3Model(model_t *mod, void *buffer)
 {
@@ -268,8 +267,8 @@ void Mod_LoadQ3Model(model_t *mod, void *buffer)
 	char name[128];
 
 	//we want to work out the size of the model in memory
-	
-	//size of surfaces = surface size + num_shaders * shader_mem size + 
+
+	//size of surfaces = surface size + num_shaders * shader_mem size +
 	//		num_triangles * tri size + num_verts * textcoord size +
 	//		num_verts * vert_mem size
 	int surf_size = 0;
@@ -304,6 +303,7 @@ void Mod_LoadQ3Model(model_t *mod, void *buffer)
 
 	mem_head = (md3header_mem_t *)Cache_Alloc (&mod->cache, mem_size, mod->name);
 	if (!mod->cache.data){
+		Con_Printf("Unable to allocate cache to load model: %s\n", mod->name);
 		return;	//cache alloc failed
 	}
 
@@ -351,7 +351,7 @@ void Mod_LoadQ3Model(model_t *mod, void *buffer)
 
 		//posn of shaders for this surface
 		currentsurf->offs_shaders = posn - surfstartposn;
-		
+
 		for (j=0; j < surf->num_surf_shaders; j++){
 			//copy jth shader accross
 			Q_memcpy((byte *)mem_head + posn, (byte *)surf + surf->shader_offs + j * sizeof(md3shader_t), sizeof(md3shader_t));
@@ -386,7 +386,7 @@ void Mod_LoadQ3Model(model_t *mod, void *buffer)
 			mem_vert->vec[1] = (float)disk_vert->vec[1] / 64.0f;
 			mem_vert->vec[2] = (float)disk_vert->vec[2] / 64.0f;
 
-			
+
 			//work out normals
 			lat = (disk_vert->normal + 255) * (2 * 3.141592654f) / 256.0f;
 			lng = ((disk_vert->normal >> 8) & 255) * (2 * 3.141592654f) / 256.0f;
@@ -418,16 +418,16 @@ void Mod_LoadQ3Model(model_t *mod, void *buffer)
 	currentsurf = (md3surface_mem_t *)((byte *)mem_head + mem_head->offs_surfaces);
 	for (i=0; i<mem_head->num_surfaces; i++)
 	{
-		if (*(long *)currentsurf->id != MD3IDHEADER){
+		if (*(int *)currentsurf->id != MD3IDHEADER){
 			Con_Printf("MD3 bad surface for: %s\n", mem_head->filename);
 
 		}else {
 			md3shader_mem_t *shader = (md3shader_mem_t *)((byte *)currentsurf + currentsurf->offs_shaders);
-			
+
 			for (j=0; j<currentsurf->num_surf_shaders; j++){
 				//try loading texture here
 				sprintf(&name[0],"progs/%s",shader[j].name);
-				
+
 				shader[j].texnum = GL_LoadTexImage(&name[0], false, true, gl_sincity.value);
 				if (shader[j].texnum == 0){
 					Con_Printf("Model: %s  Texture missing: %s\n", mod->name, shader[j].name);
@@ -487,7 +487,7 @@ void Mod_LoadQ3MultiModel (model_t *mod)
 		head->linktype = MULTIMODEL_LINK_TAG;
 		head->linkedmodel = upper;
 		Q_strcpy(head->tagname, "tag_head");
-		
+
 		return;
 	}
 
@@ -502,6 +502,4 @@ void Mod_LoadQ3MultiModel (model_t *mod)
 		COM_CloseFile(handle);
 	}
 }
-#endif
-
 #endif

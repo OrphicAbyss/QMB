@@ -62,6 +62,7 @@ net_driver_t net_drivers[MAX_NET_DRIVERS] =
 
 int net_numdrivers = 2;
 
+
 #include "net_wins.h"
 #include "net_wipx.h"
 

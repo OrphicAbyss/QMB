@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -83,13 +83,13 @@ texture_t *R_TextureAnimation (texture_t *base)
 		if (base->alternate_anims)
 			base = base->alternate_anims;
 //	}
-	
+
 	if (!base->anim_total)
 		return base;
 
 	reletive = (int)(cl.time*10) % base->anim_total;
 
-	count = 0;	
+	count = 0;
 	while (base->anim_min > reletive || base->anim_max <= reletive)
 	{
 		base = base->anim_next;
@@ -110,8 +110,8 @@ texture_t *R_TextureAnimation (texture_t *base)
 =============================================================
 */
 
-lp1DMTexFUNC qglMTexCoord1fARB = NULL;
-lpMTexFUNC qglMTexCoord2fARB = NULL;
+lp1DMTexFUNC qglMultiTexCoord1fARB = NULL;
+lpMTexFUNC qglMultiTexCoord2fARB = NULL;
 lpSelTexFUNC qglSelectTextureARB = NULL;
 
 void GL_SelectTexture (GLenum target);
@@ -172,7 +172,7 @@ void R_RecursiveWorldNode (mnode_t *node, float *modelorg)
 	//i think this checks if its on the screen and not behind the viewer
 	if (R_CullBox (node->minmaxs, node->minmaxs+3))
 		return;
-	
+
 // if a leaf node, draw stuff
 	if (node->contents < 0)
 	{
@@ -346,7 +346,7 @@ void R_DrawBrushModel (entity_t *e)
 		glColor3fv (lightcolor);
 	}else {
 		glColor3f (1.0,1.0,1.0);
-		memset (lightmap_polys, 0, sizeof(lightmap_polys));
+		Q_memset (lightmap_polys, 0, sizeof(lightmap_polys));
 	}
 
 	VectorSubtract (r_refdef.vieworg, e->origin, modelorg);
@@ -467,13 +467,13 @@ void R_DrawWorld (void)
 	entity_t	ent;
 	float		modelorg[3];
 
-	memset (&ent, 0, sizeof(ent));
+	Q_memset (&ent, 0, sizeof(ent));
 	ent.model = cl.worldmodel;
 
 	VectorCopy (r_refdef.vieworg, modelorg);
 
 	glColor3f (1,1,1);
-	memset (lightmap_polys, 0, sizeof(lightmap_polys));
+	Q_memset (lightmap_polys, 0, sizeof(lightmap_polys));
 
 //draw the display list
 	R_RecursiveWorldNode (cl.worldmodel->nodes, &modelorg[0]);
@@ -483,7 +483,7 @@ void R_DrawWorld (void)
 		Surf_DrawTextureChainsFour (cl.worldmodel);
 	else
 		Surf_DrawTextureChainsTwo (cl.worldmodel);
-	
+
 }
 
 
@@ -501,18 +501,18 @@ void R_MarkLeaves (void)
 
 	if (r_oldviewleaf == r_viewleaf && !r_novis.value)
 		return;
-	
+
 	r_visframecount++;
 	r_oldviewleaf = r_viewleaf;
 
 	if (r_novis.value)
 	{
 		vis = solid;
-		memset (solid, 0xff, (cl.worldmodel->numleafs+7)>>3);
+		Q_memset (solid, 0xff, (cl.worldmodel->numleafs+7)>>3);
 	}
 	else
 		vis = Mod_LeafPVS (r_viewleaf, cl.worldmodel);
-		
+
 	for (i=0 ; i<cl.worldmodel->numleafs ; i++)
 	{
 		if (vis[i>>3] & (1<<(i&7)))
@@ -632,7 +632,7 @@ void BuildSurfaceDisplayList (model_t *m, msurface_t *fa)
 			// skip co-linear points
 			#define COLINEAR_EPSILON 0.001
 			if ((fabs( v1[0] - v2[0] ) <= COLINEAR_EPSILON) &&
-				(fabs( v1[1] - v2[1] ) <= COLINEAR_EPSILON) && 
+				(fabs( v1[1] - v2[1] ) <= COLINEAR_EPSILON) &&
 				(fabs( v1[2] - v2[2] ) <= COLINEAR_EPSILON))
 			{
 				int j;
@@ -728,7 +728,7 @@ void GL_CreateSurfaceLightmap (msurface_t *surf)
 	R_BuildLightMap (surf, base, BLOCK_WIDTH*lightmap_bytes);
 }
 
-void GL_UploadLightmap (void) 
+void GL_UploadLightmap (void)
 {
 	int i;
 
@@ -769,7 +769,7 @@ void GL_BuildLightmaps (void)
 	model_t	*m;
 	extern vec3_t	lightcolor;
 
-	memset (allocated, 0, sizeof(allocated));
+	Q_memset (allocated, 0, sizeof(allocated));
 
 	r_framecount = 1;		// no dlightcache
 
@@ -819,7 +819,7 @@ void R_AddDynamicLights (msurface_t *surf)
 // LordHavoc: .lit support begin
 	float		cred, cgreen, cblue, brightness;
 	unsigned	*bl;
-// LordHavoc: .lit support end   
+// LordHavoc: .lit support end
 
 	smax = (surf->extents[0]>>4)+1;
 	tmax = (surf->extents[1]>>4)+1;
@@ -847,7 +847,7 @@ void R_AddDynamicLights (msurface_t *surf)
 
 		local[0] -= surf->texturemins[0];
 		local[1] -= surf->texturemins[1];
-     		
+
 // LordHavoc: .lit support begin
 		bl = blocklights;
 		cred = cl_dlights[lnum].colour[0] * 256.0f;
@@ -883,7 +883,7 @@ void R_AddDynamicLights (msurface_t *surf)
 __inline void RGBtoGrayscale(unsigned *rgb){
 	unsigned value;
 	//unsigned output;
-	
+
 	if (gl_sincity.value == 1){
 	//value = rgb[0] * 0.2125 + rgb[1] * 0.7154 + rgb[2] * 0.0721;
 	//value = max(max(rgb[0],rgb[1]),rgb[2]);
@@ -940,7 +940,7 @@ void R_BuildLightMap (msurface_t *surf, byte *dest, int stride)
 		*bl++ = 0;//g
 		*bl++ = 0;//b
 	}
-	
+
 // add all the lightmaps
 	if (lightmap)
 		for (maps = 0 ; maps < MAXLIGHTMAPS && surf->styles[maps] != 255 ;
@@ -950,20 +950,20 @@ void R_BuildLightMap (msurface_t *surf, byte *dest, int stride)
 
 			scale = d_lightstylevalue[surf->styles[maps]];
 			surf->cached_light[maps] = scale;	// 8.8 fraction
-			
+
 			bl = blocklights;
 			for (i=0 ; i<size ; i++)
 			{
-				rgb = bl;	
+				rgb = bl;
 				*bl++ += *lightmap++ * scale;//r
 				*bl++ += *lightmap++ * scale;//g
 				*bl++ += *lightmap++ * scale;//b
 
 				RGBtoGrayscale(rgb);
 			}
-			
+
 		}
-	
+
 		//qmb :overbright dynamic ligths only
 		//so scale back the normal lightmap so it renders normally
 		bl=blocklights;

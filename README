@@ -7,7 +7,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -24,9 +24,15 @@ Some code changes are from tutorials originally hosted on QuakeSrc.Org, I'm not
 sure where you can find these tutorials any more but the inside3d.org forums
 would be a good place to start.
 
-Microsoft Visual Studio was used to compile this project, the express edition
-would be a good place to start if you are having problems compiling with a
-different compiler.
+GCC is used to compile this project. Tested on windows using MinGW and MSYS.
+Also tested under Fedora Core 16.
+
+The following libraries are required to build this project:
+libpng
+libjpeg
+GLee
+SDL
+Opengl
 
 This code was forked to at version QMB 1.18 to become Vengeance R2 engine. At
 the time (2012/02/16) of writing this README more information about vengeance r2

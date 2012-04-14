@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -51,7 +51,7 @@ void TraceLine (vec3_t start, vec3_t end, vec3_t impact)
 {
 	trace_t	trace;
 
-	memset (&trace, 0, sizeof(trace));
+	Q_memset (&trace, 0, sizeof(trace));
 	SV_RecursiveHullCheck (cl.worldmodel->hulls, 0, 0, 1, start, end, &trace);
 
 	VectorCopy (trace.endpos, impact);
@@ -70,7 +70,7 @@ void Chase_Update (void)
 
 	// calc exact destination
 	for (i=0 ; i<3 ; i++)
-		chase_dest[i] = r_refdef.vieworg[i] 
+		chase_dest[i] = r_refdef.vieworg[i]
 		- forward[i]*chase_back.value
 		- right[i]*chase_right.value;
 	chase_dest[2] = r_refdef.vieworg[2] + chase_up.value;
@@ -93,6 +93,6 @@ void Chase_Update (void)
 	TraceLine(r_refdef.vieworg, chase_dest, stop);
 	if (Length(stop) != 0)
 		VectorCopy(stop, chase_dest);
-     
+
 }
 

@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -59,6 +59,33 @@ void Sys_PopFPCW (void);
 
 volatile int					sys_checksum;
 
+
+/*
+================
+Sys_PageIn
+================
+*/
+void Sys_PageIn (void *ptr, int size)
+{
+	byte	*x;
+	int		j, m, n;
+
+// touch all the memory to make sure it's there. The 16-page skip is to
+// keep Win 95 from thinking we're trying to page ourselves in (we are
+// doing that, of course, but there's no reason we shouldn't)
+	x = (byte *)ptr;
+
+	for (n=0 ; n<4 ; n++)
+	{
+		for (m=0 ; m<(size - 16 * 0x1000) ; m += 4)
+		{
+			sys_checksum += *(int *)&x[m];
+			sys_checksum += *(int *)&x[m + 16 * 0x1000];
+		}
+	}
+}
+
+
 /*
 ===============================================================================
 
@@ -73,7 +100,7 @@ FILE	*sys_handles[MAX_HANDLES];
 int		findhandle (void)
 {
 	int		i;
-	
+
 	for (i=1 ; i<MAX_HANDLES ; i++)
 		if (!sys_handles[i])
 			return i;
@@ -90,11 +117,16 @@ int filelength (FILE *f)
 {
 	int		pos;
 	int		end;
+	int		t;
+
+	t = VID_ForceUnlockedAndReturnState ();
 
 	pos = ftell (f);
 	fseek (f, 0, SEEK_END);
 	end = ftell (f);
 	fseek (f, pos, SEEK_SET);
+
+	VID_ForceLockState (t);
 
 	return end;
 }
@@ -103,6 +135,9 @@ int Sys_FileOpenRead (char *path, int *hndl)
 {
 	FILE	*f;
 	int		i, retval;
+	int		t;
+
+	t = VID_ForceUnlockedAndReturnState ();
 
 	i = findhandle ();
 
@@ -120,6 +155,8 @@ int Sys_FileOpenRead (char *path, int *hndl)
 		retval = filelength(f);
 	}
 
+	VID_ForceLockState (t);
+
 	return retval;
 }
 
@@ -127,6 +164,9 @@ int Sys_FileOpenWrite (char *path)
 {
 	FILE	*f;
 	int		i;
+	int		t;
+
+	t = VID_ForceUnlockedAndReturnState ();
 
 	i = findhandle ();
 
@@ -134,41 +174,57 @@ int Sys_FileOpenWrite (char *path)
 	if (!f)
 		Sys_Error ("Error opening %s: %s", path,strerror(errno));
 	sys_handles[i] = f;
-	
+
+	VID_ForceLockState (t);
+
 	return i;
 }
 
 void Sys_FileClose (int handle)
 {
+	int		t;
+
+	t = VID_ForceUnlockedAndReturnState ();
 	fclose (sys_handles[handle]);
 	sys_handles[handle] = NULL;
+	VID_ForceLockState (t);
 }
 
 void Sys_FileSeek (int handle, int position)
 {
+	int		t;
+
+	t = VID_ForceUnlockedAndReturnState ();
 	fseek (sys_handles[handle], position, SEEK_SET);
+	VID_ForceLockState (t);
 }
 
 int Sys_FileRead (int handle, void *dest, int count)
 {
-	int		x;
+	int		t, x;
 
+	t = VID_ForceUnlockedAndReturnState ();
 	x = fread (dest, 1, count, sys_handles[handle]);
+	VID_ForceLockState (t);
 	return x;
 }
 
 int Sys_FileWrite (int handle, void *data, int count)
 {
-	int		x;
+	int		t, x;
 
+	t = VID_ForceUnlockedAndReturnState ();
 	x = fwrite (data, 1, count, sys_handles[handle]);
+	VID_ForceLockState (t);
 	return x;
 }
 
 int	Sys_FileTime (char *path)
 {
 	FILE	*f;
-	int		retval;
+	int		t, retval;
+
+	t = VID_ForceUnlockedAndReturnState ();
 
 	f = fopen(path, "rb");
 
@@ -181,11 +237,10 @@ int	Sys_FileTime (char *path)
 	{
 		retval = -1;
 	}
-	
+
+	VID_ForceLockState (t);
 	return retval;
 }
-
-_CRTIMP int __cdecl _mkdir(const char *);
 
 void Sys_mkdir (char *path)
 {
@@ -214,6 +269,9 @@ void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
    		Sys_Error("Protection change failed\n");
 }
 
+
+#ifndef _M_IX86
+
 void Sys_SetFPCW (void)
 {
 }
@@ -229,6 +287,8 @@ void Sys_PopFPCW (void)
 void MaskExceptions (void)
 {
 }
+
+#endif
 
 /*
 ================
@@ -273,7 +333,7 @@ void Sys_Init (void)
 	if ((vinfo.dwMajorVersion < 4) ||
 		(vinfo.dwPlatformId == VER_PLATFORM_WIN32s))
 	{
-		Sys_Error ("GLQuake requires at least Win95 or NT 4.0");
+		Sys_Error ("WinQuake requires at least Win95 or NT 4.0");
 	}
 
 	if (vinfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
@@ -300,6 +360,7 @@ void Sys_Error (char *error, ...)
 	if (!in_sys_error3)
 	{
 		in_sys_error3 = 1;
+		VID_ForceUnlockedAndReturnState ();
 	}
 
 	va_start (argptr, error);
@@ -313,11 +374,11 @@ void Sys_Error (char *error, ...)
 		va_end (argptr);
 
 		sprintf (text2, "ERROR: %s\n", text);
-		WriteFile (houtput, text5, strlen (text5), &dummy, NULL);
-		WriteFile (houtput, text4, strlen (text4), &dummy, NULL);
-		WriteFile (houtput, text2, strlen (text2), &dummy, NULL);
-		WriteFile (houtput, text3, strlen (text3), &dummy, NULL);
-		WriteFile (houtput, text4, strlen (text4), &dummy, NULL);
+		WriteFile (houtput, text5, Q_strlen (text5), &dummy, NULL);
+		WriteFile (houtput, text4, Q_strlen (text4), &dummy, NULL);
+		WriteFile (houtput, text2, Q_strlen (text2), &dummy, NULL);
+		WriteFile (houtput, text3, Q_strlen (text3), &dummy, NULL);
+		WriteFile (houtput, text4, Q_strlen (text4), &dummy, NULL);
 
 
 		starttime = Sys_FloatTime ();
@@ -367,21 +428,21 @@ void Sys_Printf (char *fmt, ...)
 	va_list		argptr;
 	char		text[1024];
 	DWORD		dummy;
-	
+
 	if (isDedicated)
 	{
 		va_start (argptr,fmt);
 		vsprintf (text, fmt, argptr);
 		va_end (argptr);
 
-		WriteFile(houtput, text, strlen (text), &dummy, NULL);	
+		WriteFile(houtput, text, Q_strlen (text), &dummy, NULL);
 	}
 }
 
-quakeparms_t	parms;
-
 void Sys_Quit (void)
 {
+
+	VID_ForceUnlockedAndReturnState ();
 
 	Host_Shutdown();
 
@@ -394,10 +455,9 @@ void Sys_Quit (void)
 // shut down QHOST hooks if necessary
 	DeinitConProc ();
 
-	free(parms.membase);
-
 	exit (0);
 }
+
 
 /*
 ================
@@ -497,7 +557,8 @@ char *Sys_ConsoleInput (void)
 	static char	text[256];
 	static int		len;
 	INPUT_RECORD	recs[1024];
-	int		dummy;
+	int		count;
+	int		i, dummy;
 	int		ch, numread, numevents;
 
 	if (!isDedicated)
@@ -527,7 +588,7 @@ char *Sys_ConsoleInput (void)
 				switch (ch)
 				{
 					case '\r':
-						WriteFile(houtput, "\r\n", 2, &dummy, NULL);	
+						WriteFile(houtput, "\r\n", 2, &dummy, NULL);
 
 						if (len)
 						{
@@ -546,7 +607,7 @@ char *Sys_ConsoleInput (void)
 						break;
 
 					case '\b':
-						WriteFile(houtput, "\b \b", 3, &dummy, NULL);	
+						WriteFile(houtput, "\b \b", 3, &dummy, NULL);
 						if (len)
 						{
 							len--;
@@ -556,7 +617,7 @@ char *Sys_ConsoleInput (void)
 					default:
 						if (ch >= ' ')
 						{
-							WriteFile(houtput, &ch, 1, &dummy, NULL);	
+							WriteFile(houtput, &ch, 1, &dummy, NULL);
 							text[len] = ch;
 							len = (len + 1) & 0xff;
 						}
@@ -625,13 +686,18 @@ HINSTANCE	global_hInstance;
 int			global_nCmdShow;
 char		*argv[MAX_NUM_ARGVS];
 static char	*empty_string = "";
+HWND		hwnd_dialog;
+
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+    MSG				msg;
+	quakeparms_t	parms;
 	double			time, oldtime, newtime;
 	MEMORYSTATUS	lpBuffer;
 	static	char	cwd[1024];
 	int				t;
+	RECT			rect;
 
     /* previous instances do not exist in Win32 */
     if (hPrevInstance)
@@ -673,7 +739,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 				*lpCmdLine = 0;
 				lpCmdLine++;
 			}
-			
+
 		}
 	}
 
@@ -686,6 +752,29 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	isDedicated = (COM_CheckParm ("-dedicated") != 0);
 
+	if (!isDedicated)
+	{
+		hwnd_dialog = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, NULL);
+
+		if (hwnd_dialog)
+		{
+			if (GetWindowRect (hwnd_dialog, &rect))
+			{
+				if (rect.left > (rect.top * 2))
+				{
+					SetWindowPos (hwnd_dialog, 0,
+						(rect.left / 2) - ((rect.right - rect.left) / 2),
+						rect.top, 0, 0,
+						SWP_NOZORDER | SWP_NOSIZE);
+				}
+			}
+
+			ShowWindow (hwnd_dialog, SW_SHOWDEFAULT);
+			UpdateWindow (hwnd_dialog);
+			SetForegroundWindow (hwnd_dialog);
+		}
+	}
+
 // take the greater of all the available memory or half the total memory,
 // but at least 8 Mb and no more than 16 Mb, unless they explicitly
 // request otherwise
@@ -694,7 +783,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	if (parms.memsize < MINIMUM_WIN_MEMORY)
 		parms.memsize = MINIMUM_WIN_MEMORY;
 
-	if (parms.memsize < (signed)(lpBuffer.dwTotalPhys >> 1))
+	if (parms.memsize < (lpBuffer.dwTotalPhys >> 1))
 		parms.memsize = lpBuffer.dwTotalPhys >> 1;
 
 	if (parms.memsize > MAXIMUM_WIN_MEMORY)
@@ -712,6 +801,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	if (!parms.membase)
 		Sys_Error ("Not enough memory free; check disk space\n");
+
+	Sys_PageIn (parms.membase, parms.memsize);
 
 	tevent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
@@ -734,13 +825,13 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 			if (t < com_argc)
 				hFile = (HANDLE)Q_atoi (com_argv[t+1]);
 		}
-			
+
 		if ((t = COM_CheckParm ("-HPARENT")) > 0)
 		{
 			if (t < com_argc)
 				heventParent = (HANDLE)Q_atoi (com_argv[t+1]);
 		}
-			
+
 		if ((t = COM_CheckParm ("-HCHILD")) > 0)
 		{
 			if (t < com_argc)
@@ -751,7 +842,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	}
 
 	Sys_Init ();
-	Math_Init ();
+
 // because sound is off until we become active
 	S_BlockSound ();
 
@@ -778,12 +869,12 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		else
 		{
 		// yield the CPU for a little while when paused, minimized, or not the focus
-			if ((cl.paused && !ActiveApp) || Minimized)
+			if ((cl.paused && (!ActiveApp && !DDActive)) || Minimized || block_drawing)
 			{
 				SleepUntilInput (PAUSE_SLEEP);
 				scr_skipupdate = 1;		// no point in bothering to draw
 			}
-			else if (!ActiveApp)
+			else if (!ActiveApp && !DDActive)
 			{
 				SleepUntilInput (NOT_FOCUS_SLEEP);
 			}

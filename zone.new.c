@@ -76,7 +76,7 @@ void *_Mem_Alloc(mempool_t *pool, int size, char *filename, int fileline)
 		clump = malloc(sizeof(memclump_t));
 		if (clump == NULL)
 			Sys_Error("Mem_Alloc: out of memory (alloc at %s:%i)", filename, fileline);
-		memset(clump, 0, sizeof(memclump_t));
+		Q_memset(clump, 0, sizeof(memclump_t));
 		*clumpchainpointer = clump;
 		clump->sentinel1 = MEMCLUMP_SENTINEL;
 		clump->sentinel2 = MEMCLUMP_SENTINEL;
@@ -113,7 +113,7 @@ choseclump:
 	// append to head of list
 	mem->chain = pool->chain;
 	pool->chain = mem;
-	memset((void *)((byte *) mem + sizeof(memheader_t)), 0, mem->size);
+	Q_memset((void *)((byte *) mem + sizeof(memheader_t)), 0, mem->size);
 	return (void *)((byte *) mem + sizeof(memheader_t));
 }
 
@@ -170,7 +170,7 @@ void _Mem_Free(void *data, char *filename, int fileline)
 						}
 					}
 					pool->realsize -= sizeof(memclump_t);
-					memset(clump, 0xBF, sizeof(memclump_t));
+					Q_memset(clump, 0xBF, sizeof(memclump_t));
 					free(clump);
 				}
 				else
@@ -184,7 +184,7 @@ void _Mem_Free(void *data, char *filename, int fileline)
 			{
 #endif
 				pool->realsize -= sizeof(memheader_t) + mem->size + sizeof(int);
-				memset(mem, 0xBF, sizeof(memheader_t) + mem->size + sizeof(int));
+				Q_memset(mem, 0xBF, sizeof(memheader_t) + mem->size + sizeof(int));
 				free(mem);
 #if MEMCLUMPING
 			}
@@ -201,11 +201,11 @@ mempool_t *_Mem_AllocPool(char *name, char *filename, int fileline)
 	pool = malloc(sizeof(mempool_t));
 	if (pool == NULL)
 		Sys_Error("Mem_AllocPool: out of memory (allocpool at %s:%i)", filename, fileline);
-	memset(pool, 0, sizeof(mempool_t));
+	Q_memset(pool, 0, sizeof(mempool_t));
 	pool->chain = NULL;
 	pool->totalsize = 0;
 	pool->realsize = sizeof(mempool_t);
-	strcpy(pool->name, name);
+	Q_strcpy(pool->name, name);
 	pool->next = poolchain;
 	poolchain = pool;
 	return pool;
@@ -227,7 +227,7 @@ void _Mem_FreePool(mempool_t **pool, char *filename, int fileline)
 			Mem_Free((void *)((byte *) (*pool)->chain + sizeof(memheader_t)));
 
 		// free the pool itself
-		memset(*pool, 0xBF, sizeof(mempool_t));
+		Q_memset(*pool, 0xBF, sizeof(mempool_t));
 		free(*pool);
 		*pool = NULL;
 	}
@@ -347,7 +347,7 @@ void MemList_f(void)
 		Mem_PrintStats();
 		break;
 	case 2:
-		if (!strcmp(Cmd_Argv(1), "all"))
+		if (!Q_strcmp(Cmd_Argv(1), "all"))
 		{
 			Mem_PrintList(true);
 			Mem_PrintStats();

@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -35,6 +35,9 @@ int			shinetex_glass, shinetex_chrome, underwatertexture, highlighttexture;
 int			crosshair_tex[32];
 
 int			playertextures;		// up to 16 color translated skins
+
+// Used by depth hack
+float		gldepthmin, gldepthmax;
 
 //
 // view origin
@@ -124,7 +127,7 @@ cvar_t  gl_test = {"gl_temp", "1", true};
 //qmb :gamma
 extern	cvar_t		v_gamma; // muff
 
-// idea originally nicked from LordHavoc 
+// idea originally nicked from LordHavoc
 // re-worked + extended - muff 5 Feb 2001
 // called inside polyblend
 void DoGamma()
@@ -148,7 +151,7 @@ void DoGamma()
 	glVertex3f (10, -100, 100);
 	glVertex3f (10, -100, -100);
 	glVertex3f (10, 100, -100);
-	
+
 	//if we do this twice, we double the brightening effect for a wider range of gamma's
 	glVertex3f (11, 100, 100);
 	glVertex3f (11, -100, 100);
@@ -308,7 +311,7 @@ void R_DrawEntitiesOnList (void)
 	// draw sprites
 	for (i=0 ; i<cl_numvisedicts ; i++)
 	{
-		
+
 		if (cl_visedicts[i]->model->type == mod_sprite)
 		{
 			R_DrawSpriteModel (cl_visedicts[i]);
@@ -328,26 +331,26 @@ void R_DrawViewModel (void)
 	entity_t	*e;
 
     float old_interpolate_model_transform;
- 
+
     if (!r_drawviewmodel.value)
         return;
- 
+
     if (chase_active.value) //make sure we are in 1st person view
         return;
- 
+
     if (!r_drawentities.value) //make sure we are drawing entities
         return;
- 
+
     if (cl.items & IT_INVISIBILITY) //make sure we arnt invisable
         return;
- 
+
     if (cl.stats[STAT_HEALTH] <= 0)	//make sure we arnt dead
         return;
- 
+
     e = &cl.viewent;
     if (!e->model)	//make sure we have a model to draw
         return;
- 
+
     // hack the depth range to prevent view model from poking into walls
     glDepthRange (gldepthmin, gldepthmin + 0.3*(gldepthmax-gldepthmin));
 	//qmb :interpolation
@@ -421,7 +424,7 @@ void R_SetFrustum (void)
 {
 	int		i;
 
-	if (r_refdef.fov_x == 90) 
+	if (r_refdef.fov_x == 90)
 	{
 		// front side is visible
 
@@ -434,13 +437,13 @@ void R_SetFrustum (void)
 	else
 	{
 		// rotate VPN right by FOV_X/2 degrees
-		RotatePointAroundVector( frustum[0].normal, vup, vpn, -(90-r_refdef.fov_x / 2 ) );
+		RotatePointAroundVector( frustum[0].normal, vup, vpn, -(90-r_refdef.fov_x / 2));
 		// rotate VPN left by FOV_X/2 degrees
-		RotatePointAroundVector( frustum[1].normal, vup, vpn, 90-r_refdef.fov_x / 2 );
+		RotatePointAroundVector( frustum[1].normal, vup, vpn, 90-r_refdef.fov_x / 2);
 		// rotate VPN up by FOV_X/2 degrees
-		RotatePointAroundVector( frustum[2].normal, vright, vpn, 90-r_refdef.fov_y / 2 );
+		RotatePointAroundVector( frustum[2].normal, vright, vpn, 90-r_refdef.fov_y / 2);
 		// rotate VPN down by FOV_X/2 degrees
-		RotatePointAroundVector( frustum[3].normal, vright, vpn, -( 90 - r_refdef.fov_y / 2 ) );
+		RotatePointAroundVector( frustum[3].normal, vright, vpn, -(90 - r_refdef.fov_y / 2));
 	}
 
 	for (i=0 ; i<4 ; i++)
@@ -486,6 +489,22 @@ void R_SetupFrame (void)
 
 }
 
+void qGluPerspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
+{
+	gluPerspective(fovy, aspect, zNear, zFar);
+/*
+   GLdouble xmin, xmax, ymin, ymax;
+
+   ymax = zNear * tan(fovy * M_PI / 360.0);
+   ymin = -ymax;
+
+   xmin = ymin * aspect;
+   xmax = ymax * aspect;
+
+   glFrustum(xmin, xmax, ymin, ymax, zNear, zFar);
+*/
+}
+
 /*
 =============
 R_SetupGL
@@ -500,8 +519,7 @@ void R_SetupGL (void)
 	//
 	// set up viewpoint
 	//
-	glMatrixMode(GL_PROJECTION);
-    glLoadIdentity ();
+
 	x = r_refdef.vrect.x * glwidth/vid.width;
 	x2 = (r_refdef.vrect.x + r_refdef.vrect.width) * glwidth/vid.width;
 	y = (vid.height-r_refdef.vrect.y) * glheight/vid.height;
@@ -524,7 +542,10 @@ void R_SetupGL (void)
     screenaspect = (float)r_refdef.vrect.width/r_refdef.vrect.height;
 //	yfov = 2*atan((float)r_refdef.vrect.height/r_refdef.vrect.width)*180/M_PI;
 
-	gluPerspective (r_refdef.fov_y,  screenaspect,  4,  4096);
+	glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+	//gluPerspective (r_refdef.fov_y, screenaspect, 4, 4096);
+	qGluPerspective(r_refdef.fov_y, screenaspect, 4, 4096);
 
 	glCullFace(GL_FRONT);
 
@@ -541,9 +562,11 @@ void R_SetupGL (void)
 	//
 	// set drawing parms
 	//
+/*
 	if (gl_cull.value)
 		glEnable(GL_CULL_FACE);
 	else
+*/
 		glDisable(GL_CULL_FACE);
 
 	glDisable(GL_BLEND);
@@ -689,10 +712,10 @@ void R_RenderView (void)
 		glFogi(GL_FOG_MODE, GL_LINEAR);
 			colors[0] = gl_fogred.value;
 			colors[1] = gl_foggreen.value;
-			colors[2] = gl_fogblue.value; 
-		glFogfv(GL_FOG_COLOR, colors); 
-		glFogf(GL_FOG_START, gl_fogstart.value); 
-		glFogf(GL_FOG_END, gl_fogend.value); 
+			colors[2] = gl_fogblue.value;
+		glFogfv(GL_FOG_COLOR, colors);
+		glFogf(GL_FOG_START, gl_fogstart.value);
+		glFogf(GL_FOG_END, gl_fogend.value);
 		glFogf(GL_FOG_DENSITY, 0.2f);
 		glEnable(GL_FOG);
 
@@ -700,8 +723,6 @@ void R_RenderView (void)
 			while ( (error = glGetError()) != GL_NO_ERROR )
 				Con_DPrintf ("&c900Error:&c009Fog&r %s\n", gluErrorString(error));
 	}
-
-
 
 	R_RenderScene ();
 
@@ -713,7 +734,7 @@ void R_RenderView (void)
 	if (r_speeds.value)
 	{
 		time2 = Sys_FloatTime ();
-		Con_Printf ("%3i ms  %4i wpoly %4i epoly\n", (int)((time2-time1)*1000), c_brush_polys, c_alias_polys); 
+		Con_Printf ("%3i ms  %4i wpoly %4i epoly\n", (int)((time2-time1)*1000), c_brush_polys, c_alias_polys);
 	}
 
 	if (r_errors.value && developer.value)

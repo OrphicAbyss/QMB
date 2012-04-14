@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 QMB: 2.10
 
   FEATURES:
-  
+
   Basic physics,  including: world colisions, velocity and constant acceleration.
   Easy extendable particle types.
   Drawing optimised for speed (not correctness).
@@ -36,13 +36,13 @@ QMB: 2.10
 
   REQUIREMENTS:
   **32bit texture loading (from www.quakesrc.org)**
-  
+
   *include this file (gl_rpart.c and gl_rpart.h) in your source code
   *remove particle_t etc from glquake.h
   *remove the old r_part.c
   *compile :D
   *customise to taste
-  
+
 *******************************************************/
 
 #include "quakedef.h"
@@ -55,7 +55,7 @@ QMB: 2.10
 //sin and cos tables for the particle triangle fans
 static double sint[7] = {0.000000, 0.781832,  0.974928,  0.433884, -0.433884, -0.974928, -0.781832};
 static double cost[7] = {1.000000, 0.623490, -0.222521, -0.900969, -0.900969, -0.222521,  0.623490};
- 
+
 //linked lists pointers for the first of the active, free and the a spare list for
 //particles
 particle_t			*active_particles,			*free_particles,		*particles;
@@ -107,7 +107,7 @@ int CL_TruePointContents (vec3_t p)
 
 __inline void RGBtoGrayscalef(vec3_t rgb){
 	float value;
-	
+
 	if (gl_sincity.value == 1){
 		//value = min(255,rgb[0] * 0.2125 + rgb[1] * 0.7154 + rgb[2] * 0.0721);
 		//value = min(255,max(max(rgb[0],rgb[1]),rgb[2]));
@@ -128,7 +128,7 @@ __inline void RGBtoGrayscalef(vec3_t rgb){
 void R_ClearParticles (void)
 {
 	int		i;
-	
+
 	numParticles = 0;						//no particles alive
 	timepassed = cl.time;					//reset emitter times
 	timetemp = cl.time;
@@ -165,19 +165,19 @@ void R_ClearParticles (void)
 	some orders may look strange when particles overlap
 
 	to add a new type:
-	
+
 	  AddParticleType(int src, int dst, part_move_t move, part_grav_t grav, part_type_t id, int custom_id, int texture, float startalpha)
 
   //blend mode
   //some examples are (gl_one,gl_one), (gl_src_alpha,gl_one_minus_src_alpha)
 					src = GL_SRC_ALPHA;
 					dst = GL_ONE;
-	
+
   //colision&physics:	pm_static		:particle ignroes velocity
   						pm_nophysics	:particle with velocity but ignores the map
 						pm_normal		:particle with velocity, stops moving when it hits a wall
 						pm_float		:particle with velocity, only alive in the water
-						pm_bounce		:particle with velocity, bounces off the world 
+						pm_bounce		:particle with velocity, bounces off the world
 						pm_bounce_fast	:particle with velocity, bounces off the world (no energy loss)
 						pm_shrink		:particle with velocity, shrinks over time
 						pm_die			:particle with velocity, dies after touching the map
@@ -208,7 +208,7 @@ void R_ClearParticles (void)
 			used to uniquely define diffrent custom particles
 					custom_id = 0;
 
-	
+
   //what texture to use
 					texture = part_tex;
 
@@ -337,7 +337,7 @@ void R_EntityParticles (entity_t *ent)
 		angle = cl.time * avelocities[i][2];
 		sr = sin(angle);
 		cr = cos(angle);
-	
+
 		forward[0] = cp*cy;
 		forward[1] = cp*sy;
 		forward[2] = -sp;
@@ -351,17 +351,17 @@ void R_EntityParticles (entity_t *ent)
 
 		p->hit = 0;
 		p->die = cl.time + 0.01;
-	
+
 		colourByte = (byte *)&d_8to24table[0x6f];
 		p->colour[0] = colourByte[0]/255.0;
 		p->colour[1] = colourByte[1]/255.0;
 		p->colour[2] = colourByte[2]/255.0;
 
 		//p->type = pt_explode;
-		
-		p->org[0] = ent->origin[0] + r_avertexnormals[i][0]*dist + forward[0]*beamlength;			
-		p->org[1] = ent->origin[1] + r_avertexnormals[i][1]*dist + forward[1]*beamlength;			
-		p->org[2] = ent->origin[2] + r_avertexnormals[i][2]*dist + forward[2]*beamlength;			
+
+		p->org[0] = ent->origin[0] + r_avertexnormals[i][0]*dist + forward[0]*beamlength;
+		p->org[1] = ent->origin[1] + r_avertexnormals[i][1]*dist + forward[1]*beamlength;
+		p->org[2] = ent->origin[2] + r_avertexnormals[i][2]*dist + forward[2]*beamlength;
 	}
 	Con_Printf ("EntityParticles");*/
 }
@@ -432,7 +432,7 @@ void R_ParseParticleEffect (void)
 {
 	vec3_t		org, dir;
 	int			i, count, msgcount, colour;
-	
+
 	for (i=0 ; i<3 ; i++)			//read in org
 		org[i] = MSG_ReadCoord ();
 	for (i=0 ; i<3 ; i++)			//read in direction
@@ -444,17 +444,17 @@ void R_ParseParticleEffect (void)
 		count = 1024;		//its actually a particle explosion
 	else
 		count = msgcount;
-	
+
 	R_RunParticleEffect (org, dir, colour, count);
 }
-	
+
 /*===============
 R_ParticleExplosion
 ===============*/
 void R_ParticleExplosion (vec3_t org)
 {
 	vec3_t black;
-	
+
 	black[0] = 1;
 	black[1] = 0;
 	black[2] = 0;
@@ -534,7 +534,7 @@ void R_RunParticleEffect (vec3_t org, vec3_t dir, int color, int count)
 	byte		*colourByte;
 	vec3_t		colour, tempdir;
 	int			i;
-	
+
 	if ((dir[0] == 0) && (dir[1] == 0) && (dir[2] == 0))
 		VectorCopy(zerodir,tempdir);
 	else
@@ -595,7 +595,7 @@ void R_RunParticleEffect (vec3_t org, vec3_t dir, int color, int count)
 			{
 				for (i=0; i<8; i++){
 					colour[0] = colour[1] = colour[2] = (rand()%90)/255.0;
-					AddParticleColor(org, zero, 1, 1, 4, p_chunks, colour, tempdir); 
+					AddParticleColor(org, zero, 1, 1, 4, p_chunks, colour, tempdir);
 				}
 				AddParticle(org, 1, 100, 1.0f, p_sparks, tempdir);
 			}
@@ -663,7 +663,7 @@ void R_TeleportSplash (vec3_t org)
 void R_RocketTrail (vec3_t start, vec3_t end, int type)
 {
 	vec3_t		colour;
-	
+
 	switch (type)
 	{
 		case 0:	// rocket trail
@@ -751,7 +751,7 @@ void Java_DrawParticle(JNIEnv *env, jclass this, float x, float y, float z, floa
 	glColor4f (r,g,b,a);
 
 	glPushMatrix ();
-		glTranslatef(org[0], org[1], org[2]);				
+		glTranslatef(org[0], org[1], org[2]);
 		glScalef (size, size, size);
 
 		glRotatef (rotation,  vpn[0], vpn[1], vpn[2]);
@@ -827,7 +827,7 @@ void DrawParticles(void)
 			if ((pt->id != p_trail)&&(pt->id != p_lightning)){
 				//all textured particles except trails and lightning
 				drawncount = 0;
-				
+
 				for (p=pt->start; p ; p=p->next){
 
 					//test to see if particle is too close to the screen (high fill rate usage)
@@ -840,7 +840,7 @@ void DrawParticles(void)
 
 					glColor4f (p->colour[0],p->colour[1],p->colour[2],p->ramp);
 
-					if (p->hit == 0){ 
+					if (p->hit == 0){
 			/***NV_point_sprits***/
 			//Should work but is fucked
 			//They scale the wrong way
@@ -860,7 +860,7 @@ void DrawParticles(void)
 							glDisable(GL_POINT_SPRITE_NV);
 						}else{
 							glPushMatrix ();
-								glTranslatef(p->org[0], p->org[1], p->org[2]);				
+								glTranslatef(p->org[0], p->org[1], p->org[2]);
 								glScalef (p->size, p->size, p->size);
 
 								if (p->rotation_speed)
@@ -984,10 +984,10 @@ void DrawParticles(void)
 
 				for (p=pt->start; p ; p=p->next){
 					vec3_t dup, offset;
-					
+
 					VectorScale(p->vel, 0.125f, dup);
 					VectorSubtract(p->org, dup, dup);
-					
+
 					glBegin(GL_QUADS);
 						glColor4f (p->ramp*p->colour[0],p->ramp*p->colour[1],p->ramp*p->colour[2],p->ramp);
 						//glColor4f (0,0,p->ramp*1.0f,p->ramp);
@@ -1104,7 +1104,7 @@ void R_UpdateAll(void)
 					}/* else if (kill->next && (kill->next->dist > kill->dist)){
 						//particles further away should be drawn first
 						//move them up the list
-						
+
 						p->next = kill->next;
 						kill->next = kill->next->next;
 						p->next->next = kill;
@@ -1138,7 +1138,7 @@ void R_UpdateAll(void)
 							if (kill->next->dist > kill->dist){
 								//particles further away should be drawn first
 								//move them up the list
-								
+
 								p->next = kill->next;
 								kill->next = kill->next->next;
 								p->next->next = kill;
@@ -1196,8 +1196,8 @@ void R_UpdateAll(void)
 					{
 						p->hit = 1;
 						//work out exactly where we hit and what the normal was
-						
-						
+
+
 						//copy our hit position to our position
 						VectorCopy(stop, p->org);
 						//VectorMA(stop,-1,normal,p->org);
@@ -1237,7 +1237,7 @@ void R_UpdateAll(void)
 					if ((stop != p->org)&&(Length(stop)!=0))
 					{
 						dist = DotProduct(p->vel, normal) * -1.3;
-					
+
 						VectorMA(p->vel, dist, normal, p->vel);
 						VectorCopy(stop, p->org);
 					}
@@ -1251,7 +1251,7 @@ void R_UpdateAll(void)
 					if ((stop != p->org)&&(Length(stop)!=0))
 					{
 						dist = DotProduct(p->vel, normal) * -1.4;
-					
+
 						VectorMA(p->vel, dist, normal, p->vel);
 						VectorCopy(stop, p->org);
 					}
@@ -1298,7 +1298,7 @@ void TraceLineN (vec3_t start, vec3_t end, vec3_t impact, vec3_t normal, int acc
 	trace_t	trace;
 	vec3_t	temp;
 
-	memset (&trace, 0, sizeof(trace));
+	Q_memset (&trace, 0, sizeof(trace));
 
 	SV_RecursiveHullCheck (cl.worldmodel->hulls, 0, 0, 1, start, end, &trace);
 
@@ -1394,7 +1394,7 @@ void AddParticle(vec3_t org, int count, float size, float time, int type, vec3_t
 		break;
 	case (p_chunks):
 		colour[0] = colour[1] = colour[2] = (rand()%182)/255.0;
-	}		
+	}
 
 	AddParticleColor(org, zero, count, size, time, type, colour, dir);
 }
@@ -1545,7 +1545,7 @@ void AddParticleColor(vec3_t org, vec3_t org2, int count, float size, float time
 			p->vel[0] = (rand()%40)-20*dir[0];
 			p->vel[1] = (rand()%40)-20*dir[1];
 			p->vel[2] = (rand()%40)-5*dir[2];
-			
+
 			break;
 
 		case (p_bubble):
@@ -1620,7 +1620,7 @@ void AddDecalColor(vec3_t org, vec3_t normal, float size, float time, int textur
 
 	VectorCopy(org, p->org);	//set position
 	VectorCopy(normal, p->vel);	//set direction
-		
+
 	p->hit = 1;					//turn off physics and tell renderer to draw it
 
 	p->start = cl.time;			//current time
@@ -1657,11 +1657,11 @@ void AddFire(vec3_t org, float size)
 
 	if ((cl.time == cl.oldtime))
 		return;
-	
+
 	for (pt = particle_type_active; (pt) && (pt->id != p_fire); pt = pt->next);
 
 	count = 1;//(int)((cl.time-timepassed)*1.5);
-	
+
 	if (timetemp <= cl.oldtime){
 		timepassed = cl.time;
 		timetemp = cl.time;
@@ -1793,7 +1793,7 @@ particle_t *AddTrailColor(vec3_t start, vec3_t end, int type, float time, float 
 	//work out Velocity
 	frametime = -1/(cl.time - cl.oldtime)/8;
 	VectorMA(zerodir,frametime,point,StartVelocity);
-	
+
 	for (pt = particle_type_active; (pt) && (pt->id != typetemp); pt = pt->next);
 	for (bubbles = particle_type_active; (bubbles) && (bubbles->id != p_bubble); bubbles = bubbles->next);
 
@@ -1908,7 +1908,7 @@ particle_t *AddTrailColor(vec3_t start, vec3_t end, int type, float time, float 
 			p->type = pm_static;
 			p->size = size;
 			p->rotation_speed = 0;
-		
+
 			//add the particle to the correct one
 			switch (type)
 			{
@@ -1931,7 +1931,7 @@ particle_t *AddTrailColor(vec3_t start, vec3_t end, int type, float time, float 
 					p->vel[0] = 0;
 					p->vel[1] = 0;
 					p->vel[2] = 0;
-					break;					
+					break;
 				}
 				break;
 			case (p_blood):
@@ -1977,7 +1977,7 @@ int LoadParticleTexture (char *texture)
 }
 
 /** MakeParticleTexture
- * Makes the particle textures only 2 the 
+ * Makes the particle textures only 2 the
  * smoke texture (which could do with some work and
  * the others which is just a round circle.
  *
@@ -2015,10 +2015,10 @@ void MakeParticleTexure(void)
 			data[i][j][1]	= 255;
 			data[i][j][2]	= 255;
 			separation = (int) sqrt((i - 64)*(i - 64));
-			data[i][j][3] = (max - separation)*2; 
+			data[i][j][3] = (max - separation)*2;
 		}
     }
-	
+
 	//Add 128 random 4 unit circles
 	for(k=0;k<128;k++){
 		centreX = rand()%122+3;

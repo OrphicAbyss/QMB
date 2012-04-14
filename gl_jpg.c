@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -19,11 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "quakedef.h"
-//jpeg stuff
-#include "JCONFIG.h"
-#include "JERROR.h"
-#include "Jmorecfg.h"
-#include "JPEGLIB.h"
+#include <jpeglib.h>
 #include <math.h>
 
 extern int image_width;
@@ -74,7 +70,7 @@ byte *LoadJPG (FILE *f)
     // read the jpeg
     count = 0;
 
-    while (cinfo.output_scanline < cinfo.output_height) 
+    while (cinfo.output_scanline < cinfo.output_height)
     {
         num_scanlines = jpeg_read_scanlines(&cinfo, in, 1);
         out = in[0];

@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -211,7 +211,7 @@ void BuildTris (void)
 	//
 	numorder = 0;
 	numcommands = 0;
-	memset (used, 0, sizeof(used));
+	Q_memset (used, 0, sizeof(used));
 	for (i=0 ; i<pheader->numtris ; i++)
 	{
 		// pick an unused triangle and start the trifan
@@ -298,11 +298,11 @@ void GL_MakeAliasModelDisplayLists (model_t *m, aliashdr_t *hdr)
 	//
 	// look for a cached version
 	//
-	strcpy (cache, "glquake/");
-	COM_StripExtension (m->name+strlen("progs/"), cache+strlen("glquake/"));
-	strcat (cache, ".ms2");
+	Q_strcpy (cache, "glquake/");
+	COM_StripExtension (m->name+Q_strlen("progs/"), cache+Q_strlen("glquake/"));
+	Q_strcat (cache, ".ms2");
 
-	COM_FOpenFile (cache, &f);	
+	COM_FOpenFile (cache, &f);
 	if (f)
 	{
 		fread (&numcommands, 4, 1, f);
@@ -316,7 +316,7 @@ void GL_MakeAliasModelDisplayLists (model_t *m, aliashdr_t *hdr)
 		//
 		// build it from scratch
 		//
-		
+
 		// **QMB REM**
 		//dont print stuff
 		//Con_Printf ("meshing %s...\n",m->name);
@@ -349,9 +349,9 @@ void GL_MakeAliasModelDisplayLists (model_t *m, aliashdr_t *hdr)
 
 	cmds = Hunk_Alloc (numcommands * 4);
 	paliashdr->commands = (byte *)cmds - (byte *)paliashdr;
-	memcpy (cmds, commands, numcommands * 4);
+	Q_memcpy (cmds, commands, numcommands * 4);
 
-	verts = Hunk_Alloc (paliashdr->numposes * paliashdr->poseverts 
+	verts = Hunk_Alloc (paliashdr->numposes * paliashdr->poseverts
 		* sizeof(trivertx_t) );
 	paliashdr->posedata = (byte *)verts - (byte *)paliashdr;
 	for (i=0 ; i<paliashdr->numposes ; i++)
@@ -383,7 +383,7 @@ vec3_t	shadevector;
 //float   ambientlight;
 extern vec3_t lightcolor; // LordHavoc: .lit support to the definitions at the top
 
-     
+
 // precalculated dot products for quantized angles
 #define SHADEDOT_QUANT 16
 float	r_avertexnormal_dots[SHADEDOT_QUANT][256] =
@@ -474,8 +474,8 @@ void GL_DrawAliasFrame (aliashdr_t *paliashdr, int posenum, int shell, int cell)
 
 			if (!shell){
 				// texture coordinates come from the draw list
-				qglMTexCoord1fARB (GL_TEXTURE1_ARB, bound(0,DotProduct(shadevector,normal),1));
-				qglMTexCoord2fARB (GL_TEXTURE0_ARB, ((float *)order)[0], ((float *)order)[1]);
+				qglMultiTexCoord1fARB (GL_TEXTURE1_ARB, bound(0,DotProduct(shadevector,normal),1));
+				qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, ((float *)order)[0], ((float *)order)[1]);
 				glVertex3f (verts->v[0], verts->v[1], verts->v[2]);
 			}else{
 				glTexCoord2f (((float *)order)[0] + realtime*2, ((float *)order)[1] + realtime*2);
@@ -490,7 +490,7 @@ void GL_DrawAliasFrame (aliashdr_t *paliashdr, int posenum, int shell, int cell)
 		glEnd ();
 	}
 
-	
+
 	if (r_celshading.value || r_vertexshading.value)
 	{
 	//setup for shading
@@ -641,7 +641,7 @@ void GL_DrawAliasBlendedFrame (aliashdr_t *paliashdr, int pose1, int pose2, floa
 		}
 		do {
 			// normals and vertexes come from the frame list
-			// blend the light intensity from the two frames together    
+			// blend the light intensity from the two frames together
 			colour[0] = colour[1] = colour[2] = shadedots[verts1->lightnormalindex] * iblend + shadedots[verts2->lightnormalindex] * blend;
 			colour[0] *= lightcolor[0];
 			colour[1] *= lightcolor[1];
@@ -661,18 +661,18 @@ void GL_DrawAliasBlendedFrame (aliashdr_t *paliashdr, int pose1, int pose2, floa
 			// blend the vertex positions from each frame together
 			if (!shell){
 				// texture coordinates come from the draw list
-				qglMTexCoord1fARB (GL_TEXTURE1_ARB, bound(0,DotProduct(shadevector,normal),1));
-				qglMTexCoord2fARB (GL_TEXTURE0_ARB, ((float *)order)[0], ((float *)order)[1]);	
+				qglMultiTexCoord1fARB (GL_TEXTURE1_ARB, bound(0,DotProduct(shadevector,normal),1));
+				qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, ((float *)order)[0], ((float *)order)[1]);
 				glVertex3f (verts1->v[0] * iblend + verts2->v[0] * blend,
 							verts1->v[1] * iblend + verts2->v[1] * blend,
-							verts1->v[2] * iblend + verts2->v[2] * blend);				
+							verts1->v[2] * iblend + verts2->v[2] * blend);
 			}else{
 				glTexCoord2f (((float *)order)[0] + realtime*2, ((float *)order)[1] + realtime*2);
 				glVertex3f (verts1->v[0] * iblend + verts2->v[0] * blend + r_avertexnormals[verts1->lightnormalindex][0] * iblendshell[0] + r_avertexnormals[verts2->lightnormalindex][0] * blendshell[0],
 							verts1->v[1] * iblend + verts2->v[1] * blend + r_avertexnormals[verts1->lightnormalindex][1] * iblendshell[1] + r_avertexnormals[verts2->lightnormalindex][1] * blendshell[1],
 							verts1->v[2] * iblend + verts2->v[2] * blend + r_avertexnormals[verts1->lightnormalindex][2] * iblendshell[2] + r_avertexnormals[verts2->lightnormalindex][2] * blendshell[2]);
 			}
-			
+
 			order += 2;
 			verts1++;
 			verts2++;
@@ -830,8 +830,8 @@ void GL_DrawQ2AliasFrame (entity_t *e, md2_t *pheader, int lastpose, int pose, f
 	ilerp = 1.0 - lerp;
 
 	//new version by muff - fixes bug, easier to read, faster (well slightly)
-	frame1 = (md2frame_t *)((int) pheader + pheader->ofs_frames + (pheader->framesize * lastpose)); 
-	frame2 = (md2frame_t *)((int) pheader + pheader->ofs_frames + (pheader->framesize * pose)); 
+	frame1 = (md2frame_t *)((void *) pheader + pheader->ofs_frames + (pheader->framesize * lastpose));
+	frame2 = (md2frame_t *)((void *) pheader + pheader->ofs_frames + (pheader->framesize * pose));
 
 	VectorCopy(frame1->scale, scale1);
 	VectorCopy(frame1->translate, translate1);
@@ -839,7 +839,7 @@ void GL_DrawQ2AliasFrame (entity_t *e, md2_t *pheader, int lastpose, int pose, f
 	VectorCopy(frame2->translate, translate2);
 	verts1 = &frame1->verts[0];
 	verts2 = &frame2->verts[0];
-	order = (int *)((int)pheader + pheader->ofs_glcmds);
+	order = (int *)((void *)pheader + pheader->ofs_glcmds);
 
 	glColor4f (1,1,1,1); // FIXME - temporary shading for tutorial - NOT LordHavoc's original code
 
@@ -860,7 +860,7 @@ void GL_DrawQ2AliasFrame (entity_t *e, md2_t *pheader, int lastpose, int pose, f
 		do
 		{
 			// normals and vertexes come from the frame list
-			// blend the light intensity from the two frames together    
+			// blend the light intensity from the two frames together
 			d[0] = d[1] = d[2] = shadedots[verts1->lightnormalindex] * ilerp + shadedots[verts2->lightnormalindex] * lerp;
 			//d[0] = (shadedots[verts2->lightnormalindex] + shadedots[verts1->lightnormalindex])/2;
 			d[0] *= lightcolor[0];
@@ -872,7 +872,7 @@ void GL_DrawQ2AliasFrame (entity_t *e, md2_t *pheader, int lastpose, int pose, f
 			glVertex3f((verts1[order[2]].v[0]*scale1[0]+translate1[0])*ilerp+(verts2[order[2]].v[0]*scale2[0]+translate2[0])*lerp,
 					   (verts1[order[2]].v[1]*scale1[1]+translate1[1])*ilerp+(verts2[order[2]].v[1]*scale2[1]+translate2[1])*lerp,
 					   (verts1[order[2]].v[2]*scale1[2]+translate1[2])*ilerp+(verts2[order[2]].v[2]*scale2[2]+translate2[2])*lerp);
-				
+
 			order+=3;
 		} while (--count);
 
@@ -947,7 +947,7 @@ void R_DrawAliasModel (entity_t *e)
     aliashdr_t  *paliashdr;
     //trivertx_t  *verts, *v;
     //int         index;
-    float       an;//s, t, 
+    float       an;//s, t,
     int         anim;
 	md2_t		*pheader; // LH / muff
 	int			shell; //QMB :model shells
@@ -960,7 +960,7 @@ void R_DrawAliasModel (entity_t *e)
 		shell = true;
 	else
 		shell = false;
- 
+
 //set get the model from the e
     clmodel = e->model;
 
@@ -970,16 +970,16 @@ void R_DrawAliasModel (entity_t *e)
 //make sure its in screen
     if (R_CullBox (mins, maxs) && e != &cl.viewent)
         return;
- 
+
 //QMB: FIXME
 //should use a particle emitter linked to the model for its org
 //needs to be linked when the model is created and distroyed when
 //the entity is distroyed
 //check if its a fire and add the particle effect
-	if (!strcmp (clmodel->name, "progs/flame.mdl"))
+	if (!Q_strcmp (clmodel->name, "progs/flame.mdl"))
 		AddFire(e->origin, 4);
 
-	if (!strcmp (clmodel->name, "progs/flame2.mdl"))
+	if (!Q_strcmp (clmodel->name, "progs/flame2.mdl"))
 	{
 		AddFire(e->origin, 10);
 		return; //do not draw the big fire model, its just a place holder for the particles
@@ -1023,15 +1023,14 @@ void R_DrawAliasModel (entity_t *e)
     }
 
 //scale lighting to floating point
-	VectorScale(lightcolor, 1.0f / 200.0f, lightcolor); 
- 
+	VectorScale(lightcolor, 1.0f / 200.0f, lightcolor);
+
 	//
 	// locate the proper data
 	//
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	if (gl_n_patches && gl_npatches.value)
-	{
+	if (gl_n_patches && gl_npatches.value){
 		glEnable(GL_PN_TRIANGLES_ATI);
 		glPNTrianglesiATI( GL_PN_TRIANGLES_TESSELATION_LEVEL_ATI, gl_npatches.value);
 
@@ -1046,7 +1045,6 @@ void R_DrawAliasModel (entity_t *e)
 		  glPNTrianglesiATI( GL_PN_TRIANGLES_NORMAL_MODE_ATI, GL_PN_TRIANGLES_NORMAL_MODE_LINEAR_ATI);
 	}
 
-#ifdef Q3MODELS
 	if (clmodel->aliastype == MD3IDHEADER){
 		//do nothing for testing
 		if (!r_modeltexture.value){	GL_DisableTMU(GL_TEXTURE0_ARB); }//disable texture if needed
@@ -1060,7 +1058,7 @@ void R_DrawAliasModel (entity_t *e)
 			glCullFace (GL_BACK);
 			glEnable(GL_BLEND);
 			glPolygonMode (GL_FRONT, GL_LINE);
-			
+
 			if (e == &cl.viewent){
 				glLineWidth (1.0f);
 			}else{
@@ -1090,10 +1088,7 @@ void R_DrawAliasModel (entity_t *e)
 			glDisable(GL_BLEND);
 			glColor3f(1.0,1.0,1.0);
 		}
-	} else
-#endif 
-	if (clmodel->aliastype != ALIASTYPE_MD2)
-	{
+	} else if (clmodel->aliastype != ALIASTYPE_MD2) {
 		paliashdr = (aliashdr_t *)Mod_Extradata (e->model);
 		c_alias_polys += paliashdr->numtris;
 
@@ -1182,7 +1177,7 @@ void R_DrawAliasModel (entity_t *e)
 		}
 		glPopMatrix ();
 
-	}  
+	}
 	else
 	{
 		pheader = (md2_t *)Mod_Extradata (e->model);
@@ -1191,7 +1186,7 @@ void R_DrawAliasModel (entity_t *e)
 		glBindTexture(GL_TEXTURE_2D,pheader->gl_texturenum[e->skinnum]);
 		R_SetupQ2AliasFrame (e, pheader);
 	}
- 
+
 	if (gl_n_patches && gl_npatches.value)
 	{
 		glDisable(GL_PN_TRIANGLES_ATI);

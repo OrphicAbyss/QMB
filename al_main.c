@@ -33,7 +33,7 @@ typedef struct
 	ALubyte		wave[4];		// 'WAVE'
 	ALubyte		fmt[4];			// 'fmt '
 	ALuint		fmtSize;
-	ALushort	Format;                              
+	ALushort	Format;
 	ALushort	Channels;
 	ALuint		SamplesPerSec;
 	ALuint		BytesPerSec;
@@ -206,7 +206,7 @@ int main(int argc, char* argv[])
 		alDeleteBuffers(NUM_BUFFERS, g_Buffers);
 		exit(-1);
 	}
-	
+
 	// Unload ding.wav
 	alutUnloadWAV(format,data,size,freq);
 	if ((error = alGetError()) != AL_NO_ERROR)
@@ -379,7 +379,7 @@ int main(int argc, char* argv[])
 
 	if (eaxSet == NULL)
 		g_bEAX = false;
-	
+
 	sprintf((char*)szFnName,"EAXGet");
 
 	eaxGet = (EAXGet)alGetProcAddress(szFnName);
@@ -487,7 +487,7 @@ ALvoid BufferTest(ALvoid)
 
 	ALfloat source0Pos[]={ 2.0, 0.0,-2.0};	// Front and right of the listener
 	ALfloat source0Vel[]={ 0.0, 0.0, 0.0};
-	
+
 	alGenSources(1,source);
 	if ((error = alGetError()) != AL_NO_ERROR)
 	{
@@ -502,11 +502,11 @@ ALvoid BufferTest(ALvoid)
 	alSourcef(source[0],AL_GAIN,1.0f);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcef 0 AL_GAIN : \n", error);
-	
+
 	alSourcefv(source[0],AL_POSITION,source0Pos);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_POSITION : \n", error);
-	
+
 	alSourcefv(source[0],AL_VELOCITY,source0Vel);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_VELOCITY : \n", error);
@@ -582,9 +582,9 @@ ALvoid BufferTest(ALvoid)
 	Creates 2 Sources - one to the front right of the listener, and one to the rear left of the listener
 */
 ALvoid PositionTest(ALvoid)
-{	
+{
 	ALint	error;
-	
+
 	ALuint	source[2];
 	ALbyte	ch;
 
@@ -612,7 +612,7 @@ ALvoid PositionTest(ALvoid)
 	alSourcefv(source[0],AL_POSITION,source0Pos);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_POSITION : \n", error);
-	
+
 	alSourcefv(source[0],AL_VELOCITY,source0Vel);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_VELOCITY : \n", error);
@@ -740,7 +740,7 @@ ALvoid LoopingTest(ALvoid)
 		DisplayALError("alGenSources 1 : ", error);
 		return;
 	}
-	
+
 	alSourcef(source[0],AL_PITCH,1.0f);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcef 0 AL_PITCH : \n", error);
@@ -748,11 +748,11 @@ ALvoid LoopingTest(ALvoid)
 	alSourcef(source[0],AL_GAIN,1.0f);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcef 0 AL_GAIN : \n", error);
-	
+
 	alSourcefv(source[0],AL_POSITION,source0Pos);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_POSITION : \n", error);
-	
+
 	alSourcefv(source[0],AL_VELOCITY,source0Vel);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_VELOCITY : \n", error);
@@ -896,7 +896,7 @@ ALvoid EAXTest(ALvoid)
 		DisplayALError("alGenSources 2 : ", error);
 		return;
 	}
-	
+
 	alSourcef(source[0],AL_PITCH,1.0f);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcef 0 AL_PITCH : \n", error);
@@ -904,11 +904,11 @@ ALvoid EAXTest(ALvoid)
 	alSourcef(source[0],AL_GAIN,1.0f);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcef 0 AL_GAIN : \n", error);
-	
+
 	alSourcefv(source[0],AL_POSITION,source0Pos);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_POSITION : \n", error);
-	
+
 	alSourcefv(source[0],AL_VELOCITY,source0Vel);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_VELOCITY : \n", error);
@@ -1086,7 +1086,7 @@ ALvoid QueueTest(ALvoid)
 		DisplayALError("alGenSources 1 : ", error);
 		return;
 	}
-	
+
 	alSourcef(source[0],AL_PITCH,1.0f);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcef 0 AL_PITCH : ", error);
@@ -1094,11 +1094,11 @@ ALvoid QueueTest(ALvoid)
 	alSourcef(source[0],AL_GAIN,1.0f);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcef 0 AL_GAIN : ", error);
-	
+
 	alSourcefv(source[0],AL_POSITION,source0Pos);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_POSITION : ", error);
-	
+
 	alSourcefv(source[0],AL_VELOCITY,source0Vel);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_VELOCITY : ", error);
@@ -1137,7 +1137,7 @@ ALvoid QueueTest(ALvoid)
 	buffers[2] = g_Buffers[4];
 	buffers[3] = g_Buffers[5];
 	buffers[4] = NULL;
-	
+
 	do
 	{
 		ch = _getch();
@@ -1218,7 +1218,7 @@ ALvoid QueueTest(ALvoid)
 						buffersremoved[0] = 4;
 					else
 						buffersremoved[0] = 0;
-				
+
 					printf("\nRemoved Buffer %d from queue\r", buffersremoved[0]);
 				}
 
@@ -1355,9 +1355,9 @@ ALvoid QueueTest(ALvoid)
 					Buffer = 4;
 				else
 					Buffer = 0;
-				
+
 				printf("Current Buffer is %d, %d Buffers in queue, %d Processed\r", Buffer, BuffersInQueue, BuffersProcessed);
-				
+
 				break;
 		}
 	} while (ch != 'Q');
@@ -1393,7 +1393,7 @@ ALvoid FreqTest(ALvoid)
 		DisplayALError("alGenSources 1 : ", error);
 		return;
 	}
-	
+
 	alSourcef(source[0],AL_PITCH,1.0f);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcef 0 AL_PITCH : \n", error);
@@ -1401,11 +1401,11 @@ ALvoid FreqTest(ALvoid)
 	alSourcef(source[0],AL_GAIN,1.0f);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcef 0 AL_GAIN : \n", error);
-	
+
 	alSourcefv(source[0],AL_POSITION,source0Pos);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_POSITION : \n", error);
-	
+
 	alSourcefv(source[0],AL_VELOCITY,source0Vel);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_VELOCITY : \n", error);
@@ -1456,7 +1456,7 @@ ALvoid FreqTest(ALvoid)
 	alDeleteSources(1, source);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alDeleteSources 2 : ", error);
-	
+
 	return;
 }
 
@@ -1528,7 +1528,7 @@ ALvoid StereoTest(ALvoid)
 				alSourcePlay(source[0]);
 				if ((error = alGetError()) != AL_NO_ERROR)
 					DisplayALError("alSourcePlay source 0 : ", error);
-				
+
 				break;
 			case '2':
 				// Stop source
@@ -1545,7 +1545,7 @@ ALvoid StereoTest(ALvoid)
 				alSourcefv(source[0],AL_POSITION,source0Pos);
 				if ((error = alGetError()) != AL_NO_ERROR)
 					DisplayALError("alSourcefv 0 AL_POSITION : \n", error);
-	
+
 				// Set 3D velocity
 				alSourcefv(source[0],AL_VELOCITY,source0Vel);
 				if ((error = alGetError()) != AL_NO_ERROR)
@@ -1627,9 +1627,9 @@ ALvoid StereoTest(ALvoid)
 					Buffer = 6;
 				else
 					Buffer = 0;
-				
+
 				printf("Current Buffer is %d, %d Buffers in queue, %d Processed\r", Buffer, BuffersInQueue, BuffersProcessed);
-				
+
 				break;
 		}
 	} while (ch != 'Q');
@@ -1642,7 +1642,7 @@ ALvoid StereoTest(ALvoid)
 	alDeleteSources(1, source);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alDeleteSources 2 : ", error);
-	
+
 	return;
 }
 
@@ -1676,11 +1676,11 @@ ALvoid GainTest(ALvoid)
 	alSourcef(source[0],AL_GAIN,1.0f);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcef 0 AL_GAIN : \n", error);
-	
+
 	alSourcefv(source[0],AL_POSITION,source0Pos);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_POSITION : \n", error);
-	
+
 	alSourcefv(source[0],AL_VELOCITY,source0Vel);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_VELOCITY : \n", error);
@@ -1810,7 +1810,7 @@ ALvoid GainTest(ALvoid)
 	alDeleteSources(2, source);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alDeleteSources 2 : ", error);
-	
+
 	return;
 }
 
@@ -1819,7 +1819,7 @@ ALvoid GainTest(ALvoid)
 
 /*
 	Streaming Test
-	Stream a long stereo wave file from harddisc - using AL Queuing 
+	Stream a long stereo wave file from harddisc - using AL Queuing
 */
 ALvoid StreamingTest(ALvoid)
 {
@@ -1931,7 +1931,7 @@ ALvoid StreamingTest(ALvoid)
 		if (processed > 0)
 		{
 			buffersreturned += processed;
-			
+
 			curtime = timeGetTime() - starttime;
 			printf("Time is %d ... Buffers Completed is %d   \n", curtime, buffersreturned);
 			if ((curtime < 2700) && (buffersreturned == 12))
@@ -1965,13 +1965,13 @@ ALvoid StreamingTest(ALvoid)
 
 					if (DataToRead == DataSize)
 						bFinished = AL_TRUE;
-					
+
 					fread(data, 1, DataToRead, fp);
 					DataSize -= DataToRead;
-					
+
 					if (bFinished == AL_TRUE)
 					{
-						memset(data + DataToRead, 0, BSIZE - DataToRead);
+						Q_memset(data + DataToRead, 0, BSIZE - DataToRead);
 					}
 
 					alBufferData(BufferID, Format, data, BSIZE, wave.SamplesPerSec);
@@ -2024,7 +2024,7 @@ ALvoid StreamingTest(ALvoid)
 ALvoid RelativeTest(ALvoid)
 {
 	ALint	error;
-	
+
 	ALuint	source[1];
 	ALbyte	ch;
 	ALboolean bRelative = AL_FALSE;
@@ -2039,7 +2039,7 @@ ALvoid RelativeTest(ALvoid)
 		DisplayALError("alGenSources 1 : ", error);
 		return;
 	}
-	
+
 	alSourcef(source[0],AL_PITCH,1.0f);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcef 0 AL_PITCH : \n", error);
@@ -2047,7 +2047,7 @@ ALvoid RelativeTest(ALvoid)
 	alSourcef(source[0],AL_GAIN,1.0f);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcef 0 AL_GAIN : \n", error);
-	
+
 	alSourcefv(source[0],AL_VELOCITY, Vel);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcefv 0 AL_VELOCITY : \n", error);
@@ -2060,7 +2060,7 @@ ALvoid RelativeTest(ALvoid)
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcei 0 AL_LOOPING true: \n", error);
 
-	alSourcei(source[0], AL_SOURCE_RELATIVE, AL_FALSE);	
+	alSourcei(source[0], AL_SOURCE_RELATIVE, AL_FALSE);
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DisplayALError("alSourcei 0 AL_SOURCE_RELATIVE AL_FALSE : \n", error);
 
@@ -2083,7 +2083,7 @@ ALvoid RelativeTest(ALvoid)
 				alSourcefv(source[0],AL_POSITION,Pos);
 				if ((error = alGetError()) != AL_NO_ERROR)
 					DisplayALError("alSourcefv 0 AL_POSITION : \n", error);
-				
+
 				alSourcePlay(source[0]);
 				if ((error = alGetError()) != AL_NO_ERROR)
 					DisplayALError("alSourcePlay source 0 : ", error);

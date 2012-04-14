@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -69,7 +69,7 @@ Water, Sky
 
 2 TMU's
 4 pass system
-	
+
 	first pass:
 		Normal, Lightmap
 	second pass:
@@ -219,7 +219,7 @@ void Surf_DrawTextureChainsFour(model_t *model)
 	}else{
 		detail = false;
 	}
-	
+
 	//ok now we are ready to draw the texture chains
 	for (i=0 ; i<model->numtextures ; i++)
 	{
@@ -238,13 +238,13 @@ void Surf_DrawTextureChainsFour(model_t *model)
 			//if there is a fullbright texture then bind it to TMU2
 			GL_EnableTMU(GL_TEXTURE2_ARB);
 			glBindTexture(GL_TEXTURE_2D,t->gl_fullbright);
-		} 
+		}
 
 
 		GL_SelectTexture(GL_TEXTURE1_ARB);
 
 		for (s = model->textures[i]->texturechain; s; )
-		{	
+		{
 	// Select the right lightmap
 			glBindTexture(GL_TEXTURE_2D,lightmap_textures + s->lightmaptexturenum);
 
@@ -268,12 +268,12 @@ void Surf_DrawTextureChainsFour(model_t *model)
 			v = s->polys->verts[0];
 			for (k=0 ; k<s->polys->numverts ; k++, v+= VERTEXSIZE)
 			{
-				qglMTexCoord2fARB (GL_TEXTURE0_ARB, v[3], v[4]);
-				qglMTexCoord2fARB (GL_TEXTURE1_ARB, v[5], v[6]);
+				qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, v[3], v[4]);
+				qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, v[5], v[6]);
 				if (t->gl_fullbright)
-					qglMTexCoord2fARB (GL_TEXTURE2_ARB, v[3], v[4]);
+					qglMultiTexCoord2fARB (GL_TEXTURE2_ARB, v[3], v[4]);
 				if (detail)
-					qglMTexCoord2fARB (GL_TEXTURE3_ARB, v[7]*18, v[8]*18);
+					qglMultiTexCoord2fARB (GL_TEXTURE3_ARB, v[7]*18, v[8]*18);
 
 				glVertex3fv (v);
 			}
@@ -408,14 +408,14 @@ void Surf_DrawExtraChainsFour(msurface_t *extrachain){
 				ss= os/5 - (realtime*0.05);
 				tt= ot/5 + (realtime*0.05);
 
-				qglMTexCoord2fARB (GL_TEXTURE0_ARB,    s,    t);
-				qglMTexCoord2fARB (GL_TEXTURE1_ARB,   ss,   tt);
+				qglMultiTexCoord2fARB (GL_TEXTURE0_ARB,    s,    t);
+				qglMultiTexCoord2fARB (GL_TEXTURE1_ARB,   ss,   tt);
 			}
 
 			if (shiny_glass)
-				qglMTexCoord2fARB (GL_TEXTURE2_ARB, v[7], v[8]);
+				qglMultiTexCoord2fARB (GL_TEXTURE2_ARB, v[7], v[8]);
 			if (shiny_metal)
-				qglMTexCoord2fARB (GL_TEXTURE3_ARB, v[7], v[8]);
+				qglMultiTexCoord2fARB (GL_TEXTURE3_ARB, v[7], v[8]);
 
 			glVertex3fv (v);
 		}
@@ -535,7 +535,7 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 		prev = NULL;
 
 		for (s = model->textures[i]->texturechain; s; )
-		{	
+		{
 	// Select the right lightmap
 			glBindTexture(GL_TEXTURE_2D,lightmap_textures + s->lightmaptexturenum);
 
@@ -559,12 +559,12 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 			v = s->polys->verts[0];
 			for (k=0 ; k<s->polys->numverts ; k++, v+= VERTEXSIZE)
 			{
-				qglMTexCoord2fARB (GL_TEXTURE0_ARB, v[3], v[4]);
-				qglMTexCoord2fARB (GL_TEXTURE1_ARB, v[5], v[6]);
+				qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, v[3], v[4]);
+				qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, v[5], v[6]);
 				if (t->gl_fullbright)
-					qglMTexCoord2fARB (GL_TEXTURE2_ARB, v[3], v[4]);
+					qglMultiTexCoord2fARB (GL_TEXTURE2_ARB, v[3], v[4]);
 				if (gl_detail.value)
-					qglMTexCoord2fARB (GL_TEXTURE3_ARB, v[7]*18, v[8]*18);
+					qglMultiTexCoord2fARB (GL_TEXTURE3_ARB, v[7]*18, v[8]*18);
 
 				glVertex3fv (v);
 			}
@@ -611,7 +611,7 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 		glBindTexture(GL_TEXTURE_2D,detailtexture);
 		Surf_EnableDetail();
 	}
-	
+
 	//ok now we are ready to draw the texture chains
 	for (i=0 ; i<model->numtextures ; i++)
 	{
@@ -627,10 +627,10 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 			//if there is a fullbright texture then bind it to TMU0
 			GL_EnableTMU(GL_TEXTURE0_ARB);
 			glBindTexture(GL_TEXTURE_2D,t->gl_fullbright);
-		} 
+		}
 
 		for (s = model->textures[i]->texturechain; s; )
-		{	
+		{
 			if (!gl_detail.value && !t->gl_fullbright){
 		// Draw the polys
 				glBegin(GL_POLYGON);
@@ -638,9 +638,9 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 				for (k=0 ; k<s->polys->numverts ; k++, v+= VERTEXSIZE)
 				{
 					if (t->gl_fullbright)
-						qglMTexCoord2fARB (GL_TEXTURE0_ARB, v[3], v[4]);
+						qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, v[3], v[4]);
 					if (gl_detail.value)
-						qglMTexCoord2fARB (GL_TEXTURE1_ARB, v[7]*18, v[8]*18);
+						qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, v[7]*18, v[8]*18);
 
 					glVertex3fv (v);
 				}
@@ -735,8 +735,8 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain){
 				ss= os/5 - (realtime*0.05);
 				tt= ot/5 + (realtime*0.05);
 
-				qglMTexCoord2fARB (GL_TEXTURE0_ARB,    s,    t);
-				qglMTexCoord2fARB (GL_TEXTURE1_ARB,   ss,   tt);
+				qglMultiTexCoord2fARB (GL_TEXTURE0_ARB,    s,    t);
+				qglMultiTexCoord2fARB (GL_TEXTURE1_ARB,   ss,   tt);
 
 				glVertex3fv (v);
 			}
@@ -819,9 +819,9 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain){
 			for (k=0 ; k<surf->polys->numverts ; k++, v+= VERTEXSIZE)
 			{
 				if (shiny_glass)
-					qglMTexCoord2fARB (GL_TEXTURE0_ARB, v[7], v[8]);
+					qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, v[7], v[8]);
 				if (shiny_metal)
-					qglMTexCoord2fARB (GL_TEXTURE1_ARB, v[7], v[8]);
+					qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, v[7], v[8]);
 
 				glVertex3fv (v);
 			}

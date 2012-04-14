@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -154,9 +154,9 @@ void BotConnect (client_t *client, int ClientNo, int color, char *name)
 	globot.botactive[randombot] = true;
 
 	if (name[0] != '0')
-		strcpy (client->name, name);
+		Q_strcpy (client->name, name);
 	else
-		strcpy (client->name, PickBotName (randombot, nameTemp));
+		Q_strcpy (client->name, PickBotName (randombot, nameTemp));
 
 	if (color != 666)
 	{

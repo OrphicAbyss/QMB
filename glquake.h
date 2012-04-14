@@ -23,14 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #pragma warning(disable : 4136)     // X86
 #pragma warning(disable : 4051)     // ALPHA
 
-#ifdef _WIN32
-#include <windows.h>
-#define strcasecmp stricmp
-#define strncasecmp strnicmp
-#endif
-
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <GL/GLee.h>
 
 void GL_BeginRendering (int *x, int *y, int *width, int *height);
 void GL_EndRendering (void);
@@ -38,13 +31,12 @@ void GL_EndRendering (void);
 extern	int		texture_extension_number;
 extern	int		texture_mode;
 extern	int		gl_textureunits;	//qmb :multitexture stuff
-extern	float	gldepthmin, gldepthmax;
 
-void	GL_Upload32		(unsigned *data, int width, int height,  qboolean mipmap, qboolean alpha, qboolean grayscale);
-int		GL_Upload8		(byte *data, int width, int height,  qboolean mipmap, qboolean alpha);
-int		GL_LoadTexture	(char *identifier, int width, int height, byte *data, qboolean mipmap, qboolean alpha, int bytesperpixel, qboolean grayscale);
+void	GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap, qboolean alpha, qboolean grayscale);
+int		GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean alpha);
+int		GL_LoadTexture (char *identifier, int width, int height, byte *data, qboolean mipmap, qboolean alpha, int bytesperpixel, qboolean grayscale);
 int		GL_LoadTexImage (char *filename, qboolean complain, qboolean mipmap, qboolean grayscale);
-int		GL_FindTexture	(char *identifier);
+int		GL_FindTexture (char *identifier);
 
 extern	int glx, gly, glwidth, glheight;
 
@@ -248,10 +240,6 @@ void GL_Bind (int texnum);
 #endif
 //QMB :end
 
-#ifndef _WIN32
-#define APIENTRY /* */
-#endif
-
 typedef void (APIENTRY *lpMTexFUNC) (GLenum, GLfloat, GLfloat);
 typedef void (APIENTRY *lp1DMTexFUNC) (GLenum, GLfloat);
 typedef void (APIENTRY *lpSelTexFUNC) (GLenum);
@@ -262,8 +250,8 @@ typedef void (APIENTRY *pointPramFUNC) (GLenum pname, const GLfloat params);
 typedef void (APIENTRY *pnTrianglesIatiPROC)(GLenum pname, GLint param);
 typedef void (APIENTRY *pnTrianglesFaitPROC)(GLenum pname, GLfloat param);
 
-extern lpMTexFUNC qglMTexCoord2fARB;
-extern lp1DMTexFUNC qglMTexCoord1fARB;
+extern lpMTexFUNC qglMultiTexCoord2fARB;
+extern lp1DMTexFUNC qglMultiTexCoord1fARB;
 extern lpSelTexFUNC qglSelectTextureARB;
 extern pointPramFUNCv qglPointParameterfvEXT;
 extern pointPramFUNC qglPointParameterfEXT;
@@ -280,7 +268,5 @@ extern qboolean gl_n_patches;
 extern void GL_EnableTMU(int tmu);
 extern void GL_DisableTMU(int tmu);
 extern void GL_SelectTexture (GLenum target);
-
-#define Q3MODELS 1      //Allow Q3 models in the same way as Q1 models. --> JTR
 
 void   Mod_LoadMd3Model (model_t *mod, void *buffer);

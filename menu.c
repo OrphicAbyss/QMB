@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -155,7 +155,7 @@ void M_PrintWhite (int cx, int cy, char *str)
 void M_Centerprint (int cy, char *str)
 {
 	int cx;
-	cx = vid.width/2 - (strlen(str)*4);
+	cx = vid.width/2 - (Q_strlen(str)*4);
 
 	while (*str)
 	{
@@ -168,7 +168,7 @@ void M_Centerprint (int cy, char *str)
 void M_CenterprintWhite (int cy, char *str)
 {
 	int cx;
-	cx = vid.width/2 - (strlen(str)*4);
+	cx = vid.width/2 - (Q_strlen(str)*4);
 
 	while (*str)
 	{
@@ -227,7 +227,7 @@ void M_Main_ButtonList (char *buttons[], int cursor_location, int in_main)
 
 	for ( i = 0; buttons[i] != 0; i++ )
 	{
-		x_length = x_length + (strlen(buttons[i])*8);
+		x_length = x_length + (Q_strlen(buttons[i])*8);
 	}
 
 	x_mod = (vid.width - x_length) / (i+1);
@@ -245,7 +245,7 @@ void M_Main_ButtonList (char *buttons[], int cursor_location, int in_main)
 		}
 		else
 			PrintRed (x, y, buttons[i]);
-		x = x + (strlen(buttons[i])*8);
+		x = x + (Q_strlen(buttons[i])*8);
 	}
 }
 
@@ -265,7 +265,7 @@ void M_Main_Layout (int f_cursor, int f_inmenu)
 	// top
 	Draw_Fill (0,0,vid.width, vid.height/8, 0);
 	Draw_Fill (0,vid.height/16,vid.width, 1, LAYOUT_RED);
-	
+
 	// bottom
 	Draw_Fill (0,vid.height-24,vid.width, vid.height, 0);
 	// bottom fade
@@ -291,16 +291,16 @@ void M_BuildTranslationTable(int top, int bottom)
 		identityTable[j] = j;
 	dest = translationTable;
 	source = identityTable;
-	memcpy (dest, source, 256);
+	Q_memcpy (dest, source, 256);
 
 	if (top < 128)	// the artists made some backwards ranges.  sigh.
-		memcpy (dest + TOP_RANGE, source + top, 16);
+		Q_memcpy (dest + TOP_RANGE, source + top, 16);
 	else
 		for (j=0 ; j<16 ; j++)
 			dest[TOP_RANGE+j] = source[top+15-j];
 
 	if (bottom < 128)
-		memcpy (dest + BOTTOM_RANGE, source + bottom, 16);
+		Q_memcpy (dest + BOTTOM_RANGE, source + bottom, 16);
 	else
 		for (j=0 ; j<16 ; j++)
 			dest[BOTTOM_RANGE+j] = source[bottom+15-j];
@@ -332,7 +332,7 @@ void M_DrawTextBox (int x, int y, int width, int lines)
 	}
 	p = Draw_CachePic ("gfx/box_bl.lmp");
 	M_DrawTransPic (cx, cy+8, p);
-	
+
 	// draw middle
 	cx += 8;
 	while (width > 0)
@@ -540,12 +540,12 @@ void M_SinglePlayer_Draw (void)
 		dim_load = true;
 		dim_save = true;
 	}
-	
+
 	if (!sv.active || cl.intermission)
 		dim_save = true;
 
 	M_PrintWhite (BUTTON_MENU_X, game_cursor_table[GAME_NEW], names[0]);
-	
+
 	if (dim_load)
 		M_Print (BUTTON_MENU_X, game_cursor_table[GAME_LOAD], names[1]);
 	else
@@ -650,7 +650,7 @@ void M_ScanSaves (void)
 
 	for (i=0 ; i<MAX_SAVEGAMES ; i++)
 	{
-		strcpy (m_filenames[i], "--- UNUSED SLOT ---");
+		Q_strcpy (m_filenames[i], "--- UNUSED SLOT ---");
 		loadable[i] = false;
 		sprintf (name, "%s/s%i.sav", com_gamedir, i);
 		f = fopen (name, "r");
@@ -658,7 +658,7 @@ void M_ScanSaves (void)
 			continue;
 		fscanf (f, "%i\n", &version);
 		fscanf (f, "%79s\n", name);
-		strncpy (m_filenames[i], name, sizeof(m_filenames[i])-1);
+		Q_strncpy (m_filenames[i], name, sizeof(m_filenames[i])-1);
 
 	// change _ back to space
 		for (j=0 ; j<SAVEGAME_COMMENT_LENGTH ; j++)
@@ -674,7 +674,7 @@ void M_Menu_Load_f (void)
 	dim_load = false;
 	if (svs.maxclients != 1 || deathmatch.value || coop.value)
 		dim_load = true;
-	
+
 	if (dim_load == true)
 		return;
 
@@ -690,7 +690,7 @@ void M_Menu_Save_f (void)
 	dim_save = false;
 	if (svs.maxclients != 1 || deathmatch.value || coop.value)
 		dim_save = true;
-	
+
 	if (!sv.active || cl.intermission)
 		dim_save = true;
 
@@ -960,10 +960,10 @@ void M_Setup_Draw (void)
 	M_DrawCharacter (56, setup_cursor_table [setup_cursor], 12+((int)(realtime*4)&1));
 
 	if (setup_cursor == 0)
-		M_DrawCharacter (168 + 8*strlen(setup_hostname), setup_cursor_table [setup_cursor], 10+((int)(realtime*4)&1));
+		M_DrawCharacter (168 + 8*Q_strlen(setup_hostname), setup_cursor_table [setup_cursor], 10+((int)(realtime*4)&1));
 
 	if (setup_cursor == 1)
-		M_DrawCharacter (168 + 8*strlen(setup_myname), setup_cursor_table [setup_cursor], 10+((int)(realtime*4)&1));
+		M_DrawCharacter (168 + 8*Q_strlen(setup_myname), setup_cursor_table [setup_cursor], 10+((int)(realtime*4)&1));
 }
 
 void M_Setup_Key (int k)
@@ -1031,14 +1031,14 @@ forward:
 	case K_BACKSPACE:
 		if (setup_cursor == 0)
 		{
-			if (strlen(setup_hostname))
-				setup_hostname[strlen(setup_hostname)-1] = 0;
+			if (Q_strlen(setup_hostname))
+				setup_hostname[Q_strlen(setup_hostname)-1] = 0;
 		}
 
 		if (setup_cursor == 1)
 		{
-			if (strlen(setup_myname))
-				setup_myname[strlen(setup_myname)-1] = 0;
+			if (Q_strlen(setup_myname))
+				setup_myname[Q_strlen(setup_myname)-1] = 0;
 		}
 		break;
 
@@ -1047,7 +1047,7 @@ forward:
 			break;
 		if (setup_cursor == 0)
 		{
-			l = strlen(setup_hostname);
+			l = Q_strlen(setup_hostname);
 			if (l < 15)
 			{
 				setup_hostname[l+1] = 0;
@@ -1056,7 +1056,7 @@ forward:
 		}
 		if (setup_cursor == 1)
 		{
-			l = strlen(setup_myname);
+			l = Q_strlen(setup_myname);
 			if (l < 15)
 			{
 				setup_myname[l+1] = 0;
@@ -1236,7 +1236,7 @@ again:
 #define ITEM_CROSSHAIR	6
 #define	ITEM_AUTORUN	7
 #define	ITEM_REVERSE	8
-#define	ITEM_SPRING		9 
+#define	ITEM_SPRING		9
 #define	ITEM_STRAFE		10
 #define	ITEM_WINMOUSE	11
 
@@ -1535,7 +1535,7 @@ int vid_options_cursor_table[] = {BUTTON_START,
 								  BUTTON_START+BUTTON_HEIGHT*11,
 								  BUTTON_START+BUTTON_HEIGHT*12,
 								  BUTTON_START+BUTTON_HEIGHT*13};
-								  
+
 int		vid_options_cursor;
 
 void M_Menu_Video_f (void)
@@ -1645,7 +1645,7 @@ void M_Video_Draw (void)
 
 	y = vid_options_cursor_table[ITEM_VIDEO_RESET];
 	M_PrintWhite (16, y, "     Reset to defaults");
-	
+
 	y = vid_options_cursor_table[ITEM_SCR_SIZE];
 	M_Print (16, y, "           Screen size");
 	r = (scr_viewsize.value - 30) / (120 - 30);
@@ -1827,7 +1827,7 @@ void M_FindKeysForCommand (char *command, int *twokeys)
 	char	*b;
 
 	twokeys[0] = twokeys[1] = -1;
-	l = strlen(command);
+	l = Q_strlen(command);
 	count = 0;
 
 	for (j=0 ; j<256 ; j++)
@@ -1835,7 +1835,7 @@ void M_FindKeysForCommand (char *command, int *twokeys)
 		b = keybindings[j];
 		if (!b)
 			continue;
-		if (!strncmp (b, command, l) )
+		if (!Q_strncmp (b, command, l) )
 		{
 			twokeys[count] = j;
 			count++;
@@ -1851,14 +1851,14 @@ void M_UnbindCommand (char *command)
 	int		l;
 	char	*b;
 
-	l = strlen(command);
+	l = Q_strlen(command);
 
 	for (j=0 ; j<256 ; j++)
 	{
 		b = keybindings[j];
 		if (!b)
 			continue;
-		if (!strncmp (b, command, l) )
+		if (!Q_strncmp (b, command, l) )
 			Key_SetBinding (j, "");
 	}
 }
@@ -1871,7 +1871,7 @@ void M_Keys_Draw (void)
 	char	*name;
 	int		x, y;
 	qpic_t	*p;
-	
+
 	M_Main_Layout (M_M_OPTION, false);
 
 	p = Draw_CachePic ("gfx/ttl_cstm.lmp");
@@ -1889,7 +1889,7 @@ void M_Keys_Draw (void)
 
 		M_Print (16, y, bindnames[i][1]);
 
-		l = strlen (bindnames[i][0]);
+		l = Q_strlen (bindnames[i][0]);
 
 		M_FindKeysForCommand (bindnames[i][0], keys);
 
@@ -1901,7 +1901,7 @@ void M_Keys_Draw (void)
 		{
 			name = Key_KeynumToString (keys[0]);
 			M_Print (140, y, name);
-			x = strlen(name) * 8;
+			x = Q_strlen(name) * 8;
 			if (keys[1] != -1)
 			{
 				M_Print (140 + x + 8, y, "or");
@@ -2288,14 +2288,14 @@ int		msgNumber;
 int		m_quit_prevstate;
 qboolean	wasInMenus;
 
-char *quitMessage [] = 
+char *quitMessage [] =
 {
 /* .........1.........2.... */
   "  Are you gonna quit    ",
   "  this game just like   ",
   "   everything else?     ",
   "                        ",
- 
+
   " Milord, methinks that  ",
   "   thou art a lowly     ",
   " quitter. Is this true? ",
@@ -2310,22 +2310,22 @@ char *quitMessage [] =
   "   for trying to quit!  ",
   "     Press Y to get     ",
   "      smacked out.      ",
- 
+
   " Press Y to quit like a ",
   "   big loser in life.   ",
   "  Press N to stay proud ",
   "    and successful!     ",
- 
+
   "   If you press Y to    ",
   "  quit, I will summon   ",
   "  Satan all over your   ",
   "      hard drive!       ",
- 
+
   "  Um, Asmodeus dislikes ",
   " his children trying to ",
   " quit. Press Y to return",
   "   to your Tinkertoys.  ",
- 
+
   "  If you quit now, I'll ",
   "  throw a blanket-party ",
   "   for you next time!   ",
@@ -2510,7 +2510,7 @@ if (StartingGame)
 	M_DrawCharacter (basex-8, serialConfig_cursor_table [serialConfig_cursor], 12+((int)(realtime*4)&1));
 
 	if (serialConfig_cursor == 4)
-		M_DrawCharacter (168 + 8*strlen(serialConfig_phone), serialConfig_cursor_table [serialConfig_cursor], 10+((int)(realtime*4)&1));
+		M_DrawCharacter (168 + 8*Q_strlen(serialConfig_phone), serialConfig_cursor_table [serialConfig_cursor], 10+((int)(realtime*4)&1));
 
 	if (*m_return_reason)
 		M_PrintWhite (basex, 148, m_return_reason);
@@ -2649,8 +2649,8 @@ forward:
 	case K_BACKSPACE:
 		if (serialConfig_cursor == 4)
 		{
-			if (strlen(serialConfig_phone))
-				serialConfig_phone[strlen(serialConfig_phone)-1] = 0;
+			if (Q_strlen(serialConfig_phone))
+				serialConfig_phone[Q_strlen(serialConfig_phone)-1] = 0;
 		}
 		break;
 
@@ -2659,7 +2659,7 @@ forward:
 			break;
 		if (serialConfig_cursor == 4)
 		{
-			l = strlen(serialConfig_phone);
+			l = Q_strlen(serialConfig_phone);
 			if (l < 15)
 			{
 				serialConfig_phone[l+1] = 0;
@@ -2723,19 +2723,19 @@ void M_ModemConfig_Draw (void)
 	M_DrawTextBox (basex, modemConfig_cursor_table[1]+4, 16, 1);
 	M_Print (basex+8, modemConfig_cursor_table[1]+12, modemConfig_clear);
 	if (modemConfig_cursor == 1)
-		M_DrawCharacter (basex+8 + 8*strlen(modemConfig_clear), modemConfig_cursor_table[1]+12, 10+((int)(realtime*4)&1));
+		M_DrawCharacter (basex+8 + 8*Q_strlen(modemConfig_clear), modemConfig_cursor_table[1]+12, 10+((int)(realtime*4)&1));
 
 	M_Print (basex, modemConfig_cursor_table[2], "Init");
 	M_DrawTextBox (basex, modemConfig_cursor_table[2]+4, 30, 1);
 	M_PrintWhite (basex+8, modemConfig_cursor_table[2]+12, modemConfig_init);
 	if (modemConfig_cursor == 2)
-		M_DrawCharacter (basex+8 + 8*strlen(modemConfig_init), modemConfig_cursor_table[2]+12, 10+((int)(realtime*4)&1));
+		M_DrawCharacter (basex+8 + 8*Q_strlen(modemConfig_init), modemConfig_cursor_table[2]+12, 10+((int)(realtime*4)&1));
 
 	M_Print (basex, modemConfig_cursor_table[3], "Hangup");
 	M_DrawTextBox (basex, modemConfig_cursor_table[3]+4, 16, 1);
 	M_PrintWhite (basex+8, modemConfig_cursor_table[3]+12, modemConfig_hangup);
 	if (modemConfig_cursor == 3)
-		M_DrawCharacter (basex+8 + 8*strlen(modemConfig_hangup), modemConfig_cursor_table[3]+12, 10+((int)(realtime*4)&1));
+		M_DrawCharacter (basex+8 + 8*Q_strlen(modemConfig_hangup), modemConfig_cursor_table[3]+12, 10+((int)(realtime*4)&1));
 
 	M_DrawTextBox (basex, modemConfig_cursor_table[4]-8, 2, 1);
 	M_Print (basex+8, modemConfig_cursor_table[4], "OK");
@@ -2801,20 +2801,20 @@ void M_ModemConfig_Key (int key)
 	case K_BACKSPACE:
 		if (modemConfig_cursor == 1)
 		{
-			if (strlen(modemConfig_clear))
-				modemConfig_clear[strlen(modemConfig_clear)-1] = 0;
+			if (Q_strlen(modemConfig_clear))
+				modemConfig_clear[Q_strlen(modemConfig_clear)-1] = 0;
 		}
 
 		if (modemConfig_cursor == 2)
 		{
-			if (strlen(modemConfig_init))
-				modemConfig_init[strlen(modemConfig_init)-1] = 0;
+			if (Q_strlen(modemConfig_init))
+				modemConfig_init[Q_strlen(modemConfig_init)-1] = 0;
 		}
 
 		if (modemConfig_cursor == 3)
 		{
-			if (strlen(modemConfig_hangup))
-				modemConfig_hangup[strlen(modemConfig_hangup)-1] = 0;
+			if (Q_strlen(modemConfig_hangup))
+				modemConfig_hangup[Q_strlen(modemConfig_hangup)-1] = 0;
 		}
 		break;
 
@@ -2824,7 +2824,7 @@ void M_ModemConfig_Key (int key)
 
 		if (modemConfig_cursor == 1)
 		{
-			l = strlen(modemConfig_clear);
+			l = Q_strlen(modemConfig_clear);
 			if (l < 15)
 			{
 				modemConfig_clear[l+1] = 0;
@@ -2834,7 +2834,7 @@ void M_ModemConfig_Key (int key)
 
 		if (modemConfig_cursor == 2)
 		{
-			l = strlen(modemConfig_init);
+			l = Q_strlen(modemConfig_init);
 			if (l < 29)
 			{
 				modemConfig_init[l+1] = 0;
@@ -2844,7 +2844,7 @@ void M_ModemConfig_Key (int key)
 
 		if (modemConfig_cursor == 3)
 		{
-			l = strlen(modemConfig_hangup);
+			l = Q_strlen(modemConfig_hangup);
 			if (l < 15)
 			{
 				modemConfig_hangup[l+1] = 0;
@@ -2895,7 +2895,7 @@ void M_LanConfig_Draw (void)
 	char	*protocol;
 
 	M_Main_Layout (M_M_MULTI, false);
-	
+
 	p = Draw_CachePic ("gfx/p_multi.lmp");
 	basex = (320-p->width)/2;
 	M_DrawPic (basex, 4, p);
@@ -2937,10 +2937,10 @@ void M_LanConfig_Draw (void)
 	M_DrawCharacter (basex-8, lanConfig_cursor_table [lanConfig_cursor], 12+((int)(realtime*4)&1));
 
 	if (lanConfig_cursor == 0)
-		M_DrawCharacter (basex+9*8 + 8*strlen(lanConfig_portname), lanConfig_cursor_table [0], 10+((int)(realtime*4)&1));
+		M_DrawCharacter (basex+9*8 + 8*Q_strlen(lanConfig_portname), lanConfig_cursor_table [0], 10+((int)(realtime*4)&1));
 
 	if (lanConfig_cursor == 2)
-		M_DrawCharacter (basex+16 + 8*strlen(lanConfig_joinname), lanConfig_cursor_table [2], 10+((int)(realtime*4)&1));
+		M_DrawCharacter (basex+16 + 8*Q_strlen(lanConfig_joinname), lanConfig_cursor_table [2], 10+((int)(realtime*4)&1));
 
 	if (*m_return_reason)
 		M_PrintWhite (basex, 148, m_return_reason);
@@ -3005,14 +3005,14 @@ void M_LanConfig_Key (int key)
 	case K_BACKSPACE:
 		if (lanConfig_cursor == 0)
 		{
-			if (strlen(lanConfig_portname))
-				lanConfig_portname[strlen(lanConfig_portname)-1] = 0;
+			if (Q_strlen(lanConfig_portname))
+				lanConfig_portname[Q_strlen(lanConfig_portname)-1] = 0;
 		}
 
 		if (lanConfig_cursor == 2)
 		{
-			if (strlen(lanConfig_joinname))
-				lanConfig_joinname[strlen(lanConfig_joinname)-1] = 0;
+			if (Q_strlen(lanConfig_joinname))
+				lanConfig_joinname[Q_strlen(lanConfig_joinname)-1] = 0;
 		}
 		break;
 
@@ -3022,7 +3022,7 @@ void M_LanConfig_Key (int key)
 
 		if (lanConfig_cursor == 2)
 		{
-			l = strlen(lanConfig_joinname);
+			l = Q_strlen(lanConfig_joinname);
 			if (l < 21)
 			{
 				lanConfig_joinname[l+1] = 0;
@@ -3034,7 +3034,7 @@ void M_LanConfig_Key (int key)
 			break;
 		if (lanConfig_cursor == 0)
 		{
-			l = strlen(lanConfig_portname);
+			l = Q_strlen(lanConfig_portname);
 			if (l < 5)
 			{
 				lanConfig_portname[l+1] = 0;
@@ -3328,10 +3328,10 @@ void M_GameOptions_Draw (void)
 
 	y = gameoptions_cursor_table[ITEM_M_LEVEL];
 	M_Print (0, y, "            Level");
- 
+
 	M_PrintWhite (160, y, levels[episodes[startepisode].firstLevel + startlevel].description);
     M_PrintWhite (160, y+BUTTON_HEIGHT, levels[episodes[startepisode].firstLevel + startlevel].name);
- 
+
 // line cursor
 	M_DrawCharacter (144, gameoptions_cursor_table[gameoptions_cursor], 12+((int)(realtime*4)&1));
 
@@ -3600,7 +3600,7 @@ void M_ServerList_Draw (void)
 			hostcache_t temp;
 			for (i = 0; i < hostCacheCount; i++)
 				for (j = i+1; j < hostCacheCount; j++)
-					if (strcmp(hostcache[j].name, hostcache[i].name) < 0)
+					if (Q_strcmp(hostcache[j].name, hostcache[i].name) < 0)
 					{
 						Q_memcpy(&temp, &hostcache[j], sizeof(hostcache_t));
 						Q_memcpy(&hostcache[j], &hostcache[i], sizeof(hostcache_t));

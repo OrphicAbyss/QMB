@@ -341,8 +341,8 @@ void Collision_ClipTrace (trace_t *trace, const void *cent, const model_t *cmode
 	double startd[3], endd[3], tempd[3];
 
 	// fill in a default trace
-	memset (&rhc, 0, sizeof(rhc));
-	memset (trace, 0, sizeof(trace_t));
+	Q_memset (&rhc, 0, sizeof(rhc));
+	Q_memset (trace, 0, sizeof(trace_t));
 
 	rhc.trace = trace;
 

@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -49,7 +49,7 @@ protected:
     typedef ULONG (CALLBACK* LPFNAVIFILERELEASE)(PAVIFILE);
     typedef void (CALLBACK* LPFNAVIFILEEXIT)(void);
 
-    HINSTANCE m_avidll_handle;              
+    HINSTANCE m_avidll_handle;
     LPFNAVIFILEINIT m_lpfnAVIFileInit;
     LPFNAVIFILEOPEN m_lpfnAVIFileOpen;
     LPFNAVIFILECREATESTREAM m_lpfnAVIFileCreateStream;
@@ -144,7 +144,7 @@ BOOL CaptureAviWriter::WriteVideo(int width, int height, unsigned char* pixel_bu
         m_video_frame_size = width * height * 3;
 
         BITMAPINFOHEADER bitmap_info_header;
-        memset(&bitmap_info_header, 0, sizeof(BITMAPINFOHEADER));
+        Q_memset(&bitmap_info_header, 0, sizeof(BITMAPINFOHEADER));
         bitmap_info_header.biSize = 40;
         bitmap_info_header.biWidth = width;
         bitmap_info_header.biHeight = height;
@@ -154,25 +154,25 @@ BOOL CaptureAviWriter::WriteVideo(int width, int height, unsigned char* pixel_bu
         bitmap_info_header.biSizeImage = m_video_frame_size * 3;
 
         AVISTREAMINFO stream_header;
-        memset(&stream_header, 0, sizeof(stream_header));
+        Q_memset(&stream_header, 0, sizeof(stream_header));
         stream_header.fccType = streamtypeVIDEO;
         stream_header.fccHandler = m_codec_fourcc;
         stream_header.dwScale = 100;
         stream_header.dwRate = (unsigned long)(0.5 + m_fps * 100.0);
-        SetRect(&stream_header.rcFrame, 0, 0, width, height);  
+        SetRect(&stream_header.rcFrame, 0, 0, width, height);
 
         hr = m_lpfnAVIFileCreateStream(m_file, &m_uncompressed_video_stream, &stream_header);
         if (FAILED(hr)) return FALSE;
 
         if (m_codec_fourcc) {
             AVICOMPRESSOPTIONS opts;
-            memset(&opts, 0, sizeof(opts));
+            Q_memset(&opts, 0, sizeof(opts));
             AVICOMPRESSOPTIONS* aopts[1] = { &opts };
             opts.fccType = stream_header.fccType;
             opts.fccHandler = m_codec_fourcc;
             // Make the stream according to compression
             hr = m_lpfnAVIMakeCompressedStream(&m_compressed_video_stream, m_uncompressed_video_stream, &opts, NULL);
-            if (FAILED(hr)) return FALSE;	        
+            if (FAILED(hr)) return FALSE;
         }
 
         hr = m_lpfnAVIStreamSetFormat(VideoStream(), 0, &bitmap_info_header, sizeof(BITMAPINFOHEADER));
@@ -201,17 +201,17 @@ BOOL CaptureAviWriter::WriteAudio(int samples, unsigned char* sample_buffer)
 
     if (!m_audio_frame_counter) {
         // write header etc based on first_frame
-        memset(&m_wave_format, 0, sizeof(WAVEFORMATEX));
-        m_wave_format.wFormatTag = WAVE_FORMAT_PCM; 
+        Q_memset(&m_wave_format, 0, sizeof(WAVEFORMATEX));
+        m_wave_format.wFormatTag = WAVE_FORMAT_PCM;
         m_wave_format.nChannels = 2; // always stereo in Quake sound engine
         m_wave_format.nSamplesPerSec = m_audio_hz;
         m_wave_format.wBitsPerSample = 16; // always 16bit in Quake sound engine
-        m_wave_format.nBlockAlign = (unsigned short)(m_wave_format.wBitsPerSample/8 * m_wave_format.nChannels); 
-        m_wave_format.nAvgBytesPerSec = m_wave_format.nSamplesPerSec * m_wave_format.nBlockAlign; 
-        m_wave_format.cbSize = 0; 
+        m_wave_format.nBlockAlign = (unsigned short)(m_wave_format.wBitsPerSample/8 * m_wave_format.nChannels);
+        m_wave_format.nAvgBytesPerSec = m_wave_format.nSamplesPerSec * m_wave_format.nBlockAlign;
+        m_wave_format.cbSize = 0;
 
         AVISTREAMINFO stream_header;
-        memset(&stream_header, 0, sizeof(stream_header));
+        Q_memset(&stream_header, 0, sizeof(stream_header));
         stream_header.fccType = streamtypeAUDIO;
         stream_header.dwScale = m_wave_format.nBlockAlign;
         stream_header.dwRate = stream_header.dwScale * (unsigned long)m_wave_format.nSamplesPerSec;

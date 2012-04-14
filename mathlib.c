@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -229,16 +229,16 @@ void AngleVectors (vec3_t angles, vec3_t forward, vec3_t right, vec3_t up)
 {
 	float		angle;
 	float		sr, sp, sy, cr, cp, cy;
-	
+
 	angle	= DEG2RAD(angles[YAW]);	// Tomaz Speed
-	sy		= sin(angle);
-	cy		= cos(angle);
+	sy		= sinf(angle);
+	cy		= cosf(angle);
 	angle	= DEG2RAD(angles[PITCH]);	// Tomaz Speed
-	sp		= sin(angle);
-	cp		= cos(angle);
+	sp		= sinf(angle);
+	cp		= cosf(angle);
 	angle	= DEG2RAD(angles[ROLL]);	// Tomaz Speed
-	sr		= sin(angle);
-	cr		= cos(angle);
+	sr		= sinf(angle);
+	cr		= cosf(angle);
 
 	forward[0]	= cp*cy;
 	forward[1]	= cp*sy;
@@ -264,6 +264,15 @@ float VectorNormalize (vec3_t v)
 		v[1] *= ilength;
 		v[2] *= ilength;
 	}
-		
+
 	return length;
+}
+
+// min and max math functions (missing on linux?)
+inline float min(float a, float b){
+	return a<b ? a : b;
+}
+
+inline float max(float a, float b){
+	return a>b ? a : b;
 }

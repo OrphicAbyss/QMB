@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -150,15 +150,15 @@ void CL_DecodeHudPrint(void){
 	char	*text;
 	float	x;
 	float	y;
-	
+
 	id = MSG_ReadByte();
 	x = MSG_ReadFloat();
 	y = MSG_ReadFloat();
 	pos = MSG_ReadByte();
 	len = MSG_ReadByte();
-	
+
 	text = (void *)malloc(len);
-	strcpy(text,MSG_ReadString());
+	Q_strcpy(text,MSG_ReadString());
 
 	//code to position text
 	//0000 - 0 - left top
@@ -194,14 +194,14 @@ void CL_DecodeHudPic(void){
 	char	*text;
 	float	x;
 	float	y;
-	
+
 	len = MSG_ReadByte();
 	pos = MSG_ReadByte();
 	x = MSG_ReadFloat();
 	y = MSG_ReadFloat();
 	id = MSG_ReadByte();
 	text = (void *)malloc(len);
-	strcpy(text,MSG_ReadString());
+	Q_strcpy(text,MSG_ReadString());
 
 	//code to position text
 	//0000 - 0 - left top

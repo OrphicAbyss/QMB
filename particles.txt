@@ -27,7 +27,7 @@ Particle		Particle	Particle		Particle		Particle
 
 
 
-Basicly it would add a set of 64 (assuming 64 diffrent textured particles is enough) new 
+Basicly it would add a set of 64 (assuming 64 diffrent textured particles is enough) new
 stucts which point to a type of particle contain a blend type and point to the next set
 of particals, the draw function would then use the blend type specified by the set pointer
 then draw the list, then do the next set and so on.
@@ -42,4 +42,4 @@ as the other gains made).
 This type of structor would also allow for alot of reuse of code. For removing particles, and
 updating particles, as well as drawing particles.
 
-send comments to drlabman@planetquake.com
+Contact me via gluonporridge.net

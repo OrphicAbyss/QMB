@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -479,7 +479,7 @@ void Sbar_UpdateScoreboard (void)
 	Sbar_SortFrags ();
 
 // draw the text
-	memset (scoreboardtext, 0, sizeof(scoreboardtext));
+	Q_memset (scoreboardtext, 0, sizeof(scoreboardtext));
 
 	for (i=0 ; i<scoreboardlines; i++)
 	{
@@ -533,7 +533,7 @@ void Sbar_SoloScoreboard (void)
 	Sbar_DrawString (x+184, 4, str);
 
 // draw level name
-	l = strlen (cl.levelname);
+	l = Q_strlen (cl.levelname);
 	Sbar_DrawString (x + 232 - l*4, 12, cl.levelname);
 }
 
@@ -581,7 +581,7 @@ void Sbar_DrawInventory (void)
 
 		Sbar_DrawFade (vid.width-50, vid.height/2 - 24, 112, false);
 		Draw_AlphaFill(vid.width-50, vid.height/2 - 24, 48, 112, colour, hud_a.value);
-	
+
 		for (i=0 ; i<7 ; i++)
 		{
 			if (cl.items & (IT_SHOTGUN<<i) )
@@ -692,7 +692,7 @@ void Sbar_DrawInventory (void)
 
 	//JHL - start
 	if (hud.value >= 2 || sb_showscores) {
-	
+
 		Sbar_DrawFade (vid.width-96, vid.height-40, 16, false);
 		Draw_AlphaFill(vid.width-96, vid.height-40, 96, 16, colour, hud_a.value);
 
@@ -866,7 +866,7 @@ void Sbar_DrawFace (int x, int y)
 		int				xofs;
 		char			num[12];
 		scoreboard_t	*s;
-		
+
 		s = &cl.scores[cl.viewentity - 1];
 		// draw background
 		top = s->colors & 0xf0;
@@ -900,7 +900,7 @@ void Sbar_DrawFace (int x, int y)
 			Sbar_DrawCharacter ( 116, 3, num[1]);
 			Sbar_DrawCharacter ( 123, 3, num[2]);
 		}
-		
+
 		return;
 	}
 // PGM 01/19/97 - team color drawing
@@ -960,7 +960,7 @@ void Sbar_Draw (void)
 
 	sb_updates++;
 
-	if (sb_lines && vid.width > 320) 
+	if (sb_lines && vid.width > 320)
 		Draw_TileClear (0, vid.height - sb_lines, vid.width, sb_lines);
 
 	if (sb_showscores || cl.stats[STAT_HEALTH] <= 0)
@@ -968,7 +968,7 @@ void Sbar_Draw (void)
 		Sbar_DrawScoreboard ();
 		sb_updates = 0;
 	}
-	
+
 	if ((hud.value || sb_showscores) && cl.stats[STAT_HEALTH] > 0)
 	{
    // keys (hipnotic only)

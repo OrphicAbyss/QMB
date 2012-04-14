@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -224,7 +224,7 @@ void CreateDSTTex()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-	
+
 	for (x=0;x<DTS_CAUSTIC_SIZE;x++)
 		for (y=0;y<DTS_CAUSTIC_SIZE;y++)
 		{
@@ -287,7 +287,7 @@ void EmitWaterPolysMulti (msurface_t *fa)
 		glBindTexture(GL_TEXTURE_2D,dst_texture);
 
 		glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV, GL_TEXTURE_2D);
-		
+
 		GL_EnableTMU(GL_TEXTURE1_ARB);
 		glBindTexture(GL_TEXTURE_2D,fa->texinfo->texture->gl_texturenum);
 
@@ -337,8 +337,8 @@ void EmitWaterPolysMulti (msurface_t *fa)
 			if (r_wave.value)
 				nv[2] = v[2] + r_wave.value *sin(v[0]*0.02+cl.time)*sin(v[1]*0.02+cl.time)*sin(v[2]*0.02+cl.time);
 
-			qglMTexCoord2fARB (GL_TEXTURE0_ARB, s, t);
-			qglMTexCoord2fARB (GL_TEXTURE1_ARB, ss + cl.time/10, tt + cl.time/10);
+			qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, s, t);
+			qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, ss + cl.time/10, tt + cl.time/10);
 
 			glVertex3fv (nv);
 		}
@@ -431,8 +431,8 @@ void EmitSkyPolysMulti (msurface_t *fa)
 			ss = (realtime*16 + dir[0]) * (1.0/128);
 			tt = (realtime*16 + dir[1]) * (1.0/128);
 
-			qglMTexCoord2fARB (GL_TEXTURE0_ARB, s, t);
-			qglMTexCoord2fARB (GL_TEXTURE1_ARB, ss, tt);
+			qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, s, t);
+			qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, ss, tt);
 			glVertex3fv (v);
 		}
 		glEnd ();
@@ -584,8 +584,8 @@ void R_DrawSkyBox (void)
 		glRotatef (r_refdef.viewangles[0],  1, 0, 0);
 		glRotatef (r_refdef.viewangles[1],  0, -1, 0);
 	}
-	
-		
+
+
 	if ((r_skydetail.value==1))
 	{
 		glDisable(GL_DEPTH_TEST);
@@ -696,7 +696,7 @@ void R_DrawSkyChain (msurface_t *s)
 		glpoly_t	*p;
 		float		*v;
 		int			i;
-		
+
 		GL_SelectTexture(GL_TEXTURE0_ARB);
 		glColor3f(1,1,1);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -751,7 +751,7 @@ void R_DrawSkyChain (msurface_t *s)
 
 		removelink = s;
 		s = s->texturechain;
-		removelink->texturechain = NULL;	
+		removelink->texturechain = NULL;
 	}
 }
 

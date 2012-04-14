@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -73,13 +73,13 @@ void CL_ParseBeam ()
 	int		i;//, count;
 //	vec3_t	last, next;
 	vec3_t	colour;
-	
+
 	ent = MSG_ReadShort ();
-	
+
 	start[0] = MSG_ReadCoord ();
 	start[1] = MSG_ReadCoord ();
 	start[2] = MSG_ReadCoord ();
-	
+
 	end[0] = MSG_ReadCoord ();
 	end[1] = MSG_ReadCoord ();
 	end[2] = MSG_ReadCoord ();
@@ -214,14 +214,14 @@ void CL_ParseTEnt (void)
 		R_RunParticleEffect (pos, vec3_origin, 20, 30);
 		S_StartSound (-1, 0, cl_sfx_wizhit, pos, 1, 1);
 		break;
-		
+
 	case TE_KNIGHTSPIKE:
 		// spike hitting wall
 		MSG_ReadVector(pos);
 		R_RunParticleEffect (pos, vec3_origin, 226, 20);
 		S_StartSound (-1, 0, cl_sfx_knighthit, pos, 1, 1);
 		break;
-		
+
 	case TE_SPIKE:			// spike hitting wall
 		MSG_ReadVector(pos);
 		R_RunParticleEffect (pos, vec3_origin, 0, 10);
@@ -295,7 +295,7 @@ void CL_ParseTEnt (void)
 		dl->die = cl.time + 0.2;
 		dl->decay = 1000;
 		dl->colour[0] = 0.1f; dl->colour[1] = 0.1f; dl->colour[2] = 1.0f; //qmb :coloured lighting
-		
+
 		if ( rand() % 5 )
 			S_StartSound (-1, 0, cl_sfx_tink1, pos, 1, 1);
 		else
@@ -350,7 +350,7 @@ void CL_ParseTEnt (void)
 		MSG_ReadVector(pos);
 		R_RunParticleEffect (pos, vec3_origin, 0, 15);
 		break;
-		
+
 	case TE_EXPLOSION:			// rocket explosion
 		MSG_ReadVector(pos);
 		R_ParticleExplosion (pos);
@@ -363,7 +363,7 @@ void CL_ParseTEnt (void)
 
      	S_StartSound (-1, 0, cl_sfx_r_exp3, pos, 1, 1);
 		break;
-		
+
 	case TE_TAREXPLOSION:			// tarbaby explosion
 		MSG_ReadVector(pos);
 		R_BlobExplosion (pos);
@@ -374,26 +374,26 @@ void CL_ParseTEnt (void)
 	case TE_LIGHTNING1:				// lightning bolts
 		CL_ParseBeam ();
 		break;
-	
+
 	case TE_LIGHTNING2:				// lightning bolts
 		CL_ParseBeam ();
 		break;
-	
+
 	case TE_LIGHTNING3:				// lightning bolts
 		CL_ParseBeam ();
 		break;
-	
-// PGM 01/21/97 
+
+// PGM 01/21/97
 	case TE_BEAM:				// grappling hook beam
 		CL_ParseBeam ();
 		break;
 // PGM 01/21/97
 
-	case TE_LAVASPLASH:	
+	case TE_LAVASPLASH:
 		MSG_ReadVector(pos);
 		R_LavaSplash (pos);
 		break;
-	
+
 	case TE_TELEPORT:
 		MSG_ReadVector(pos);
 		R_TeleportSplash (pos);
@@ -407,7 +407,7 @@ void CL_ParseTEnt (void)
 		dl->colour[0] = 1.0f; dl->colour[1] = 1.0f; dl->colour[2] = 1.0f; //qmb :coloured lighting
 		// CDL
 		break;
-		
+
 	case TE_EXPLOSION2:				// color mapped explosion
 		MSG_ReadVector(pos);
 		colorStart = MSG_ReadByte ();
@@ -423,9 +423,9 @@ void CL_ParseTEnt (void)
 		colourByte = (byte *)&d_8to24table[colorStart];
 		dl->colour[0] = (float)colourByte[0]/255.0;
 		dl->colour[1] = (float)colourByte[1]/255.0;
-		dl->colour[2] = (float)colourByte[2]/255.0; 
+		dl->colour[2] = (float)colourByte[2]/255.0;
 		break;
-		
+
 #ifdef QUAKE2
 	case TE_IMPLOSION:
 		MSG_ReadVector(pos);
@@ -468,7 +468,7 @@ entity_t *CL_NewTempEntity (void)
 	if (num_temp_entities == MAX_TEMP_ENTITIES)
 		return NULL;
 	ent = &cl_temp_entities[num_temp_entities];
-	memset (ent, 0, sizeof(*ent));
+	Q_memset (ent, 0, sizeof(*ent));
 	num_temp_entities++;
 	cl_visedicts[cl_numvisedicts] = ent;
 	cl_numvisedicts++;
@@ -526,7 +526,7 @@ void CL_UpdateTEnts (void)
 			yaw = (int) (atan2(dist[1], dist[0]) * 180 / M_PI);
 			if (yaw < 0)
 				yaw += 360;
-	
+
 			forward = sqrt (dist[0]*dist[0] + dist[1]*dist[1]);
 			pitch = (int) (atan2(dist[2], forward) * 180 / M_PI);
 			if (pitch < 0)
@@ -552,7 +552,7 @@ void CL_UpdateTEnts (void)
 			d -= 30;
 		}*/
 	}
-	
+
 }
 
 void R_ClearBeams (void)

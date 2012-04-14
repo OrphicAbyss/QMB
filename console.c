@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -56,7 +56,7 @@ qboolean	con_debuglog;
 extern	char	key_lines[32][MAXCMDLINE];
 extern	int		edit_line;
 extern	int		key_linepos;
-		
+
 
 qboolean	con_initialized;
 
@@ -86,9 +86,9 @@ void Con_ToggleConsole_f (void)
 	}
 	else
 		key_dest = key_console;
-	
+
 	SCR_EndLoadingPlaque ();
-	memset (con_times, 0, sizeof(con_times));
+	Q_memset (con_times, 0, sizeof(con_times));
 }
 
 /*
@@ -102,7 +102,7 @@ void Con_Clear_f (void)
 		Q_memset (con_text, ' ', CON_TEXTSIZE);
 }
 
-						
+
 /*
 ================
 Con_ClearNotify
@@ -111,12 +111,12 @@ Con_ClearNotify
 void Con_ClearNotify (void)
 {
 	int		i;
-	
+
 	for (i=0 ; i<NUM_CON_TIMES ; i++)
 		con_times[i] = 0;
 }
 
-						
+
 /*
 ================
 Con_MessageMode_f
@@ -130,7 +130,7 @@ void Con_MessageMode_f (void)
 	team_message = false;
 }
 
-						
+
 /*
 ================
 Con_MessageMode2_f
@@ -142,7 +142,7 @@ void Con_MessageMode2_f (void)
 	team_message = true;
 }
 
-						
+
 /*
 ================
 Con_CheckResize
@@ -179,7 +179,7 @@ void Con_CheckResize (void)
 			numlines = con_totallines;
 
 		numchars = oldwidth;
-	
+
 		if (con_linewidth < numchars)
 			numchars = con_linewidth;
 
@@ -222,7 +222,7 @@ void Con_Init (void)
 
 	if (con_debuglog)
 	{
-		if (strlen (com_gamedir) < (MAXGAMEDIRLEN - strlen (t2)))
+		if (Q_strlen (com_gamedir) < (MAXGAMEDIRLEN - Q_strlen (t2)))
 		{
 			sprintf (temp, "%s%s", com_gamedir, t2);
 			unlink (temp);
@@ -234,7 +234,7 @@ void Con_Init (void)
 	Q_memset (con_text, ' ', CON_TEXTSIZE);
 	con_linewidth = -1;
 	Con_CheckResize ();
-	
+
 	Con_Printf ("Console initialized.\n");
 
 //
@@ -278,7 +278,7 @@ void Con_Print (char *txt)
 	int		c, l;
 	static int	cr;
 	int		mask;
-	
+
 	con_backscroll = 0;
 
 	if (txt[0] == 1)
@@ -316,7 +316,7 @@ void Con_Print (char *txt)
 			cr = false;
 		}
 
-		
+
 		if (!con_x)
 		{
 			Con_Linefeed ();
@@ -344,7 +344,7 @@ void Con_Print (char *txt)
 				con_x = 0;
 			break;
 		}
-		
+
 	}
 }
 
@@ -391,11 +391,11 @@ void Con_Printf (char *fmt, ...)
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
 	static qboolean	inupdate;
-	
+
 	va_start (argptr,fmt);
-	vsprintf (msg,fmt,argptr);
+	vsnprintf (msg,MAXPRINTMSG,fmt,argptr);
 	va_end (argptr);
-	
+
 // also echo to debugging console
 	Sys_Printf ("%s", msg);	// also echo to debugging console
 
@@ -405,13 +405,13 @@ void Con_Printf (char *fmt, ...)
 
 	if (!con_initialized)
 		return;
-		
+
 	if (cls.state == ca_dedicated)
 		return;		// no graphics mode
 
 // write it to the scrollable buffer
 	Con_Print (msg);
-	
+
 // update the screen if the console is displayed
 	if (cls.signon != SIGNONS && !scr_disabled_for_loading )
 	{
@@ -433,11 +433,11 @@ jint JNICALL Con_fPrintf (FILE *empty, char *fmt, ...)
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
 	static qboolean	inupdate;
-	
+
 	va_start (argptr,fmt);
-	vsprintf (msg,fmt,argptr);
+	vsnprintf (msg,fmt,argptr);
 	va_end (argptr);
-	
+
 // also echo to debugging console
 	Sys_Printf ("%s", msg);	// also echo to debugging console
 
@@ -447,13 +447,13 @@ jint JNICALL Con_fPrintf (FILE *empty, char *fmt, ...)
 
 	if (!con_initialized)
 		return -1;
-		
+
 	if (cls.state == ca_dedicated)
 		return -1;		// no graphics mode
 
 // write it to the scrollable buffer
 	Con_Print (msg);
-	
+
 // update the screen if the console is displayed
 	if (cls.signon != SIGNONS && !scr_disabled_for_loading )
 	{
@@ -467,7 +467,7 @@ jint JNICALL Con_fPrintf (FILE *empty, char *fmt, ...)
 		}
 	}
 
-	Con_Printf("Javamsg\n");
+	Con_Printf("JavaMsg\n");
 	return 0;
 }
 #endif
@@ -483,14 +483,14 @@ void Con_DPrintf (char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
-		
+
 	if (!developer.value)
 		return;			// don't confuse non-developers with techie stuff...
 
 	va_start (argptr,fmt);
 	vsprintf (msg,fmt,argptr);
 	va_end (argptr);
-	
+
 	Con_Printf ("%s", msg);
 }
 
@@ -507,7 +507,7 @@ void Con_SafePrintf (char *fmt, ...)
 	va_list		argptr;
 	char		msg[1024];
 	int			temp;
-		
+
 	va_start (argptr,fmt);
 	vsprintf (msg,fmt,argptr);
 	va_end (argptr);
@@ -571,18 +571,18 @@ void Con_DrawInput (void)
 		return;		// don't draw anything
 
 	text = key_lines[edit_line];
-	
+
 // add the cursor frame
 	text[key_linepos] = 10+((int)(realtime*con_cursorspeed)&1);
-	
+
 // fill out remainder with spaces
 	for (i=key_linepos+1 ; i< con_linewidth ; i++)
 		text[i] = ' ';
-		
+
 //	prestep if horizontally scrolling
 	if (key_linepos >= con_linewidth)
 		text += 1 + key_linepos - con_linewidth;
-		
+
 // draw it
 	y = con_vislines-16;
 
@@ -593,6 +593,30 @@ void Con_DrawInput (void)
 	key_lines[edit_line][key_linepos] = 0;
 }
 
+/**
+ * Detects a text colour code in console text and sets the glColor3f with
+ * the given colour;
+ */
+int Con_DetectColour(char *text){
+	char marker = '&';
+	int skip = 0;
+
+	if (text[0] == '&'){
+		if (text[1] == 'c'||text[1] == 'C')
+		{
+			glColor3f((float) (text[2] - '0') / 9.0f,
+			(float)  (text[3] - '0') / 9.0f,
+			(float)  (text[4] - '0') / 9.0f);
+			skip += 5;
+		}
+		else if (text[1] == 'r'){
+			glColor3f(1, 1, 1);
+			skip += 2;
+		}
+	}
+
+	return skip;
+}
 
 /*
 ================
@@ -601,87 +625,54 @@ Con_DrawNotify
 Draws the last few lines of output transparently over the game top
 ================
 */
-
-void Con_DrawNotify (void) 
-{ 
-	int  x, v; 
-	char *text; 
-	int  i; 
-	float time; 
+void Con_DrawNotify (void)
+{
+	int  x, v;
+	char *text;
+	int  i;
+	float time;
 	int   j;
 	extern char chat_buffer[];
 	v = 0;
-   
+
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	for (i= con_current-NUM_CON_TIMES+1 ; i<=con_current ; i++)
-	{ 
-		if (i < 0) 
-			continue; 
+	{
+		if (i < 0)
+			continue;
 
-		time = con_times[i % NUM_CON_TIMES]; 
-		if (time == 0) 
-			continue; 
+		time = con_times[i % NUM_CON_TIMES];
+		if (time == 0)
+			continue;
 
-		time = realtime - time; 
+		time = realtime - time;
 		if (time > con_notifytime.value)
-			continue; 
+			continue;
 
-		text = con_text + (i % con_totallines)*con_linewidth; 
-		clearnotify = 0; 
-		scr_copytop = 1; 
-		j = 0; 
-		for (x = 0 ; x < con_linewidth ; x++) 
-		{ 
-			if (text[x] == '&') 
-			{ 
-				if (text[x + 1] == 'c') 
-				{ 
-					x += 2; 
-					glColor3f((float) (text[x] - '0') / 9, 
-					(float)  (text[x + 1] - '0') / 9, 
-					(float)  (text[x + 2] - '0') / 9); 
-					x += 3; 
-				} 
-				else if (text[x + 1] == 'r') 
-				{ 
-					glColor3f(1, 1, 1); 
-					x += 2; 
-				} 
-			}
+		text = con_text + (i % con_totallines)*con_linewidth;
+		clearnotify = 0;
+		scr_copytop = 1;
+		j = 0;
+		for (x = 0 ; x < con_linewidth ; x++)
+		{
+			x += Con_DetectColour(&text[x]);
 
-			if (text[x] == '¦') 
-				{ 
-				if (text[x + 1] == 'ã'||text[x + 1] == 'Ã') 
-				{ 
-					x += 2; 
-					glColor3f((float) (text[x] - '°') / 9, 
-					(float)  (text[x + 1] - '°') / 9, 
-					(float)  (text[x + 2] - '°') / 9); 
-					x += 3; 
-				} 
-				else if (text[x + 1] == 'ò') 
-				{ 
-					glColor3f(1, 1, 1); 
-					x += 2; 
-				} 
-			}
-			
-			Draw_Character ((j+1)<<3, v, text[x]); 
-			j++; 
-		} 
-		glColor3f(1, 1, 1); 
-		v += 8; 
-	} 
+			Draw_Character ((j+1)<<3, v, text[x]);
+			j++;
+		}
+		glColor3f(1, 1, 1);
+		v += 8;
+	}
 
-	if (key_dest == key_message) 
-	{ 
-		clearnotify = 0; 
-		scr_copytop = 1; 
+	if (key_dest == key_message)
+	{
+		clearnotify = 0;
+		scr_copytop = 1;
 
-		x = 0; 
+		x = 0;
 
-		Draw_String (8, v, "say:"); 
+		Draw_String (8, v, "say:");
 		while(chat_buffer[x])
 		{
 			Draw_Character ( (x+5)<<3, v, chat_buffer[x]);
@@ -689,9 +680,9 @@ void Con_DrawNotify (void)
 		}
 		Draw_Character ( (x+5)<<3, v, 10+((int)(realtime*con_cursorspeed)&1));
 		v += 8;
-	} 
-	if (v > con_notifylines) 
-		con_notifylines = v; 
+	}
+	if (v > con_notifylines)
+		con_notifylines = v;
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
@@ -705,91 +696,61 @@ The typing input line at the bottom should only be drawn if typing is allowed
 ================
 */
 
-void Con_DrawConsole (int lines, qboolean drawinput) 
-{ 
-	int    i, j, x, y; 
-	int    rows; 
-	char   *text; 
-//	char   dlbar[1024]; 
+void Con_DrawConsole (int lines, qboolean drawinput)
+{
+	int    i, charPos, x, y;
+	int    rows;
+	char   *text;
+//	char   dlbar[1024];
 
 //no console shown
 	if (lines <= 0)
-		return; 
+		return;
 
 // draw the background
-	Draw_ConsoleBackground (lines); 
+	Draw_ConsoleBackground (lines);
 	con_vislines = lines;
-	rows = (lines-22)>>3;  // rows of text to draw 
+	rows = (lines-22)>>3;  // rows of text to draw
 	//y = lines - 30;
 	y = lines - 16 - (rows<<3);	// may start slightly negative
 
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); 
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glColor3f(1, 1, 1);
 
-	// draw from the bottom up 
-	// its top down in quake (bottom up in quakeworld)
-	if (con_backscroll) 
-	{ 
-		// draw arrows to show the buffer is backscrolled 
-		for (x=0 ; x < con_linewidth ; x+=4) 
-			Draw_Character ( (x+1)<<3, y, '^'); 
-		y += 8; 
-		rows--; 
-	} 
+	// If we are backscrolled, reserve a row for use after drawing the rest of the console
+	if (con_backscroll){
+		rows--;
+	}
 
 	for (i= con_current - rows + 1 ; i<=con_current ; i++, y+=8 )
 	{
-		j = i - con_backscroll;
-		if (j<0)
-			j = 0;
+		charPos = i - con_backscroll;
+		if (charPos<0)
+			charPos = 0;
 
-		text = con_text + (j % con_totallines)*con_linewidth; 
-		j = 0; 
-		for (x=0 ; x < con_linewidth ; x++) 
-		{ 
-			if (text[x] == '&') 
-			{ 
-				if (text[x + 1] == 'c'||text[x + 1] == 'C') 
-				{ 
-					x += 2; 
-					glColor3f((float) (text[x] - '0') / 9, 
-					(float)  (text[x + 1] - '0') / 9, 
-					(float)  (text[x + 2] - '0') / 9); 
-					x += 3; 
-				} 
-				else if (text[x + 1] == 'r') 
-				{ 
-					glColor3f(1, 1, 1); 
-					x += 2; 
-				}
-			}
-			if (text[x] == '¦') 
-				{ 
-				if (text[x + 1] == 'ã'||text[x + 1] == 'Ã') 
-				{ 
-					x += 2; 
-					glColor3f((float) (text[x] - '°') / 9, 
-					(float)  (text[x + 1] - '°') / 9, 
-					(float)  (text[x + 2] - '°') / 9); 
-					x += 3; 
-				} 
-				else if (text[x + 1] == 'ò') 
-				{ 
-					glColor3f(1, 1, 1); 
-					x += 2; 
-				} 
-			} 
-			//Draw_Character ((x+1)<<3, y, text[x]);
-			Draw_Character ((j+1)<<3, y, text[x]); 
-			j++; 
-		} 
+		text = con_text + (charPos % con_totallines)*con_linewidth;
+		charPos = 0;
+		for (x=0 ; x < con_linewidth ; x++)
+		{
+			x += Con_DetectColour(&text[x]);
+
+			Draw_Character ((charPos+1)<<3, y, text[x]);
+			charPos++;
+		}
+	}
+
+	// Draw arrows to show that the buffer is backscrolled
+	if (con_backscroll){
+		for (x=0 ; x < con_linewidth ; x+=4)
+			Draw_Character ( (x+1)<<3, y, '^');
+		y += 8;
 	}
 
 // draw the input prompt, user text, and cursor if desired
 	if (drawinput)
-	Con_DrawInput ();
+		Con_DrawInput ();
 
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE); 
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
 /*

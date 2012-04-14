@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "ICapture.h"
 #include "CaptureHelpers.h"
-
 
 extern cvar_t host_framerate;
 extern float scr_con_current;
@@ -72,7 +71,7 @@ void CaptureHelper_Start_f (void)
     }
     fps = 1/(float)(host_framerate.value);
 
-    strcpy(filename, Cmd_Argv(1));
+    Q_strcpy(filename, Cmd_Argv(1));
 	COM_DefaultExtension (filename, Capture_DOTEXTENSION); // currently we capture AVI
 
 	if (shm){
@@ -141,7 +140,7 @@ void CaptureHelper_OnStopPlayback(void)
 	cls.capturedemo = false;
     CaptureHelper_Stop_f();
 	CL_Disconnect();
-	Host_ShutdownServer(false);		
+	Host_ShutdownServer(false);
 	Sys_Quit();
 }
 
@@ -174,7 +173,7 @@ void CaptureHelper_OnTransferStereo16(void)
     if (!CaptureHelper_IsActive()) return;
 
     // Copy last audio chunk written into our temporary buffer
-    memcpy(capture_audio_samples + 2 * captured_audio_samples, snd_out, snd_linear_count * shm->channels);
+    Q_memcpy(capture_audio_samples + 2 * captured_audio_samples, snd_out, snd_linear_count * shm->channels);
     captured_audio_samples += snd_linear_count / 2;
 
     if (captured_audio_samples >= (int)(0.5 + host_framerate.value * shm->speed)) {

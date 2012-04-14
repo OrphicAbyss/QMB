@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 #include "quakedef.h"
-#include "png.h"
+#include <png.h>
 
 extern int image_width;
 extern int image_height;
@@ -34,7 +34,7 @@ typedef struct png_s
    long FRowBytes;   //DL Added 30/05/2000
    double FGamma; //DL Added 07/06/2000
    double FScreenGamma; //DL Added 07/06/2000
-   char *FRowPtrs; // DL Changed for consistancy 30/05/2000 
+   char *FRowPtrs; // DL Changed for consistancy 30/05/2000
    char* Data; //property Data: pByte read fData;
    char* Title;
    char* Author;
@@ -42,8 +42,8 @@ typedef struct png_s
    int BitDepth;
    int BytesPerPixel;
    int ColorType;
-   int Height;
-   int Width;
+   png_uint_32 Height;
+   png_uint_32 Width;
    int Interlace;
    int Compression;
    int Filter;
@@ -61,8 +61,8 @@ void InitializeDemData()
    // Initialize Data and RowPtrs
    if(my_png->Data)
    {
-      //Z_Free(my_png->Data);      
-      free(my_png->Data);      
+      //Z_Free(my_png->Data);
+      free(my_png->Data);
       my_png->Data = 0;
    }
    if(my_png->FRowPtrs)
@@ -79,10 +79,10 @@ void InitializeDemData()
 
    if((my_png->Data)&&(my_png->FRowPtrs))
    {
-      cvaluep = (long*)my_png->FRowPtrs;   
+      cvaluep = (long*)my_png->FRowPtrs;
       for(y=0;y<my_png->Height;y++)
       {
-         cvaluep[y] = (long)my_png->Data + ( y * (long)my_png->FRowBytes ); //DL Added 08/07/2000     
+         cvaluep[y] = (long)my_png->Data + ( y * (long)my_png->FRowBytes ); //DL Added 08/07/2000
       }
    }
 }
@@ -102,7 +102,7 @@ void mypng_struct_create()
    my_png->Filter = PNG_FILTER_TYPE_DEFAULT;
 }
 //_____________________________________________________________________________
-void mypng_struct_destroy(qboolean keepData) { 
+void mypng_struct_destroy(qboolean keepData) {
    if(!my_png)
       return;
    if(my_png->Data && !keepData)
@@ -117,16 +117,16 @@ void mypng_struct_destroy(qboolean keepData) {
 }
 //_____________________________________________________________________________
 void PNGAPI fReadData(png_structp png,png_bytep data,png_size_t length) { // called by pnglib
-   unsigned int i; 
+   unsigned int i;
    for(i=0;i<length;i++)
-      data[i] = my_png->tmpBuf[my_png->tmpi++];    // give pnglib a some more bytes 
+      data[i] = my_png->tmpBuf[my_png->tmpi++];    // give pnglib a some more bytes
 }
 //_____________________________________________________________________________
 
 extern int filelength (FILE *f);
 
 //Tei png version, ripped and adapted from sul_png.c from Quake2max
-byte * LoadPNG (FILE *f,char * name)
+byte * LoadPNG (FILE *f, char * name, int filesize)
 {
    png_structp png;
    png_infop pnginfo;
@@ -135,11 +135,9 @@ byte * LoadPNG (FILE *f,char * name)
    byte *raw;
    byte *imagedata;
 
-   len = filelength(f);
+   raw = malloc(filesize+1);
 
-   raw = malloc(len+1);//Z_Malloc(len + 1);
-
-   fread (raw, 1, len, f);
+   fread (raw, 1, filesize, f);
    fclose(f);
 
    if (!raw)
@@ -149,7 +147,7 @@ byte * LoadPNG (FILE *f,char * name)
    }
 
    if( png_sig_cmp(raw,0,4))
-      return 0; 
+      return 0;
 
    png = png_create_read_struct(PNG_LIBPNG_VER_STRING,0,0,0);
    if(!png)
@@ -176,7 +174,7 @@ byte * LoadPNG (FILE *f,char * name)
    png_get_IHDR(png, pnginfo, &my_png->Width, &my_png->Height,&my_png->BitDepth, &my_png->ColorType, &my_png->Interlace, &my_png->Compression, &my_png->Filter );
    // ...removed bgColor code here...
 
-   if (my_png->ColorType == PNG_COLOR_TYPE_PALETTE) 
+   if (my_png->ColorType == PNG_COLOR_TYPE_PALETTE)
       png_set_palette_to_rgb(png);
    if (my_png->ColorType == PNG_COLOR_TYPE_GRAY && my_png->BitDepth < 8)
       png_set_gray_1_2_4_to_8(png);
@@ -230,12 +228,12 @@ byte * LoadPNG (FILE *f,char * name)
 		Con_Printf ("Bad png color depth: %s\n", name);
 		//*pic = NULL;
 		imagedata = 0;
-		free( my_png->Data );      
+		free( my_png->Data );
 		free(raw);
    }
 
    mypng_struct_destroy(true);
-   
+
    return imagedata;
 }
 //Tei png version, ripped and adapted from sul_png.c from Quake2max

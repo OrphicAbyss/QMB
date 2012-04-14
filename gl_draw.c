@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -25,13 +25,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define GL_COLOR_INDEX8_EXT     0x80E5
 
-extern unsigned char d_15to8table[65536];
 //qmb :detail texture
 extern int	detailtexture;
 extern int	detailtexture2;
 extern int	quadtexture;
 byte *jpeg_rgba;
-     
+
 cvar_t		gl_nobind = {"gl_nobind", "0"};
 cvar_t		gl_max_size = {"gl_max_size", "4096"};
 cvar_t		gl_quick_texture_reload = {"gl_quick_texture_reload", "1", true};
@@ -229,18 +228,18 @@ qpic_t	*Draw_CachePic (char *path)
 	glpic_t		*gl;
 
 	for (pic=menu_cachepics, i=0 ; i<menu_numcachepics ; pic++, i++)
-		if (!strcmp (path, pic->name))
+		if (!Q_strcmp (path, pic->name))
 			return &pic->pic;
 
 	if (menu_numcachepics == MAX_CACHED_PICS)
 		Sys_Error ("menu_numcachepics == MAX_CACHED_PICS");
 	menu_numcachepics++;
-	strcpy (pic->name, path);
+	Q_strcpy (pic->name, path);
 
 //
 // load the pic from disk
 //
-	dat = (qpic_t *)COM_LoadTempFile (path);	
+	dat = (qpic_t *)COM_LoadTempFile (path);
 	if (!dat)
 		Sys_Error ("Draw_CachePic: failed to load %s", path);
 	SwapPic (dat);
@@ -248,8 +247,8 @@ qpic_t	*Draw_CachePic (char *path)
 	// HACK HACK HACK --- we need to keep the bytes for
 	// the translatable player picture just for the menu
 	// configuration dialog
-	if (!strcmp (path, "gfx/menuplyr.lmp"))
-		memcpy (menuplyr_pixels, dat->data, dat->width*dat->height);
+	if (!Q_strcmp (path, "gfx/menuplyr.lmp"))
+		Q_memcpy (menuplyr_pixels, dat->data, dat->width*dat->height);
 
 	pic->pic.width = dat->width;
 	pic->pic.height = dat->height;
@@ -379,7 +378,7 @@ void Draw_Init (void)
 	{
 		start = Hunk_LowMark();
 
-		cb = (qpic_t *)COM_LoadTempFile ("gfx/conback.lmp");	
+		cb = (qpic_t *)COM_LoadTempFile ("gfx/conback.lmp");
 		if (!cb)
 			Sys_Error ("Couldn't load gfx/conback.lmp");
 		SwapPic (cb);
@@ -439,7 +438,7 @@ void Draw_Character (int x, int y, int num)
 		return;		// space
 
 	num &= 255;
-	
+
 	if (y <= -8)
 		return;			// totally off screen
 
@@ -572,7 +571,7 @@ void Draw_TransPic (int x, int y, qpic_t *pic)
 	{
 		//Sys_Error ("Draw_TransPic: bad coordinates");
 	}
-		
+
 	Draw_AlphaPic (x, y, pic, 1);
 }
 
@@ -796,7 +795,7 @@ void Draw_Crosshair (int texnum, vec3_t colour, float alpha)
 	glTexCoord2f (1, 1);	glVertex2f (x+xsize, y+ysize);
 	glTexCoord2f (0, 1);	glVertex2f (x, y+ysize);
 	glEnd ();
-	
+
 	// restore display settings
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glColor4f(1,1,1,1);
@@ -847,7 +846,7 @@ void GL_Set2D (void)
 
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity ();
-	glOrtho  (0, vid.width, vid.height, 0, -99999, 99999);
+	glOrtho  (0, vid.width, vid.height, 0, -1000, 1000);
 
 	glMatrixMode(GL_MODELVIEW);
     glLoadIdentity ();
@@ -950,7 +949,7 @@ void Image_Resample32Lerp(const void *indata, int inwidth, int inheight, void *o
 			{
 				inrow = (byte *)indata + inwidth4*yi;
 				if (yi == oldy+1)
-					memcpy(resamplerow1, resamplerow2, outwidth4);
+					Q_memcpy(resamplerow1, resamplerow2, outwidth4);
 				else
 					Image_Resample32LerpLine (inrow, resamplerow1, inwidth, outwidth);
 				Image_Resample32LerpLine (inrow + inwidth4, resamplerow2, inwidth, outwidth);
@@ -1013,12 +1012,12 @@ void Image_Resample32Lerp(const void *indata, int inwidth, int inheight, void *o
 			{
 				inrow = (byte *)indata + inwidth4*yi;
 				if (yi == oldy+1)
-					memcpy(resamplerow1, resamplerow2, outwidth4);
+					Q_memcpy(resamplerow1, resamplerow2, outwidth4);
 				else
 					Image_Resample32LerpLine (inrow, resamplerow1, inwidth, outwidth);
 				oldy = yi;
 			}
-			memcpy(out, resamplerow1, outwidth4);
+			Q_memcpy(out, resamplerow1, outwidth4);
 		}
 	}
 }
@@ -1082,7 +1081,7 @@ void Image_Resample24Lerp(const void *indata, int inwidth, int inheight, void *o
 			{
 				inrow = (byte *)indata + inwidth3*yi;
 				if (yi == oldy+1)
-					memcpy(resamplerow1, resamplerow2, outwidth3);
+					Q_memcpy(resamplerow1, resamplerow2, outwidth3);
 				else
 					Image_Resample24LerpLine (inrow, resamplerow1, inwidth, outwidth);
 				Image_Resample24LerpLine (inrow + inwidth3, resamplerow2, inwidth, outwidth);
@@ -1138,12 +1137,12 @@ void Image_Resample24Lerp(const void *indata, int inwidth, int inheight, void *o
 			{
 				inrow = (byte *)indata + inwidth3*yi;
 				if (yi == oldy+1)
-					memcpy(resamplerow1, resamplerow2, outwidth3);
+					Q_memcpy(resamplerow1, resamplerow2, outwidth3);
 				else
 					Image_Resample24LerpLine (inrow, resamplerow1, inwidth, outwidth);
 				oldy = yi;
 			}
-			memcpy(out, resamplerow1, outwidth3);
+			Q_memcpy(out, resamplerow1, outwidth3);
 		}
 	}
 }
@@ -1360,7 +1359,7 @@ int GL_FindTexture (char *identifier)
 
 	for (i=0, glt=gltextures ; i<numgltextures ; i++, glt++)
 	{
-		if (!strcmp (identifier, glt->identifier))
+		if (!Q_strcmp (identifier, glt->identifier))
 			return gltextures[i].texnum;
 	}
 
@@ -1382,10 +1381,10 @@ __inline unsigned RGBAtoGrayscale(unsigned rgba){
 	unsigned char *rgb, value;
 	unsigned output;
 	double shift;
-	
+
 	output = rgba;
 	rgb = ((unsigned char *)&output);
-		
+
 	value = min(255,rgb[0] * 0.2125 + rgb[1] * 0.7154 + rgb[2] * 0.0721);
 	//shift = sqrt(max(0,(rgb[0])-(rgb[1]+rgb[2])/2))/16;
 	//value = min(255,rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114);
@@ -1399,7 +1398,7 @@ __inline unsigned RGBAtoGrayscale(unsigned rgba){
 		rgb[1] = rgb[1] + (value - rgb[1])*shift;
 		rgb[2] = rgb[2] + (value - rgb[2])*shift;
 	#endif
-		
+
 	return output;
 }
 
@@ -1435,7 +1434,7 @@ void GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap, qbool
 	{
 		scaled = malloc(sizeof(unsigned)*scaled_width*scaled_height);
 		Con_SafeDPrintf("&c500Upload32:&r Needed Dynamic Buffer for texture resize...\n");
-		
+
 		if (scaled==NULL)
 			Sys_Error ("GL_LoadTexture: texture is too big, cannot resample textures bigger than %i",scaled_width*scaled_height);
 	}
@@ -1463,7 +1462,7 @@ void GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap, qbool
 				/*
 				int depth = 1;
 				int mip = 0;
-				
+
 				//upload first without mipmapping
 				glTexImage2D (GL_TEXTURE_2D, mip++, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
@@ -1528,13 +1527,13 @@ int GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean al
 	unsigned	*trans;
 	int			i, s;
 	int			p;
-	
+
 	s = width*height;
-	
+
 	if (s<512*256)
 	{
 		trans = &temp_buffer[0];
-		memset(trans,0,512*256*sizeof(unsigned));
+		Q_memset(trans,0,512*256*sizeof(unsigned));
 	}
 	else
 	{
@@ -1550,7 +1549,7 @@ int GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean al
 		for (i = 0 ; i<s ; i++) {
 			p = data[i];
 			if (p < 224){
-				trans[i] = d_8to24table[255];			// transparent 
+				trans[i] = d_8to24table[255];			// transparent
 			}else {
 				trans[i] = d_8to24table[p];				// fullbright
 				alpha = 1;	//found a fullbright texture, need to tell upload32 that this texture will have alpha
@@ -1621,7 +1620,7 @@ int GL_LoadTexture (char *identifier, int width, int height, byte *data, qboolea
 	{
 		for (i=0, glt=gltextures ; i < numgltextures ; i++, glt++)
 		{
-			if (!strcmp (identifier, glt->identifier))
+			if (!Q_strcmp (identifier, glt->identifier))
 			{
 				if (lhcsum != glt->lhcsum || width != glt->width || height != glt->height)
 				{
@@ -1635,7 +1634,7 @@ int GL_LoadTexture (char *identifier, int width, int height, byte *data, qboolea
 	// whoever at id or threewave must've been half asleep...
 	glt = &gltextures[numgltextures++];
 
-	strcpy (glt->identifier, identifier);
+	Q_strcpy (glt->identifier, identifier);
 	glt->texnum = texture_extension_number++;
 
 GL_LoadTexture_setup:
@@ -1643,7 +1642,7 @@ GL_LoadTexture_setup:
 	glt->width = width;
 	glt->height = height;
 	glt->mipmap = mipmap;
-	glt->bytesperpixel = bytesperpixel; 
+	glt->bytesperpixel = bytesperpixel;
 
 	if (!isDedicated)
 	{
@@ -1673,18 +1672,18 @@ GL_LoadTexture_setup:
 
 static GLenum oldtarget = GL_TEXTURE0_ARB;
 
-void GL_SelectTexture (GLenum target) 
+void GL_SelectTexture (GLenum target)
 {
 	qglSelectTextureARB(target);
-	if (target == oldtarget) 
+	if (target == oldtarget)
 		return;
 	oldtarget = target;
 }
 
 extern byte *LoadPCX (FILE *f);
-extern byte *LoadTGA (FILE *f, char *name);
+extern byte *LoadTGA (FILE *f, char *name, int filesize);
 extern byte *LoadJPG (FILE *f);
-extern byte *LoadPNG (FILE *f,char * name);
+extern byte *LoadPNG (FILE *f, char * name, int filesize);
 extern char *COM_FileExtension (char *in);
 
 byte* loadimagepixels (char* filename, qboolean complain)
@@ -1696,6 +1695,7 @@ byte* loadimagepixels (char* filename, qboolean complain)
 //	int		found, i;
 	char	*filefound[8];
 	byte	*output = 0;
+	int		filesize = 0;
 
 	COM_StripExtension(filename, basename); // strip the extension to allow PNG, JPG, TGA and PCX
 
@@ -1711,12 +1711,12 @@ byte* loadimagepixels (char* filename, qboolean complain)
 			if (Q_strcmp (COM_FileExtension(filefound[i]), "png")==0){
 				COM_FOpenFile (filefound[i], &f);
 				if (f)
-					output = LoadPNG (f, filefound[i]);
+					output = LoadPNG (f, filefound[i], 0);
 			}
 			if (Q_strcmp (COM_FileExtension(filefound[i]), "tga")==0){
 				COM_FOpenFile (filefound[i], &f);
 				if (f)
-					output = LoadTGA (f, filefound[i]);
+					output = LoadTGA (f, filefound[i], 0);
 			}
 			if (Q_strcmp (COM_FileExtension(filefound[i]), "jpg")==0){
 				COM_FOpenFile (filefound[i], &f);
@@ -1739,28 +1739,29 @@ byte* loadimagepixels (char* filename, qboolean complain)
 	}
 
 #else
+
 	//old way
 	//png loading
 	sprintf (name, "%s.png", basename);
-	COM_FOpenFile (name, &f);
+	filesize = COM_FOpenFile (name, &f);
 	if (f)
-		return LoadPNG (f, basename);
+		return LoadPNG (f, basename, filesize);
 
 	//tga loading
 	sprintf (name, "%s.tga", basename);
-	COM_FOpenFile (name, &f);
+	filesize = COM_FOpenFile (name, &f);
 	if (f)
-		return LoadTGA (f, basename);
+		return LoadTGA (f, basename, filesize);
 
 	//jpg loading
 	sprintf (name, "%s.jpg", basename);
-	COM_FOpenFile (name, &f);
+	filesize = COM_FOpenFile (name, &f);
 	if (f)
 		return LoadJPG (f);
 
 	//pcx loading
 	sprintf (name, "%s.pcx", basename);
-	COM_FOpenFile (name, &f);
+	filesize = COM_FOpenFile (name, &f);
 	if (f)
 		return LoadPCX (f);
 #endif

@@ -2,9 +2,9 @@
 #include "bot.h"
 
 void SearchForEnemyCoop (client_t *client)
-{ //its a coop game	
+{ //its a coop game
 	edict_t	*bot = client->edict;
-	edict_t	*nmy = bot->bot.enemy;					
+	edict_t	*nmy = bot->bot.enemy;
 	edict_t *bestent;
 	vec3_t	eyes1, eyes2, origin, test, bestdir;
 	int		test2, i;
@@ -34,7 +34,7 @@ void SearchForEnemyCoop (client_t *client)
 	VectorCopy (bot->v.angles, bestdir);
 	bestdist = 1000;
 	bestent = NULL;
-	
+
 	//save calculations
 
 	nmy = NEXT_EDICT(sv.edicts);
@@ -43,7 +43,7 @@ void SearchForEnemyCoop (client_t *client)
 		if (nmy->v.takedamage != DAMAGE_AIM	||				//takes damage
 			nmy == bot						||				//isnt the bot
 			!(nmy->v.health > 0)			||				// and is alive
-			!strcmp(pr_strings + nmy->v.classname, "player"))	//not a player
+			!Q_strcmp(pr_strings + nmy->v.classname, "player"))	//not a player
 			continue;
 
 		//work out position of other object
@@ -58,7 +58,7 @@ void SearchForEnemyCoop (client_t *client)
 			bestent = nmy;
 		}
 	}
-	
+
 	if (bestent)
 	{
 		nmy = bestent;
@@ -84,7 +84,7 @@ void SearchForEnemyCoop (client_t *client)
 		!nmy->bot.isbot)			// and is not a bot
 	{
 		bot->bot.chase = nmy;									// Then start chasing him
-		VectorSubtract (nmy->v.origin, bot->v.origin, origin);	// Get a nice vector	
+		VectorSubtract (nmy->v.origin, bot->v.origin, origin);	// Get a nice vector
 
 		CalcAngles (origin, test);		// And use it to see in what direction the client is
 		bot->v.angles[0] = 0;			// This is reset so it doesnt look like hes running into the floor if the chase client is below him
@@ -93,7 +93,7 @@ void SearchForEnemyCoop (client_t *client)
 		AttackMoveBot (client, false, true, false, nmy);	// And get him running
 		return;
 	}
-		
+
 	bot->bot.enemy = bot;				// Set enemy to the bot himself again
 	nmy	= Nextent(globot.world);		// Prepare to loop through clients
 	num	= 0;
@@ -102,7 +102,7 @@ void SearchForEnemyCoop (client_t *client)
 		if (nmy != bot			&&		// and is not the bot himself
 			nmy->v.health > 0	&&		// and is alive
 			!nmy->bot.isbot)			// and is not a bot
-		
+
 		{
 			VectorAdd (nmy->v.origin, nmy->v.view_ofs, eyes1);	// We want the origin of the clients eyes
 
@@ -118,7 +118,7 @@ void SearchForEnemyCoop (client_t *client)
 		}
 		num++;
 		nmy = Nextent(nmy);									// If the client was'nt visible then continue the loop with the next client
-	}														
+	}
 
 	//should only get here if all humans are dead
 	bot->v.button0 = 0;		// So why waste ammo?
