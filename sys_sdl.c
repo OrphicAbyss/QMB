@@ -35,17 +35,40 @@ cvar_t  sys_nostdout = {"sys_nostdout","0"};
 // General routines
 // =======================================================================
 
+/**
+ * Prints out to the stdout the console text.
+ *
+ * Removes any colour control codes for cleaner output.
+ *
+ * @param fmt
+ * @param ...
+ */
 void Sys_Printf (char *fmt, ...)
 {
 	va_list		argptr;
 	char		text[1024];
+	char		output[1024];
+
+	int			inputPos, outputPos, inputLen;
 
 	va_start (argptr,fmt);
-	vsprintf (text,fmt,argptr);
+	vsnprintf (text,1024,fmt,argptr);
 	va_end (argptr);
-	fprintf(stderr, "%s", text);
 
-	//Con_Print (text);
+	inputLen = strlen(text) + 1;
+	outputPos = 0;
+	for (inputPos=0;inputPos<inputLen;inputPos++){
+		if (text[inputPos] == '&' && text[inputPos+1] == 'r'){
+			//skip the code
+			inputPos += 2;
+		} if (text[inputPos] == '&' && text[inputPos+1] == 'c'){
+			inputPos += 4;
+		}else {
+			output[outputPos++] = text[inputPos];
+		}
+	}
+
+	fprintf(stdout, "%s", output);
 }
 
 void Sys_Quit (void)
@@ -323,9 +346,7 @@ int main (int c, char **v)
 	parms.argv = com_argv;
 
 	Sys_Init();
-
-    Host_Init(&parms);
-
+	Host_Init(&parms);
 	Cvar_RegisterVariable (&sys_nostdout);
 
     oldtime = Sys_FloatTime () - 0.1;
