@@ -21,9 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
-
-int			sb_updates;		// if >= vid.numpages, no update needed
-
 #define STAT_MINUS		10	// num frame for '-' stats digit
 qpic_t		*sb_nums[2][11];
 qpic_t		*sb_colon, *sb_slash;
@@ -89,7 +86,6 @@ void Sbar_ShowScores (void)
 	if (sb_showscores)
 		return;
 	sb_showscores = true;
-	sb_updates = 0;
 }
 
 /*
@@ -102,17 +98,6 @@ Tab key up
 void Sbar_DontShowScores (void)
 {
 	sb_showscores = false;
-	sb_updates = 0;
-}
-
-/*
-===============
-Sbar_Changed
-===============
-*/
-void Sbar_Changed (void)
-{
-	sb_updates = 0;	// update next frame
 }
 
 /*
@@ -601,9 +586,6 @@ void Sbar_DrawInventory (void)
 					flashon = (flashon%5) + 2;
 
 				Sbar_DrawPic (vid.width-sb_weapons[flashon][i]->width, ((vid.height/4*3)*(-1))+i*24, sb_weapons[flashon][i]);
-
-				if (flashon > 1)
-					sb_updates = 0;		// force update to remove flash
 			}
 		}
 
@@ -658,8 +640,6 @@ void Sbar_DrawInventory (void)
 				}
 				else
 				   Sbar_DrawPic (176 + (i*24), -16, hsb_weapons[flashon][i]);
-				if (flashon > 1)
-				   sb_updates = 0;      // force update to remove flash
 			 }
 		  }
 		}
@@ -706,18 +686,13 @@ void Sbar_DrawInventory (void)
 			 time = cl.item_gettime[17+i];
 			 if (time && time > cl.time - 2 && flashon )
 			 {  // flash frame
-				sb_updates = 0;
-			 }
-			 else
-			 {
+
+			 } else {
 			 //MED 01/04/97 changed keys
-				if (!hipnotic || (i>1))
-				{
+				if (!hipnotic || (i>1)){
 				   Sbar_DrawPic (vid.width-192+i*32, -32, sb_items[i]);
 				}
 			 }
-			 if (time && time > cl.time - 2)
-				sb_updates = 0;
 		  }
 		//MED 01/04/97 added hipnotic items
 		// hipnotic items
@@ -729,14 +704,9 @@ void Sbar_DrawInventory (void)
 				time = cl.item_gettime[24+i];
 				if (time && time > cl.time - 2 && flashon )
 				{  // flash frame
-				   sb_updates = 0;
-				}
-				else
-				{
+
+				} else
 				   Sbar_DrawPic (288 + i*16, -16, hsb_items[i]);
-				}
-				if (time && time > cl.time - 2)
-				   sb_updates = 0;
 			 }
 		}
 
@@ -751,15 +721,8 @@ void Sbar_DrawInventory (void)
 
 					if (time &&	time > cl.time - 2 && flashon )
 					{	// flash frame
-						sb_updates = 0;
-					}
-					else
-					{
+					} else
 						Sbar_DrawPic (288 + i*16, -16, rsb_items[i]);
-					}
-
-					if (time &&	time > cl.time - 2)
-						sb_updates = 0;
 				}
 			}
 		}
@@ -773,12 +736,8 @@ void Sbar_DrawInventory (void)
 					time = cl.item_gettime[28+i];
 					if (time &&	time > cl.time - 2 && flashon )
 					{	// flash frame
-						sb_updates = 0;
-					}
-					else
+					} else
 						Sbar_DrawPic (vid.width-128 + i*32, -SBAR_HEIGHT, sb_sigil[i]);
-					if (time &&	time > cl.time - 2)
-						sb_updates = 0;
 				}
 			}
 		}
@@ -935,12 +894,10 @@ void Sbar_DrawFace (int x, int y)
 		f = cl.stats[STAT_HEALTH] / 20;
 
 	if (cl.time <= cl.faceanimtime)
-	{
 		anim = 1;
-		sb_updates = 0;		// make sure the anim gets drawn over
-	}
 	else
 		anim = 0;
+
 	Sbar_DrawPic (x, y, sb_faces[f][anim]);
 }
 
@@ -954,13 +911,7 @@ void Sbar_Draw (void)
 	if (scr_con_current == vid.height)
 		return;		// console is full screen
 
-	//QMB - make the status bar get redrawn every frame
-	if (sb_updates >= vid.numpages)
-		return;
-
 	scr_copyeverything = 1;
-
-	sb_updates++;
 
 	if (sb_lines && vid.width > 320)
 		Draw_TileClear (0, vid.height - sb_lines, vid.width, sb_lines);
@@ -968,7 +919,6 @@ void Sbar_Draw (void)
 	if (sb_showscores || cl.stats[STAT_HEALTH] <= 0)
 	{
 		Sbar_DrawScoreboard ();
-		sb_updates = 0;
 	}
 
 	if ((hud.value || sb_showscores) && cl.stats[STAT_HEALTH] > 0)

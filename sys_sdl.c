@@ -187,23 +187,7 @@ int Sys_FileRead (int handle, void *dst, int count)
 
 int Sys_FileWrite (int handle, void *src, int count)
 {
-	char *data;
-	int size, done;
-
-	size = 0;
-	if ( handle >= 0 ) {
-		data = src;
-		while ( count > 0 ) {
-			done = fread (data, 1, count, sys_handles[handle]);
-			if ( done == 0 ) {
-				break;
-			}
-			data += done;
-			count -= done;
-			size += done;
-		}
-	}
-	return size;
+	fwrite (src, 1, count, sys_handles[handle]);
 }
 
 int	Sys_FileTime (char *path)

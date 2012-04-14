@@ -29,7 +29,7 @@ LINKOBJ  = $(OBJ)
 LIBS =  -L"/usr/local/lib" -L"./dxsdk/sdk/lib/" -lGL -lGLU -ljpeg -lpng -lSDL -lGLee
 INCS =  -I"C:/msys/1.0/local/include" -I"C:/MinGW/include"  -I"./dxsdk/sdk/inc"
 CXXINCS =  $(INCS)
-FLAGS = -pg -g -O -DSDL -DGLQUAKE -m32
+FLAGS = -pg -g -O0 -DSDL -DGLQUAKE -m32
 #-D__GNUWIN32__ -W -DNDEBUG -D_WINDOWS -DGLQUAKE
 CXXFLAGS =  $(CXXINCS) $(FLAGS)
 CFLAGS =  $(INCS) $(FLAGS)

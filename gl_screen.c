@@ -264,9 +264,6 @@ static void SCR_CalcRefdef (void)
 	scr_fullupdate = 0;		// force a background redraw
 	vid.recalc_refdef = 0;
 
-// force the status bar to redraw
-	Sbar_Changed ();
-
 //========================================
 
 // bound viewsize
@@ -609,14 +606,7 @@ void SCR_SetUpToDrawConsole (void)
 			scr_con_current = scr_conlines;
 	}
 
-	if (clearconsole++ < vid.numpages)
-	{
-		Sbar_Changed ();
-	}
-	else if (clearnotify++ < vid.numpages)
-	{
-	}
-	else
+	if (!(clearconsole++ < vid.numpages || clearnotify++ < vid.numpages))
 		con_notifylines = 0;
 }
 
@@ -672,22 +662,20 @@ void SCR_ScreenShot_f (void)
 //
 // find a file name to save it to
 //
-	Q_strcpy(pcxname,"quake00.tga");
+	Q_strcpy(pcxname,"quake000.tga");
 
-	for (i=0 ; i<=99 ; i++)
-	{
-		pcxname[5] = i/10 + '0';
-		pcxname[6] = i%10 + '0';
-		sprintf (checkname, "%s/%s", com_gamedir, pcxname);
+	for (i=0 ; i<=999 ; i++){
+		pcxname[5] = '0' + i/100;
+		pcxname[6] = '0' + i%100/10;
+		pcxname[7] = '0' + i%10;
+		snprintf (checkname, MAX_OSPATH, "%s/%s", com_gamedir, pcxname);
 		if (Sys_FileTime(checkname) == -1)
 			break;	// file doesn't exist
 	}
-	if (i==100)
-	{
-		Con_Printf ("SCR_ScreenShot_f: Couldn't create a PCX file\n");
+	if (i==1000){
+		Con_Printf ("SCR_ScreenShot_f: Couldn't create a PCX file, more than %i screenshots. \n",i);
 		return;
  	}
-
 
 	buffer = malloc(glwidth*glheight*3 + 18);
 	Q_memset (buffer, 0, 18);
@@ -698,16 +686,8 @@ void SCR_ScreenShot_f (void)
 	buffer[15] = glheight>>8;
 	buffer[16] = 24;	// pixel size
 
-	glReadPixels (glx, gly, glwidth, glheight, GL_RGB, GL_UNSIGNED_BYTE, buffer+18 );
+	glReadPixels (glx, gly, glwidth, glheight, GL_BGR, GL_UNSIGNED_BYTE, buffer+18 );
 
-	// swap rgb to bgr
-	c = 18+glwidth*glheight*3;
-	for (i=18 ; i<c ; i+=3)
-	{
-		temp = buffer[i];
-		buffer[i] = buffer[i+2];
-		buffer[i+2] = temp;
-	}
 	COM_WriteFile (pcxname, buffer, glwidth*glheight*3 + 18 );
 
 	free (buffer);
@@ -740,7 +720,6 @@ void SCR_BeginLoadingPlaque (void)
 
 	scr_drawloading = true;
 	scr_fullupdate = 0;
-	Sbar_Changed ();
 	SCR_UpdateScreen ();
 	scr_drawloading = false;
 

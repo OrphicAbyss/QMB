@@ -94,7 +94,6 @@ int			vid_realmode;
 int			vid_default = MODE_WINDOWED;
 static int	windowed_default;
 unsigned char	vid_curpal[256*3];
-static qboolean fullsbardraw = false;
 
 static float vid_gamma = 1.0;
 
@@ -608,9 +607,6 @@ void GL_Init (void)
 
 //	Con_Printf ("%s %s\n", gl_renderer, gl_version);
 
-    if (strnicmp(gl_renderer,"PowerVR",7)==0)
-         fullsbardraw = true;
-
     if (strnicmp(gl_renderer,"Permedia",8)==0)
          isPermedia = true;
 
@@ -694,8 +690,6 @@ void GL_EndRendering (void)
 			}
 		}
 	}
-	if (fullsbardraw)
-		Sbar_Changed();
 }
 
 void	VID_SetPalette (unsigned char *palette)
@@ -1822,9 +1816,6 @@ void	VID_Init (unsigned char *palette)
 
 	Q_strcpy (badmode.modedesc, "Bad mode");
 	vid_canalttab = true;
-
-	if (COM_CheckParm("-fullsbar"))
-		fullsbardraw = true;
 }
 
 

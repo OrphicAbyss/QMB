@@ -24,8 +24,6 @@ static int mouse_oldbuttonstate = 0;
 void (*vid_menudrawfn)(void) = NULL;
 void (*vid_menukeyfn)(int key) = NULL;
 
-static qboolean fullsbardraw = false;
-
 /*-----------------------------------------------------------------------*/
 
 //int		texture_mode = GL_NEAREST;
@@ -186,9 +184,6 @@ void GL_BeginRendering (int *x, int *y, int *width, int *height)
 void GL_EndRendering (void)
 {
 	SDL_GL_SwapBuffers();
-
-	if (fullsbardraw)
-		Sbar_Changed();
 }
 
 void    VID_SetPalette (unsigned char *palette)
@@ -286,9 +281,6 @@ void    VID_Init (unsigned char *palette)
 
 	sprintf (gldir, "%s/glquake", com_gamedir);
 	Sys_mkdir (gldir);
-
-	if (COM_CheckParm("-fullsbar"))
-		fullsbardraw = true;
 }
 
 void    VID_Shutdown (void)
