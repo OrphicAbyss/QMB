@@ -147,9 +147,7 @@ void S_Startup (void)
 
 		if (!rc)
 		{
-#ifndef	_WIN32
 			Con_Printf("S_Startup: SNDDMA_Init failed.\n");
-#endif
 			sound_started = 0;
 			return;
 		}
@@ -198,8 +196,6 @@ void S_Init (void)
 		Cvar_Set ("loadas8bit", "1");
 		Con_Printf ("loading all sounds as 8bit\n");
 	}
-
-
 
 	snd_initialized = true;
 

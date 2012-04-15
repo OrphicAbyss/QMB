@@ -233,7 +233,7 @@ void SetMinMaxSize (edict_t *e, float *min, float *max, qboolean rotate)
 			min[i] = max[i];
 			max[i] = temp;
 			Con_Printf("backwards mins/maxs\n");
-			PR_RunError ("backwards mins/maxs");
+			//PR_RunError ("backwards mins/maxs");
 		}
 	}
 

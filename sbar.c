@@ -349,9 +349,9 @@ void Sbar_DrawFade (int x, int y, int height, int side)
 	float	alpha[2];
 	vec3_t	colour;
 
-	colour[0] = hud_r.value;
-	colour[1] = hud_g.value;
-	colour[2] = hud_b.value;
+	colour[0] = 0;//hud_r.value;
+	colour[1] = 0;//hud_g.value;
+	colour[2] = 0;//hud_b.value;
 
 	if (side)
 	{
@@ -495,9 +495,9 @@ void Sbar_SoloScoreboard (void)
 	int		l, x;
 	vec3_t	colour;
 
-	colour[0] = hud_r.value;
-	colour[1] = hud_g.value;
-	colour[2] = hud_b.value;
+	colour[0] = 0;//hud_r.value;
+	colour[1] = 0;//hud_g.value;
+	colour[2] = 0;//hud_b.value;
 
 	x = vid.width/2-160;
 

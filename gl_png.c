@@ -177,7 +177,7 @@ byte * LoadPNG (FILE *f, char * name, int filesize)
    if (my_png->ColorType == PNG_COLOR_TYPE_PALETTE)
       png_set_palette_to_rgb(png);
    if (my_png->ColorType == PNG_COLOR_TYPE_GRAY && my_png->BitDepth < 8)
-      png_set_gray_1_2_4_to_8(png);
+      png_set_expand_gray_1_2_4_to_8(png);
 
    // Add alpha channel if present
    if(png_get_valid( png, pnginfo, PNG_INFO_tRNS ))

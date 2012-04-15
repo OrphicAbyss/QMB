@@ -1506,7 +1506,7 @@ void M_Options_Key (int k)
 //=============================================================================
 /* VIDEO OPTIONS MENU */
 
-#define	VID_OPTIONS_ITEMS	13
+#define	VID_OPTIONS_ITEMS	10
 
 #define ITEM_VIDEO_MODES	0
 #define ITEM_VIDEO_RESET	1
@@ -1514,27 +1514,22 @@ void M_Options_Key (int k)
 #define ITEM_GAMMA			3
 #define ITEM_DLIGHTS		4
 #define ITEM_DETAILTEX		5
-#define ITEM_SHADOWS		6
-#define ITEM_CAUSTICS		7
-#define ITEM_SHINY			8
-#define ITEM_SHOWFPS		9
-#define ITEM_HUDR			10
-#define ITEM_HUDG			11
-#define ITEM_HUDB			12
+#define ITEM_CAUSTICS		6
+#define ITEM_SHINY			7
+#define ITEM_SHOWFPS		8
+#define ITEM_HUD			9
 
 int vid_options_cursor_table[] = {BUTTON_START,
-								  BUTTON_START+BUTTON_HEIGHT,
+								  BUTTON_START+BUTTON_HEIGHT*1,
+								  BUTTON_START+BUTTON_HEIGHT*2,
 								  BUTTON_START+BUTTON_HEIGHT*3,
-								  BUTTON_START+BUTTON_HEIGHT*4,
+							      BUTTON_START+BUTTON_HEIGHT*4,
 							      BUTTON_START+BUTTON_HEIGHT*5,
-							      BUTTON_START+BUTTON_HEIGHT*6,
+								  BUTTON_START+BUTTON_HEIGHT*6,
 								  BUTTON_START+BUTTON_HEIGHT*7,
 								  BUTTON_START+BUTTON_HEIGHT*8,
 								  BUTTON_START+BUTTON_HEIGHT*9,
-								  BUTTON_START+BUTTON_HEIGHT*10,
-								  BUTTON_START+BUTTON_HEIGHT*11,
-								  BUTTON_START+BUTTON_HEIGHT*12,
-								  BUTTON_START+BUTTON_HEIGHT*13};
+								  BUTTON_START+BUTTON_HEIGHT*10};
 
 int		vid_options_cursor;
 
@@ -1543,11 +1538,17 @@ void M_Menu_Video_f (void)
 	key_dest = key_menu;
 	m_state = m_vid_options;
 	m_entersound = true;
+
+	// If we don't have a video modes list, default to the option below
+	if (vid_menudrawfn)
+		vid_options_cursor = 0;
+	else
+		vid_options_cursor = 1;
 }
 
 void M_AdjustVideoSliders (int dir)
 {
-	extern cvar_t show_fps, hud_r, hud_g, hud_b, hud_a;
+	extern cvar_t show_fps, hud_r, hud_g, hud_b, hud_a, hud;
 
 	S_LocalSound ("misc/menu3.wav");
 
@@ -1587,9 +1588,6 @@ void M_AdjustVideoSliders (int dir)
 			gl_detail.value = 0;
 		Cvar_SetValue ("gl_detail", gl_detail.value);
 		break;
-	case ITEM_SHADOWS:	// character shadows
-		Cvar_SetValue ("r_shadows", !r_shadows.value);
-		break;
 	case ITEM_CAUSTICS:	// underwater caustics
 		Cvar_SetValue ("gl_caustics", !gl_caustics.value);
 		break;
@@ -1599,6 +1597,14 @@ void M_AdjustVideoSliders (int dir)
 	case ITEM_SHOWFPS:	// show fps
 		Cvar_SetValue ("show_fps", !show_fps.value);
 		break;
+	case ITEM_HUD:
+		hud.value += dir;
+		if (hud.value > 3)
+			hud.value = 3;
+		else if (hud.value < 0)
+			hud.value = 0;
+		break;
+/*
 	case ITEM_HUDR:
 		hud_r.value += dir * 15;
 		if (hud_r.value > 255)
@@ -1620,13 +1626,14 @@ void M_AdjustVideoSliders (int dir)
 		else if (hud_b.value < 0)
 			hud_b.value = 0;
 		break;
+*/
 	}
 }
 
 
 void M_Video_Draw (void)
 {
-	extern cvar_t show_fps, hud_r, hud_g, hud_b, hud_a;
+	extern cvar_t show_fps, hud_r, hud_g, hud_b, hud_a, hud;
 	float	r;
 	int		y;
 	qpic_t	*p;
@@ -1664,10 +1671,6 @@ void M_Video_Draw (void)
 	M_Print (16, y, "       Detail textures");
 	M_DrawCheckbox (220, y, gl_detail.value);
 
-	y = vid_options_cursor_table[ITEM_SHADOWS];
-	M_Print (16, y, "               Shadows");
-	M_DrawCheckbox (220, y, r_shadows.value);
-
 	y = vid_options_cursor_table[ITEM_CAUSTICS];
 	M_Print (16, y, "   underwater caustics");
 	M_DrawCheckbox (220, y, gl_caustics.value);
@@ -1680,6 +1683,11 @@ void M_Video_Draw (void)
 	M_Print (16, y, "              Show fps");
 	M_DrawCheckbox (220, y, show_fps.value);
 
+	y = vid_options_cursor_table[ITEM_HUD];
+	M_Print (16, y, "              Show HUD");
+	r = (hud.value)/3;
+	M_DrawSlider (220, y, r);
+/*
 	y = vid_options_cursor_table[ITEM_HUDR];
 	M_Print (16, y, "             HUD   red");
 	r = (hud_r.value)/255;
@@ -1694,6 +1702,7 @@ void M_Video_Draw (void)
 	M_Print (16, y, "             HUD  blue");
 	r = (hud_b.value)/255;
 	M_DrawSlider (220, y, r);
+*/
 
 // cursor
 	M_DrawCharacter (200, vid_options_cursor_table[vid_options_cursor], 12+((int)(realtime*4)&1));
@@ -1729,7 +1738,7 @@ void M_Video_Key (int k)
 	case K_UPARROW:
 		S_LocalSound ("misc/menu1.wav");
 		vid_options_cursor--;
-		if (vid_options_cursor < 0)
+		if (vid_options_cursor < 0 || (!vid_menudrawfn && vid_options_cursor < 1))
 			vid_options_cursor = VID_OPTIONS_ITEMS-1;
 		break;
 
@@ -1737,7 +1746,7 @@ void M_Video_Key (int k)
 		S_LocalSound ("misc/menu1.wav");
 		vid_options_cursor++;
 		if (vid_options_cursor >= VID_OPTIONS_ITEMS)
-			vid_options_cursor = 0;
+			vid_options_cursor = !vid_menudrawfn ? 1 : 0;
 		break;
 
 	case K_LEFTARROW:
@@ -2011,28 +2020,6 @@ void M_Help_Draw (void)
 	M_CenterprintWhite (vid.height-16, onscreen_help);
 	M_CenterprintWhite (vid.height-8, "Use the arrow keys to scroll the pages.");
 
-/*	if (help_page == HELP_ORDERING)
-	{
-		p = Draw_CachePic ("gfx/qmb_menu_help_ordering.lmp");
-		M_DrawPic ( (320-p->width)/2, 8, p);
-
-		y = 52 + ((vid.height/2)-120);
-		M_Centerprint	(y, "All four episodes can be"); y += 8;
-		M_Centerprint	(y, "ordered by calling"); y += 8;
-		y += 16;
-		M_CenterprintWhite	(y, "1-800-idGAMES"); y += 8;
-		y += 16;
-		M_Centerprint	(y, "Quake's price is $45 plus"); y += 8;
-		M_Centerprint	(y, "$5 shipping and handling."); y += 8;
-		y += 16;
-		M_Centerprint	(y, "If you live outside the U.S.A."); y += 8;
-		M_Centerprint	(y, "consult the ORDER.TXT file"); y += 8;
-		M_Centerprint	(y, "in the Quake directory for"); y += 8;
-		M_Centerprint	(y, "ordering information or"); y += 8;
-		M_Centerprint	(y, "visit your local software"); y += 8;
-		M_Centerprint	(y, "retailer."); y += 8;
-	}
-	else*/
 	if (help_page == HELP_MOVEMENT)
 	{
 		p = Draw_CachePic ("gfx/qmb_menu_help.lmp");

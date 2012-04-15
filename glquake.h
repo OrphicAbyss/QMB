@@ -79,7 +79,6 @@ extern	cvar_t	r_drawentities;
 extern	cvar_t	r_drawworld;
 extern	cvar_t	r_drawviewmodel;
 extern	cvar_t	r_speeds;
-extern	cvar_t	r_shadows;
 extern	cvar_t	r_wateralpha;
 extern	cvar_t	r_dynamic;
 extern	cvar_t	r_novis;

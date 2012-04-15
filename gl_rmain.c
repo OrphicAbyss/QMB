@@ -66,7 +66,6 @@ void R_MarkLeaves (void);
 cvar_t	r_drawentities = {"r_drawentities","1"};
 cvar_t	r_drawviewmodel = {"r_drawviewmodel","1"};
 cvar_t	r_speeds = {"r_speeds","0"};
-cvar_t	r_shadows = {"r_shadows","1", true}; //shadows
 cvar_t	r_wateralpha = {"r_wateralpha","1", true};
 cvar_t	r_dynamic = {"r_dynamic","1"};
 cvar_t	r_novis = {"r_novis","0", true};
