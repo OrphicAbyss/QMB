@@ -1,5 +1,15 @@
+#===============================================================================
 # Makefile for QMB
+#===============================================================================
 
+#===============================================================================
+# Variables to configure
+OUTPUT_DIR = ./Quake/
+OUTPUT_BIN  = QMB
+#===============================================================================
+
+#===============================================================================
+# Regular variables
 CPP  = g++
 CC   = gcc
 WINDRES = windres
@@ -19,37 +29,35 @@ OBJ  =	bot.o bot_misc.o bot_setup.o  \
 	CaptureAvi.o CaptureHelpers.o \
 	sys_sdl.o gl_vid_sdl.o
 
-#	net_win.o net_wins.o net_wipx.o  \
-#	gl_vidnt.o gl_vidsdl.o snd_win.o  conproc.o \
-#	in_sdl.o in_win.o    \
-
 LINKOBJ  = $(OBJ)
 
-#LIBS =  -L"C:/msys/1.0/local/lib" -L"C:/MinGW/lib" -L"./dxsdk/sdk/lib/" -mwindows -luser32 -lgdi32 -lopengl32 -lglu32 -lwsock32 -lwinmm -lcomctl32 -ldxguid -ljpeg -llibpng
+WINLIBS = -L"C:/msys/1.0/local/lib" -L"C:/MinGW/lib" -L"./dxsdk/sdk/lib/" -mwindows -luser32 -lgdi32 -lopengl32 -lglu32 -lwsock32 -lwinmm -lcomctl32 -ldxguid -ljpeg -llibpng
 LIBS =  -L"/usr/local/lib" -L"./dxsdk/sdk/lib/" -lGL -lGLU -ljpeg -lpng -lSDL -lGLee
 INCS =  -I"C:/msys/1.0/local/include" -I"C:/MinGW/include"  -I"./dxsdk/sdk/inc"
 CXXINCS =  $(INCS)
 FLAGS = -pg -g -O0 -DSDL -DGLQUAKE -m32
-#-D__GNUWIN32__ -W -DNDEBUG -D_WINDOWS -DGLQUAKE
+#-W -DNDEBUG
 CXXFLAGS =  $(CXXINCS) $(FLAGS)
 CFLAGS =  $(INCS) $(FLAGS)
+#===============================================================================
 
-OUTPUT_FOLDER = ./Quake/
-BIN  = QMB
-
-
+#===============================================================================
+# TARGETS
 .PHONY: all all-before all-after clean clean-custom
 
-all: all-before $(BIN) all-after
+all: all-before $(OUTPUT_BIN) all-after
 
 clean: clean-custom
-	rm -f $(OBJ) $(BIN)
+	rm -f $(OBJ) $(OUTPUT_BIN)
 
-$(BIN): $(OBJ)
-	$(CPP) $(FLAGS) $(LINKOBJ) -o "$(BIN)" $(LIBS)
+$(OUTPUT_BIN): $(LINKOBJ)
+	$(CPP) $(FLAGS) $(LINKOBJ) -o "$(OUTPUT_BIN)" $(LIBS)
 
-all-after: $(BIN)
-	cp $(BIN) $(OUTPUT_FOLDER)
+all-after: $(OUTPUT_BIN)
+	cp $(OUTPUT_BIN) $(OUTPUT_DIR)
+
+all-before: $(OUTPUT_BIN)
+	test -d $(OUTPUT_DIR) || mkdir $(OUTPUT_DIR)
 
 %.o : %.c
 	$(CC) -c $(CFLAGS) -o $@ $<
@@ -59,3 +67,4 @@ all-after: $(BIN)
 
 WinQuake_private.res: WinQuake_private.rc winquake.rc
 	$(WINDRES) -i WinQuake_private.rc -I rc -o WinQuake_private.res -O coff
+#===============================================================================
