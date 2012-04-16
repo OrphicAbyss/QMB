@@ -2,10 +2,45 @@
 # Makefile for QMB
 #===============================================================================
 
+
+ifdef WINDIR
+# Win32
+    TARGET_PLATFORM = windows
+    EXTENSION = .exe
+else
+# UNIXes
+    ARCH:=$(shell uname)
+
+ifneq ($(filter %BSD,$(ARCH)),)
+    TARGET_PLATFORM=bsd
+    $(warning BSD Platform Not Tested)
+else
+ifeq ($(ARCH), Darwin)
+    TARGET_PLATFORM=macosx
+    $(warning macosx Platform Not Tested)
+else
+ifeq ($(ARCH), SunOS)
+    TARGET_PLATFORM=sunos
+    $(warning sunos Platform Not Tested)
+else
+    TARGET_PLATFORM=linux
+endif  # ifeq ($(ARCH), SunOS)
+endif  # ifeq ($(ARCH), Darwin)
+endif  # ifneq ($(filter %BSD,$(ARCH)),)
+    EXTENSION =
+    PLATFORM_ARCH = $(shell uname -m)
+
+ifeq ($(PLATFORM_ARCH),x86_64)
+# On a 64bit platform, warning about being a 32bit build.
+    $(warning QMB only builds as a 32bit executable, ensure 32bit libs\
+     are installed)
+endif # ifeq (PLATFORM_ARCH,x86_64)
+endif # ifdef windir
+
 #===============================================================================
 # Variables to configure
 OUTPUT_DIR = ./Quake/
-OUTPUT_BIN  = QMB
+OUTPUT_BIN  = QMB$(EXTENSION)
 #===============================================================================
 
 #===============================================================================
@@ -31,14 +66,23 @@ OBJ  =	bot.o bot_misc.o bot_setup.o  \
 
 LINKOBJ  = $(OBJ)
 
-WINLIBS = -L"C:/msys/1.0/local/lib" -L"C:/MinGW/lib" -L"./dxsdk/sdk/lib/" -mwindows -luser32 -lgdi32 -lopengl32 -lglu32 -lwsock32 -lwinmm -lcomctl32 -ldxguid -ljpeg -llibpng
-LIBS =  -L"/usr/local/lib" -L"./dxsdk/sdk/lib/" -lGL -lGLU -ljpeg -lpng -lSDL -lGLee
-INCS =  -I"C:/msys/1.0/local/include" -I"C:/MinGW/include"  -I"./dxsdk/sdk/inc"
+WIN_LIBS = -L"C:/msys/1.0/local/lib" -L"C:/MinGW/lib" -L"./dxsdk/sdk/lib/" -mwindows -luser32 -lgdi32 -lopengl32 -lglu32 -lwsock32 -lwinmm -lcomctl32 -ldxguid -ljpeg -llibpng
+LINUX_LIBS =  -lGL -lGLU -ljpeg -lpng -lSDL $(shell if test -e /usr/lib/libGLee.so; then echo -lGLee; else echo -lglee; fi)
+
+ifeq ($(TARGET_PLATFORM),windows)
+    LIBS = $(WIN_LIBS)
+    INCS = -I"C:/msys/1.0/local/include" -I"C:/MinGW/include"  -I"./dxsdk/sdk/inc"
+else
+    LIBS = $(LINUX_LIBS)
+    INCS =
+endif #ifeq ($(TARGET_PLATFORM),windows)
+
 CXXINCS =  $(INCS)
-FLAGS = -pg -g -O0 -DSDL -DGLQUAKE -m32
-#-W -DNDEBUG
-CXXFLAGS =  $(CXXINCS) $(FLAGS)
-CFLAGS =  $(INCS) $(FLAGS)
+FLAGS = -W -pg -g -O0 -DSDL -DGLQUAKE -m32
+#-m32
+#-DNDEBUG
+CXXFLAGS =  $(CXXINCS)
+CFLAGS =  $(INCS)
 #===============================================================================
 
 #===============================================================================
@@ -46,6 +90,12 @@ CFLAGS =  $(INCS) $(FLAGS)
 .PHONY: all all-before all-after clean clean-custom
 
 all: all-before $(OUTPUT_BIN) all-after
+
+#profile: FLAGS += -pg -g -O0
+profile: all
+
+#debug: FLAGS += -pg -g -O0
+debug: all
 
 clean: clean-custom
 	rm -f $(OBJ) $(OUTPUT_BIN)
@@ -57,13 +107,13 @@ all-after: $(OUTPUT_BIN)
 	cp $(OUTPUT_BIN) $(OUTPUT_DIR)
 
 all-before: $(OUTPUT_BIN)
-	test -d $(OUTPUT_DIR) || mkdir $(OUTPUT_DIR)
+	@test -d $(OUTPUT_DIR) || mkdir $(OUTPUT_DIR)
 
 %.o : %.c
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(FLAGS) -o $@ $<
 
 %.o : %.cpp
-	$(CPP) -c $(CXXFLAGS) -o $@ $<
+	$(CPP) -c $(CXXFLAGS) $(FLAGS) -o $@ $<
 
 WinQuake_private.res: WinQuake_private.rc winquake.rc
 	$(WINDRES) -i WinQuake_private.rc -I rc -o WinQuake_private.res -O coff
