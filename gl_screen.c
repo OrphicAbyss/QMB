@@ -70,7 +70,6 @@ console is:
 
 */
 
-
 int			glx, gly, glwidth, glheight;
 
 // only the refresh window will be updated unless these variables are flagged
@@ -984,8 +983,7 @@ void SCR_UpdateScreen (void)
 	}
 
 	if (r_errors.value && developer.value)
-	while ( (error = glGetError()) != GL_NO_ERROR )
-		Con_DPrintf ("&c900Error:&c0092D&r %s\n", gluErrorString(error));
+		checkGLError("After drawing HUD:");
 
 	V_UpdatePalette ();
 

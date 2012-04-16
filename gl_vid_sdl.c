@@ -119,6 +119,21 @@ void CheckCombineExtension(void)
 
 }
 
+/**
+ * Checks for a GL error and prints the error to the console
+ */
+void checkGLError(const char *text){
+	const char *errorStr;
+
+	do {
+		errorStr = GLeeGetErrorString();
+		if (strcmp(errorStr,"") == 0)
+			break;
+
+		Con_DPrintf ("&c900Error:&c0092D&r %s %s\n", text, errorStr);
+	} while (1);
+}
+
 /*
 ===============
 GL_Init

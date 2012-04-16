@@ -585,9 +585,7 @@ void R_RenderScene (void)
 	GLenum error;
 
 	if (r_errors.value && developer.value)
-		while ( (error = glGetError()) != GL_NO_ERROR )
-			Con_DPrintf ("&c900Error: &c009eh, what the:&r %s\n", gluErrorString(error));
-
+		checkGLError("Error pre-rendering:");
 
 	R_SetupFrame ();
 
@@ -596,39 +594,33 @@ void R_RenderScene (void)
 	R_SetupGL ();
 
 	if (r_errors.value && developer.value)
-		while ( (error = glGetError()) != GL_NO_ERROR )
-			Con_DPrintf ("&c900Error: &c009glsetup:&r %s\n", gluErrorString(error));
+		checkGLError("After R_SetupGL:");
 
 	R_MarkLeaves ();	// done here so we know if we're in water
 
 	R_DrawWorld ();		// adds static entities to the list
 
 	if (r_errors.value && developer.value)
-		while ( (error = glGetError()) != GL_NO_ERROR )
-			Con_DPrintf ("&c900Error: &c009map render:&r %s\n", gluErrorString(error));
-
+		checkGLError("After R_DrawWorld:");
 
 	S_ExtraUpdate ();	// don't let sound get messed up if going slow
 
 	R_DrawEntitiesOnList ();
 
 	if (r_errors.value && developer.value)
-		while ( (error = glGetError()) != GL_NO_ERROR )
-			Con_DPrintf ("&c900Error: &c009entities:&r %s\n", gluErrorString(error));
+		checkGLError("After R_DrawEntitiesOnList:");
 
 	R_RenderDlights ();
 
 	R_DrawParticles ();
 
 	if (r_errors.value && developer.value)
-		while ( (error = glGetError()) != GL_NO_ERROR )
-			Con_DPrintf ("&c900Error: &c009particles:&r %s\n", gluErrorString(error));
+		checkGLError("After R_DrawParticles:");
 
 	R_DrawViewModel ();
 
 	if (r_errors.value && developer.value)
-		while ( (error = glGetError()) != GL_NO_ERROR )
-			Con_DPrintf ("&c900Error: &c009viewmodel:&r %s\n", gluErrorString(error));
+		checkGLError("After R_DrawViewModel:");
 }
 
 
@@ -695,14 +687,12 @@ void R_RenderView (void)
 		glFinish ();
 
 	if (r_errors.value && developer.value)
-		while ( (error = glGetError()) != GL_NO_ERROR )
-			Con_DPrintf ("&c900Error:&c009Finish&r %s\n", gluErrorString(error));
+		checkGLError("Finished:");
 
 	R_Clear ();
 
 	if (r_errors.value && developer.value)
-		while ( (error = glGetError()) != GL_NO_ERROR )
-			Con_DPrintf ("&c900Error:&c009Clear&r %s\n", gluErrorString(error));
+		checkGLError("After R_Clear:");
 
 	// render normal view
 
@@ -719,8 +709,7 @@ void R_RenderView (void)
 		glEnable(GL_FOG);
 
 		if (r_errors.value && developer.value)
-			while ( (error = glGetError()) != GL_NO_ERROR )
-				Con_DPrintf ("&c900Error:&c009Fog&r %s\n", gluErrorString(error));
+			checkGLError("After fog setup:");
 	}
 
 	R_RenderScene ();
@@ -737,7 +726,5 @@ void R_RenderView (void)
 	}
 
 	if (r_errors.value && developer.value)
-		while ( (error = glGetError()) != GL_NO_ERROR )
-			Con_DPrintf ("&c900Error:&r %s\n", gluErrorString(error));
-
+		checkGLError("After R_RenderScene and R_PolyBlend:");
 }
