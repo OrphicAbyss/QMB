@@ -1875,7 +1875,7 @@ void M_UnbindCommand (char *command)
 
 void M_Keys_Draw (void)
 {
-	int		i, l;
+	unsigned int		i, l;
 	int		keys[2];
 	char	*name;
 	int		x, y;
@@ -1966,7 +1966,7 @@ void M_Keys_Key (int k)
 	case K_RIGHTARROW:
 		S_LocalSound ("misc/menu1.wav");
 		keys_cursor++;
-		if (keys_cursor >= NUMCOMMANDS)
+		if (keys_cursor >= (int)NUMCOMMANDS)
 			keys_cursor = 0;
 		break;
 
