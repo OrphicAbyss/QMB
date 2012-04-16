@@ -66,19 +66,16 @@ OBJ  =	bot.o bot_misc.o bot_setup.o  \
 
 LINKOBJ  = $(OBJ)
 
-WIN_LIBS = -L"C:/msys/1.0/local/lib" -L"C:/MinGW/lib" -L"./dxsdk/sdk/lib/" -mwindows -luser32 -lgdi32 -lopengl32 -lglu32 -lwsock32 -lwinmm -lcomctl32 -ldxguid -ljpeg -llibpng
-LINUX_LIBS =  -lGL -lGLU -ljpeg -lpng -lSDL $(shell if test -e /usr/lib/libGLee.so; then echo -lGLee; else echo -lglee; fi)
-
 ifeq ($(TARGET_PLATFORM),windows)
-    LIBS = $(WIN_LIBS)
+    LIBS = -L"C:/msys/1.0/local/lib" -L"C:/MinGW/lib" -L"./dxsdk/sdk/lib/" -mwindows -luser32 -lgdi32 -lopengl32 -lglu32 -lwsock32 -lwinmm -lcomctl32 -ldxguid -ljpeg -llibpng
     INCS = -I"C:/msys/1.0/local/include" -I"C:/MinGW/include"  -I"./dxsdk/sdk/inc"
 else
-    LIBS = $(LINUX_LIBS)
+    LIBS = -lGL -lGLU -ljpeg -lpng -lSDL $(shell if test -e /usr/lib/libGLee.so; then echo -lGLee; else echo -lglee; fi)
     INCS =
 endif #ifeq ($(TARGET_PLATFORM),windows)
 
 CXXINCS =  $(INCS)
-FLAGS = -W -pg -g -O0 -DSDL -DGLQUAKE -m32
+FLAGS = -W -DSDL -DGLQUAKE -m32
 #-m32
 #-DNDEBUG
 CXXFLAGS =  $(CXXINCS)
@@ -91,10 +88,10 @@ CFLAGS =  $(INCS)
 
 all: all-before $(OUTPUT_BIN) all-after
 
-#profile: FLAGS += -pg -g -O0
+profile: FLAGS += -pg -g -O0
 profile: all
 
-#debug: FLAGS += -pg -g -O0
+debug: FLAGS += -g -O0
 debug: all
 
 clean: clean-custom
