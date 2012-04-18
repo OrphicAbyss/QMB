@@ -66,7 +66,7 @@ int		gl_textureunits;
 
 void R_MarkLeaves (void);
 
-cvar_t	r_drawentities("r_drawentities","1");
+cvar_t	r_drawentities = {"r_drawentities","1"};
 cvar_t	r_drawviewmodel = {"r_drawviewmodel","1"};
 cvar_t	r_speeds = {"r_speeds","0"};
 cvar_t	r_wateralpha = {"r_wateralpha","1", true};
