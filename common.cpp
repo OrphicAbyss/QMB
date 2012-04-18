@@ -215,7 +215,7 @@ void Q_strncpy (char *dest, const char *src, int count)
 	{
 		*dest++ = *src++;
 	}
-	if (count)
+	if (!count)
 		*dest++ = 0;
 #endif
 }
@@ -1559,9 +1559,10 @@ Filename are reletive to the quake directory.
 Allways appends a 0 byte.
 ============
 */
-cache_user_t *loadcache;
-byte		 *loadbuf;
-int			 loadsize;
+static CacheObj	*loadcache;
+static byte		*loadbuf;
+static int		loadsize;
+
 byte *COM_LoadFile (const char *path, int usehunk)
 {
 	int     h;
@@ -1583,10 +1584,12 @@ byte *COM_LoadFile (const char *path, int usehunk)
 		buf = Hunk_TempAlloc (len+1);
 	else if (usehunk == 0)
 		buf = Z_Malloc (len+1);
-	else if (usehunk == 3)
-		buf = Cache_Alloc (loadcache, len+1, base);
-	else if (usehunk == 4)
-	{
+	else if (usehunk == 3){
+		// TODO: Shouldn't pass back the buffer, should only pass around CacheObj
+		// TODO: Require memory object base
+		loadcache = CacheObj::Alloc(base,len+1);
+		buf = loadcache->getData();
+	} else if (usehunk == 4){
 		if (len+1 > loadsize)
 			buf = Hunk_TempAlloc (len+1);
 		else
@@ -1616,9 +1619,9 @@ byte *COM_LoadTempFile (const char *path)
 	return COM_LoadFile (path, 2);
 }
 
-void COM_LoadCacheFile (const char *path, struct cache_user_s *cu)
+void COM_LoadCacheFile (const char *path, CacheObj cu)
 {
-	loadcache = cu;
+	loadcache = &cu;
 	COM_LoadFile (path, 3);
 }
 

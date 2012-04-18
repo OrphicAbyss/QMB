@@ -280,12 +280,15 @@ void    VID_Init (unsigned char *palette)
     vid.aspect = ((float)vid.height / (float)vid.width);
 	vid.conwidth = 640;
     vid.conheight = 640 * vid.aspect;
-    vid.numpages = 1;
+
+	//vid.width = vid.conwidth;
+	//vid.height = vid.conheight;
+	vid.numpages = 2;
+
     vid.colormap = host_colormap;
     vid.fullbright = 256 - LittleLong (*((int *)vid.colormap + 2048));
     vid.buffer = (pixel_t *)screen->pixels;
     vid.rowbytes = screen->pitch;
-    vid.conbuffer = vid.buffer;
     vid.conrowbytes = vid.rowbytes;
     vid.direct = 0;
 

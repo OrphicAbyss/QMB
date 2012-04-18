@@ -301,8 +301,9 @@ void Mod_LoadQ3Model(model_t *mod, void *buffer)
 
 	Con_DPrintf("Loading md3 model...%s (%s)\n", header->filename, mod->name);
 
-	mem_head = (md3header_mem_t *)Cache_Alloc (&mod->cache, mem_size, mod->name);
-	if (!mod->cache.data){
+	mod->cache = CacheObj::Alloc((char *)&mod->name, mem_size);
+	mem_head = (md3header_mem_t *)mod->cache->getData();
+	if (!mod->cache->getData()){
 		Con_Printf("Unable to allocate cache to load model: %s\n", mod->name);
 		return;	//cache alloc failed
 	}

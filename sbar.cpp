@@ -263,7 +263,7 @@ Sbar_DrawPic
 void Sbar_DrawPic (int x, int y, qpic_t *pic)
 {
 	//JHL; Completely recreated HUD, no need for separate drawing styles
-	Draw_AlphaPic (x, y + (vid.height-SBAR_HEIGHT), pic, 1);
+	Draw_AlphaPic (x, y + (vid.conheight-SBAR_HEIGHT), pic, 1);
 }
 
 /*
@@ -274,7 +274,7 @@ Sbar_DrawTransPic
 void Sbar_DrawTransPic (int x, int y, qpic_t *pic)
 {
 	//JHL; Completely recreated HUD, no need for separate drawing styles
-	Draw_TransPic (x, y + (vid.height-SBAR_HEIGHT), pic);
+	Draw_TransPic (x, y + (vid.conheight-SBAR_HEIGHT), pic);
 }
 
 /*
@@ -287,7 +287,7 @@ Draws one solid graphics character
 void Sbar_DrawCharacter (int x, int y, int num)
 {
 	//JHL; Completely recreated HUD, no need for separate drawing styles
-	Draw_Character ( x + 4 , y + vid.height-SBAR_HEIGHT, num);
+	Draw_Character ( x + 4 , y + vid.conheight-SBAR_HEIGHT, num);
 }
 
 /*
@@ -298,7 +298,7 @@ Sbar_DrawString
 void Sbar_DrawString (int x, int y, char *str)
 {
 	//JHL; Completely recreated HUD, no need for separate drawing styles
-	Draw_String (x, y+ vid.height-SBAR_HEIGHT, str);
+	Draw_String (x, y+ vid.conheight-SBAR_HEIGHT, str);
 }
 
 /*
@@ -382,9 +382,9 @@ void Sbar_DrawNum (int x, int y, int num, int digits, int color)
 	colour[1] = hud_g.value;
 	colour[2] = hud_b.value;
 
-	//Sbar_DrawFade (x, y+vid.height-24, 24, false);
-	//Draw_AlphaFill(x, y+vid.height-24, 24*digits, 24, colour, hud_a.value);
-	//Sbar_DrawFade (x+(24*digits), y+vid.height-24, 24, true);
+	//Sbar_DrawFade (x, y+vid.conheight-24, 24, false);
+	//Draw_AlphaFill(x, y+vid.conheight-24, 24*digits, 24, colour, hud_a.value);
+	//Sbar_DrawFade (x+(24*digits), y+vid.conheight-24, 24, true);
 
 	l = Sbar_itoa (num, str);
 	ptr = str;
@@ -498,11 +498,11 @@ void Sbar_SoloScoreboard (void)
 	colour[1] = 0;//hud_g.value;
 	colour[2] = 0;//hud_b.value;
 
-	x = vid.width/2-160;
+	x = vid.conwidth/2-160;
 
-	Sbar_DrawFade (x, vid.height-24, 24, false);
-	Draw_AlphaFill(x, vid.height-24, 320, 24, colour, hud_a.value);
-	Sbar_DrawFade (x+320, vid.height-24, 24, true);
+	Sbar_DrawFade (x, vid.conheight-24, 24, false);
+	Draw_AlphaFill(x, vid.conheight-24, 320, 24, colour, hud_a.value);
+	Sbar_DrawFade (x+320, vid.conheight-24, 24, true);
 
 	sprintf (str,"Monsters:%3i /%3i", cl.stats[STAT_MONSTERS], cl.stats[STAT_TOTALMONSTERS]);
 	Sbar_DrawString (x+8, 4+24, str);
@@ -565,8 +565,8 @@ void Sbar_DrawInventory (void)
 // weapons
 	if (hud.value >= 3 || sb_showscores) { //JHL - start
 
-		//Sbar_DrawFade (vid.width-50, vid.height/2 - 24, 112, false);
-		//Draw_AlphaFill(vid.width-50, vid.height/2 - 24, 48, 112, colour, hud_a.value);
+		//Sbar_DrawFade (vid.conwidth-50, vid.conheight/2 - 24, 112, false);
+		//Draw_AlphaFill(vid.conwidth-50, vid.conheight/2 - 24, 48, 112, colour, hud_a.value);
 
 		for (i=0 ; i<7 ; i++)
 		{
@@ -584,7 +584,7 @@ void Sbar_DrawInventory (void)
 				else
 					flashon = (flashon%5) + 2;
 
-				Sbar_DrawPic (vid.width-sb_weapons[flashon][i]->width, ((vid.height/4*3)*(-1))+i*24, sb_weapons[flashon][i]);
+				Sbar_DrawPic (vid.conwidth-sb_weapons[flashon][i]->width, ((vid.conheight/4*3)*(-1))+i*24, sb_weapons[flashon][i]);
 			}
 		}
 
@@ -663,19 +663,19 @@ void Sbar_DrawInventory (void)
 		{
 			sprintf (num, "%3i",cl.stats[STAT_SHELLS+i] );
 			if (num[0] != ' ')
-				Sbar_DrawCharacter ( vid.width-58, ((vid.height/4*3)*(-1))+i*48+24, 18 + num[0] - '0');
+				Sbar_DrawCharacter ( vid.conwidth-58, ((vid.conheight/4*3)*(-1))+i*48+24, 18 + num[0] - '0');
 			if (num[1] != ' ')
-				Sbar_DrawCharacter ( vid.width-52, ((vid.height/4*3)*(-1))+i*48+24, 18 + num[1] - '0');
+				Sbar_DrawCharacter ( vid.conwidth-52, ((vid.conheight/4*3)*(-1))+i*48+24, 18 + num[1] - '0');
 			if (num[2] != ' ')
-				Sbar_DrawCharacter ( vid.width-44, ((vid.height/4*3)*(-1))+i*48+24, 18 + num[2] - '0');
+				Sbar_DrawCharacter ( vid.conwidth-44, ((vid.conheight/4*3)*(-1))+i*48+24, 18 + num[2] - '0');
 		}
 	} //JHL - end
 
 	//JHL - start
 	if (hud.value >= 2 || sb_showscores) {
 
-		//Sbar_DrawFade (vid.width-96, vid.height-40, 16, false);
-		//Draw_AlphaFill(vid.width-96, vid.height-40, 96, 16, colour, hud_a.value);
+		//Sbar_DrawFade (vid.conwidth-96, vid.conheight-40, 16, false);
+		//Draw_AlphaFill(vid.conwidth-96, vid.conheight-40, 96, 16, colour, hud_a.value);
 
 		flashon = 0;
 		// items
@@ -689,7 +689,7 @@ void Sbar_DrawInventory (void)
 			 } else {
 			 //MED 01/04/97 changed keys
 				if (!hipnotic || (i>1)){
-				   Sbar_DrawPic (vid.width-192+i*32, -32, sb_items[i]);
+				   Sbar_DrawPic (vid.conwidth-192+i*32, -32, sb_items[i]);
 				}
 			 }
 		  }
@@ -736,7 +736,7 @@ void Sbar_DrawInventory (void)
 					if (time &&	time > cl.time - 2 && flashon )
 					{	// flash frame
 					} else
-						Sbar_DrawPic (vid.width-128 + i*32, -SBAR_HEIGHT, sb_sigil[i]);
+						Sbar_DrawPic (vid.conwidth-128 + i*32, -SBAR_HEIGHT, sb_sigil[i]);
 				}
 			}
 		}
@@ -768,7 +768,7 @@ void Sbar_DrawFrags (void)
 	//JHL; Completely recreated HUD, no need for separate drawing styles
 	xofs = 0;
 
-	y = vid.height - SBAR_HEIGHT - 23;
+	y = vid.conheight - SBAR_HEIGHT - 23;
 
 	for (i=0 ; i<l ; i++)
 	{
@@ -838,8 +838,8 @@ void Sbar_DrawFace (int x, int y)
 		xofs = 113;
 
 		Sbar_DrawPic (112, 0, rsb_teambord);
-		Draw_Fill (xofs, vid.height-SBAR_HEIGHT+3, 22, 9, top);
-		Draw_Fill (xofs, vid.height-SBAR_HEIGHT+12, 22, 9, bottom);
+		Draw_Fill (xofs, vid.conheight-SBAR_HEIGHT+3, 22, 9, top);
+		Draw_Fill (xofs, vid.conheight-SBAR_HEIGHT+12, 22, 9, bottom);
 
 		// draw number
 		f = s->frags;
@@ -907,13 +907,13 @@ Sbar_Draw
 */
 void Sbar_Draw (void)
 {
-	if (scr_con_current == vid.height)
+	if (scr_con_current == vid.conheight)
 		return;		// console is full screen
 
 	scr_copyeverything = 1;
 
-	if (sb_lines && vid.width > 320)
-		Draw_TileClear (0, vid.height - sb_lines, vid.width, sb_lines);
+	if (sb_lines && vid.conwidth > 320)
+		Draw_TileClear (0, vid.conheight - sb_lines, vid.conwidth, sb_lines);
 
 	if (sb_showscores || cl.stats[STAT_HEALTH] <= 0)
 	{
@@ -975,38 +975,38 @@ void Sbar_Draw (void)
 		if (hud.value >= 2 || sb_showscores)
 		{
 	// ammo count
-			Sbar_DrawNum (vid.width-48-32-32-32, 16, cl.stats[STAT_AMMO], 3, cl.stats[STAT_AMMO] <= 10);
+			Sbar_DrawNum (vid.conwidth-48-32-32-32, 16, cl.stats[STAT_AMMO], 3, cl.stats[STAT_AMMO] <= 10);
 
 	// ammo icon
 			if (rogue)
 			{
 				if (cl.items & RIT_SHELLS)
-					Sbar_DrawPic (vid.width-SBAR_HEIGHT, 0, sb_ammo[0]);
+					Sbar_DrawPic (vid.conwidth-SBAR_HEIGHT, 0, sb_ammo[0]);
 				else if (cl.items & RIT_NAILS)
-					Sbar_DrawPic (vid.width-SBAR_HEIGHT, 0, sb_ammo[1]);
+					Sbar_DrawPic (vid.conwidth-SBAR_HEIGHT, 0, sb_ammo[1]);
 				else if (cl.items & RIT_ROCKETS)
-					Sbar_DrawPic (vid.width-SBAR_HEIGHT, 0, sb_ammo[2]);
+					Sbar_DrawPic (vid.conwidth-SBAR_HEIGHT, 0, sb_ammo[2]);
 				else if (cl.items & RIT_CELLS)
-					Sbar_DrawPic (vid.width-SBAR_HEIGHT, 0, sb_ammo[3]);
+					Sbar_DrawPic (vid.conwidth-SBAR_HEIGHT, 0, sb_ammo[3]);
 				else if (cl.items & RIT_LAVA_NAILS)
-					Sbar_DrawPic (vid.width-SBAR_HEIGHT, 0, rsb_ammo[0]);
+					Sbar_DrawPic (vid.conwidth-SBAR_HEIGHT, 0, rsb_ammo[0]);
 				else if (cl.items & RIT_PLASMA_AMMO)
-					Sbar_DrawPic (vid.width-SBAR_HEIGHT, 0, rsb_ammo[1]);
+					Sbar_DrawPic (vid.conwidth-SBAR_HEIGHT, 0, rsb_ammo[1]);
 				else if (cl.items & RIT_MULTI_ROCKETS)
-					Sbar_DrawPic (vid.width-SBAR_HEIGHT, 0, rsb_ammo[2]);
+					Sbar_DrawPic (vid.conwidth-SBAR_HEIGHT, 0, rsb_ammo[2]);
 			}
 			else
 			{
 				if (cl.items & IT_SHELLS)
-					Sbar_DrawPic (vid.width-SBAR_HEIGHT, 0, sb_ammo[0]);
+					Sbar_DrawPic (vid.conwidth-SBAR_HEIGHT, 0, sb_ammo[0]);
 				else if (cl.items & IT_NAILS)
-					Sbar_DrawPic (vid.width-SBAR_HEIGHT, 0, sb_ammo[1]);
+					Sbar_DrawPic (vid.conwidth-SBAR_HEIGHT, 0, sb_ammo[1]);
 				else if (cl.items & IT_ROCKETS)
-					Sbar_DrawPic (vid.width-SBAR_HEIGHT, 0, sb_ammo[2]);
+					Sbar_DrawPic (vid.conwidth-SBAR_HEIGHT, 0, sb_ammo[2]);
 				else if (cl.items & IT_CELLS)
-					Sbar_DrawPic (vid.width-SBAR_HEIGHT, 0, sb_ammo[3]);
+					Sbar_DrawPic (vid.conwidth-SBAR_HEIGHT, 0, sb_ammo[3]);
 				else
-					Sbar_DrawPic (vid.width-SBAR_HEIGHT, 0, sb_sbar);
+					Sbar_DrawPic (vid.conwidth-SBAR_HEIGHT, 0, sb_sbar);
 			}
 		}
 
@@ -1072,7 +1072,7 @@ void Sbar_DeathmatchOverlay (void)
 	scr_fullupdate = 0;
 
 	pic = Draw_CachePic ("gfx/ranking.lmp");
-	Draw_AlphaPic ((vid.width-pic->width)/2, 8, pic, 1);
+	Draw_AlphaPic ((vid.conwidth-pic->width)/2, 8, pic, 1);
 
 // scores
 	Sbar_SortFrags ();
@@ -1080,7 +1080,7 @@ void Sbar_DeathmatchOverlay (void)
 // draw the text
 	l = scoreboardlines;
 
-	x = 80 + ((vid.width - 320)>>1);
+	x = 80 + ((vid.conwidth - 320)>>1);
 	y = 40;
 	for (i=0 ; i<l ; i++)
 	{
@@ -1140,7 +1140,7 @@ void Sbar_MiniDeathmatchOverlay (void)
 	l = scoreboardlines;
 
 	x = 0;
-	y = vid.height/3;
+	y = vid.conheight/3;
 	for (i=0 ; i<l ; i++)
 	{
 		k = fragsort[i];
@@ -1237,5 +1237,5 @@ void Sbar_FinaleOverlay (void)
 	scr_copyeverything = 1;
 
 	pic = Draw_CachePic ("gfx/finale.lmp");
-	Draw_TransPic ( (vid.width-pic->width)/2, 16, pic);
+	Draw_TransPic ( (vid.conwidth-pic->width)/2, 16, pic);
 }

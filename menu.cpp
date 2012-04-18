@@ -131,7 +131,7 @@ Draws one solid graphics character
 */
 void M_DrawCharacter (int cx, int line, int num)
 {
-	Draw_Character ( cx + ((vid.width - 320)>>1), line + ((vid.height/2)-120), num);
+	Draw_Character ( cx + ((vid.conwidth - 320)>>1), line + ((vid.conheight/2)-120), num);
 }
 
 void M_Print (int cx, int cy, const char *str)
@@ -158,7 +158,7 @@ void M_PrintWhite (int cx, int cy, const char *str)
 void M_Centerprint (int cy, const char *str)
 {
 	int cx;
-	cx = vid.width/2 - (Q_strlen(str)*4);
+	cx = vid.conwidth/2 - (Q_strlen(str)*4);
 
 	while (*str)
 	{
@@ -171,7 +171,7 @@ void M_Centerprint (int cy, const char *str)
 void M_CenterprintWhite (int cy, char *str)
 {
 	int cx;
-	cx = vid.width/2 - (Q_strlen(str)*4);
+	cx = vid.conwidth/2 - (Q_strlen(str)*4);
 
 	while (*str)
 	{
@@ -183,12 +183,12 @@ void M_CenterprintWhite (int cy, char *str)
 
 void M_DrawTransPic (int x, int y, qpic_t *pic)
 {
-	Draw_TransPic (x + ((vid.width - 320)>>1), y+(vid.height/2-120), pic);
+	Draw_TransPic (x + ((vid.conwidth - 320)>>1), y+(vid.conheight/2-120), pic);
 }
 
 void M_DrawPic (int x, int y, qpic_t *pic)
 {
-	Draw_AlphaPic (x + ((vid.width - 320)>>1), y+(vid.height/2-120), pic, 1);
+	Draw_AlphaPic (x + ((vid.conwidth - 320)>>1), y+(vid.conheight/2-120), pic, 1);
 }
 
 //=======================================================
@@ -233,8 +233,8 @@ void M_Main_ButtonList (const char *buttons[], int cursor_location, int in_main)
 		x_length = x_length + (Q_strlen(buttons[i])*8);
 	}
 
-	x_mod = (vid.width - x_length) / (i+1);
-	y = vid.height / 14;
+	x_mod = (vid.conwidth - x_length) / (i+1);
+	y = vid.conheight / 14;
 	x = 0;
 
 	for ( i = 0; buttons[i] != 0; i++ )
@@ -266,11 +266,11 @@ void M_Main_Layout (int f_cursor, int f_inmenu)
 
 // the layout
 	// top
-	Draw_Fill (0,0,vid.width, vid.height/8, 0);
-	Draw_Fill (0,vid.height/16,vid.width, 1, LAYOUT_RED);
+	Draw_Fill (0,0,vid.conwidth, vid.conheight/8, 0);
+	Draw_Fill (0,vid.conheight/16,vid.conwidth, 1, LAYOUT_RED);
 
 	// bottom
-	Draw_Fill (0,vid.height-24,vid.width, vid.height, 0);
+	Draw_Fill (0,vid.conheight-24,vid.conwidth, vid.conheight, 0);
 	// bottom fade
 
 	M_Main_ButtonList (names, f_cursor, f_inmenu);
@@ -312,7 +312,7 @@ void M_BuildTranslationTable(int top, int bottom)
 
 void M_DrawTransPicTranslate (int x, int y, qpic_t *pic)
 {
-	Draw_TransPicTranslate (x + ((vid.width - 320)>>1), y + ((vid.height/2)-120), pic, translationTable);
+	Draw_TransPicTranslate (x + ((vid.conwidth - 320)>>1), y + ((vid.conheight/2)-120), pic, translationTable);
 }
 
 
@@ -1157,8 +1157,8 @@ void M_Net_Draw (void)
 	M_DrawCharacter (BUTTON_MENU_X - 10, BUTTON_START+(m_net_cursor*BUTTON_HEIGHT), 12+((int)(realtime*4)&1));
 
 // help message
-	M_CenterprintWhite (vid.height-16, net_helpMessage[m_net_cursor*2]);
-	M_CenterprintWhite (vid.height-8, net_helpMessage[m_net_cursor*2+1]);
+	M_CenterprintWhite (vid.conheight-16, net_helpMessage[m_net_cursor*2]);
+	M_CenterprintWhite (vid.conheight-8, net_helpMessage[m_net_cursor*2+1]);
 }
 
 void M_Net_Key (int k)
@@ -1890,9 +1890,9 @@ void M_Keys_Draw (void)
 	M_DrawPic ( (320-p->width)/2, 4, p);
 
 	if (bind_grab)
-		M_CenterprintWhite (vid.height-8, "Press a key or button for this action");
+		M_CenterprintWhite (vid.conheight-8, "Press a key or button for this action");
 	else
-		M_CenterprintWhite (vid.height-8, "Enter to change, backspace to clear");
+		M_CenterprintWhite (vid.conheight-8, "Enter to change, backspace to clear");
 
 // search for known bindings
 	for (i=0 ; i<NUMCOMMANDS ; i++)
@@ -2020,8 +2020,8 @@ void M_Help_Draw (void)
 
 	//do the help message
 	sprintf (onscreen_help, "Page %i/%i", help_page+1, NUM_HELP_PAGES);
-	M_CenterprintWhite (vid.height-16, onscreen_help);
-	M_CenterprintWhite (vid.height-8, "Use the arrow keys to scroll the pages.");
+	M_CenterprintWhite (vid.conheight-16, onscreen_help);
+	M_CenterprintWhite (vid.conheight-8, "Use the arrow keys to scroll the pages.");
 
 	if (help_page == HELP_MOVEMENT)
 	{
@@ -2194,12 +2194,12 @@ void M_Credits_Draw (void)
 
 	//do the help message
 	sprintf (onscreen_help, "Page %i/%i", credits_page+1, NUM_CREDITS_PAGES);
-	M_CenterprintWhite (vid.height-16, onscreen_help);
-	M_CenterprintWhite (vid.height-8, "Use the arrow keys to scroll the pages.");
+	M_CenterprintWhite (vid.conheight-16, onscreen_help);
+	M_CenterprintWhite (vid.conheight-8, "Use the arrow keys to scroll the pages.");
 
 	if (credits_page == CREDITS_QMB)
 	{
-		y = 16 + ((vid.height/2)-120);
+		y = 16 + ((vid.conheight/2)-120);
 		M_CenterprintWhite	(y, "QMB - Quake Engine Coding Project");
 
 		y = (int)(host_time * 10)%6;
@@ -2215,7 +2215,7 @@ void M_Credits_Draw (void)
 	}
 	else if (credits_page == CREDITS_ID)
 	{
-		y = 16 + ((vid.height/2)-120);
+		y = 16 + ((vid.conheight/2)-120);
 		M_CenterprintWhite	(y, "QUAKE by id Software");
 
 		y = 28;
@@ -3328,8 +3328,8 @@ void M_GameOptions_Draw (void)
 // help message
 	if (gameoptions_cursor == ITEM_M_PLAYERS)
 	{
-		M_CenterprintWhite (vid.height-16, "For more than 4 players it is recommended to");
-		M_CenterprintWhite (vid.height-8, "use \"-listen\" command line parameter.");
+		M_CenterprintWhite (vid.conheight-16, "For more than 4 players it is recommended to");
+		M_CenterprintWhite (vid.conheight-8, "use \"-listen\" command line parameter.");
 	}
 }
 
@@ -3695,7 +3695,7 @@ void M_Draw (void)
 
 		if (scr_con_current)
 		{
-			Draw_ConsoleBackground (vid.height);
+			Draw_ConsoleBackground (vid.conheight);
 			S_ExtraUpdate ();
 		}
 

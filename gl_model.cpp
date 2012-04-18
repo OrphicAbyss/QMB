@@ -67,15 +67,17 @@ void *Mod_Extradata (model_t *mod)
 {
 	void	*r;
 
-	r = Cache_Check (&mod->cache);
+	r = mod->cache->getData();
 	if (r)
 		return r;
 
 	Mod_LoadModel (mod, true);
 
-	if (!mod->cache.data)
+	r = mod->cache->getData();
+	if (!r)
 		Sys_Error ("Mod_Extradata: caching failed");
-	return mod->cache.data;
+
+	return r;
 }
 
 /*
@@ -223,8 +225,8 @@ void Mod_TouchModel (char *name)
 
 	if (!mod->needload)
 	{
-		if (mod->type == mod_alias)
-			Cache_Check (&mod->cache);
+//		if (mod->type == mod_alias)
+//			Cache_Check (&mod->cache);
 	}
 }
 
@@ -248,7 +250,7 @@ model_t *Mod_LoadModel (model_t *mod, qboolean crash)
 	{
 		if (mod->type == mod_alias)
 		{
-			d = Cache_Check (&mod->cache);
+			d = mod->cache->getData();
 			if (d)
 				return mod;
 		}
@@ -1910,10 +1912,10 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
 	end = Hunk_LowMark ();
 	total = end - start;
 
-	Cache_Alloc (&mod->cache, total, loadname);
-	if (!mod->cache.data)
+	mod->cache = CacheObj::Alloc(loadname, total);
+	if (!mod->cache->getData())
 		return;
-	Q_memcpy (mod->cache.data, pheader, total);
+	Q_memcpy (mod->cache->getData(), pheader, total);
 
 	Hunk_FreeToLowMark (start);
 }
@@ -2081,10 +2083,10 @@ for (i = 0;i < 7;i++)
 	end = Hunk_LowMark ();
 	total = end - start;
 
-	Cache_Alloc (&mod->cache, total, loadname);
-	if (!mod->cache.data)
+	mod->cache = CacheObj::Alloc(loadname, total);
+	if (!mod->cache->getData())
 		return;
-	Q_memcpy (mod->cache.data, pheader, total);
+	Q_memcpy (mod->cache->getData(), pheader, total);
 
 	Hunk_FreeToLowMark (start);
 }
@@ -2248,9 +2250,10 @@ void Mod_LoadSpriteModel (model_t *mod, void *buffer)
 
 	size = sizeof (msprite_t) +	(numframes - 1) * sizeof (psprite->frames);
 
-	psprite = (msprite_t *)Hunk_AllocName (size, loadname);
+	//psprite = (msprite_t *)Hunk_AllocName (size, loadname);
 
-	mod->cache.data = psprite;
+	mod->cache = CacheObj::Alloc(loadname, size);
+	psprite = (msprite_t *)mod->cache->getData();
 
 	psprite->type = LittleLong (pin->type);
 	psprite->maxwidth = LittleLong (pin->width);
@@ -2309,7 +2312,7 @@ void Mod_Print (void)
 	Con_Printf ("Cached models:\n");
 	for (i=0, mod=mod_known ; i < mod_numknown ; i++, mod++)
 	{
-		Con_Printf ("%8p : %s\n",mod->cache.data, mod->name);
+		Con_Printf ("%8p : %s\n",mod->cache->getData(), mod->name);
 	}
 }
 

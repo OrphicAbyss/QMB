@@ -39,7 +39,7 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
 	int		sample, samplefrac, fracstep;
 	sfxcache_t	*sc;
 
-	sc = (sfxcache_t *)Cache_Check (&sfx->cache);
+	sc = (sfxcache_t *)sfx->cache->getData();
 	if (!sc)
 		return;
 
@@ -101,11 +101,12 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	wavinfo_t	info;
 	int		len;
 	float	stepscale;
-	sfxcache_t	*sc;
+	sfxcache_t	*sc = NULL;
 	byte	stackbuf[1*1024];		// avoid dirtying the cache heap
 
 // see if still in memory
-	sc = (sfxcache_t *)Cache_Check (&s->cache);
+	if (s->cache)
+		sc = (sfxcache_t *)s->cache->getData();
 	if (sc)
 		return sc;
 
@@ -136,7 +137,8 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 
 	len = len * info.width * info.channels;
 
-	sc = (sfxcache_t *)Cache_Alloc ( &s->cache, len + sizeof(sfxcache_t), s->name);
+	s->cache = CacheObj::Alloc(s->name,len+sizeof(sfxcache_t));
+	sc = (sfxcache_t *)s->cache->getData();
 	if (!sc)
 		return NULL;
 

@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -139,7 +139,7 @@ typedef struct msurface_s
 
 	int			firstedge;	// look up in model->surfedges[], negative numbers
 	int			numedges;	// are backwards edges
-	
+
 	short		texturemins[2];
 	short		extents[2];
 
@@ -151,7 +151,7 @@ typedef struct msurface_s
 	struct	msurface_s	*outline;	//chain for outlines
 	struct	msurface_s	*bmodel; //chain for bmodels
 	mtexinfo_t	*texinfo;
-	
+
 // lighting info
 	int			dlightframe;
 	int			dlightbits;
@@ -168,14 +168,14 @@ typedef struct mnode_s
 // common with leaf
 	int			contents;		// 0, to differentiate from leafs
 	int			visframe;		// node needs to be traversed if current
-	
+
 	float		minmaxs[6];		// for bounding box culling
 
 	struct mnode_s	*parent;
 
 // node specific
 	mplane_t	*plane;
-	struct mnode_s	*children[2];	
+	struct mnode_s	*children[2];
 
 	unsigned short		firstsurface;
 	unsigned short		numsurfaces;
@@ -358,7 +358,7 @@ extern	trivertx_t	*poseverts[MAXALIASFRAMES];
 
 #define	MD2MAX_TRIANGLES	4096
 #define MD2MAX_VERTS		2048
-#define MD2MAX_FRAMES		512 
+#define MD2MAX_FRAMES		512
 #define MD2MAX_SKINS		32
 #define	MD2MAX_SKINNAME		64
 // sanity checking size
@@ -370,7 +370,7 @@ typedef struct
 	short	t;
 } md2stvert_t;
 
-typedef struct 
+typedef struct
 {
 	short	index_xyz[3];
 	short	index_st[3];
@@ -426,7 +426,7 @@ typedef struct
 	int			ofs_st;			// byte offset from start for stverts
 	int			ofs_tris;		// offset for dtriangles
 	int			ofs_frames;		// offset for first frame
-	int			ofs_glcmds;	
+	int			ofs_glcmds;
 	int			ofs_end;		// end of file
 
 	int			gl_texturenum[MAX_SKINS];
@@ -463,17 +463,17 @@ typedef struct model_s
 	int			aliastype; // LordHavoc: Q2 model support
 	int			numframes;
 	synctype_t	synctype;
-	
+
 	int			flags;
 
 //
 // volume occupied by the model graphics
-//		
+//
 	vec3_t		mins, maxs;
 	float		radius;
 
 //
-// solid volume for clipping 
+// solid volume for clipping
 //
 	qboolean	clipbox;
 	vec3_t		clipmins, clipmaxs;
@@ -528,7 +528,7 @@ typedef struct model_s
 //
 // additional model data
 //
-	cache_user_t	cache;		// only access through Mod_Extradata
+	CacheObj	*cache;		// only access through Mod_Extradata
 
 } model_t;
 

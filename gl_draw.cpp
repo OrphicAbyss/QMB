@@ -404,8 +404,8 @@ void Draw_Init (void)
 	gl->tl = 0;
 	gl->th = 1;
 
-	conback->width = vid.width;
-	conback->height = vid.height;
+	conback->width = vid.conwidth;
+	conback->height = vid.conheight;
 
 	// save a texture slot for translated picture
 	translate_texture = texture_extension_number++;
@@ -569,8 +569,8 @@ Draw_TransPic
 */
 void Draw_TransPic (int x, int y, qpic_t *pic)
 {
-	if (x < 0 || (unsigned)(x + pic->width) > vid.width || y < 0 ||
-		 (unsigned)(y + pic->height) > vid.height)
+	if (x < 0 || (unsigned)(x + pic->width) > vid.conwidth || y < 0 ||
+		 (unsigned)(y + pic->height) > vid.conheight)
 	{
 		//Sys_Error ("Draw_TransPic: bad coordinates");
 	}
@@ -633,12 +633,12 @@ Draw_ConsoleBackground
 */
 void Draw_ConsoleBackground (int lines)
 {
-	int y = (vid.height * 3) >> 2;
+	int y = (vid.conheight * 3) >> 2;
 
 	if (lines > y)
-		Draw_AlphaPic(0, lines - vid.height, conback, 1);
+		Draw_AlphaPic(0, lines - vid.conheight, conback, 1);
 	else
-		Draw_AlphaPic (0, lines - vid.height, conback, (float)(gl_conalpha.value * lines)/y);
+		Draw_AlphaPic (0, lines - vid.conheight, conback, (float)(gl_conalpha.value * lines)/y);
 }
 
 
@@ -779,8 +779,8 @@ void Draw_Crosshair (int texnum, vec3_t colour, float alpha)
 	//
 	// Crosshair offset
 	//
-	x = (vid.width /2) - 16; // was 14
-	y = (vid.height/2) - 8;  // was 14
+	x = (vid.conwidth /2) - 16; // was 14
+	y = (vid.conheight/2) - 8;  // was 14
 
 	//
 	// Start drawing
@@ -821,10 +821,10 @@ void Draw_FadeScreen (void)
 	int	start_x, start_y,
 		end_x,	 end_y;
 
-	start_x = (vid.width-320)/2;
-	start_y = (vid.height-240)/2;
-	end_x = (vid.width+320)/2;
-	end_y = (vid.height+240)/2;
+	start_x = (vid.conwidth-320)/2;
+	start_y = (vid.conheight-240)/2;
+	end_x = (vid.conwidth+320)/2;
+	end_y = (vid.conheight+240)/2;
 	colour[0]=colour[1]=colour[2]=0;
 	alpha[0]=0;
 	alpha[1]=178;
@@ -849,7 +849,7 @@ void GL_Set2D (void)
 
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity ();
-	glOrtho  (0, vid.width, vid.height, 0, -1000, 1000);
+	glOrtho  (0, vid.conwidth, vid.conheight, 0, -1000, 1000);
 
 	glMatrixMode(GL_MODELVIEW);
     glLoadIdentity ();

@@ -172,7 +172,7 @@ void SCR_DrawCenterString (void)
 	start = scr_centerstring;
 
 	if (scr_center_lines <= 4)
-		y = vid.height*0.35;
+		y = vid.conheight*0.35;
 	else
 		y = 48;
 
@@ -182,7 +182,7 @@ void SCR_DrawCenterString (void)
 		for (l=0 ; l<40 ; l++)
 			if (start[l] == '\n' || !start[l])
 				break;
-		x = (vid.width - l*8)/2;
+		x = (vid.conwidth - l*8)/2;
 		for (j=0 ; j<l ; j++, x+=8)
 		{
 			Draw_Character (x, y, start[j]);
@@ -255,7 +255,6 @@ static void SCR_CalcRefdef (void)
 	int		h;
 	qboolean		full = false;
 
-
 	scr_fullupdate = 0;		// force a background redraw
 	vid.recalc_refdef = 0;
 
@@ -264,7 +263,7 @@ static void SCR_CalcRefdef (void)
 // bound viewsize
 	if (scr_viewsize.value < 30)
 		setValue ("viewsize","30");
-	if (scr_viewsize.value > 120)
+	if (scr_viewsize.value > 100)
 		setValue ("viewsize","120");
 
 // bound field of view
@@ -273,19 +272,8 @@ static void SCR_CalcRefdef (void)
 	if (scr_fov.value > 170)
 		setValue ("fov","170");
 
-// intermission is always full screen
-	if (cl.intermission)
-		size = 120;
-	else
-		size = scr_viewsize.value;
-
-	/* Always draw status bar and inventory
-	if (size >= 120)
-		sb_lines = 0;		// no status bar at all
-	else if (size >= 110)
-		sb_lines = 24;		// no inventory
-	else*/
-		sb_lines = 24+16+8;
+	size = scr_viewsize.value;
+	sb_lines = 24+16+8;
 
 	if (scr_viewsize.value >= 100.0) {
 		full = true;
@@ -300,6 +288,7 @@ static void SCR_CalcRefdef (void)
 	}
 	size /= 100.0;
 
+	// TODO: remove sb_lines variable
 	h = vid.height;// - sb_lines;
 
 	r_refdef.vrect.width = vid.width * size;
@@ -492,12 +481,12 @@ void SCR_DrawFPS (void)
 
 	sprintf(st, "%3d FPS", lastfps);
 
-	x = vid.width - Q_strlen(st) * 8 - 16;
+	x = vid.conwidth - Q_strlen(st) * 8 - 16;
 	y = 0;
 	Draw_String(x, y, st);
 
 	sprintf(st, "%3d Last second", lastsecond);
-	x = vid.width - Q_strlen(st) * 8 - 16;
+	x = vid.conwidth - Q_strlen(st) * 8 - 16;
 	y = 8;
 	Draw_String(x, y, st);
 }
@@ -514,8 +503,8 @@ void Scr_ShowNumP (void)
 
 	sprintf(st, "%i Particles in world", numParticles);
 
-	x = vid.width - Q_strlen(st) * 8 - 16;
-	y = 16 ; //vid.height - (sb_lines * (vid.height/240) )- 16;
+	x = vid.conwidth - Q_strlen(st) * 8 - 16;
+	y = 16 ; //vid.conheight - (sb_lines * (vid.conheight/240) )- 16;
 	//Draw_TileClear(x, y, Q_strlen(st)*16, 16);
 	Draw_String(x, y, st);
 }
@@ -536,7 +525,7 @@ void SCR_DrawPause (void)
 		return;
 
 	pic = Draw_CachePic ("gfx/pause.lmp");
-	Draw_AlphaPic ( (vid.width - pic->width)/2, (vid.height - 48 - pic->height)/2, pic, 1);
+	Draw_AlphaPic ( (vid.conwidth - pic->width)/2, (vid.conheight - 48 - pic->height)/2, pic, 1);
 }
 
 
@@ -554,7 +543,7 @@ void SCR_DrawLoading (void)
 		return;
 
 	pic = Draw_CachePic ("gfx/loading.lmp");
-	Draw_AlphaPic ( (vid.width - pic->width)/2, (vid.height - 48 - pic->height)/2, pic, 1);
+	Draw_AlphaPic ( (vid.conwidth - pic->width)/2, (vid.conheight - 48 - pic->height)/2, pic, 1);
 }
 
 
@@ -579,11 +568,11 @@ void SCR_SetUpToDrawConsole (void)
 
 	if (con_forcedup)
 	{
-		scr_conlines = vid.height;		// full screen
+		scr_conlines = vid.conheight;		// full screen
 		scr_con_current = scr_conlines;
 	}
 	else if (key_dest == key_console)
-		scr_conlines = vid.height/2;	// half screen
+		scr_conlines = vid.conheight/2;	// half screen
 	else
 		scr_conlines = 0;				// none visible
 
@@ -750,7 +739,7 @@ void SCR_DrawNotifyString (void)
 
 	start = scr_notifystring;
 
-	y = vid.height*0.35;
+	y = vid.conheight*0.35;
 
 	do
 	{
@@ -758,7 +747,7 @@ void SCR_DrawNotifyString (void)
 		for (l=0 ; l<40 ; l++)
 			if (start[l] == '\n' || !start[l])
 				break;
-		x = (vid.width - l*8)/2;
+		x = (vid.conwidth - l*8)/2;
 		for (j=0 ; j<l ; j++, x+=8)
 			Draw_Character (x, y, start[j]);
 
@@ -835,11 +824,11 @@ void SCR_TileClear (void)
 {
 	if (r_refdef.vrect.x > 0) {
 		// left
-		Draw_TileClear (0, 0, r_refdef.vrect.x, vid.height - sb_lines);
+		Draw_TileClear (0, 0, r_refdef.vrect.x, vid.conheight - sb_lines);
 		// right
 		Draw_TileClear (r_refdef.vrect.x + r_refdef.vrect.width, 0,
-			vid.width - r_refdef.vrect.x + r_refdef.vrect.width,
-			vid.height - sb_lines);
+			vid.conwidth - r_refdef.vrect.x + r_refdef.vrect.width,
+			vid.conheight - sb_lines);
 	}
 	if (r_refdef.vrect.y > 0) {
 		// top
@@ -850,7 +839,7 @@ void SCR_TileClear (void)
 		Draw_TileClear (r_refdef.vrect.x,
 			r_refdef.vrect.y + r_refdef.vrect.height,
 			r_refdef.vrect.width,
-			vid.height - sb_lines -
+			vid.conheight - sb_lines -
 			(r_refdef.vrect.height + r_refdef.vrect.y));
 	}
 }

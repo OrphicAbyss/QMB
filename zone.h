@@ -108,24 +108,29 @@ void *Hunk_TempAlloc (int size);
 
 void Hunk_Check (void);
 
-typedef struct cache_user_s
-{
-	void	*data;
-} cache_user_t;
+/**
+ * CacheObj represents allocated space for a cached object.
+ */
+class CacheObj {
+private:
+	static const int maxNameLength = 32;
+	void *data;
+	char name[maxNameLength];
+	int size;
 
-void Cache_Flush (void);
+	CacheObj(char *name, int size);
+public:
+	char *getName();
+	void *getData();
+	int getSize();
+	void freeData();
 
-void *Cache_Check (cache_user_t *c);
-// returns the cached data, and moves to the head of the LRU list
-// if present, otherwise returns NULL
-
-void Cache_Free (cache_user_t *c);
-
-void *Cache_Alloc (cache_user_t *c, int size, char *name);
-// Returns NULL if all purgable data was tossed and there still
-// wasn't enough room.
-
-void Cache_Report (void);
+	static CacheObj *Alloc(char *name, int size);
+	static void Free(CacheObj *obj);
+	static void Flush();
+	static void Print();
+	static void Report();
+};
 
 
 

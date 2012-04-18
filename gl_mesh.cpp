@@ -830,8 +830,8 @@ void GL_DrawQ2AliasFrame (entity_t *e, md2_t *pheader, int lastpose, int pose, f
 	ilerp = 1.0 - lerp;
 
 	//new version by muff - fixes bug, easier to read, faster (well slightly)
-	frame1 = (md2frame_t *)((void *) pheader + pheader->ofs_frames + (pheader->framesize * lastpose));
-	frame2 = (md2frame_t *)((void *) pheader + pheader->ofs_frames + (pheader->framesize * pose));
+	frame1 = (md2frame_t *)((char *) pheader + pheader->ofs_frames + (pheader->framesize * lastpose));
+	frame2 = (md2frame_t *)((char *) pheader + pheader->ofs_frames + (pheader->framesize * pose));
 
 	VectorCopy(frame1->scale, scale1);
 	VectorCopy(frame1->translate, translate1);
@@ -839,7 +839,7 @@ void GL_DrawQ2AliasFrame (entity_t *e, md2_t *pheader, int lastpose, int pose, f
 	VectorCopy(frame2->translate, translate2);
 	verts1 = &frame1->verts[0];
 	verts2 = &frame2->verts[0];
-	order = (int *)((void *)pheader + pheader->ofs_glcmds);
+	order = (int *)((char *)pheader + pheader->ofs_glcmds);
 
 	glColor4f (1,1,1,1); // FIXME - temporary shading for tutorial - NOT LordHavoc's original code
 

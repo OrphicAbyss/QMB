@@ -171,17 +171,17 @@ void CL_DecodeHudPrint(void){
 	//1000 - 8 - centre top
 	//1010 - 9 - centre bottom
 	if (4 && pos == 4){
-		y = vid.height / 2 + y;
+		y = vid.conheight / 2 + y;
 	}else if (1 && pos == 1){
-		y = vid.height - y;
+		y = vid.conheight - y;
 	}else {
 		y = y;
 	}
 
 	if (8 && pos == 8){
-		x = vid.width / 2 + x;
+		x = vid.conwidth / 2 + x;
 	}else if (2 && pos == 2){
-		x = vid.width - x;
+		x = vid.conwidth - x;
 	}else {
 		x = x;
 	}
@@ -213,13 +213,13 @@ void CL_DecodeHudPic(void){
 		y = y;
 	}else if (pos =1){
 		x = x;
-		y = vid.height - y;
+		y = vid.conheight - y;
 	}else if (pos =2){
-		x = vid.width - x;
+		x = vid.conwidth - x;
 		y = y;
 	}else if (pos =3){
 		x = x;
-		y = vid.height - y;
+		y = vid.conheight - y;
 	}
 
 	R_AddTextHudItem(id, x,y,text);
