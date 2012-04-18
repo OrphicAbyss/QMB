@@ -54,7 +54,7 @@ qboolean	keydown[256];
 
 typedef struct
 {
-	char	*name;
+	const char	*name;
 	int		keynum;
 } keyname_t;
 
@@ -408,7 +408,7 @@ given keynum.
 FIXME: handle quote special (general escape sequence?)
 ===================
 */
-char *Key_KeynumToString (int keynum)
+const char *Key_KeynumToString (int keynum)
 {
 	keyname_t	*kn;
 	static	char	tinystr[2];
@@ -435,9 +435,9 @@ char *Key_KeynumToString (int keynum)
 Key_SetBinding
 ===================
 */
-void Key_SetBinding (int keynum, char *binding)
+void Key_SetBinding (int keynum, const char *binding)
 {
-	char	*new;
+	char	*newKeyBinding;
 	int		l;
 
 	if (keynum == -1)
@@ -452,10 +452,9 @@ void Key_SetBinding (int keynum, char *binding)
 
 // allocate memory for new binding
 	l = Q_strlen (binding);
-	new = Z_Malloc (l+1);
-	Q_strcpy (new, binding);
-	new[l] = 0;
-	keybindings[keynum] = new;
+	newKeyBinding = (char *)Z_Malloc (l+1);
+	Q_strcpy (newKeyBinding, binding);
+	keybindings[keynum] = newKeyBinding;
 }
 
 /*

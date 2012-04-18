@@ -90,3 +90,6 @@ float	anglemod(float a);
 
 // LordHavoc: like AngleVectors, but taking a forward vector instead of angles, useful!
 void VectorVectors(const vec3_t forward, vec3_t right, vec3_t up);
+
+float min(float a, float b);
+float max(float a, float b);

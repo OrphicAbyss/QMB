@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -94,9 +94,9 @@ void Z_CheckHeap (void);
 int Z_FreeMemory (void);
 
 void *Hunk_Alloc (int size);		// returns 0 filled memory
-void *Hunk_AllocName (int size, char *name);
+void *Hunk_AllocName (int size, const char *name);
 
-void *Hunk_HighAllocName (int size, char *name);
+void *Hunk_HighAllocName (int size, const char *name);
 
 int	Hunk_LowMark (void);
 void Hunk_FreeToLowMark (int mark);

@@ -193,7 +193,7 @@ void S_Init (void)
 
 	if (host_parms.memsize < 0x800000)
 	{
-		Cvar_Set ("loadas8bit", "1");
+		setValue ("loadas8bit", "1");
 		Con_Printf ("loading all sounds as 8bit\n");
 	}
 
@@ -203,14 +203,14 @@ void S_Init (void)
 
 	SND_InitScaletable ();
 
-	known_sfx = Hunk_AllocName (MAX_SFX*sizeof(sfx_t), "sfx_t");
+	known_sfx = (sfx_t *)Hunk_AllocName (MAX_SFX*sizeof(sfx_t), "sfx_t");
 	num_sfx = 0;
 
 // create a piece of DMA memory
 
 	if (fakedma)
 	{
-		shm = (void *) Hunk_AllocName(sizeof(*shm), "shm");
+		shm = (dma_t *) Hunk_AllocName(sizeof(*shm), "shm");
 		shm->splitbuffer = 0;
 		shm->samplebits = 16;
 		shm->speed = 22050;
@@ -220,7 +220,7 @@ void S_Init (void)
 		shm->soundalive = true;
 		shm->gamealive = true;
 		shm->submission_chunk = 1;
-		shm->buffer = Hunk_AllocName(1<<16, "shmbuf");
+		shm->buffer = (byte *)Hunk_AllocName(1<<16, "shmbuf");
 	}
 
 	if ( shm ) {
@@ -272,7 +272,7 @@ S_FindName
 
 ==================
 */
-sfx_t *S_FindName (char *name)
+sfx_t *S_FindName (const char *name)
 {
 	int		i;
 	sfx_t	*sfx;
@@ -325,7 +325,7 @@ S_PrecacheSound
 
 ==================
 */
-sfx_t *S_PrecacheSound (char *name)
+sfx_t *S_PrecacheSound (const char *name)
 {
 	sfx_t	*sfx;
 
@@ -968,7 +968,7 @@ void S_SoundList(void)
 	total = 0;
 	for (sfx=known_sfx, i=0 ; i<num_sfx ; i++, sfx++)
 	{
-		sc = Cache_Check (&sfx->cache);
+		sc = (sfxcache_t *)Cache_Check (&sfx->cache);
 		if (!sc)
 			continue;
 		size = sc->length*sc->width*(sc->stereo+1);
@@ -983,7 +983,7 @@ void S_SoundList(void)
 }
 
 
-void S_LocalSound (char *sound)
+void S_LocalSound (const char *sound)
 {
 	sfx_t	*sfx;
 

@@ -102,10 +102,6 @@ int			scr_fullupdate;
 int			clearconsole;
 int			clearnotify;
 
-int			sb_lines;
-
-viddef_t	vid;				// global video state
-
 vrect_t		scr_vrect;
 
 qboolean	scr_disabled_for_loading;
@@ -267,15 +263,15 @@ static void SCR_CalcRefdef (void)
 
 // bound viewsize
 	if (scr_viewsize.value < 30)
-		Cvar_Set ("viewsize","30");
+		setValue ("viewsize","30");
 	if (scr_viewsize.value > 120)
-		Cvar_Set ("viewsize","120");
+		setValue ("viewsize","120");
 
 // bound field of view
 	if (scr_fov.value < 10)
-		Cvar_Set ("fov","10");
+		setValue ("fov","10");
 	if (scr_fov.value > 170)
-		Cvar_Set ("fov","170");
+		setValue ("fov","170");
 
 // intermission is always full screen
 	if (cl.intermission)
@@ -676,7 +672,7 @@ void SCR_ScreenShot_f (void)
 		return;
  	}
 
-	buffer = malloc(glwidth*glheight*3 + 18);
+	buffer = (byte *)malloc(glwidth*glheight*3 + 18);
 	Q_memset (buffer, 0, 18);
 	buffer[2] = 2;		// uncompressed type
 	buffer[12] = glwidth&255;
@@ -858,6 +854,8 @@ void SCR_TileClear (void)
 			(r_refdef.vrect.height + r_refdef.vrect.y));
 	}
 }
+
+void Draw_Crosshair (int texnum, vec3_t colour, float alpha);
 
 /*
 ==================

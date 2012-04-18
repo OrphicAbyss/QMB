@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cl_parse.c  -- parse a message received from the server
 
 #include "quakedef.h"
+#include "common.h"
 
 char *svc_strings[] =
 {
@@ -233,7 +234,7 @@ void CL_ParseServerInfo (void)
 		Con_Printf("Bad maxclients (%u) from server\n", cl.maxclients);
 		return;
 	}
-	cl.scores = Hunk_AllocName (cl.maxclients*sizeof(*cl.scores), "scores");
+	cl.scores = (scoreboard_t *)Hunk_AllocName (cl.maxclients*sizeof(*cl.scores), "scores");
 
 // parse gametype
 	cl.gametype = MSG_ReadByte ();

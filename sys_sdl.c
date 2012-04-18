@@ -19,6 +19,8 @@
 #include <sys/mman.h>
 #endif
 
+#include <SDL/SDL.h>
+
 #include "quakedef.h"
 
 qboolean			isDedicated;
@@ -43,7 +45,7 @@ cvar_t  sys_nostdout = {"sys_nostdout","0"};
  * @param fmt
  * @param ...
  */
-void Sys_Printf (char *fmt, ...)
+void Sys_Printf (const char *fmt, ...)
 {
 	va_list		argptr;
 	char		text[1024];
@@ -82,7 +84,7 @@ void Sys_Init(void)
 	Math_Init();
 }
 
-void Sys_Error (char *error, ...)
+void Sys_Error (const char *error, ...)
 {
     va_list     argptr;
     char        string[1024];
@@ -193,7 +195,7 @@ int Sys_FileRead (int handle, void *dst, int count)
 
 	size = 0;
 	if ( handle >= 0 ) {
-		data = dst;
+		data = (char *)dst;
 		while ( count > 0 ) {
 			done = fread (data, 1, count, sys_handles[handle]);
 			if ( done == 0 ) {
@@ -306,7 +308,7 @@ byte *Sys_ZoneBase (int *size)
 				break;
 			}
 	}
-	return malloc (*size);
+	return (byte *)malloc (*size);
 
 }
 

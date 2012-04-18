@@ -30,7 +30,7 @@ void R_MD3TagRotate (entity_t *e, model_t *tagmodel, char *tagname)
 {
 	int i;
 	md3tag_t *tag = NULL;
-	md3header_t *model = Mod_Extradata(tagmodel);
+	md3header_t *model = (md3header_t *)Mod_Extradata(tagmodel);
 	float m[16];
 
 	for (i=0; i<model->num_tags; i++)
@@ -89,7 +89,7 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline)
 	//md3 interpolation
 	float blend, iblend;
 
-	model = Mod_Extradata (e->model);
+	model = (md3header_mem_t *)Mod_Extradata (e->model);
 
 	if (*(int *)model->id != MD3IDHEADER){
 		Con_Printf("MD3 bad model for: %s\n", model->filename);

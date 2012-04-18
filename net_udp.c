@@ -29,6 +29,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <sys/ioctl.h>
 #include <errno.h>
 
+#include <unistd.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #ifdef __sun__
 #include <sys/filio.h>
 #endif
@@ -37,7 +41,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <libc.h>
 #endif
 
-extern int gethostname (char *, int);
 extern int close (int);
 
 extern cvar_t hostname;
@@ -72,7 +75,7 @@ int UDP_Init (void)
 	if (Q_strcmp(hostname.string, "UNNAMED") == 0)
 	{
 		buff[15] = 0;
-		Cvar_Set ("hostname", buff);
+		setValue ("hostname", buff);
 	}
 
 	if ((net_controlsocket = UDP_OpenSocket (0)) == -1)
@@ -141,7 +144,7 @@ int UDP_OpenSocket (int port)
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(port);
-	if( bind (newsocket, (void *)&address, sizeof(address)) == -1)
+	if( bind (newsocket, (sockaddr *)&address, sizeof(address)) == -1)
 		goto ErrorReturn;
 
 	return newsocket;
@@ -248,7 +251,7 @@ int UDP_Read (int socket, byte *buf, int len, struct qsockaddr *addr)
 	int addrlen = sizeof (struct qsockaddr);
 	int ret;
 
-	ret = recvfrom (socket, buf, len, 0, (struct sockaddr *)addr, &addrlen);
+	ret = recvfrom (socket, buf, len, 0, (struct sockaddr *)addr, (socklen_t *)&addrlen);
 	if (ret == -1 && (errno == EWOULDBLOCK || errno == ECONNREFUSED))
 		return 0;
 	return ret;
@@ -337,7 +340,7 @@ int UDP_GetSocketAddr (int socket, struct qsockaddr *addr)
 	unsigned int a;
 
 	Q_memset(addr, 0, sizeof(struct qsockaddr));
-	getsockname(socket, (struct sockaddr *)addr, &addrlen);
+	getsockname(socket, (struct sockaddr *)addr, (socklen_t *)&addrlen);
 	a = ((struct sockaddr_in *)addr)->sin_addr.s_addr;
 	if (a == 0 || a == inet_addr("127.0.0.1"))
 		((struct sockaddr_in *)addr)->sin_addr.s_addr = myAddr;

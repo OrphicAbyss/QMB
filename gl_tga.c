@@ -363,7 +363,7 @@ byte* LoadTGA (FILE *f, char *name, int filesize)
 	rows = targa_header.height;
 	numPixels = columns * rows;
 
-	image_rgba = malloc (numPixels*4);
+	image_rgba = (byte *)malloc (numPixels*4);
 	if (!image_rgba)
 	{
 		Con_DPrintf ("&c900LoadTGA:&r not enough memory for %i by %i image\n", image_width, image_height);
@@ -378,7 +378,7 @@ byte* LoadTGA (FILE *f, char *name, int filesize)
 	filesize = filesize - ftell(f);
 
 	//read it whole image at once
-	datafile = malloc (filesize);
+	datafile = (byte *)malloc (filesize);
 	if (!datafile)
 	{
 		Con_DPrintf ("&c900LoadTGA:&r not enough memory for %i by %i image\n", image_width, image_height);

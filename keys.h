@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -17,6 +17,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+
+#ifndef __KEYS__
+#define __KEYS__
 
 //
 // these are the key numbers that should be passed to Key_Event
@@ -128,6 +131,7 @@ extern	int		key_lastpress;
 void Key_Event (int key, qboolean down);
 void Key_Init (void);
 void Key_WriteBindings (FILE *f);
-void Key_SetBinding (int keynum, char *binding);
+void Key_SetBinding (int keynum, const char *binding);
 void Key_ClearStates (void);
 
+#endif

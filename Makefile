@@ -46,7 +46,7 @@ OUTPUT_BIN  = QMB$(EXTENSION)
 #===============================================================================
 # Regular variables
 CPP  = g++
-CC   = gcc
+CC   = g++
 WINDRES = windres
 RES  = WinQuake_private.res
 OBJ  =	bot.o bot_misc.o bot_setup.o  \
@@ -62,7 +62,8 @@ OBJ  =	bot.o bot_misc.o bot_setup.o  \
 	cd_sdl.o snd_dma.o snd_mem.o snd_mix.o snd_sdl.o \
 	sv_main.o sv_move.o sv_phys.o sv_user.o \
 	CaptureAvi.o CaptureHelpers.o \
-	sys_sdl.o gl_vid_sdl.o
+	sys_sdl.o gl_vid_sdl.o \
+	cvar_cpp.o
 
 LINKOBJ  = $(OBJ)
 
@@ -70,7 +71,7 @@ ifeq ($(TARGET_PLATFORM),windows)
     LIBS = -L"C:/msys/1.0/local/lib" -L"C:/MinGW/lib" -L"./dxsdk/sdk/lib/" -mwindows -luser32 -lgdi32 -lopengl32 -lglu32 -lwsock32 -lwinmm -lcomctl32 -ldxguid -ljpeg -llibpng
     INCS = -I"C:/msys/1.0/local/include" -I"C:/MinGW/include"  -I"./dxsdk/sdk/inc"
 else
-    LIBS = -lGL -lGLU -ljpeg -lpng -lSDL $(shell if test -e /usr/lib/libGLee.so; then echo -lGLee; else echo -lglee; fi)
+    LIBS = -lc -lGL -lGLU -ljpeg -lpng -lSDL $(shell if test -e /usr/lib/libGLee.so; then echo -lGLee; else echo -lglee; fi)
     INCS =
 endif #ifeq ($(TARGET_PLATFORM),windows)
 

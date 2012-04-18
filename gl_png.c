@@ -73,8 +73,8 @@ void InitializeDemData()
    }
    //my_png->Data = Z_Malloc(my_png->Height * my_png->FRowBytes ); // DL Added 30/5/2000
    //my_png->FRowPtrs = Z_Malloc(sizeof(void*) * my_png->Height);
-   my_png->Data = malloc(my_png->Height * my_png->FRowBytes ); // DL Added 30/5/2000
-   my_png->FRowPtrs = malloc(sizeof(void*) * my_png->Height);
+   my_png->Data = (char *)malloc(my_png->Height * my_png->FRowBytes ); // DL Added 30/5/2000
+   my_png->FRowPtrs = (char *)malloc(sizeof(void*) * my_png->Height);
 
 
    if((my_png->Data)&&(my_png->FRowPtrs))
@@ -91,7 +91,7 @@ void mypng_struct_create()
 {
    if(my_png) return;
    //my_png = Z_Malloc(sizeof(png_t));
-   my_png = malloc(sizeof(png_t));
+   my_png = (png_t *)malloc(sizeof(png_t));
    my_png->Data    = 0;
    my_png->FRowPtrs = 0;
    my_png->Height  = 0;
@@ -135,7 +135,7 @@ byte * LoadPNG (FILE *f, char * name, int filesize)
    byte *raw;
    byte *imagedata;
 
-   raw = malloc(filesize+1);
+   raw = (byte *)malloc(filesize+1);
 
    fread (raw, 1, filesize, f);
    fclose(f);
@@ -164,7 +164,7 @@ byte * LoadPNG (FILE *f, char * name, int filesize)
 
    mypng_struct_create(); // creates the my_png struct
 
-   my_png->tmpBuf = raw; //buf = whole file content
+   my_png->tmpBuf = (char *)raw; //buf = whole file content
    my_png->tmpi=0;
 
    png_set_read_fn(png,ioBuffer,fReadData );
@@ -219,9 +219,9 @@ byte * LoadPNG (FILE *f, char * name, int filesize)
 
    if (my_png->BitDepth == 8)
    {
-      image_width      = my_png->Width;
-      image_height   = my_png->Height;
-      imagedata      = my_png->Data;
+      image_width  = my_png->Width;
+      image_height = my_png->Height;
+      imagedata    = (byte *)my_png->Data;
    }
    else
    {

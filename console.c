@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 #include <fcntl.h>
 #include "quakedef.h"
+#include "common.h"
 
 int 		con_linewidth;
 
@@ -230,7 +231,7 @@ void Con_Init (void)
 		Con_OpenDebugLog ();
 	}
 
-	con_text = Hunk_AllocName (CON_TEXTSIZE, "context");
+	con_text = (char *)Hunk_AllocName (CON_TEXTSIZE, "context");
 	Q_memset (con_text, ' ', CON_TEXTSIZE);
 	con_linewidth = -1;
 	Con_CheckResize ();
@@ -386,7 +387,7 @@ Handles cursor positioning, line wrapping, etc
 */
 #define	MAXPRINTMSG	4096
 // FIXME: make a buffer size safe vsprintf?
-void Con_Printf (char *fmt, ...)
+void Con_Printf (const char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
@@ -479,7 +480,7 @@ Con_DPrintf
 A Con_Printf that only shows up if the "developer" cvar is set
 ================
 */
-void Con_DPrintf (char *fmt, ...)
+void Con_DPrintf (const char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
@@ -502,7 +503,7 @@ Con_SafePrintf
 Okay to call even when the screen can't be updated
 ==================
 */
-void Con_SafePrintf (char *fmt, ...)
+void Con_SafePrintf (const char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[1024];
@@ -526,7 +527,7 @@ A Con_Printf that only shows up if the "developer" cvar is set
 Okay to call even when the screen can't be updated
 ==================
 */
-void Con_SafeDPrintf (char *fmt, ...)
+void Con_SafeDPrintf (const char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[1024];

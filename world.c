@@ -268,6 +268,9 @@ void SV_UnlinkEdict (edict_t *ent)
 	ent->area.prev = ent->area.next = NULL;
 }
 
+edict_t * edictFromArea(link_t *linkPtr){
+	return ((edict_t *)((byte *)linkPtr - (long)&(((edict_t *)0)->area)));
+}
 
 /*
 ====================
@@ -284,7 +287,7 @@ void SV_TouchLinks ( edict_t *ent, areanode_t *node )
 	for (l = node->trigger_edicts.next ; l != &node->trigger_edicts ; l = next)
 	{
 		next = l->next;
-		touch = (void *)EDICT_FROM_AREA(l);
+		touch = edictFromArea(l);
 		if (touch == ent)
 			continue;
 		if (!touch->v.touch || touch->v.solid != SOLID_TRIGGER)
@@ -742,7 +745,7 @@ void SV_ClipToLinks ( areanode_t *node, moveclip_t *clip )
 	for (l = node->solid_edicts.next ; l != &node->solid_edicts ; l = next)
 	{
 		next = l->next;
-		touch = (void *)EDICT_FROM_AREA(l);
+		touch = edictFromArea(l);
 		if (touch->v.solid == SOLID_NOT)
 			continue;
 		if (touch == clip->passedict)

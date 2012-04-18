@@ -35,7 +35,7 @@ int		texture_mode = GL_LINEAR;
 
 int		texture_extension_number = 1;
 
-float		gldepthmin, gldepthmax;
+
 
 //qmb :extra stuff
 qboolean gl_combine = false;
@@ -143,14 +143,14 @@ void GL_Init (void)
 {
 	extern char *ENGINE_EXTENSIONS;
 
-	gl_vendor = glGetString (GL_VENDOR);
+	gl_vendor = (char *)glGetString (GL_VENDOR);
 	Con_Printf ("GL_VENDOR: %s\n", gl_vendor);
-	gl_renderer = glGetString (GL_RENDERER);
+	gl_renderer = (char *)glGetString (GL_RENDERER);
 	Con_Printf ("GL_RENDERER: %s\n", gl_renderer);
 
-	gl_version = glGetString (GL_VERSION);
+	gl_version = (char *)glGetString (GL_VERSION);
 	Con_Printf ("GL_VERSION: %s\n", gl_version);
-	gl_extensions = glGetString (GL_EXTENSIONS);
+	gl_extensions = (char *)glGetString (GL_EXTENSIONS);
 	//Con_Printf ("GL_EXTENSIONS: %s\n", gl_extensions);
 
 	CheckMultiTextureExtensions ();
@@ -283,7 +283,7 @@ void    VID_Init (unsigned char *palette)
     vid.numpages = 1;
     vid.colormap = host_colormap;
     vid.fullbright = 256 - LittleLong (*((int *)vid.colormap + 2048));
-    vid.buffer = screen->pixels;
+    vid.buffer = (pixel_t *)screen->pixels;
     vid.rowbytes = screen->pitch;
     vid.conbuffer = vid.buffer;
     vid.conrowbytes = vid.rowbytes;

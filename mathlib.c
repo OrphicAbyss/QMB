@@ -269,10 +269,10 @@ float VectorNormalize (vec3_t v)
 }
 
 // min and max math functions (missing on linux?)
-inline float min(float a, float b){
+float min(float a, float b){
 	return a<b ? a : b;
 }
 
-inline float max(float a, float b){
+float max(float a, float b){
 	return a>b ? a : b;
 }

@@ -460,21 +460,21 @@ void PF_normalize (void)
 {
 	float	*value1;
 	vec3_t	newvalue;
-	float	new;
+	float	length;
 
 	value1 = G_VECTOR(OFS_PARM0);
 
-	new = value1[0] * value1[0] + value1[1] * value1[1] + value1[2]*value1[2];
-	new = sqrt(new);
+	length = value1[0] * value1[0] + value1[1] * value1[1] + value1[2]*value1[2];
+	length = sqrt(length);
 
-	if (new == 0)
+	if (length == 0)
 		newvalue[0] = newvalue[1] = newvalue[2] = 0;
 	else
 	{
-		new = 1/new;
-		newvalue[0] = value1[0] * new;
-		newvalue[1] = value1[1] * new;
-		newvalue[2] = value1[2] * new;
+		length = 1/length;
+		newvalue[0] = value1[0] * length;
+		newvalue[1] = value1[1] * length;
+		newvalue[2] = value1[2] * length;
 	}
 
 	VectorCopy (newvalue, G_VECTOR(OFS_RETURN));
@@ -490,14 +490,14 @@ scalar vlen(vector)
 void PF_vlen (void)
 {
 	float	*value1;
-	float	new;
+	float	length;
 
 	value1 = G_VECTOR(OFS_PARM0);
 
-	new = value1[0] * value1[0] + value1[1] * value1[1] + value1[2]*value1[2];
-	new = sqrt(new);
+	length = value1[0] * value1[0] + value1[1] * value1[1] + value1[2]*value1[2];
+	length = sqrt(length);
 
-	G_FLOAT(OFS_RETURN) = new;
+	G_FLOAT(OFS_RETURN) = length;
 }
 
 /*
@@ -981,7 +981,7 @@ void PF_cvar_set (void)
 	var = G_STRING(OFS_PARM0);
 	val = G_STRING(OFS_PARM1);
 
-	Cvar_Set (var, val);
+	setValue (var, val);
 }
 
 /*
@@ -2656,7 +2656,7 @@ void PF_fopen (void)
 				G_FLOAT(OFS_RETURN) = (float) h;
 				return;
 			}
-			ftemp = Z_Malloc(fsize + 1);
+			ftemp = (char *)Z_Malloc(fsize + 1);
 			Sys_FileRead(h, ftemp, fsize);
 			Sys_FileClose(h);
 			// spit it back out
@@ -2734,7 +2734,7 @@ void PF_strcat(void)
 {
 
 	int ltwo;
-	unsigned int start;
+	int start;
 	char *p, *d;
 	d = pr_string_temp;
 
@@ -2794,7 +2794,7 @@ void PF_strzone(void)
 {
 	char *m, *p;
 	m = G_STRING(OFS_PARM0);
-	p = Z_Malloc(Q_strlen(m) + 1);
+	p = (char *)Z_Malloc(Q_strlen(m) + 1);
 	Q_strcpy(p, m);
 
 	G_INT(OFS_RETURN) = p - pr_strings;

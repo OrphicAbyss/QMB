@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "quakedef.h"
+#include "common.h"
 
 extern cvar_t	pausable;
 
@@ -60,7 +61,7 @@ void Host_Status_f (void)
 	int			minutes;
 	int			hours = 0;
 	int			j;
-	void		(*print) (char *fmt, ...);
+	void		(*print)(const char *fmt, ...);
 
 	if (cmd_source == src_command)
 	{
@@ -630,7 +631,7 @@ void Host_Loadgame_f (void)
 	for (i=0 ; i<MAX_LIGHTSTYLES ; i++)
 	{
 		fscanf (f, "%s\n", str);
-		sv.lightstyles[i] = Hunk_Alloc (Q_strlen(str)+1);
+		sv.lightstyles[i] = (char *)Hunk_Alloc (Q_strlen(str)+1);
 		Q_strcpy (sv.lightstyles[i], str);
 	}
 
@@ -721,7 +722,7 @@ void Host_Name_f (void)
 	{
 		if (Q_strcmp(cl_name.string, newName) == 0)
 			return;
-		Cvar_Set ("_cl_name", newName);
+		setValue ("_cl_name", newName);
 		if (cls.state == ca_connected)
 			Cmd_ForwardToServer ();
 		return;

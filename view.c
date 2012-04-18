@@ -544,7 +544,7 @@ V_UpdatePalette
 void V_UpdatePalette (void)
 {
 	int		i, j;
-	qboolean	new;
+	qboolean changed;
 	byte	*basepal, *newpal;
 	byte	pal[768];
 	float	r,g,b,a;
@@ -553,19 +553,19 @@ void V_UpdatePalette (void)
 
 	V_CalcPowerupCshift ();
 
-	new = false;
+	changed = false;
 
 	for (i=0 ; i<NUM_CSHIFTS ; i++)
 	{
 		if (cl.cshifts[i].percent != cl.prev_cshifts[i].percent)
 		{
-			new = true;
+			changed = true;
 			cl.prev_cshifts[i].percent = cl.cshifts[i].percent;
 		}
 		for (j=0 ; j<3 ; j++)
 			if (cl.cshifts[i].destcolor[j] != cl.prev_cshifts[i].destcolor[j])
 			{
-				new = true;
+				changed = true;
 				cl.prev_cshifts[i].destcolor[j] = cl.cshifts[i].destcolor[j];
 			}
 	}
@@ -581,7 +581,7 @@ void V_UpdatePalette (void)
 		cl.cshifts[CSHIFT_BONUS].percent = 0;
 
 	force = V_CheckGamma ();
-	if (!new && !force)
+	if (!changed && !force)
 		return;
 
 	V_CalcBlend ();
@@ -945,9 +945,9 @@ void V_RenderView (void)
 // don't allow cheats in multiplayer
 	if (cl.maxclients > 1)
 	{
-		Cvar_Set ("scr_ofsx", "0");
-		Cvar_Set ("scr_ofsy", "0");
-		Cvar_Set ("scr_ofsz", "0");
+		setValue ("scr_ofsx", "0");
+		setValue ("scr_ofsy", "0");
+		setValue ("scr_ofsz", "0");
 	}
 
 	if (cl.intermission)

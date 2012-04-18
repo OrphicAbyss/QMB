@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -34,6 +34,6 @@ void Draw_TileClear (int x, int y, int w, int h);
 void Draw_Fill (int x, int y, int w, int h, int c);
 void Draw_FadeScreen (void);
 void Draw_String (int x, int y, char *str);
-qpic_t *Draw_PicFromWad (char *name);
-qpic_t *Draw_PicFromWadXY (char *name, int height, int width);
-qpic_t *Draw_CachePic (char *path);
+qpic_t *Draw_PicFromWad (const char *name);
+qpic_t *Draw_PicFromWadXY (const char *name, int height, int width);
+qpic_t *Draw_CachePic (const char *path);

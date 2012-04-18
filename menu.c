@@ -18,15 +18,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 #include "quakedef.h"
+#include "common.h"
+#include "keys.h"
 
 #ifdef _WIN32
 #include "winquake.h"
 #endif
 
-void (*vid_menudrawfn)(void);
-void (*vid_menukeyfn)(int key);
+extern void (*vid_menudrawfn)(void);
+extern void (*vid_menukeyfn)(int key);
 
-enum {m_none, m_main, m_singleplayer, m_load, m_save, m_multiplayer, m_setup, m_net, m_options, m_video, m_keys, m_help, m_quit, m_serialconfig, m_modemconfig, m_lanconfig, m_gameoptions, m_search, m_slist, m_vid_options, m_credits} m_state;
+typedef enum m_state_e {m_none, m_main, m_singleplayer, m_load, m_save, m_multiplayer, m_setup, m_net, m_options, m_video, m_keys, m_help, m_quit, m_serialconfig, m_modemconfig, m_lanconfig, m_gameoptions, m_search, m_slist, m_vid_options, m_credits} m_state_t;
+m_state_t m_state;
 
 void M_Menu_Main_f (void);
 	void M_Menu_SinglePlayer_f (void);
@@ -131,7 +134,7 @@ void M_DrawCharacter (int cx, int line, int num)
 	Draw_Character ( cx + ((vid.width - 320)>>1), line + ((vid.height/2)-120), num);
 }
 
-void M_Print (int cx, int cy, char *str)
+void M_Print (int cx, int cy, const char *str)
 {
 	while (*str)
 	{
@@ -141,7 +144,7 @@ void M_Print (int cx, int cy, char *str)
 	}
 }
 
-void M_PrintWhite (int cx, int cy, char *str)
+void M_PrintWhite (int cx, int cy, const char *str)
 {
 	while (*str)
 	{
@@ -152,7 +155,7 @@ void M_PrintWhite (int cx, int cy, char *str)
 }
 
 //JHL:ADD; center print
-void M_Centerprint (int cy, char *str)
+void M_Centerprint (int cy, const char *str)
 {
 	int cx;
 	cx = vid.width/2 - (Q_strlen(str)*4);
@@ -196,7 +199,7 @@ M_Main_Layout
 JHL:ADD; Draws the main menu in desired manner
 ================
 */
-void PrintRed (int cx, int cy, char *str)
+void PrintRed (int cx, int cy, const char *str)
 {
 	while (*str)
 	{
@@ -206,7 +209,7 @@ void PrintRed (int cx, int cy, char *str)
 	}
 }
 
-void PrintWhite (int cx, int cy, char *str)
+void PrintWhite (int cx, int cy, const char *str)
 {
 	while (*str)
 	{
@@ -216,7 +219,7 @@ void PrintWhite (int cx, int cy, char *str)
 	}
 }
 
-void M_Main_ButtonList (char *buttons[], int cursor_location, int in_main)
+void M_Main_ButtonList (const char *buttons[], int cursor_location, int in_main)
 {
 	int	x, y,
 		x_mod,
@@ -251,7 +254,7 @@ void M_Main_ButtonList (char *buttons[], int cursor_location, int in_main)
 
 void M_Main_Layout (int f_cursor, int f_inmenu)
 {
-	char	*names[] =
+	const char	*names[] =
 	{
 		"Single",
 		"Multiplayer",
@@ -516,7 +519,7 @@ void M_Menu_SinglePlayer_f (void)
 void M_SinglePlayer_Draw (void)
 {
 	qpic_t	*p;
-	char	*names[] =
+	const char *names[] =
 	{
 		"New game",
 		"Load",
@@ -1021,7 +1024,7 @@ forward:
 		if (Q_strcmp(cl_name.string, setup_myname) != 0)
 			Cbuf_AddText ( va ("name \"%s\"\n", setup_myname) );
 		if (Q_strcmp(hostname.string, setup_hostname) != 0)
-			Cvar_Set("hostname", setup_hostname);
+			setValue("hostname", setup_hostname);
 		if (setup_top != setup_oldtop || setup_bottom != setup_oldbottom)
 			Cbuf_AddText( va ("color %i %i\n", setup_top, setup_bottom) );
 		m_entersound = true;
@@ -1792,7 +1795,7 @@ void M_VideoModes_Key (int key)
 //=============================================================================
 /* KEYS MENU */
 
-char *bindnames[][2] =
+const char *bindnames[][2] =
 {
 {"+attack", 		"attack"},
 {"impulse 10.0", 		"next weapon"},
@@ -1828,7 +1831,7 @@ void M_Menu_Keys_f (void)
 }
 
 
-void M_FindKeysForCommand (char *command, int *twokeys)
+void M_FindKeysForCommand (const char *command, int *twokeys)
 {
 	int		count;
 	int		j;
@@ -1854,7 +1857,7 @@ void M_FindKeysForCommand (char *command, int *twokeys)
 	}
 }
 
-void M_UnbindCommand (char *command)
+void M_UnbindCommand (const char *command)
 {
 	int		j;
 	int		l;
@@ -1877,7 +1880,7 @@ void M_Keys_Draw (void)
 {
 	unsigned int		i, l;
 	int		keys[2];
-	char	*name;
+	const char	*name;
 	int		x, y;
 	qpic_t	*p;
 
@@ -2271,11 +2274,11 @@ void M_Credits_Key (int key)
 //=============================================================================
 /* QUIT MENU */
 
-int		msgNumber;
-int		m_quit_prevstate;
+int			msgNumber;
+m_state_t	m_quit_prevstate;
 qboolean	wasInMenus;
 
-char *quitMessage [] =
+const char *quitMessage [] =
 {
 /* .........1.........2.... */
   "  Are you gonna quit    ",
@@ -3049,8 +3052,8 @@ void M_LanConfig_Key (int key)
 
 typedef struct
 {
-	char	*name;
-	char	*description;
+	const char	*name;
+	const char	*description;
 } level_t;
 
 level_t		levels[] =
@@ -3154,7 +3157,7 @@ level_t		roguelevels[] =
 
 typedef struct
 {
-	char	*description;
+	const char	*description;
 	int		firstLevel;
 	int		levels;
 } episode_t;

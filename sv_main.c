@@ -1041,7 +1041,7 @@ void SV_SpawnServer (char *server)
 
 	// let's not have any servers with no name
 	if (hostname.string[0] == 0)
-		Cvar_Set ("hostname", "QMB UNNAMED");
+		setValue ("hostname", "QMB UNNAMED");
 	scr_centertime_off = 0;
 
 	Con_DPrintf ("SpawnServer: %s\n",server);
@@ -1084,7 +1084,7 @@ void SV_SpawnServer (char *server)
 // allocate server memory
 	sv.max_edicts = MAX_EDICTS;
 
-	sv.edicts = Hunk_AllocName (sv.max_edicts*pr_edict_size, "edicts");
+	sv.edicts = (edict_t *)Hunk_AllocName (sv.max_edicts*pr_edict_size, "edicts");
 
 	sv.datagram.maxsize = sizeof(sv.datagram_buf);
 	sv.datagram.cursize = 0;

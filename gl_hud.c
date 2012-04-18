@@ -112,7 +112,7 @@ void R_AddPicHudItem(byte id, float x, float y, float w, float h, vec3_t colour,
 	huds[id].alpha = alpha;
 
 	//allocate memory for pic data
-	p = (void *)malloc(sizeof(glpic_t));
+	p = (glpic_t *)malloc(sizeof(glpic_t));
 	p->texnum = gl_texnum;
 	p->sl = 0;
 	p->tl = 0;
@@ -120,7 +120,7 @@ void R_AddPicHudItem(byte id, float x, float y, float w, float h, vec3_t colour,
 	p->th = 1;
 
 	//not sure why i need to make it a void pointer, as they are the same type of pointer...
-	huds[id].pic = (void *)p;
+	huds[id].pic = p;
 	huds[id].used = 1;
 }
 
@@ -157,7 +157,7 @@ void CL_DecodeHudPrint(void){
 	pos = MSG_ReadByte();
 	len = MSG_ReadByte();
 
-	text = (void *)malloc(len);
+	text = (char *)malloc(len);
 	Q_strcpy(text,MSG_ReadString());
 
 	//code to position text
@@ -200,7 +200,7 @@ void CL_DecodeHudPic(void){
 	x = MSG_ReadFloat();
 	y = MSG_ReadFloat();
 	id = MSG_ReadByte();
-	text = (void *)malloc(len);
+	text = (char *)malloc(len);
 	Q_strcpy(text,MSG_ReadString());
 
 	//code to position text

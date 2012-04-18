@@ -303,7 +303,7 @@ float	beamlength = 16;
 
 void R_EntityParticles (entity_t *ent)
 {
-	int *colour = &d_8to24table[0x6f];
+	int *colour = (int *)&d_8to24table[0x6f];
 	R_ParticleExplosion2(ent->origin, *colour, 1);
 
 	/*

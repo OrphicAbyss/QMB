@@ -107,12 +107,12 @@ void S_BeginPrecaching	(void);
 void S_EndPrecaching		(void);
 void S_PaintChannels		(int endtime);
 void S_InitPaintChannels	(void);
-void S_LocalSound			(char *s);
+void S_LocalSound			(const char *s);
 void S_AmbientOff			(void);
 void S_AmbientOn			(void);
 sfxcache_t *S_LoadSound	(sfx_t *s);
 
-sfx_t *S_PrecacheSound		(char *sample);
+sfx_t *S_PrecacheSound		(const char *sample);
 // picks a channel based on priorities, empty slots, number of channels
 channel_t *SND_PickChannel(int entnum, int entchannel);
 void SND_InitScaletable	(void);

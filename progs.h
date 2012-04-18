@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -29,7 +29,7 @@ typedef union eval_s
 	func_t			function;
 	int				_int;
 	int				edict;
-} eval_t;	
+} eval_t;
 
 #define	MAX_ENT_LEAFS	16
 typedef struct edict_s
@@ -37,17 +37,16 @@ typedef struct edict_s
 	bot_t		bot;				//qmb :globot
 	qboolean	free;
 	link_t		area;				// linked to a division node or leaf
-	
+
 	int			num_leafs;
 	short		leafnums[MAX_ENT_LEAFS];
 
 	entity_state_t	baseline;
-	
+
 	float		freetime;			// sv.time when the object was freed
 	entvars_t	v;					// C exported fields from progs
 // other fields from progs come immediately after
 } edict_t;
-#define	EDICT_FROM_AREA(l) STRUCT_FROM_LINK(l,edict_t,area)
 
 //============================================================================
 

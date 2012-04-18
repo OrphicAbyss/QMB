@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "ICapture.h"
 #include "CaptureHelpers.h"
 
+#include "cvar_cpp.h"
+
 extern cvar_t host_framerate;
 extern float scr_con_current;
 extern qboolean scr_drawloading;
@@ -38,7 +40,8 @@ int frames;
 // Code in engine is written relatively independent of kind of capture.
 // When wired to AVI as currently, capture_codec is a fourcc.
 // "0" indicates no compression codec.
-cvar_t capture_codec = {"capture_codec", "0", true };
+//cvar_t capture_codec = {"capture_codec", "0", true };
+CVar *capture_codec;
 
 
 qboolean CaptureHelper_IsActive(void)
@@ -77,14 +80,14 @@ void CaptureHelper_Start_f (void)
 	if (shm){
 		Capture_Open(
 			filename,
-			(*capture_codec.string != '0') ? capture_codec.string : 0,
+			(*capture_codec->getString() != '0') ? capture_codec->getString() : 0,
 			fps,
 			shm->speed
 		);
 	}else{
 		Capture_Open(
 			filename,
-			(*capture_codec.string != '0') ? capture_codec.string : 0,
+			(*capture_codec->getString() != '0') ? capture_codec->getString() : 0,
 			fps,
 			0
 		);
@@ -129,7 +132,8 @@ void CaptureHelper_Init(void)
     Cmd_AddCommand ("capture_start", CaptureHelper_Start_f);
     Cmd_AddCommand ("capture_stop", CaptureHelper_Stop_f);
     Cmd_AddCommand ("capturedemo", CaptureHelper_CaptureDemo_f);
-    Cvar_RegisterVariable (&capture_codec);
+	capture_codec = new CVar("capture_codec", "0", true);
+    CVar::registerCVar(capture_codec);
 }
 
 
@@ -153,7 +157,7 @@ void CaptureHelper_OnUpdateScreen(void)
 
     if (!CaptureHelper_IsActive()) return;
 
-    buffer = malloc(size);
+    buffer = (byte  *)malloc(size);
 	glReadPixels (glx, gly, glwidth, glheight, GL_RGB, GL_UNSIGNED_BYTE, buffer);
 	for (i = 0; i < size; i += 3) {
 		temp = buffer[i];

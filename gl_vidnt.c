@@ -1825,7 +1825,7 @@ void	VID_Init (unsigned char *palette)
 
 extern void M_Menu_Options_f (void);
 extern void M_Print (int cx, int cy, char *str);
-extern void M_PrintWhite (int cx, int cy, char *str);
+extern void M_PrintWhite (int cx, int cy, const char *str);
 extern void M_DrawCharacter (int cx, int line, int num);
 extern void M_DrawTransPic (int x, int y, qpic_t *pic);
 extern void M_DrawPic (int x, int y, qpic_t *pic);

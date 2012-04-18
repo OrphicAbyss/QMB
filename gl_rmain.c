@@ -20,6 +20,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // r_main.c
 
 #include "quakedef.h"
+#include "cvar_cpp.h"
+
+#include <GL/glu.h>
 
 entity_t	r_worldentity;
 
@@ -63,7 +66,7 @@ int		gl_textureunits;
 
 void R_MarkLeaves (void);
 
-cvar_t	r_drawentities = {"r_drawentities","1"};
+cvar_t	r_drawentities("r_drawentities","1");
 cvar_t	r_drawviewmodel = {"r_drawviewmodel","1"};
 cvar_t	r_speeds = {"r_speeds","0"};
 cvar_t	r_wateralpha = {"r_wateralpha","1", true};
@@ -465,7 +468,7 @@ void R_SetupFrame (void)
 
 // don't allow cheats in multiplayer
 	if (cl.maxclients > 1)
-		Cvar_Set ("r_fullbright", "0");
+		setValue ("r_fullbright", "0");
 
 	R_AnimateLight ();
 

@@ -42,7 +42,6 @@ qpic_t	*sb_face_invuln;
 qpic_t	*sb_face_invis_invuln;
 
 qboolean	sb_showscores;
-
 int			sb_lines;			// scan lines to draw
 
 qpic_t      *rsb_invbar[2];

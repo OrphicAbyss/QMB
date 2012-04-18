@@ -22,6 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // vid buffer
 
 #include "quakedef.h"
+#include "mathlib.h"
+
+#include <GL/glu.h>
 
 #define GL_COLOR_INDEX8_EXT     0x80E5
 
@@ -111,14 +114,14 @@ byte		menuplyr_pixels[4096];
 int		pic_texels;
 int		pic_count;
 
-qpic_t *Draw_PicFromWad (char *name)
+qpic_t *Draw_PicFromWad (const char *name)
 {
 	qpic_t	*p;
 	glpic_t	*gl;
 	int texnum;
 	char texname[128];
 
-	p = W_GetLumpName (name);
+	p = (qpic_t *)W_GetLumpName (name);
 	gl = (glpic_t *)p->data;
 
 	sprintf(texname,"textures/wad/%s", name);
@@ -154,14 +157,14 @@ qpic_t *Draw_PicFromWad (char *name)
 	return p;
 }
 
-qpic_t *Draw_PicFromWadXY (char *name, int height, int width)
+qpic_t *Draw_PicFromWadXY (const char *name, int height, int width)
 {
 	qpic_t	*p;
 	glpic_t	*gl;
 	int texnum;
 	char texname[128];
 
-	p = W_GetLumpName (name);
+	p = (qpic_t *)W_GetLumpName (name);
 	gl = (glpic_t *)p->data;
 
 	sprintf(texname,"textures/wad/%s", name);
@@ -220,7 +223,7 @@ qpic_t *Draw_PicFromWad (char *name)
 Draw_CachePic
 ================
 */
-qpic_t	*Draw_CachePic (char *path)
+qpic_t	*Draw_CachePic (const char *path)
 {
 	cachepic_t	*pic;
 	int			i;
@@ -346,7 +349,7 @@ void Draw_Init (void)
 
 	// 3dfx can only handle 256 wide textures
 	if (!Q_strncasecmp ((char *)gl_renderer, "3dfx",4) || strstr((char *)gl_renderer, "Glide")){
-		Cvar_Set ("gl_max_size", "256");
+		setValue ("gl_max_size", "256");
 		Con_Printf("Setting max texture size to 256x256 since 3dfx cards cant handle bigger ones");
 	}
 
@@ -360,7 +363,7 @@ void Draw_Init (void)
 	char_texture = GL_LoadTexImage ("gfx/charset", false, true, gl_sincity.value);
 	if (char_texture == 0)// did not find a matching TGA...
 	{
-		draw_chars = W_GetLumpName ("conchars");
+		draw_chars = (byte *)W_GetLumpName ("conchars");
 		for (i=0 ; i<256*64 ; i++)
 			if (draw_chars[i] == 0)
 				draw_chars[i] = 255;	// proper transparent color
@@ -932,10 +935,10 @@ void Image_Resample32Lerp(const void *indata, int inwidth, int inheight, void *o
 	int i, j, r, yi, oldy, f, fstep, lerp, endy = (inheight-1), inwidth4 = inwidth*4, outwidth4 = outwidth*4;
 	byte *out;
 	const byte *inrow;
-	out = outdata;
+	out = (byte *)outdata;
 	fstep = (int) (inheight*65536.0f/outheight);
 
-	inrow = indata;
+	inrow = (const byte *)indata;
 	oldy = 0;
 	Image_Resample32LerpLine (inrow, resamplerow1, inwidth, outwidth);
 	Image_Resample32LerpLine (inrow + inwidth4, resamplerow2, inwidth, outwidth);
@@ -1028,7 +1031,7 @@ void Image_Resample32Nearest(const void *indata, int inwidth, int inheight, void
 	unsigned frac, fracstep;
 	// relies on int being 4 bytes
 	int *inrow, *out;
-	out = outdata;
+	out = (int *)outdata;
 
 	fracstep = inwidth*0x10000/outwidth;
 	for (i = 0;i < outheight;i++)
@@ -1064,10 +1067,10 @@ void Image_Resample24Lerp(const void *indata, int inwidth, int inheight, void *o
 	int i, j, r, yi, oldy, f, fstep, lerp, endy = (inheight-1), inwidth3 = inwidth * 3, outwidth3 = outwidth * 3;
 	byte *out;
 	const byte *inrow;
-	out = outdata;
+	out = (byte *)outdata;
 	fstep = (int) (inheight*65536.0f/outheight);
 
-	inrow = indata;
+	inrow = (const byte *)indata;
 	oldy = 0;
 	Image_Resample24LerpLine (inrow, resamplerow1, inwidth, outwidth);
 	Image_Resample24LerpLine (inrow + inwidth3, resamplerow2, inwidth, outwidth);
@@ -1152,7 +1155,7 @@ void Image_Resample24Nolerp(const void *indata, int inwidth, int inheight, void 
 	int i, j, f, inwidth3 = inwidth * 3;
 	unsigned frac, fracstep;
 	byte *inrow, *out;
-	out = outdata;
+	out = (byte *)outdata;
 
 	fracstep = inwidth*0x10000/outwidth;
 	for (i = 0;i < outheight;i++)
@@ -1196,7 +1199,7 @@ void Image_Resample (const void *indata, int inwidth, int inheight, int indepth,
 		if (resamplerow1)
 			free(resamplerow1);
 		resamplerowsize = outwidth*4;
-		resamplerow1 = malloc(resamplerowsize*2);
+		resamplerow1 = (byte *)malloc(resamplerowsize*2);
 		resamplerow2 = resamplerow1 + resamplerowsize;
 	}
 	if (bytesperpixel == 4)
@@ -1402,7 +1405,7 @@ __inline unsigned RGBAtoGrayscale(unsigned rgba){
 	return output;
 }
 
-void GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap, qboolean alpha, qboolean grayscale)
+void GL_Upload32 (unsigned int *data, int width, int height, qboolean mipmap, qboolean alpha, qboolean grayscale)
 {
 	static unsigned	temp_buffer[512*512];
 	int			samples;
@@ -1432,7 +1435,7 @@ void GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap, qbool
 		scaled = &temp_buffer[0];
 	else
 	{
-		scaled = malloc(sizeof(unsigned)*scaled_width*scaled_height);
+		scaled = (unsigned *)malloc(sizeof(unsigned)*scaled_width*scaled_height);
 		Con_SafeDPrintf("&c500Upload32:&r Needed Dynamic Buffer for texture resize...\n");
 
 		if (scaled==NULL)
@@ -1537,7 +1540,7 @@ int GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean al
 	}
 	else
 	{
-		trans = malloc(s*sizeof(unsigned));
+		trans = (unsigned *)malloc(s*sizeof(unsigned));
 		Con_SafeDPrintf("&c500GL_Upload8:&r Needed Dynamic Buffer for 8bit to 24bit texture convert...\n");
 	}
 	// if there are no transparent pixels, make it a 3 component (ie: RGB not RGBA)
@@ -1651,7 +1654,7 @@ GL_LoadTexture_setup:
 		if (bytesperpixel == 1)
 			fullbright = GL_Upload8 (data, width, height, mipmap, alpha);
 		else if (bytesperpixel == 4)
-			GL_Upload32 ((void *)data, width, height, mipmap, true, grayscale);
+			GL_Upload32 ((unsigned int *)data, width, height, mipmap, true, grayscale);
 		else
 			Sys_Error("GL_LoadTexture: unknown bytesperpixel\n");
 	}
@@ -1691,7 +1694,7 @@ byte* loadimagepixels (char* filename, qboolean complain)
 	FILE	*f;
 //	char	*data;
 	char	basename[128], name[128];
-	byte	*c;
+	char	*c;
 //	int		found, i;
 	char	*filefound[8];
 	byte	*output = 0;

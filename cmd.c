@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cmd.c -- Quake script command processing module
 
 #include "quakedef.h"
+#include "common.h"
 
 void Cmd_ForwardToServer (void);
 
@@ -117,7 +118,7 @@ void Cbuf_InsertText (char *text)
 	templen = cmd_text.cursize;
 	if (templen)
 	{
-		temp = Z_Malloc (templen);
+		temp = (char *)Z_Malloc (templen);
 		Q_memcpy (temp, cmd_text.data, templen);
 		SZ_Clear (&cmd_text);
 	}
@@ -233,7 +234,7 @@ void Cmd_StuffCmds_f (void)
 	if (!s)
 		return;
 
-	text = Z_Malloc (s+1);
+	text = (char *)Z_Malloc (s+1);
 	text[0] = 0;
 	for (i=1 ; i<com_argc ; i++)
 	{
@@ -245,7 +246,7 @@ void Cmd_StuffCmds_f (void)
 	}
 
 // pull out the commands
-	build = Z_Malloc (s+1);
+	build = (char *)Z_Malloc (s+1);
 	build[0] = 0;
 
 	for (i=0 ; i<s-1 ; i++)
@@ -333,7 +334,7 @@ char *CopyString (char *in)
 {
 	char	*out;
 
-	out = Z_Malloc (Q_strlen(in)+1);
+	out = (char *)Z_Malloc (Q_strlen(in)+1);
 	Q_strcpy (out, in);
 	return out;
 }
@@ -372,7 +373,7 @@ void Cmd_Alias_f (void)
 
 	if (!a)
 	{
-		a = Z_Malloc (sizeof(cmdalias_t));
+		a = (cmdalias_t *)Z_Malloc (sizeof(cmdalias_t));
 		a->next = cmd_alias;
 		cmd_alias = a;
 	}
@@ -515,7 +516,7 @@ void Cmd_TokenizeString (char *text)
 
 		if (cmd_argc < MAX_ARGS)
 		{
-			cmd_argv[cmd_argc] = Z_Malloc (Q_strlen(com_token)+1);
+			cmd_argv[cmd_argc] = (char *)Z_Malloc (Q_strlen(com_token)+1);
 			Q_strcpy (cmd_argv[cmd_argc], com_token);
 			cmd_argc++;
 		}
@@ -529,7 +530,7 @@ void Cmd_TokenizeString (char *text)
 Cmd_AddCommand
 ============
 */
-void	Cmd_AddCommand (char *cmd_name, xcommand_t function)
+void	Cmd_AddCommand (const char *cmd_name, xcommand_t function)
 {
 	cmd_function_t	*cmd;
 
@@ -553,8 +554,8 @@ void	Cmd_AddCommand (char *cmd_name, xcommand_t function)
 		}
 	}
 
-	cmd = Hunk_Alloc (sizeof(cmd_function_t));
-	cmd->name = cmd_name;
+	cmd = (cmd_function_t *)Hunk_Alloc (sizeof(cmd_function_t));
+	cmd->name = (char *)cmd_name;
 	cmd->function = function;
 	cmd->next = cmd_functions;
 	cmd_functions = cmd;

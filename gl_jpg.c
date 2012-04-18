@@ -65,7 +65,7 @@ byte *LoadJPG (FILE *f)
 
 
     // initialize the return data
-    image_rgba = malloc ((numPixels * 4));
+    image_rgba = (byte *)malloc ((numPixels * 4));
 
     // read the jpeg
     count = 0;

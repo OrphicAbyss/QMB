@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 cvar_t bgmvolume = {"bgmvolume", "1", true};
 cvar_t volume = {"volume", "0.7", true};
 
- 
+
 void S_Init (void)
 {
 }
@@ -62,7 +62,7 @@ void S_StopSound (int entnum, int entchannel)
 {
 }
 
-sfx_t *S_PrecacheSound (char *sample)
+sfx_t *S_PrecacheSound (const char *sample)
 {
 	return NULL;
 }
@@ -72,7 +72,7 @@ void S_ClearPrecache (void)
 }
 
 void S_Update (vec3_t origin, vec3_t v_forward, vec3_t v_right, vec3_t v_up)
-{	
+{
 }
 
 void S_StopAllSounds (qboolean clear)
@@ -91,7 +91,7 @@ void S_ExtraUpdate (void)
 {
 }
 
-void S_LocalSound (char *s)
+void S_LocalSound (const char *s)
 {
 }
 
