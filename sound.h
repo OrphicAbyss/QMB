@@ -35,7 +35,7 @@ typedef struct
 typedef struct sfx_s
 {
 	char 	name[MAX_QPATH];
-	CacheObj *cache;
+	MemoryObj *cache;
 } sfx_t;
 
 // !!! if this is changed, it much be changed in asm_i386.h too !!!

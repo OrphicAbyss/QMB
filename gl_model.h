@@ -528,7 +528,7 @@ typedef struct model_s
 //
 // additional model data
 //
-	CacheObj	*cache;		// only access through Mod_Extradata
+	MemoryObj	*cache;		// only access through Mod_Extradata
 
 } model_t;
 

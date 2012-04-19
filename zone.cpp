@@ -540,86 +540,110 @@ void *Hunk_TempAlloc (int size)
 
 /*
 ===============================================================================
-
-CACHE MEMORY
-
+CACHE & ZONE MEMORY
 ===============================================================================
 */
 
-CacheObj::CacheObj(char *name, int size){
+MemoryObj::MemoryObj(MemType type, char *name, int size){
 	Q_memset(this->name,0,maxNameLength);
 	Q_strncpy(this->name,name,maxNameLength);
+	this->type = type;
 	this->data = malloc(size);
 	this->size = size;
 }
 
-CacheObj::~CacheObj(){
+MemoryObj::~MemoryObj(){
 	free(data);
 }
 
-void CacheObj::freeData(){
+void MemoryObj::freeData(){
 	if (data)
 		free(data);
 
 	data = NULL;
 }
 
-char *CacheObj::getName(){
+char *MemoryObj::getName(){
 	return name;
 }
 
-void *CacheObj::getData(){
+void *MemoryObj::getData(){
 	return data;
 }
 
-int CacheObj::getSize(){
+int MemoryObj::getSize(){
 	return size;
 }
 
-static std::list<CacheObj *> cacheObjects;
+static std::list<MemoryObj *> zoneObjects;
+static std::list<MemoryObj *> cacheObjects;
 
-CacheObj *CacheObj::Alloc(char* name, int size){
-	CacheObj *obj = new CacheObj(name, size);
+MemoryObj *MemoryObj::Alloc(MemType type, char* name, int size){
+	MemoryObj *obj = new MemoryObj(type, name, size);
 
-	Con_DPrintf ("Allocated Cache Object: %s (Size: %8d)\n", obj->getName(), obj->getSize());
-
-	cacheObjects.push_back(obj);
+	switch (type){
+		case ZONE:
+			Con_DPrintf ("Allocated Zone Object: %s (Size: %8d)\n", obj->getName(), obj->getSize());
+			zoneObjects.push_back(obj);
+			break;
+		case CACHE:
+			Con_DPrintf ("Allocated Cache Object: %s (Size: %8d)\n", obj->getName(), obj->getSize());
+			cacheObjects.push_back(obj);
+			break;
+		default:
+			Con_Printf("Unknown memory type being allocated.");
+			break;
+	}
 
 	return obj;
 }
 
-void CacheObj::Free(CacheObj *obj){
+void MemoryObj::Free(MemoryObj *obj){
 	obj->freeData();
 }
 
-void CacheObj::Flush(){
-	std::list<CacheObj *>::iterator i;
+void MemoryObj::Flush(MemType type){
+	std::list<MemoryObj *>::iterator i;
 
-	for (i = cacheObjects.begin(); i != cacheObjects.end(); i++){
-		CacheObj *obj = *i;
-		obj->freeData();
+	switch (type){
+		case ZONE:
+			for (i = zoneObjects.begin(); i != zoneObjects.end(); i++){
+				MemoryObj *obj = *i;
+				obj->freeData();
+			}
+			break;
+		case CACHE:
+			for (i = cacheObjects.begin(); i != cacheObjects.end(); i++){
+				MemoryObj *obj = *i;
+				obj->freeData();
+			}
+			break;
+		default:
+			Con_Printf("Unknown memory type being allocated.");
+			break;
 	}
+
 }
 
-void CacheObj::Print(){
-	std::list<CacheObj *>::iterator i;
+void MemoryObj::Print(){
+	std::list<MemoryObj *>::iterator i;
 	long size = 0;
 
 	Con_Printf("Cache Size Debug\n---------------------------\n");
 	for (i = cacheObjects.begin(); i != cacheObjects.end(); i++){
-		CacheObj *obj = *i;
+		MemoryObj *obj = *i;
 		Con_Printf ("%8d : %s\n", obj->getSize(), obj->getName());
 		size += obj->getSize();
 	}
 	Con_Printf("---------------------------\nTotal size: %8i\n---------------------------\n",size);
 }
 
-void CacheObj::Report(){
-	std::list<CacheObj *>::iterator i;
+void MemoryObj::Report(){
+	std::list<MemoryObj *>::iterator i;
 	int size = 0;
 
 	for (i = cacheObjects.begin(); i != cacheObjects.end(); i++){
-		CacheObj *obj = *i;
+		MemoryObj *obj = *i;
 		size += obj->getSize();
 	}
 	Con_Printf ("%4.1f megabyte data cache\n", size / (float)(1024*1024) );
@@ -632,7 +656,7 @@ void CacheObj::Report(){
  */
 void Cache_Flush (void)
 {
-	CacheObj::Flush();
+	MemoryObj::Flush(MemoryObj::CACHE);
 }
 
 /**
@@ -640,7 +664,7 @@ void Cache_Flush (void)
  */
 void Cache_Print (void)
 {
-	CacheObj::Print();
+	MemoryObj::Print();
 }
 
 /**
@@ -648,7 +672,7 @@ void Cache_Print (void)
  */
 void Cache_Report (void)
 {
-	CacheObj::Report();
+	MemoryObj::Report();
 }
 
 /**

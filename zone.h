@@ -111,24 +111,27 @@ void Hunk_Check (void);
 /**
  * CacheObj represents allocated space for a cached object.
  */
-class CacheObj {
+class MemoryObj {
+public:
+	enum MemType { CACHE, ZONE };
 private:
 	static const int maxNameLength = 32;
 	void *data;
 	char name[maxNameLength];
 	int size;
+	MemType type;
 
-	CacheObj(char *name, int size);
-	~CacheObj();
+	MemoryObj(MemType type, char *name, int size);
+	~MemoryObj();
 public:
 	char *getName();
 	void *getData();
 	int getSize();
 	void freeData();
 
-	static CacheObj *Alloc(char *name, int size);
-	static void Free(CacheObj *obj);
-	static void Flush();
+	static MemoryObj *Alloc(MemType type, char *name, int size);
+	static void Free(MemoryObj *obj);
+	static void Flush(MemType type);
 	static void Print();
 	static void Report();
 };

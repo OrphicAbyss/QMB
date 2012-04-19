@@ -1559,7 +1559,7 @@ Filename are reletive to the quake directory.
 Allways appends a 0 byte.
 ============
 */
-static CacheObj	*loadcache;
+static MemoryObj	*loadcache;
 static byte		*loadbuf;
 static int		loadsize;
 
@@ -1587,7 +1587,7 @@ byte *COM_LoadFile (const char *path, int usehunk)
 	else if (usehunk == 3){
 		// TODO: Shouldn't pass back the buffer, should only pass around CacheObj
 		// TODO: Require memory object base
-		loadcache = CacheObj::Alloc(base,len+1);
+		loadcache = MemoryObj::Alloc(MemoryObj::CACHE,base,len+1);
 		buf = loadcache->getData();
 	} else if (usehunk == 4){
 		if (len+1 > loadsize)
@@ -1619,7 +1619,7 @@ byte *COM_LoadTempFile (const char *path)
 	return COM_LoadFile (path, 2);
 }
 
-void COM_LoadCacheFile (const char *path, CacheObj cu)
+void COM_LoadCacheFile (const char *path, MemoryObj cu)
 {
 	loadcache = &cu;
 	COM_LoadFile (path, 3);

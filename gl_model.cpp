@@ -1912,7 +1912,7 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
 	end = Hunk_LowMark ();
 	total = end - start;
 
-	mod->cache = CacheObj::Alloc(loadname, total);
+	mod->cache = MemoryObj::Alloc(MemoryObj::CACHE, loadname, total);
 	if (!mod->cache->getData())
 		return;
 	Q_memcpy (mod->cache->getData(), pheader, total);
@@ -2083,7 +2083,7 @@ for (i = 0;i < 7;i++)
 	end = Hunk_LowMark ();
 	total = end - start;
 
-	mod->cache = CacheObj::Alloc(loadname, total);
+	mod->cache = MemoryObj::Alloc(MemoryObj::CACHE, loadname, total);
 	if (!mod->cache->getData())
 		return;
 	Q_memcpy (mod->cache->getData(), pheader, total);
@@ -2252,7 +2252,7 @@ void Mod_LoadSpriteModel (model_t *mod, void *buffer)
 
 	//psprite = (msprite_t *)Hunk_AllocName (size, loadname);
 
-	mod->cache = CacheObj::Alloc(loadname, size);
+	mod->cache = MemoryObj::Alloc(MemoryObj::CACHE, loadname, size);
 	psprite = (msprite_t *)mod->cache->getData();
 
 	psprite->type = LittleLong (pin->type);

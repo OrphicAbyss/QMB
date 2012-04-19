@@ -137,7 +137,7 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 
 	len = len * info.width * info.channels;
 
-	s->cache = CacheObj::Alloc(s->name,len+sizeof(sfxcache_t));
+	s->cache = MemoryObj::Alloc(MemoryObj::CACHE, s->name,len+sizeof(sfxcache_t));
 	sc = (sfxcache_t *)s->cache->getData();
 	if (!sc)
 		return NULL;
