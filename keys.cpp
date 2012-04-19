@@ -103,6 +103,13 @@ keyname_t keynames[] =
 	{"MOUSE7", K_MOUSE7},
 	{"MOUSE8", K_MOUSE8},
 	{"MOUSE9", K_MOUSE9},
+	{"MOUSE10", K_MOUSE10},
+	{"MOUSE11", K_MOUSE11},
+	{"MOUSE12", K_MOUSE12},
+	{"MOUSE13", K_MOUSE13},
+	{"MOUSE14", K_MOUSE14},
+	{"MOUSE15", K_MOUSE15},
+	{"MOUSE16", K_MOUSE16},
 
 	{"JOY1", K_JOY1},
 	{"JOY2", K_JOY2},
@@ -152,6 +159,8 @@ keyname_t keynames[] =
 ==============================================================================
 */
 
+
+int repeatkey = 0;
 
 /*
 ====================
@@ -248,7 +257,7 @@ void Key_Console (int key)
 
 	if (key == K_PGUP || key==K_MWHEELUP)
 	{
-		con_backscroll += 2;
+		con_backscroll += 4;
 		if ((unsigned)con_backscroll > con_totallines - (vid.height>>3) - 1)
 			con_backscroll = con_totallines - (vid.height>>3) - 1;
 		return;
@@ -256,7 +265,7 @@ void Key_Console (int key)
 
 	if (key == K_PGDN || key==K_MWHEELDOWN)
 	{
-		con_backscroll -= 2;
+		con_backscroll -= 4;
 		if (con_backscroll < 0)
 			con_backscroll = 0;
 		return;

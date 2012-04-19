@@ -950,9 +950,10 @@ void SCR_UpdateScreen (void)
 		if (crosshair.value<32 && crosshair_tex[(int)crosshair.value] != 0)
 			Draw_Crosshair (crosshair_tex[(int)crosshair.value], colour, 0.7f);
 		else
-			if (crosshair.value)
-			{
-				Draw_Character (scr_vrect.x + scr_vrect.width/2, scr_vrect.y + scr_vrect.height/2, '+');
+			if (crosshair.value){
+				float x = (vid.conwidth /2) - 0;
+				float y = (vid.conheight/2) - 0;
+				Draw_Character (x, y, '+');
 			}
 
 		SCR_DrawRam ();
