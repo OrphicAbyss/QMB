@@ -7,9 +7,6 @@
 viddef_t    vid;                // global video state
 unsigned	d_8to24table[256];
 
-// The original defaults
-//#define    BASEWIDTH    320
-//#define    BASEHEIGHT   200
 // Much better for high resolution displays
 #define    BASEWIDTH    (800)
 #define    BASEHEIGHT   (600)
@@ -34,8 +31,6 @@ int		texture_mode = GL_LINEAR;
 //int		texture_mode = GL_LINEAR_MIPMAP_LINEAR;
 
 int		texture_extension_number = 1;
-
-
 
 //qmb :extra stuff
 qboolean gl_combine = false;
@@ -280,9 +275,6 @@ void    VID_Init (unsigned char *palette)
     vid.aspect = ((float)vid.height / (float)vid.width);
 	vid.conwidth = 640;
     vid.conheight = 640 * vid.aspect;
-
-	//vid.width = vid.conwidth;
-	//vid.height = vid.conheight;
 	vid.numpages = 2;
 
     vid.colormap = host_colormap;
@@ -428,6 +420,16 @@ void Sys_SendKeyEvents(void)
                 }
                 break;
 
+			case SDL_MOUSEBUTTONDOWN:
+			case SDL_MOUSEBUTTONUP:
+				{
+					Uint8 button = event.button.button;
+					Uint8 state = event.button.state;
+
+					Key_Event(K_MOUSE1 + button - 1, state);
+				}
+				break;
+
             case SDL_QUIT:
                 CL_Disconnect ();
                 Host_ShutdownServer(false);
@@ -454,31 +456,7 @@ void IN_Shutdown (void)
 
 void IN_Commands (void)
 {
-    int i;
-    int mouse_buttonstate;
 
-    if (!mouse_avail) return;
-
-    i = SDL_GetMouseState(NULL, NULL);
-    /* Quake swaps the second and third buttons */
-    mouse_buttonstate = (i & ~0x06) | ((i & 0x02)<<1) | ((i & 0x04)>>1);
-    for (i=0 ; i<3; i++) {
-        if ( (mouse_buttonstate & (1<<i)) && !(mouse_oldbuttonstate & (1<<i)) )
-            Key_Event (K_MOUSE1 + i, true);
-
-        if ( !(mouse_buttonstate & (1<<i)) && (mouse_oldbuttonstate & (1<<i)) )
-            Key_Event (K_MOUSE1 + i, false);
-    }
-	// mousewheel buttons
-	for (i=3 ; i<5; i++){
-		if ( (mouse_buttonstate & (1<<i)) && !(mouse_oldbuttonstate & (1<<i)) )
-            Key_Event (K_MWHEELUP + i, true);
-
-        if ( !(mouse_buttonstate & (1<<i)) && (mouse_oldbuttonstate & (1<<i)) )
-            Key_Event (K_MWHEELUP + i, false);
-
-	}
-    mouse_oldbuttonstate = mouse_buttonstate;
 }
 
 void IN_Move (usercmd_t *cmd)
