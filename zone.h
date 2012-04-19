@@ -119,6 +119,7 @@ private:
 	int size;
 
 	CacheObj(char *name, int size);
+	~CacheObj();
 public:
 	char *getName();
 	void *getData();

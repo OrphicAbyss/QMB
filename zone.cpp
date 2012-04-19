@@ -550,6 +550,11 @@ CacheObj::CacheObj(char *name, int size){
 	Q_memset(this->name,0,maxNameLength);
 	Q_strncpy(this->name,name,maxNameLength);
 	this->data = malloc(size);
+	this->size = size;
+}
+
+CacheObj::~CacheObj(){
+	free(data);
 }
 
 void CacheObj::freeData(){
@@ -576,6 +581,8 @@ static std::list<CacheObj *> cacheObjects;
 CacheObj *CacheObj::Alloc(char* name, int size){
 	CacheObj *obj = new CacheObj(name, size);
 
+	Con_DPrintf ("Allocated Cache Object: %s (Size: %8d)\n", obj->getName(), obj->getSize());
+
 	cacheObjects.push_back(obj);
 
 	return obj;
@@ -601,7 +608,7 @@ void CacheObj::Print(){
 	Con_Printf("Cache Size Debug\n---------------------------\n");
 	for (i = cacheObjects.begin(); i != cacheObjects.end(); i++){
 		CacheObj *obj = *i;
-		Con_Printf ("%8i : %s\n", obj->getSize(), obj->getName());
+		Con_Printf ("%8d : %s\n", obj->getSize(), obj->getName());
 		size += obj->getSize();
 	}
 	Con_Printf("---------------------------\nTotal size: %8i\n---------------------------\n",size);

@@ -327,18 +327,23 @@ void moncontrol(int x)
 
 int main (int c, char **v)
 {
-
 	double		time, oldtime, newtime;
 	quakeparms_t parms;
 	extern int vcrFile;
 	extern int recording;
 	static int frame;
+	int value;
 
 	moncontrol(0);
 
 	//signal(SIGFPE, SIG_IGN);
 
-	parms.memsize = 8*1024*1024;
+	value = COM_CheckParm("-mem");
+	if (value)
+		parms.memsize = (int) (Q_atof(com_argv[value+1]) * 1024 * 1024);
+	else
+		parms.memsize = 16*1024*1024;
+
 	parms.membase = malloc (parms.memsize);
 	parms.basedir = basedir;
 	parms.cachedir = cachedir;

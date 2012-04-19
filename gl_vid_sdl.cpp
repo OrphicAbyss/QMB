@@ -327,8 +327,7 @@ void Sys_SendKeyEvents(void)
                 sym = event.key.keysym.sym;
                 state = event.key.state;
                 modstate = SDL_GetModState();
-                switch(sym)
-                {
+                switch(sym) {
 					//case SDLK_BACKQUOTE: sym = '`'; break;
                    case SDLK_DELETE: sym = K_DEL; break;
                    case SDLK_BACKSPACE: sym = K_BACKSPACE; break;
@@ -463,13 +462,22 @@ void IN_Commands (void)
     i = SDL_GetMouseState(NULL, NULL);
     /* Quake swaps the second and third buttons */
     mouse_buttonstate = (i & ~0x06) | ((i & 0x02)<<1) | ((i & 0x04)>>1);
-    for (i=0 ; i<3 ; i++) {
+    for (i=0 ; i<3; i++) {
         if ( (mouse_buttonstate & (1<<i)) && !(mouse_oldbuttonstate & (1<<i)) )
             Key_Event (K_MOUSE1 + i, true);
 
         if ( !(mouse_buttonstate & (1<<i)) && (mouse_oldbuttonstate & (1<<i)) )
             Key_Event (K_MOUSE1 + i, false);
     }
+	// mousewheel buttons
+	for (i=3 ; i<5; i++){
+		if ( (mouse_buttonstate & (1<<i)) && !(mouse_oldbuttonstate & (1<<i)) )
+            Key_Event (K_MWHEELUP + i, true);
+
+        if ( !(mouse_buttonstate & (1<<i)) && (mouse_oldbuttonstate & (1<<i)) )
+            Key_Event (K_MWHEELUP + i, false);
+
+	}
     mouse_oldbuttonstate = mouse_buttonstate;
 }
 
