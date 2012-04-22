@@ -1,224 +1,352 @@
-/*
-Copyright (C) 1996-1997 Id Software, Inc.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
-// cvar.c -- dynamic variable tracking
-
 #include "quakedef.h"
 
-cvar_t	*cvar_vars;
-const char	*cvar_null_string = "";
+#include <list>
 
-/*
-============
-Cvar_FindVar
-============
-*/
-cvar_t *Cvar_FindVar (const char *var_name)
-{
-	cvar_t	*var;
+using std::list;
 
-	for (var=cvar_vars ; var ; var=var->next)
-		if (!Q_strcmp (var_name, var->name))
-			return var;
+static list<CVar *> CVars;
+
+void clearCVars(void){
+	list<CVar *>::iterator i = CVars.begin();
+
+	while (i != CVars.end()){
+		delete (*i);
+		i = CVars.erase(i);
+	}
+}
+
+/**
+ * Add a cvar to the list of cvars
+ *
+ * @param cvar The cvar to add
+ */
+void CVar::addCVar(CVar *cvar){
+	CVars.push_back(cvar);
+}
+
+/**
+ * Search the list of cvars for one with the given name
+ *
+ * @param name The cvar name to search for
+ * @return The cvar object, or null if none found
+ */
+CVar *CVar::findCVar (const char *name){
+	list<CVar *>::iterator i;
+
+	for (i = CVars.begin(); i != CVars.end(); i++){
+		CVar *cvar = *i;
+
+		if (0 == Q_strcmp(cvar->getName(),name)){
+			return cvar;
+		}
+	}
 
 	return NULL;
 }
 
-/*
-============
-Cvar_VariableValue
-============
-*/
-float	Cvar_VariableValue (char *var_name)
-{
-	cvar_t	*var;
+CVar *CVar::findNextServerCVar (const char *name){
+	list<CVar *>::iterator i;
+	bool found = false;
 
-	var = Cvar_FindVar (var_name);
-	if (!var)
-		return 0;
-	return Q_atof (var->string);
-}
+	if (name != NULL){
+		//Find the old cvar first
+		for (i = CVars.begin(); i != CVars.end(); i++){
+			CVar *cvar = *i;
 
+			if (0 == Q_strcmp(cvar->getName(),name)){
+				found = true;
+			}
+		}
+	} else {
+		// Start search for the server replicated CVars at start
+		found = true;
+		i = CVars.begin();
+	}
 
-/*
-============
-Cvar_VariableString
-============
-*/
-const char *Cvar_VariableString (const char *var_name)
-{
-	cvar_t *var;
+	if (found){
+		//Find the next server cvar
+		for (; i != CVars.end(); i++){
+			CVar *cvar = *i;
 
-	var = Cvar_FindVar (var_name);
-	if (!var)
-		return cvar_null_string;
-	return var->string;
-}
-
-
-/*
-============
-Cvar_CompleteVariable
-============
-*/
-char *Cvar_CompleteVariable (char *partial)
-{
-	cvar_t		*CVar;
-	int			len;
-
-	len = Q_strlen(partial);
-
-	if (!len)
-		return NULL;
-
-// check functions
-	for (CVar=cvar_vars ; CVar ; CVar=CVar->next)
-		if (!Q_strncmp (partial,CVar->name, len))
-			return CVar->name;
+			if (cvar->isServer()){
+				return cvar;
+			}
+		}
+	}
 
 	return NULL;
 }
 
-
-/*
-============
-Cvar_Set
-============
-*/
-void setValue (const char *var_name, char *value)
-{
-	cvar_t	*var;
-	qboolean changed;
-
-	var = Cvar_FindVar (var_name);
-	if (!var)
-	{	// there is an error in C code if this happens
-		Con_Printf ("Cvar_Set: variable %s not found\n", var_name);
-		return;
-	}
-
-	changed = Q_strcmp(var->string, value);
-
-	Z_Free (var->string);	// free the old value string
-
-	var->string = (char *)Z_Malloc (Q_strlen(value)+1);
-	Q_strcpy (var->string, value);
-	var->value = Q_atof (var->string);
-	if (var->server && changed)
-	{
-		if (sv.active)
-			SV_BroadcastPrintf ("\"%s\" changed to \"%s\"\n", var->name, var->string);
-	}
-}
-
-/*
-============
-Cvar_SetValue
-============
-*/
-void Cvar_SetValue (const char *var_name, float value)
-{
-	char	val[32];
-
-	snprintf (val,32,"%f",value);
-	setValue (var_name, val);
-}
-
-
-/*
-============
-Cvar_RegisterVariable
-
-Adds a freestanding variable to the variable list.
-============
-*/
-void Cvar_RegisterVariable (cvar_t *variable)
-{
-	char	*oldstr;
-
+/**
+ * Register a cvar by adding it to our list of active cvars. Ensures that there
+ * isn't already a cvar or command by that name.
+ *
+ * @param variable
+ */
+void CVar::registerCVar(CVar* variable){
 // first check to see if it has allready been defined
-	if (Cvar_FindVar (variable->name))
-	{
+	if (CVar::findCVar(variable->getName())) {
 		Con_Printf ("Can't register variable %s, allready defined\n", variable->name);
 		return;
 	}
 
 // check for overlap with a command
-	if (Cmd_Exists (variable->name))
-	{
+	if (Cmd_Exists (variable->getName())){
 		Con_Printf ("Cvar_RegisterVariable: %s is a command\n", variable->name);
 		return;
 	}
 
-// copy the value off, because future sets will Z_Free it
-	oldstr = variable->string;
-	variable->string = (char *)Z_Malloc (Q_strlen(variable->string)+1);
-	Q_strcpy (variable->string, oldstr);
-	variable->value = Q_atof (variable->string);
+	// assign space for the string
+	variable->reg();
 
 // link the variable in
-	variable->next = cvar_vars;
-	cvar_vars = variable;
+	addCVar(variable);
 }
 
-/*
-============
-Cvar_Command
+/**
+ * Set a cvar value given the name of the cvar and the value to set it to.
+ *
+ * @param var_name The name of the cvar to set
+ * @param value The value to set the cvar to
+ */
+void CVar::setValue(const char *var_name, const char *value){
+	CVar *var = CVar::findCVar(var_name);
 
-Handles variable inspection and changing from the console
-============
-*/
-qboolean	Cvar_Command (void)
-{
-	cvar_t			*v;
+	if (var != NULL){
+		var->set(value);
+	}
+}
+
+/**
+ * Get the float value of a cvar for the name passed in.
+ *
+ * @param name The name of the cvar
+ * @return Either the value of the cvar or 0 if the cvar doesn't exist or if it
+ *			doesn't have a float value (ie is a string value)
+ */
+float CVar::getFloatValue(char *name){
+	CVar *var = CVar::findCVar(name);
+	if (var != NULL)
+		return var->getFloat();
+	return 0;
+}
+
+/**
+ * Get the string value of a cvar for the name passed in.
+ *
+ * @param name
+ * @return
+ */
+const char *CVar::getStringValue(char *name){
+	CVar *var = CVar::findCVar(name);
+	if (var != NULL)
+		return var->getString();
+	return "";
+}
+
+/**
+ * Attempt to auto-complete a cvar name given the partial value. If there are
+ * multiple matches, print the matched names and return NULL.
+ *
+ * @param partial The partial name to match against
+ * @return the fullname of the cvar, NULL if none match or if more than one match
+ */
+char *CVar::completeVariable(char *partial){
+	list<CVar *>::iterator i;
+	CVar *match = NULL;
+	int sizeOfStr = Q_strlen(partial);
+	bool multiple = false;
+
+	for (i = CVars.begin(); i != CVars.end() && !multiple; i++){
+		CVar *cvar = *i;
+
+		if (0 == Q_strncmp(cvar->getName(),partial,sizeOfStr)){
+			if (match != NULL){
+				multiple = true;
+			} else {
+				match = cvar;
+			}
+		}
+	}
+
+	if (multiple){
+		bool first = true;
+		Con_Printf("CVars: ");
+		for (i = CVars.begin(); i != CVars.end(); i++){
+			CVar *cvar = *i;
+
+			if (0 == Q_strncmp(cvar->getName(),partial,sizeOfStr)){
+				if (first){
+					first = false;
+					Con_Printf(cvar->getName());
+				} else {
+					Con_Printf(", %s",cvar->getName());
+				}
+			}
+		}
+		Con_Printf("\n");
+		match = NULL;
+	}
+
+	if (match != NULL)
+		return match->getName();
+	else
+		return NULL;
+}
+
+/**
+ * Handles variable inspection and changing from the console
+ *
+ * @return true if the variable was found, false otherwise
+ */
+bool CVar::consoleCommand(void){
+	CVar *v;
 
 // check variables
-	v = Cvar_FindVar (Cmd_Argv(0));
+	v = CVar::findCVar(Cmd_Argv(0));
 	if (!v)
 		return false;
 
 // perform a variable print or set
-	if (Cmd_Argc() == 1)
-	{
-		Con_Printf ("\"%s\" is \"%s\"\n", v->name, v->string);
-		return true;
+	if (Cmd_Argc() == 1){
+		Con_Printf ("\"%s\" is \"%s\"\n", v->getName(), v->getString());
+	} else {
+		v->set(Cmd_Argv(1));
 	}
-
-	setValue (v->name, Cmd_Argv(1));
 	return true;
 }
 
+/**
+ * Writes lines containing "set variable value" for all variables with the
+ *  archive flag set to true.
+ *
+ * @param f File to write the variables to
+ */
+void CVar::writeVariables (FILE *f){
+	list<CVar *>::iterator i;
 
-/*
-============
-Cvar_WriteVariables
+	for (i = CVars.begin(); i != CVars.end(); i++){
+		CVar *cvar = *i;
 
-Writes lines containing "set variable value" for all variables
-with the archive flag set to true.
-============
-*/
-void Cvar_WriteVariables (FILE *f)
-{
-	cvar_t	*var;
-
-	for (var = cvar_vars ; var ; var = var->next)
-		if (var->archive)
-			fprintf (f, "%s \"%s\"\n", var->name, var->string);
+		if (cvar->isArchived())
+			fprintf (f, "%s \"%s\"\n", cvar->getName(), cvar->getString());
+	}
 }
 
+CVar::CVar(char *name, char *sValue){
+	init(name, sValue, false, false);
+}
+
+CVar::CVar(char *name, char *sValue, bool archive){
+	init(name, sValue, archive, false);
+}
+
+CVar::CVar(char *name, char *sValue, bool archive, bool server){
+	init(name, sValue, archive, server);
+}
+
+/**
+ * Initialises the cvar data (called by the constructors).
+ *
+ * @param name Name of the cvar
+ * @param sValue String value of the cvar
+ * @param archive True if the cvar is saved to configs
+ * @param server True if the cvar is sent from server to all clients when
+ *				  changed
+ */
+void CVar::init(char *name,char *sValue,bool archive,bool server){
+	this->name = name;
+	this->archive = archive;
+	this->server = server;
+
+	// use this until we register then make a copy of the string
+	this->sValue = sValue;
+	this->fValue = 0;
+	this->iValue = 0;
+	this->bValue = false;
+
+	parseValue();
+}
+
+/**
+ * Make a copy of the string into temp memory
+ */
+void CVar::reg(){
+	char *value = this->sValue;
+	this->sValue = (char *)Z_Malloc (Q_strlen(value)+1);
+	Q_strcpy (this->sValue, value);
+}
+
+/**
+ * Parse the string value into the float and integer value fields
+ */
+void CVar::parseValue(){
+	this->fValue = Q_atof(this->sValue);
+	this->iValue = Q_atoi(this->sValue);
+	this->bValue = this->iValue != 0;
+}
+
+/**
+ * Set the string value of the CVar
+ *
+ * @param value The new string value
+ */
+void CVar::set(const char *value){
+	bool changed;
+
+	changed = Q_strcmp(this->sValue, value);
+
+	// Allocate new space for the string
+	Z_Free (this->sValue);
+	this->sValue = (char *)Z_Malloc (Q_strlen(value)+1);
+	Q_strcpy (this->sValue, value);
+	// Convert the value to a float
+	this->parseValue();
+
+	if (this->server && changed) {
+		if (sv.active)
+			SV_BroadcastPrintf ("\"%s\" changed to \"%s\"\n", this->name, this->sValue);
+	}
+}
+
+void CVar::set(float value){
+	char strValue[32];
+
+	snprintf(strValue,32,"%f",value);
+	this->set(strValue);
+}
+
+void CVar::set(bool value){
+	if (value)
+		this->set("1");
+	else
+		this->set("0");
+}
+
+char *CVar::getName(){
+	return this->name;
+}
+
+char *CVar::getString(){
+	return this->sValue;
+}
+
+bool CVar::getBool(){
+	return this->bValue;
+}
+
+int CVar::getInt(){
+	return this->iValue;
+}
+
+float CVar::getFloat(){
+	return this->fValue;
+}
+
+bool CVar::isArchived(){
+	return this->archive;
+}
+
+bool CVar::isServer(){
+	return this->server;
+}

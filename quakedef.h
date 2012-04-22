@@ -195,7 +195,6 @@ typedef struct
 #include "wad.h"
 #include "draw.h"
 #include "cvar.h"
-#include "cvar_cpp.h"
 #include "screen.h"
 #include "net.h"
 #include "protocol.h"
