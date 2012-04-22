@@ -49,7 +49,7 @@ void Cbuf_InsertText (char *text);
 
 void Cbuf_Execute (void);
 // Pulls off \n terminated lines of text from the command buffer and sends
-// them through Cmd_ExecuteString.  Stops when the buffer is empty.
+// them through CmdArgs::Cmd_ExecuteString.  Stops when the buffer is empty.
 // Normally called once per frame, but may be explicitly invoked.
 // Do not call inside a command function!
 
@@ -68,52 +68,67 @@ not apropriate.
 
 typedef void (*xcommand_t) (void);
 
-typedef enum
-{
-	src_client,		// came in over a net connection as a clc_stringcmd
-					// host_client will be valid during this state.
-	src_command		// from the command buffer
-} cmd_source_t;
+class Cmd {
+private:
+	char *name;
+	xcommand_t func;
+	Cmd(const char *name, xcommand_t func);
+public:
+	char *getName();
+	void call();
+	xcommand_t getFunction();
 
-extern	cmd_source_t	cmd_source;
+	static void addCmd(const char *name, xcommand_t func);
+	static Cmd *findCmd(const char *name);
+	static char *completeCommand(char *partial);
+	static bool consoleCommand();
+};
+
+class Alias {
+private:
+	char *name;
+	char *cmdString;
+	Alias(const char *name, const char *cmdString);
+	void remove();
+public:
+	char *getName();
+	char *getCmdString();
+
+	static void addAlias(const char *name, const char *value);
+	static void removeAlias(Alias *alias);
+	static Alias *findAlias(const char *name);
+	static char *completeAlias(const char *partial);
+	static void printAliases();
+	static bool consoleCommand();
+};
+
+class MemoryObj;
+
+class CmdArgs {
+public:
+	enum Source { UNDEFINED, CLIENT, COMMAND };
+private:
+	static const int maxArgs = 80;
+	static char *cmd_null_string;
+	static MemoryObj *argvMem[maxArgs];
+	static char *argv[maxArgs];
+	static char *cmd_args;
+	static int argumentCount;
+	static Source cmd_source;
+
+	static void tokenizeString(char *text);
+public:
+	static void executeString(char *text, Source src);
+	static char *getArg(int index);
+	static char *Cmd_Args();
+	static int getArgCount();
+	static void forwardToServer();
+	static int checkParm (char *parm);
+	static Source getSource();
+	static void setSource(Source src);
+};
 
 void	Cmd_Init (void);
-
-void	Cmd_AddCommand (const char *cmd_name, xcommand_t function);
-// called by the init functions of other parts of the program to
-// register commands and functions to call for them.
-// The cmd_name is referenced later, so it should not be in temp memory
-
-qboolean Cmd_Exists (char *cmd_name);
-// used by the cvar code to check for cvar / command name overlap
-
-char 	*Cmd_CompleteCommand (char *partial);
-// attempts to match a partial command for automatic command line completion
-// returns NULL if nothing fits
-
-int		Cmd_Argc (void);
-char	*Cmd_Argv (int arg);
-char	*Cmd_Args (void);
-// The functions that execute commands get their parameters with these
-// functions. Cmd_Argv () will return an empty string, not a NULL
-// if arg > argc, so string operations are allways safe.
-
-int Cmd_CheckParm (char *parm);
-// Returns the position (1 to argc-1) in the command's argument list
-// where the given parameter apears, or 0 if not present
-
-void Cmd_TokenizeString (char *text);
-// Takes a null terminated string.  Does not need to be /n terminated.
-// breaks the string up into arg tokens.
-
-void	Cmd_ExecuteString (char *text, cmd_source_t src);
-// Parses a single line of text into arguments and tries to execute it.
-// The text can come from the command buffer, a remote client, or stdin.
-
-void	Cmd_ForwardToServer (void);
-// adds the current command line as a clc_stringcmd to the client message.
-// things like godmode, noclip, etc, are commands directed to the server,
-// so when they are typed in at the console, they will need to be forwarded.
 
 void	Cmd_Print (char *text);
 // used by command functions to send output to either the graphics console or

@@ -357,7 +357,7 @@ int Q_strcasecmp (const char *s1, const char *s2)
 #endif
 }
 
-int Q_atoi (char *str)
+int Q_atoi (const char *str)
 {
 #ifdef uselib
 	return atoi(str);
@@ -420,7 +420,7 @@ int Q_atoi (char *str)
 }
 
 
-float Q_atof (char *str)
+float Q_atof (const char *str)
 {
 #ifdef uselib
 	return atof(str);
@@ -1211,7 +1211,7 @@ void COM_Init (char *basedir)
 
 	CVar::registerCVar(&registered);
 	CVar::registerCVar(&cmdline);
-	Cmd_AddCommand ("path", COM_Path_f);
+	Cmd::addCmd("path", COM_Path_f);
 
 	COM_InitFilesystem ();
 	COM_CheckRegistered ();

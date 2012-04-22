@@ -184,8 +184,8 @@ void Sbar_Init (void)
 	sb_face_invis_invuln = Draw_PicFromWadXY ("face_inv2",48,48);
 	sb_face_quad = Draw_PicFromWadXY ("face_quad",48,48);
 
-	Cmd_AddCommand ("+showscores", Sbar_ShowScores);
-	Cmd_AddCommand ("-showscores", Sbar_DontShowScores);
+	Cmd::addCmd("+showscores", Sbar_ShowScores);
+	Cmd::addCmd("-showscores", Sbar_DontShowScores);
 
   //JHL; load from flat lump file
 	sb_sbar = Draw_CachePic ("gfx/qmb_hud_sbar_slot.lmp");

@@ -923,7 +923,7 @@ void CL_ParseServerMessage (void)
 			break;
 
 		case svc_sellscreen:
-			Cmd_ExecuteString ("help", src_command);
+			CmdArgs::executeString("help", CmdArgs::COMMAND);
 			break;
 
 		case svc_setentityflags:

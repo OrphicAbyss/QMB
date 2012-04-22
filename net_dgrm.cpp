@@ -111,11 +111,11 @@ void NET_Ban_f (void)
 	char	maskStr [32];
 	void	(*print) (const char *fmt, ...);
 
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
 		if (!sv.active)
 		{
-			Cmd_ForwardToServer ();
+			CmdArgs::forwardToServer();
 			return;
 		}
 		print = Con_Printf;
@@ -127,7 +127,7 @@ void NET_Ban_f (void)
 		print = SV_ClientPrintf;
 	}
 
-	switch (Cmd_Argc ())
+	switch (CmdArgs::getArgCount ())
 	{
 		case 1:
 			if (((struct in_addr *)&banAddr)->s_addr)
@@ -141,16 +141,16 @@ void NET_Ban_f (void)
 			break;
 
 		case 2:
-			if (Q_strcasecmp(Cmd_Argv(1), "off") == 0)
+			if (Q_strcasecmp(CmdArgs::getArg(1), "off") == 0)
 				banAddr = 0x00000000;
 			else
-				banAddr = inet_addr(Cmd_Argv(1));
+				banAddr = inet_addr(CmdArgs::getArg(1));
 			banMask = 0xffffffff;
 			break;
 
 		case 3:
-			banAddr = inet_addr(Cmd_Argv(1));
-			banMask = inet_addr(Cmd_Argv(2));
+			banAddr = inet_addr(CmdArgs::getArg(1));
+			banMask = inet_addr(CmdArgs::getArg(2));
 			break;
 
 		default:
@@ -478,7 +478,7 @@ void NET_Stats_f (void)
 {
 	qsocket_t	*s;
 
-	if (Cmd_Argc () == 1)
+	if (CmdArgs::getArgCount () == 1)
 	{
 		Con_Printf("unreliable messages sent   = %i\n", unreliableMessagesSent);
 		Con_Printf("unreliable messages recv   = %i\n", unreliableMessagesReceived);
@@ -491,7 +491,7 @@ void NET_Stats_f (void)
 		Con_Printf("shortPacketCount           = %i\n", shortPacketCount);
 		Con_Printf("droppedDatagrams           = %i\n", droppedDatagrams);
 	}
-	else if (Q_strcmp(Cmd_Argv(1), "*") == 0)
+	else if (Q_strcmp(CmdArgs::getArg(1), "*") == 0)
 	{
 		for (s = net_activeSockets; s; s = s->next)
 			PrintStats(s);
@@ -501,11 +501,11 @@ void NET_Stats_f (void)
 	else
 	{
 		for (s = net_activeSockets; s; s = s->next)
-			if (Q_strcasecmp(Cmd_Argv(1), s->address) == 0)
+			if (Q_strcasecmp(CmdArgs::getArg(1), s->address) == 0)
 				break;
 		if (s == NULL)
 			for (s = net_freeSockets; s; s = s->next)
-				if (Q_strcasecmp(Cmd_Argv(1), s->address) == 0)
+				if (Q_strcasecmp(CmdArgs::getArg(1), s->address) == 0)
 					break;
 		if (s == NULL)
 			return;
@@ -589,7 +589,7 @@ static void Test_f (void)
 	if (testInProgress)
 		return;
 
-	host = Cmd_Argv (1);
+	host = CmdArgs::getArg (1);
 
 	if (host && hostCacheCount)
 	{
@@ -717,7 +717,7 @@ static void Test2_f (void)
 	if (test2InProgress)
 		return;
 
-	host = Cmd_Argv (1);
+	host = CmdArgs::getArg (1);
 
 	if (host && hostCacheCount)
 	{
@@ -772,7 +772,7 @@ int Datagram_Init (void)
 	int csock;
 
 	myDriverLevel = net_driverlevel;
-	Cmd_AddCommand ("net_stats", NET_Stats_f);
+	Cmd::addCmd("net_stats", NET_Stats_f);
 
 	if (COM_CheckParm("-nolan"))
 		return -1;
@@ -787,10 +787,10 @@ int Datagram_Init (void)
 		}
 
 #ifdef BAN_TEST
-	Cmd_AddCommand ("ban", NET_Ban_f);
+	Cmd::addCmd("ban", NET_Ban_f);
 #endif
-	Cmd_AddCommand ("test", Test_f);
-	Cmd_AddCommand ("test2", Test2_f);
+	Cmd::addCmd("test", Test_f);
+	Cmd::addCmd("test2", Test2_f);
 
 	return 0;
 }

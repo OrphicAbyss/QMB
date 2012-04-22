@@ -3644,20 +3644,20 @@ void M_ServerList_Key (int k)
 
 void M_Init (void)
 {
-	Cmd_AddCommand ("togglemenu", M_ToggleMenu_f);
+	Cmd::addCmd("togglemenu", M_ToggleMenu_f);
 
-	Cmd_AddCommand ("menu_main", M_Menu_Main_f);
-	Cmd_AddCommand ("menu_singleplayer", M_Menu_SinglePlayer_f);
-	Cmd_AddCommand ("menu_load", M_Menu_Load_f);
-	Cmd_AddCommand ("menu_save", M_Menu_Save_f);
-	Cmd_AddCommand ("menu_multiplayer", M_Menu_MultiPlayer_f);
-	Cmd_AddCommand ("menu_setup", M_Menu_Setup_f);
-	Cmd_AddCommand ("menu_options", M_Menu_Options_f);
-	Cmd_AddCommand ("menu_keys", M_Menu_Keys_f);
-	Cmd_AddCommand ("menu_video", M_Menu_Video_f);
-	Cmd_AddCommand ("help", M_Menu_Help_f);
-	Cmd_AddCommand ("menu_quit", M_Menu_Quit_f);
-	Cmd_AddCommand ("credits", M_Menu_Credits_f);
+	Cmd::addCmd("menu_main", M_Menu_Main_f);
+	Cmd::addCmd("menu_singleplayer", M_Menu_SinglePlayer_f);
+	Cmd::addCmd("menu_load", M_Menu_Load_f);
+	Cmd::addCmd("menu_save", M_Menu_Save_f);
+	Cmd::addCmd("menu_multiplayer", M_Menu_MultiPlayer_f);
+	Cmd::addCmd("menu_setup", M_Menu_Setup_f);
+	Cmd::addCmd("menu_options", M_Menu_Options_f);
+	Cmd::addCmd("menu_keys", M_Menu_Keys_f);
+	Cmd::addCmd("menu_video", M_Menu_Video_f);
+	Cmd::addCmd("help", M_Menu_Help_f);
+	Cmd::addCmd("menu_quit", M_Menu_Quit_f);
+	Cmd::addCmd("credits", M_Menu_Credits_f);
 }
 
 void M_Draw (void)

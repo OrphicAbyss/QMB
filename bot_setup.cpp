@@ -197,15 +197,15 @@ void NextFreeClient (void)
 	int			i, color;
 	char		name[32];
 
-	if (Cmd_Argc() == 2)
+	if (CmdArgs::getArgCount() == 2)
 	{
-		color = Q_atoi(Cmd_Argv(1));
+		color = Q_atoi(CmdArgs::getArg(1));
 		sprintf (name, "0");
 	}
-	else if (Cmd_Argc() == 3)
+	else if (CmdArgs::getArgCount() == 3)
 	{
-		color = Q_atoi(Cmd_Argv(1));
-		sprintf (name, "%s", Cmd_Argv(2));
+		color = Q_atoi(CmdArgs::getArg(1));
+		sprintf (name, "%s", CmdArgs::getArg(2));
 	}
 	else
 	{

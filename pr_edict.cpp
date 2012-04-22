@@ -557,7 +557,7 @@ void ED_PrintEdict_f (void)
 {
 	int		i;
 
-	i = Q_atoi (Cmd_Argv(1));
+	i = Q_atoi (CmdArgs::getArg(1));
 	if (i >= sv.num_edicts)
 	{
 		Con_Printf("Bad edict number\n");
@@ -1076,10 +1076,10 @@ void JVM_Init (void);
 #endif
 
 void PR_Init (void){
-	Cmd_AddCommand ("edict", ED_PrintEdict_f);
-	Cmd_AddCommand ("edicts", ED_PrintEdicts);
-	Cmd_AddCommand ("edictcount", ED_Count);
-	Cmd_AddCommand ("profile", PR_Profile_f);
+	Cmd::addCmd("edict", ED_PrintEdict_f);
+	Cmd::addCmd("edicts", ED_PrintEdicts);
+	Cmd::addCmd("edictcount", ED_Count);
+	Cmd::addCmd("profile", PR_Profile_f);
 	CVar::registerCVar(&pr_checkextension); //LH's checkextensions
 	CVar::registerCVar(&nomonsters);
 	CVar::registerCVar(&gamecfg);

@@ -241,10 +241,10 @@ void Con_Init (void)
 // register our commands
 	CVar::registerCVar(&con_notifytime);
 
-	Cmd_AddCommand ("toggleconsole", Con_ToggleConsole_f);
-	Cmd_AddCommand ("messagemode", Con_MessageMode_f);
-	Cmd_AddCommand ("messagemode2", Con_MessageMode2_f);
-	Cmd_AddCommand ("clear", Con_Clear_f);
+	Cmd::addCmd("toggleconsole", Con_ToggleConsole_f);
+	Cmd::addCmd("messagemode", Con_MessageMode_f);
+	Cmd::addCmd("messagemode2", Con_MessageMode2_f);
+	Cmd::addCmd("clear", Con_Clear_f);
 	con_initialized = true;
 }
 

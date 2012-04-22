@@ -340,14 +340,14 @@ void Mem_PrintList(int listallocations)
 
 void MemList_f(void)
 {
-	switch(Cmd_Argc())
+	switch(CmdArgs::getArgCount())
 	{
 	case 1:
 		Mem_PrintList(false);
 		Mem_PrintStats();
 		break;
 	case 2:
-		if (!Q_strcmp(Cmd_Argv(1), "all"))
+		if (!Q_strcmp(CmdArgs::getArg(1), "all"))
 		{
 			Mem_PrintList(true);
 			Mem_PrintStats();

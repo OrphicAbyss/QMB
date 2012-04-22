@@ -136,7 +136,7 @@ int CDAudio_Init()
 		Con_Printf("CDAudio_Init: CD contains no audio tracks.\n");
 		cdValid = false;
 	}
-	Cmd_AddCommand("cd",CD_f);
+	Cmd::addCmd("cd",CD_f);
 	Con_Printf("CD Audio Initialized.\n");
 	return 0;
 }
@@ -154,9 +154,9 @@ static void CD_f()
 {
 	char *command;
 	int cdstate;
-	if(Cmd_Argc() < 2) return;
+	if(CmdArgs::getArgCount() < 2) return;
 
-	command = Cmd_Argv(1);
+	command = CmdArgs::getArg(1);
 	if(!Q_strcasecmp(command,"on"))
 	{
 		enabled = true;
@@ -172,12 +172,12 @@ static void CD_f()
 	}
 	if(!Q_strcasecmp(command,"play"))
 	{
-		CDAudio_Play(Q_atoi(Cmd_Argv(2)),false);
+		CDAudio_Play(Q_atoi(CmdArgs::getArg(2)),false);
 		return;
 	}
 	if(!Q_strcasecmp(command,"loop"))
 	{
-		CDAudio_Play(Q_atoi(Cmd_Argv(2)),true);
+		CDAudio_Play(Q_atoi(CmdArgs::getArg(2)),true);
 		return;
 	}
 	if(!Q_strcasecmp(command,"stop"))

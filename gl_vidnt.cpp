@@ -1259,7 +1259,7 @@ void VID_DescribeMode_f (void)
 {
 	int		t, modenum;
 
-	modenum = Q_atoi (Cmd_Argv(1));
+	modenum = Q_atoi (CmdArgs::getArg(1));
 
 	t = leavecurrentmode;
 	leavecurrentmode = 0;

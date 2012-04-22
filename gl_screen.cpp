@@ -376,9 +376,9 @@ void SCR_Init (void)
 	CVar::registerCVar(&gl_triplebuffer);
 
 // register our commands
-	Cmd_AddCommand ("screenshot",SCR_ScreenShot_f);
-	Cmd_AddCommand ("sizeup",SCR_SizeUp_f);
-	Cmd_AddCommand ("sizedown",SCR_SizeDown_f);
+	Cmd::addCmd("screenshot",SCR_ScreenShot_f);
+	Cmd::addCmd("sizeup",SCR_SizeUp_f);
+	Cmd::addCmd("sizedown",SCR_SizeDown_f);
 
 	scr_ram = Draw_PicFromWad ("ram");
 	scr_net = Draw_PicFromWad ("net");

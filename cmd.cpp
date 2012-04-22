@@ -20,23 +20,227 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cmd.c -- Quake script command processing module
 
 #include "quakedef.h"
-#include "common.h"
 
-void Cmd_ForwardToServer (void);
+#include <list>
 
-#define	MAX_ALIAS_NAME	32
+using std::list;
 
-typedef struct cmdalias_s
-{
-	struct cmdalias_s	*next;
-	char	name[MAX_ALIAS_NAME];
-	char	*value;
-} cmdalias_t;
+static list<Cmd *> Cmds;
 
-cmdalias_t	*cmd_alias;
+Cmd::Cmd(const char* name, xcommand_t func){
+	this->name = (char *)Z_Malloc (Q_strlen(name)+1);
+	Q_strcpy (this->name, name);
+	this->func = func;
+}
 
-int trashtest;
-int *trashspot;
+char *Cmd::getName(){
+	return this->name;
+}
+
+void Cmd::call(){
+	this->func();
+}
+
+xcommand_t Cmd::getFunction(){
+	return this->func;
+}
+
+void Cmd::addCmd(const char* name, xcommand_t func){
+	// fail if the command is a variable name
+	if (CVar::findCVar(name)){
+		Con_Printf ("Command: %s already defined as a cvar\n", name);
+		return;
+	}
+
+	// fail if the command already exists
+	if (Cmd::findCmd(name)){
+		Con_Printf ("Command: %s already defined\n", name);
+		return;
+	}
+
+	Cmd *cmd = new Cmd(name,func);
+	Cmds.push_back(cmd);
+}
+
+Cmd *Cmd::findCmd(const char* name){
+	list<Cmd *>::iterator i;
+
+	for (i = Cmds.begin(); i != Cmds.end(); i++){
+		Cmd *cmd = *i;
+
+		if (0 == Q_strcmp(cmd->getName(),name)){
+			return cmd;
+		}
+	}
+
+	return NULL;
+}
+
+bool Cmd::consoleCommand(){
+	Cmd *cmd = Cmd::findCmd(CmdArgs::getArg(0));
+
+	if (cmd){
+		cmd->call();
+		return true;
+	}
+	return false;
+}
+
+char *Cmd::completeCommand(char* partial){
+	list<Cmd *>::iterator i;
+	Cmd *match = NULL;
+	int sizeOfStr = Q_strlen(partial);
+	bool multiple = false;
+
+	for (i = Cmds.begin(); i != Cmds.end() && !multiple; i++){
+		Cmd *cmd = *i;
+
+		if (0 == Q_strncmp(cmd->getName(),partial,sizeOfStr)){
+			if (match != NULL){
+				multiple = true;
+			} else {
+				match = cmd;
+			}
+		}
+	}
+
+	if (multiple){
+		bool first = true;
+		Con_Printf("Commands: ");
+		for (i = Cmds.begin(); i != Cmds.end(); i++){
+			Cmd *cmd = *i;
+
+			if (0 == Q_strncmp(cmd->getName(),partial,sizeOfStr)){
+				if (first){
+					first = false;
+					Con_Printf(cmd->getName());
+				} else {
+					Con_Printf(", %s",cmd->getName());
+				}
+			}
+		}
+		Con_Printf("\n");
+		match = NULL;
+	}
+
+	if (match != NULL)
+		return match->getName();
+	else
+		return NULL;
+}
+
+
+
+static list<Alias *> Aliases;
+
+Alias::Alias(const char* name, const char* cmdString){
+	this->name = (char *)Z_Malloc (Q_strlen(name)+1);
+	Q_strcpy (this->name, name);
+	this->cmdString = (char *)Z_Malloc (Q_strlen(cmdString)+1);
+	Q_strcpy (this->cmdString, cmdString);
+}
+
+void Alias::remove(){
+	Z_Free(this->name);
+	Z_Free(this->cmdString);
+}
+
+char *Alias::getName(){
+	return this->name;
+}
+
+char *Alias::getCmdString(){
+	return this->cmdString;
+}
+
+void Alias::addAlias(const char* name, const char* value){
+	Alias *alias = new Alias(name,value);
+	Aliases.push_back(alias);
+}
+
+void Alias::removeAlias(Alias* alias){
+	Aliases.remove(alias);
+	delete alias;
+}
+
+Alias *Alias::findAlias(const char* name){
+	list<Alias *>::iterator i;
+
+	for (i = Aliases.begin(); i != Aliases.end(); i++){
+		Alias *alias = *i;
+
+		if (0 == Q_strcmp(alias->getName(),name)){
+			return alias;
+		}
+	}
+
+	return NULL;
+}
+
+char *Alias::completeAlias(const char* partial){
+	list<Alias *>::iterator i;
+	Alias *match = NULL;
+	int sizeOfStr = Q_strlen(partial);
+	bool multiple = false;
+
+	for (i = Aliases.begin(); i != Aliases.end() && !multiple; i++){
+		Alias *alias = *i;
+
+		if (0 == Q_strncmp(alias->getName(),partial,sizeOfStr)){
+			if (match != NULL){
+				multiple = true;
+			} else {
+				match = alias;
+			}
+		}
+	}
+
+	if (multiple){
+		bool first = true;
+		Con_Printf("Aliases: ");
+		for (i = Aliases.begin(); i != Aliases.end(); i++){
+			Alias *alias = *i;
+
+			if (0 == Q_strncmp(alias->getName(),partial,sizeOfStr)){
+				if (first){
+					first = false;
+					Con_Printf(alias->getName());
+				} else {
+					Con_Printf(", %s",alias->getName());
+				}
+			}
+		}
+		Con_Printf("\n");
+		match = NULL;
+	}
+
+	if (match != NULL)
+		return match->getName();
+	else
+		return NULL;
+}
+
+void Alias::printAliases(){
+	list<Alias *>::iterator i;
+
+	Con_Printf ("Current alias commands:\n");
+
+	for (i = Aliases.begin(); i != Aliases.end(); i++){
+		Alias *alias = *i;
+
+		Con_Printf ("%s : %s\n", alias->getName(), alias->getCmdString());
+	}
+}
+
+bool Alias::consoleCommand(){
+	Alias *alias = Alias::findAlias(CmdArgs::CmdArgs::getArg(0));
+
+	if (alias){
+		Cbuf_InsertText (alias->getCmdString());
+		return true;
+	}
+	return false;
+}
 
 qboolean	cmd_wait;
 
@@ -182,7 +386,7 @@ void Cbuf_Execute (void)
 		}
 
 // execute the command line
-		Cmd_ExecuteString (line, src_command);
+		CmdArgs::executeString(line, CmdArgs::COMMAND);
 
 		if (cmd_wait)
 		{	// skip out while text still remains in buffer, leaving it
@@ -217,7 +421,7 @@ void Cmd_StuffCmds_f (void)
 	int		s;
 	char	*text, *build, c;
 
-	if (Cmd_Argc () != 1)
+	if (CmdArgs::getArgCount () != 1)
 	{
 		Con_Printf ("stuffcmds : execute command line parameters\n");
 		return;
@@ -286,20 +490,20 @@ void Cmd_Exec_f (void)
 	char	*f;
 	int		mark;
 
-	if (Cmd_Argc () != 2)
+	if (CmdArgs::CmdArgs::getArgCount () != 2)
 	{
 		Con_Printf ("exec <filename> : execute a script file\n");
 		return;
 	}
 
 	mark = Hunk_LowMark ();
-	f = (char *)COM_LoadHunkFile (Cmd_Argv(1));
+	f = (char *)COM_LoadHunkFile (CmdArgs::CmdArgs::getArg(1));
 	if (!f)
 	{
-		Con_Printf ("couldn't exec %s\n",Cmd_Argv(1));
+		Con_Printf ("couldn't exec %s\n",CmdArgs::CmdArgs::getArg(1));
 		return;
 	}
-	Con_Printf ("execing %s\n",Cmd_Argv(1));
+	Con_Printf ("execing %s\n",CmdArgs::CmdArgs::getArg(1));
 
 	Cbuf_InsertText (f);
 	Hunk_FreeToLowMark (mark);
@@ -317,8 +521,8 @@ void Cmd_Echo_f (void)
 {
 	int		i;
 
-	for (i=1 ; i<Cmd_Argc() ; i++)
-		Con_Printf ("%s ",Cmd_Argv(i));
+	for (i=1 ; i<CmdArgs::CmdArgs::getArgCount() ; i++)
+		Con_Printf ("%s ",CmdArgs::CmdArgs::getArg(i));
 	Con_Printf ("\n");
 }
 
@@ -329,68 +533,40 @@ Cmd_Alias_f
 Creates a new command that executes a command string (possibly ; seperated)
 ===============
 */
-
-char *CopyString (char *in)
-{
-	char	*out;
-
-	out = (char *)Z_Malloc (Q_strlen(in)+1);
-	Q_strcpy (out, in);
-	return out;
-}
-
 void Cmd_Alias_f (void)
 {
-	cmdalias_t	*a;
 	char		cmd[1024];
-	int			i, c;
-	char		*s;
+	int			i, maxArgs;
+	const char	*aliasName;
 
-	if (Cmd_Argc() == 1)
-	{
-		Con_Printf ("Current alias commands:\n");
-		for (a = cmd_alias ; a ; a=a->next)
-			Con_Printf ("%s : %s\n", a->name, a->value);
+	Q_memset(cmd,0,1024);
+
+	if (CmdArgs::CmdArgs::getArgCount() == 1){
+		Alias::printAliases();
 		return;
 	}
 
-	s = Cmd_Argv(1);
-	if (Q_strlen(s) >= MAX_ALIAS_NAME)
-	{
-		Con_Printf ("Alias name is too long\n");
-		return;
-	}
+	aliasName = CmdArgs::CmdArgs::getArg(1);
 
-	// if the alias allready exists, reuse it
-	for (a = cmd_alias ; a ; a=a->next)
-	{
-		if (!Q_strcmp(s, a->name))
-		{
-			Z_Free (a->value);
-			break;
-		}
+	// if the alias already exists, delete the old one
+	Alias *a = Alias::findAlias(aliasName);
+	if (a){
+		Alias::removeAlias(a);
 	}
-
-	if (!a)
-	{
-		a = (cmdalias_t *)Z_Malloc (sizeof(cmdalias_t));
-		a->next = cmd_alias;
-		cmd_alias = a;
-	}
-	Q_strcpy (a->name, s);
 
 // copy the rest of the command line
 	cmd[0] = 0;		// start out with a null string
-	c = Cmd_Argc();
-	for (i=2 ; i< c ; i++)
+	maxArgs = CmdArgs::CmdArgs::getArgCount();
+	for (i=2 ; i< maxArgs ; i++)
 	{
-		Q_strcat (cmd, Cmd_Argv(i));
-		if (i != c)
+		Q_strcat (cmd, CmdArgs::CmdArgs::getArg(i));
+		if (i != maxArgs)
 			Q_strcat (cmd, " ");
 	}
 	Q_strcat (cmd, "\n");
 
-	a->value = CopyString (cmd);
+	//Create an alias
+	Alias::addAlias(aliasName,cmd);
 }
 
 /*
@@ -400,26 +576,6 @@ void Cmd_Alias_f (void)
 
 =============================================================================
 */
-
-typedef struct cmd_function_s
-{
-	struct cmd_function_s	*next;
-	char					*name;
-	xcommand_t				function;
-} cmd_function_t;
-
-
-#define	MAX_ARGS		80
-
-static	int		cmd_argc;
-static	char	*cmd_argv[MAX_ARGS];
-static	char	*cmd_null_string = "";
-static	char	*cmd_args = NULL;
-
-cmd_source_t	cmd_source;
-
-
-static	cmd_function_t	*cmd_functions;		// possible commands to execute
 
 /*
 ============
@@ -431,266 +587,120 @@ void Cmd_Init (void)
 //
 // register our commands
 //
-	Cmd_AddCommand ("stuffcmds",Cmd_StuffCmds_f);
-	Cmd_AddCommand ("exec",Cmd_Exec_f);
-	Cmd_AddCommand ("echo",Cmd_Echo_f);
-	Cmd_AddCommand ("alias",Cmd_Alias_f);
-	Cmd_AddCommand ("cmd", Cmd_ForwardToServer);
-	Cmd_AddCommand ("wait", Cmd_Wait_f);
+	Cmd::addCmd("stuffcmds",Cmd_StuffCmds_f);
+	Cmd::addCmd("exec",Cmd_Exec_f);
+	Cmd::addCmd("echo",Cmd_Echo_f);
+	Cmd::addCmd("alias",Cmd_Alias_f);
+	Cmd::addCmd("cmd", CmdArgs::forwardToServer);
+	Cmd::addCmd("wait", Cmd_Wait_f);
 }
 
-/*
-============
-Cmd_Argc
-============
-*/
-int		Cmd_Argc (void)
-{
-	return cmd_argc;
+char *CmdArgs::cmd_null_string = "";
+char *CmdArgs::argv [80] = {};
+char *CmdArgs::cmd_args = NULL;
+int CmdArgs::argumentCount = 0;
+CmdArgs::Source CmdArgs::cmd_source = COMMAND;
+
+int CmdArgs::getArgCount(void){
+	return argumentCount;
 }
 
-/*
-============
-Cmd_Argv
-============
-*/
-char	*Cmd_Argv (int arg)
-{
-	if ( (unsigned)arg >= (unsigned)cmd_argc )
+char *CmdArgs::getArg(int arg){
+	if (arg >= argumentCount )
 		return cmd_null_string;
-	return cmd_argv[arg];
+	return argv[arg];
 }
 
-/*
-============
-Cmd_Args
-============
-*/
-char		*Cmd_Args (void)
-{
+char *CmdArgs::Cmd_Args(){
 	return cmd_args;
 }
 
+CmdArgs::Source CmdArgs::getSource(){
+	return cmd_source;
+}
 
-/*
-============
-Cmd_TokenizeString
+void CmdArgs::setSource(Source src){
+	cmd_source = src;
+}
 
-Parses the given string into command line tokens.
-============
-*/
-void Cmd_TokenizeString (char *text)
-{
+/**
+ * Parses the given string into command line tokens.
+ */
+void CmdArgs::tokenizeString(char *text){
 	int		i;
 
 // clear the args from the last string
-	for (i=0 ; i<cmd_argc ; i++)
-		Z_Free (cmd_argv[i]);
+	for (i=0 ; i<argumentCount ; i++)
+		Z_Free (getArg(i));
 
-	cmd_argc = 0;
+	argumentCount = 0;
 	cmd_args = NULL;
 
-	while (1)
-	{
-// skip whitespace up to a /n
-		while (*text && *text <= ' ' && *text != '\n')
-		{
+	while (true){
+		// skip whitespace up to a /n
+		while (*text && *text <= ' ' && *text != '\n'){
 			text++;
 		}
 
-		if (*text == '\n')
-		{	// a newline seperates commands in the buffer
+		// a newline separates commands in the buffer
+		if (*text == '\n'){
 			text++;
 			break;
 		}
 
+		// if we have reached the end of the text, return
 		if (!*text)
 			return;
 
-		if (cmd_argc == 1)
+		if (argumentCount == 1)
 			 cmd_args = text;
 
-		text = COM_Parse (text);
+		text = COM_Parse(text);
 		if (!text)
 			return;
 
-		if (cmd_argc < MAX_ARGS)
-		{
-			cmd_argv[cmd_argc] = (char *)Z_Malloc (Q_strlen(com_token)+1);
-			Q_strcpy (cmd_argv[cmd_argc], com_token);
-			cmd_argc++;
+		if (argumentCount < maxArgs){
+			argv[argumentCount] = (char *)Z_Malloc (Q_strlen(com_token)+1);
+			Q_strcpy (argv[argumentCount], com_token);
+			argumentCount++;
 		}
 	}
 
 }
 
-
-/*
-============
-Cmd_AddCommand
-============
-*/
-void	Cmd_AddCommand (const char *cmd_name, xcommand_t function)
+/**
+ * A complete command line has been parsed, so try to execute it
+ */
+void CmdArgs::executeString(char *text, Source src)
 {
-	cmd_function_t	*cmd;
+	setSource(src);
+	tokenizeString(text);
 
-	if (host_initialized)	// because hunk allocation would get stomped
-		Sys_Error ("Cmd_AddCommand after host_initialized");
-
-// fail if the command is a variable name
-	if (CVar::findCVar(cmd_name)){
-		Con_Printf ("Cmd_AddCommand: %s already defined as a var\n", cmd_name);
-		return;
-	}
-
-// fail if the command already exists
-	for (cmd=cmd_functions ; cmd ; cmd=cmd->next)
-	{
-		if (!Q_strcmp (cmd_name, cmd->name))
-		{
-			Con_Printf ("Cmd_AddCommand: %s already defined\n", cmd_name);
-			return;
-		}
-	}
-
-	cmd = (cmd_function_t *)Hunk_Alloc (sizeof(cmd_function_t));
-	cmd->name = (char *)cmd_name;
-	cmd->function = function;
-	cmd->next = cmd_functions;
-	cmd_functions = cmd;
-}
-
-/*
-============
-Cmd_Exists
-============
-*/
-qboolean	Cmd_Exists (char *cmd_name)
-{
-	cmd_function_t	*cmd;
-
-	for (cmd=cmd_functions ; cmd ; cmd=cmd->next)
-	{
-		if (!Q_strcmp (cmd_name,cmd->name))
-			return true;
-	}
-
-	return false;
-}
-
-
-
-/*
-============
-Cmd_CompleteCommand
-============
-*/
-char *Cmd_CompleteCommand (char *partial)
-{
-	cmd_function_t	*cmd = NULL;
-	cmd_function_t	*found = NULL;
-	int				len;
-	bool			multiple = false;
-
-	len = Q_strlen(partial);
-
-	if (!len)
-		return NULL;
-
-// check functions
-	for (cmd=cmd_functions ; cmd && !multiple ; cmd=cmd->next){
-		if (!Q_strncmp (partial,cmd->name, len)){
-			if (found != NULL)
-				found = cmd;
-			else
-				multiple = true;
-		}
-	}
-
-// Found multiple matches, print out all options
-	if (multiple){
-		bool first = true;
-		Con_Printf("Commands: ");
-		for (cmd=cmd_functions ; cmd ; cmd=cmd->next){
-			if (!Q_strncmp (partial,cmd->name, len)){
-				if (first){
-					first = false;
-					Con_Printf(cmd->name);
-				} else {
-					Con_Printf(", %s",cmd->name);
-				}
-			}
-		}
-		Con_Printf("\n");
-
-		found = NULL;
-	}
-
-	if (found != NULL)
-		return found->name;
-	else
-		return NULL;
-}
-
-/*
-============
-Cmd_ExecuteString
-
-A complete command line has been parsed, so try to execute it
-FIXME: lookupnoadd the token to speed search?
-============
-*/
-void	Cmd_ExecuteString (char *text, cmd_source_t src)
-{
-	cmd_function_t	*cmd;
-	cmdalias_t		*a;
-
-	cmd_source = src;
-	Cmd_TokenizeString (text);
-
-// execute the command line
-	if (!Cmd_Argc())
+	// execute the command line
+	if (!CmdArgs::getArgCount())
 		return;		// no tokens
 
-// check functions
-	for (cmd=cmd_functions ; cmd ; cmd=cmd->next)
-	{
-		if (!Q_strcasecmp (cmd_argv[0],cmd->name))
-		{
-			cmd->function ();
-			return;
-		}
-	}
+	// check commands
+	if (Cmd::consoleCommand())
+		return;
 
-// check alias
-	for (a=cmd_alias ; a ; a=a->next)
-	{
-		if (!Q_strcasecmp (cmd_argv[0], a->name))
-		{
-			Cbuf_InsertText (a->value);
-			return;
-		}
-	}
+	// check aliases
+	if (Alias::consoleCommand())
+		return;
 
-// check cvars
+	// check cvar
 	if (!CVar::consoleCommand())
-		Con_Printf ("Unknown command \"%s\"\n", Cmd_Argv(0));
-
+		Con_Printf ("Unknown command \"%s\"\n", getArg(0));
 }
 
 
-/*
-===================
-Cmd_ForwardToServer
-
-Sends the entire command line over to the server
-===================
-*/
-void Cmd_ForwardToServer (void)
-{
+/**
+ * Sends the entire command line over to the server
+ */
+void CmdArgs::forwardToServer(){
 	if (cls.state != ca_connected)
 	{
-		Con_Printf ("Can't \"%s\", not connected\n", Cmd_Argv(0));
+		Con_Printf ("Can't \"%s\", not connected\n", getArg(0));
 		return;
 	}
 
@@ -698,36 +708,29 @@ void Cmd_ForwardToServer (void)
 		return;		// not really connected
 
 	MSG_WriteByte (&cls.message, clc_stringcmd);
-	if (Q_strcasecmp(Cmd_Argv(0), "cmd") != 0)
+	if (Q_strcasecmp(getArg(0), "cmd") != 0)
 	{
-		SZ_Print (&cls.message, Cmd_Argv(0));
+		SZ_Print (&cls.message, getArg(0));
 		SZ_Print (&cls.message, " ");
 	}
-	if (Cmd_Argc() > 1)
-		SZ_Print (&cls.message, Cmd_Args());
+	if (getArgCount() > 1)
+		SZ_Print (&cls.message, CmdArgs::Cmd_Args());
 	else
 		SZ_Print (&cls.message, "\n");
 }
 
-
-/*
-================
-Cmd_CheckParm
-
-Returns the position (1 to argc-1) in the command's argument list
-where the given parameter apears, or 0 if not present
-================
-*/
-
-int Cmd_CheckParm (char *parm)
-{
+/**
+ * Returns the position (1 to argc-1) in the command's argument list where the
+ *  given parameter appears, or 0 if not present
+ */
+int CmdArgs::checkParm (char *parm){
 	int i;
 
 	if (!parm)
 		Sys_Error ("Cmd_CheckParm: NULL");
 
-	for (i = 1; i < Cmd_Argc (); i++)
-		if (! Q_strcasecmp (parm, Cmd_Argv (i)))
+	for (i = 1; i < CmdArgs::getArgCount(); i++)
+		if (! Q_strcasecmp (parm, CmdArgs::getArg (i)))
 			return i;
 
 	return 0;

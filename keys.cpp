@@ -198,7 +198,7 @@ void Key_Console (int key)
 
 	if (key == K_TAB)
 	{	// command completion
-		cmd = Cmd_CompleteCommand (key_lines[edit_line]+1);
+		cmd = Cmd::completeCommand(key_lines[edit_line]+1);
 		if (!cmd)
 			cmd = CVar::completeVariable(key_lines[edit_line]+1);
 		if (cmd){
@@ -472,16 +472,16 @@ void Key_Unbind_f (void)
 {
 	int		b;
 
-	if (Cmd_Argc() != 2)
+	if (CmdArgs::getArgCount() != 2)
 	{
 		Con_Printf ("unbind <key> : remove commands from a key\n");
 		return;
 	}
 
-	b = Key_StringToKeynum (Cmd_Argv(1));
+	b = Key_StringToKeynum (CmdArgs::getArg(1));
 	if (b==-1)
 	{
-		Con_Printf ("\"%s\" isn't a valid key\n", Cmd_Argv(1));
+		Con_Printf ("\"%s\" isn't a valid key\n", CmdArgs::getArg(1));
 		return;
 	}
 
@@ -508,26 +508,26 @@ void Key_Bind_f (void)
 	int			i, c, b;
 	char		cmd[1024];
 
-	c = Cmd_Argc();
+	c = CmdArgs::getArgCount();
 
 	if (c != 2 && c != 3)
 	{
 		Con_Printf ("bind <key> [command] : attach a command to a key\n");
 		return;
 	}
-	b = Key_StringToKeynum (Cmd_Argv(1));
+	b = Key_StringToKeynum (CmdArgs::getArg(1));
 	if (b==-1)
 	{
-		Con_Printf ("\"%s\" isn't a valid key\n", Cmd_Argv(1));
+		Con_Printf ("\"%s\" isn't a valid key\n", CmdArgs::getArg(1));
 		return;
 	}
 
 	if (c == 2)
 	{
 		if (keybindings[b])
-			Con_Printf ("\"%s\" = \"%s\"\n", Cmd_Argv(1), keybindings[b] );
+			Con_Printf ("\"%s\" = \"%s\"\n", CmdArgs::getArg(1), keybindings[b] );
 		else
-			Con_Printf ("\"%s\" is not bound\n", Cmd_Argv(1) );
+			Con_Printf ("\"%s\" is not bound\n", CmdArgs::getArg(1) );
 		return;
 	}
 
@@ -537,7 +537,7 @@ void Key_Bind_f (void)
 	{
 		if (i > 2)
 			Q_strcat (cmd, " ");
-		Q_strcat (cmd, Cmd_Argv(i));
+		Q_strcat (cmd, CmdArgs::getArg(i));
 	}
 
 	Key_SetBinding (b, cmd);
@@ -630,9 +630,9 @@ void Key_Init (void)
 //
 // register our functions
 //
-	Cmd_AddCommand ("bind",Key_Bind_f);
-	Cmd_AddCommand ("unbind",Key_Unbind_f);
-	Cmd_AddCommand ("unbindall",Key_Unbindall_f);
+	Cmd::addCmd("bind",Key_Bind_f);
+	Cmd::addCmd("unbind",Key_Unbind_f);
+	Cmd::addCmd("unbindall",Key_Unbindall_f);
 
 
 }

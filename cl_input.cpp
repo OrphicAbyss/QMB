@@ -58,9 +58,9 @@ int			in_impulse;
 void KeyDown (kbutton_t *b)
 {
 	int		k;
-	char	*c;
+	const char	*c;
 
-	c = Cmd_Argv(1);
+	c = CmdArgs::getArg(1);
 	if (c[0])
 		k = Q_atoi(c);
 	else
@@ -87,9 +87,9 @@ void KeyDown (kbutton_t *b)
 void KeyUp (kbutton_t *b)
 {
 	int		k;
-	char	*c;
+	const char	*c;
 
-	c = Cmd_Argv(1);
+	c = CmdArgs::getArg(1);
 	if (c[0])
 		k = Q_atoi(c);
 	else
@@ -156,7 +156,7 @@ void IN_UseUp (void) {KeyUp(&in_use);}
 void IN_JumpDown (void) {KeyDown(&in_jump);}
 void IN_JumpUp (void) {KeyUp(&in_jump);}
 
-void IN_Impulse (void) {in_impulse=Q_atoi(Cmd_Argv(1));}
+void IN_Impulse (void) {in_impulse=Q_atoi(CmdArgs::getArg(1));}
 
 /*
 ===============
@@ -329,7 +329,7 @@ void CL_SendMove (usercmd_t *cmd)
 	buf.cursize = 0;
 	buf.data = data;
 
-	cl.cmd = *cmd;
+	cl.alias = *cmd;
 
 //
 // send the movement message
@@ -397,41 +397,41 @@ CL_InitInput
 */
 void CL_InitInput (void)
 {
-	Cmd_AddCommand ("+moveup",IN_UpDown);
-	Cmd_AddCommand ("-moveup",IN_UpUp);
-	Cmd_AddCommand ("+movedown",IN_DownDown);
-	Cmd_AddCommand ("-movedown",IN_DownUp);
-	Cmd_AddCommand ("+left",IN_LeftDown);
-	Cmd_AddCommand ("-left",IN_LeftUp);
-	Cmd_AddCommand ("+right",IN_RightDown);
-	Cmd_AddCommand ("-right",IN_RightUp);
-	Cmd_AddCommand ("+forward",IN_ForwardDown);
-	Cmd_AddCommand ("-forward",IN_ForwardUp);
-	Cmd_AddCommand ("+back",IN_BackDown);
-	Cmd_AddCommand ("-back",IN_BackUp);
-	Cmd_AddCommand ("+lookup", IN_LookupDown);
-	Cmd_AddCommand ("-lookup", IN_LookupUp);
-	Cmd_AddCommand ("+lookdown", IN_LookdownDown);
-	Cmd_AddCommand ("-lookdown", IN_LookdownUp);
-	Cmd_AddCommand ("+strafe", IN_StrafeDown);
-	Cmd_AddCommand ("-strafe", IN_StrafeUp);
-	Cmd_AddCommand ("+moveleft", IN_MoveleftDown);
-	Cmd_AddCommand ("-moveleft", IN_MoveleftUp);
-	Cmd_AddCommand ("+moveright", IN_MoverightDown);
-	Cmd_AddCommand ("-moveright", IN_MoverightUp);
-	Cmd_AddCommand ("+speed", IN_SpeedDown);
-	Cmd_AddCommand ("-speed", IN_SpeedUp);
-	Cmd_AddCommand ("+attack", IN_AttackDown);
-	Cmd_AddCommand ("-attack", IN_AttackUp);
-	Cmd_AddCommand ("+use", IN_UseDown);
-	Cmd_AddCommand ("-use", IN_UseUp);
-	Cmd_AddCommand ("+jump", IN_JumpDown);
-	Cmd_AddCommand ("-jump", IN_JumpUp);
-	Cmd_AddCommand ("impulse", IN_Impulse);
-	Cmd_AddCommand ("+klook", IN_KLookDown);
-	Cmd_AddCommand ("-klook", IN_KLookUp);
-	//Cmd_AddCommand ("+mlook", IN_MLookDown);
-	//Cmd_AddCommand ("-mlook", IN_MLookUp);
+	Cmd::addCmd("+moveup",IN_UpDown);
+	Cmd::addCmd("-moveup",IN_UpUp);
+	Cmd::addCmd("+movedown",IN_DownDown);
+	Cmd::addCmd("-movedown",IN_DownUp);
+	Cmd::addCmd("+left",IN_LeftDown);
+	Cmd::addCmd("-left",IN_LeftUp);
+	Cmd::addCmd("+right",IN_RightDown);
+	Cmd::addCmd("-right",IN_RightUp);
+	Cmd::addCmd("+forward",IN_ForwardDown);
+	Cmd::addCmd("-forward",IN_ForwardUp);
+	Cmd::addCmd("+back",IN_BackDown);
+	Cmd::addCmd("-back",IN_BackUp);
+	Cmd::addCmd("+lookup", IN_LookupDown);
+	Cmd::addCmd("-lookup", IN_LookupUp);
+	Cmd::addCmd("+lookdown", IN_LookdownDown);
+	Cmd::addCmd("-lookdown", IN_LookdownUp);
+	Cmd::addCmd("+strafe", IN_StrafeDown);
+	Cmd::addCmd("-strafe", IN_StrafeUp);
+	Cmd::addCmd("+moveleft", IN_MoveleftDown);
+	Cmd::addCmd("-moveleft", IN_MoveleftUp);
+	Cmd::addCmd("+moveright", IN_MoverightDown);
+	Cmd::addCmd("-moveright", IN_MoverightUp);
+	Cmd::addCmd("+speed", IN_SpeedDown);
+	Cmd::addCmd("-speed", IN_SpeedUp);
+	Cmd::addCmd("+attack", IN_AttackDown);
+	Cmd::addCmd("-attack", IN_AttackUp);
+	Cmd::addCmd("+use", IN_UseDown);
+	Cmd::addCmd("-use", IN_UseUp);
+	Cmd::addCmd("+jump", IN_JumpDown);
+	Cmd::addCmd("-jump", IN_JumpUp);
+	Cmd::addCmd("impulse", IN_Impulse);
+	Cmd::addCmd("+klook", IN_KLookDown);
+	Cmd::addCmd("-klook", IN_KLookUp);
+	//Cmd::addCmd("+mlook", IN_MLookDown);
+	//Cmd::addCmd("-mlook", IN_MLookUp);
 
 }
 

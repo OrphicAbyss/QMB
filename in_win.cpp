@@ -155,7 +155,7 @@ static DIDATAFORMAT	df = {
 // forward-referenced functions
 void IN_StartupJoystick (void);
 void Joy_AdvancedUpdate_f (void);
-void IN_JoyMove (usercmd_t *cmd);
+void IN_JoyMove (usercmd_t *alias);
 
 
 /*
@@ -579,7 +579,7 @@ void IN_MouseEvent (int mstate)
 IN_MouseMove
 ===========
 */
-void IN_MouseMove (usercmd_t *cmd)
+void IN_MouseMove (usercmd_t *alias)
 {
 	int					mx, my;
 	int					i;
@@ -699,7 +699,7 @@ void IN_MouseMove (usercmd_t *cmd)
 
 // add mouse X/Y movement to cmd
 	if ( (in_strafe.state & 1) || (lookstrafe.value && (in_mlook.value) ))
-		cmd->sidemove += m_side.value * mouse_x;
+		alias->sidemove += m_side.value * mouse_x;
 	else
 		cl.viewangles[YAW] -= m_yaw.value * mouse_x;
 
@@ -717,9 +717,9 @@ void IN_MouseMove (usercmd_t *cmd)
 	else
 	{
 		if ((in_strafe.state & 1) && noclip_anglehack)
-			cmd->upmove -= m_forward.value * mouse_y;
+			alias->upmove -= m_forward.value * mouse_y;
 		else
-			cmd->forwardmove -= m_forward.value * mouse_y;
+			alias->forwardmove -= m_forward.value * mouse_y;
 	}
 
 // if the mouse has moved, force it to the center, so there's room to move
@@ -735,13 +735,13 @@ void IN_MouseMove (usercmd_t *cmd)
 IN_Move
 ===========
 */
-void IN_Move (usercmd_t *cmd)
+void IN_Move (usercmd_t *alias)
 {
 
 	if (ActiveApp && !Minimized)
 	{
-		IN_MouseMove (cmd);
-		IN_JoyMove (cmd);
+		IN_MouseMove (alias);
+		IN_JoyMove (alias);
 	}
 }
 
@@ -1064,7 +1064,7 @@ qboolean IN_ReadJoystick (void)
 IN_JoyMove
 ===========
 */
-void IN_JoyMove (usercmd_t *cmd)
+void IN_JoyMove (usercmd_t *alias)
 {
 	float	speed, aspeed;
 	float	fAxisValue, fTemp;
@@ -1158,7 +1158,7 @@ void IN_JoyMove (usercmd_t *cmd)
 				// user wants forward control to be forward control
 				if (fabs(fAxisValue) > joy_forwardthreshold.value)
 				{
-					cmd->forwardmove += (fAxisValue * joy_forwardsensitivity.value) * speed * cl_forwardspeed.value;
+					alias->forwardmove += (fAxisValue * joy_forwardsensitivity.value) * speed * cl_forwardspeed.value;
 				}
 			}
 			break;
@@ -1166,7 +1166,7 @@ void IN_JoyMove (usercmd_t *cmd)
 		case AxisSide:
 			if (fabs(fAxisValue) > joy_sidethreshold.value)
 			{
-				cmd->sidemove += (fAxisValue * joy_sidesensitivity.value) * speed * cl_sidespeed.value;
+				alias->sidemove += (fAxisValue * joy_sidesensitivity.value) * speed * cl_sidespeed.value;
 			}
 			break;
 
@@ -1176,7 +1176,7 @@ void IN_JoyMove (usercmd_t *cmd)
 				// user wants turn control to become side control
 				if (fabs(fAxisValue) > joy_sidethreshold.value)
 				{
-					cmd->sidemove -= (fAxisValue * joy_sidesensitivity.value) * speed * cl_sidespeed.value;
+					alias->sidemove -= (fAxisValue * joy_sidesensitivity.value) * speed * cl_sidespeed.value;
 				}
 			}
 			else

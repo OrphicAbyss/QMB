@@ -22,8 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "ICapture.h"
 #include "CaptureHelpers.h"
 
-#include "cvar_cpp.h"
-
 extern CVar host_framerate;
 extern float scr_con_current;
 extern qboolean scr_drawloading;
@@ -41,7 +39,6 @@ int frames;
 // When wired to AVI as currently, capture_codec is a fourcc.
 // "0" indicates no compression codec.
 CVar capture_codec("capture_codec","0",true);
-
 
 qboolean CaptureHelper_IsActive(void)
 {
@@ -62,7 +59,7 @@ void CaptureHelper_Start_f (void)
 	//if aready recording ignore the request...
 	if (Capture_IsRecording()) return;
 
-	if (Cmd_Argc() != 2) {
+	if (CmdArgs::getArgCount() != 2) {
 		Con_Printf ("capture_start <filename>: Start capturing to named file.\n");
 		return;
 	}
@@ -73,7 +70,7 @@ void CaptureHelper_Start_f (void)
     }
     fps = 1/host_framerate.getFloat();
 
-    Q_strcpy(filename, Cmd_Argv(1));
+    Q_strcpy(filename, CmdArgs::getArg(1));
 	COM_DefaultExtension (filename, Capture_DOTEXTENSION); // currently we capture AVI
 
 	if (shm){
@@ -105,12 +102,12 @@ void CaptureHelper_Stop_f (void)
 
 void CaptureHelper_CaptureDemo_f(void)
 {
-	if (Cmd_Argc() != 2) {
+	if (CmdArgs::getArgCount() != 2) {
 		Con_Printf ("capturedemo <demoname> : capture <demoname>.dem then exit\n");
 		return;
 	}
 
-	Con_Printf ("Capturing %s.dem\n", Cmd_Argv(1), Cmd_Argv(1));
+	Con_Printf ("Capturing %s.dem\n", CmdArgs::getArg(1), CmdArgs::getArg(1));
 
     if (!host_framerate.getBool())
 		host_framerate.set(1/30.0f); // 15fps default
@@ -129,9 +126,9 @@ void CaptureHelper_Init(void)
 {
     captured_audio_samples = 0;
 
-    Cmd_AddCommand ("capture_start", CaptureHelper_Start_f);
-    Cmd_AddCommand ("capture_stop", CaptureHelper_Stop_f);
-    Cmd_AddCommand ("capturedemo", CaptureHelper_CaptureDemo_f);
+    Cmd::addCmd("capture_start", CaptureHelper_Start_f);
+    Cmd::addCmd("capture_stop", CaptureHelper_Stop_f);
+    Cmd::addCmd("capturedemo", CaptureHelper_CaptureDemo_f);
 	//capture_codec = new CVar("capture_codec", "0", true);
     CVar::registerCVar(&capture_codec);
 }

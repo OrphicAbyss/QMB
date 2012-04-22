@@ -119,9 +119,9 @@ void R_Init (void)
 	extern byte *hunk_base;
 	extern CVar gl_finish;
 
-	Cmd_AddCommand ("timerefresh", R_TimeRefresh_f);
-	Cmd_AddCommand ("loadsky", R_LoadSky_f);
-	Cmd_AddCommand ("currentcoord", R_CurrentCoord_f);
+	Cmd::addCmd("timerefresh", R_TimeRefresh_f);
+	Cmd::addCmd("loadsky", R_LoadSky_f);
+	Cmd::addCmd("currentcoord", R_CurrentCoord_f);
 
 	CVar::registerCVar(&r_drawentities);
 	CVar::registerCVar(&r_drawviewmodel);

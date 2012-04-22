@@ -954,12 +954,12 @@ void Com_f (void)
 	int		n;
 
 	// first, determine which port they're messing with
-	portNumber = Q_atoi(Cmd_Argv (0) + 3) - 1;
+	portNumber = Q_atoi(CmdArgs::getArg (0) + 3) - 1;
 	if (portNumber > 1)
 		return;
 	p = handleToPort[portNumber];
 
-	if (Cmd_Argc() == 1)
+	if (CmdArgs::getArgCount() == 1)
 	{
 		Con_Printf("Settings for COM%i\n", portNumber + 1);
 		Con_Printf("enabled:   %s\n", p->enabled ? "true" : "false");
@@ -1012,7 +1012,7 @@ void Com_f (void)
 				Con_Printf("COM port must be disabled to change port\n");
 				return;
 			}
-		p->uart = Q_atoi (Cmd_Argv (i+1));
+		p->uart = Q_atoi (CmdArgs::getArg (i+1));
 	}
 
 	if ((i = Cmd_CheckParm ("irq")) != 0)
@@ -1022,7 +1022,7 @@ void Com_f (void)
 				Con_Printf("COM port must be disabled to change irq\n");
 				return;
 			}
-		p->irq = Q_atoi (Cmd_Argv (i+1));
+		p->irq = Q_atoi (CmdArgs::getArg (i+1));
 	}
 
 	if ((i = Cmd_CheckParm ("baud")) != 0)
@@ -1032,7 +1032,7 @@ void Com_f (void)
 				Con_Printf("COM port must be disabled to change baud\n");
 				return;
 			}
-		n = Q_atoi (Cmd_Argv (i+1));
+		n = Q_atoi (CmdArgs::getArg (i+1));
 		if (n == 0)
 			Con_Printf("Invalid baud rate specified\n");
 		else
@@ -1079,18 +1079,18 @@ void Com_f (void)
 
 	if ((i = Cmd_CheckParm ("clear")) != 0)
 	{
-		Q_strncpy (p->clear, Cmd_Argv (i+1), 16);
+		Q_strncpy (p->clear, CmdArgs::getArg (i+1), 16);
 	}
 
 	if ((i = Cmd_CheckParm ("startup")) != 0)
 	{
-		Q_strncpy (p->startup, Cmd_Argv (i+1), 32);
+		Q_strncpy (p->startup, CmdArgs::getArg (i+1), 32);
 		p->modemInitialized = false;
 	}
 
 	if ((i = Cmd_CheckParm ("shutdown")) != 0)
 	{
-		Q_strncpy (p->shutdown, Cmd_Argv (i+1), 16);
+		Q_strncpy (p->shutdown, CmdArgs::getArg (i+1), 16);
 	}
 
 	if (Cmd_CheckParm ("-cts"))
@@ -1155,7 +1155,7 @@ int TTY_Init(void)
 		p->portNumber = n;
 		p->dialType = 'T';
 		sprintf(p->name, "com%u", n+1);
-		Cmd_AddCommand (p->name, Com_f);
+		Cmd::addCmd(p->name, Com_f);
 		ResetComPortConfig (p);
 	}
 

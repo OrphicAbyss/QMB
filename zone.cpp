@@ -706,9 +706,9 @@ void Cache_Report (void)
  */
 void Cache_Init (void)
 {
-	Cmd_AddCommand ("flush", Cache_Flush);
-	Cmd_AddCommand ("cache_print", Cache_Print);
-	Cmd_AddCommand ("cache_report", Cache_Report);
+	Cmd::addCmd("flush", Cache_Flush);
+	Cmd::addCmd("cache_print", Cache_Print);
+	Cmd::addCmd("cache_report", Cache_Report);
 }
 
 //============================================================================
@@ -729,7 +729,6 @@ void Memory_Init (void *buf, int size)
 	hunk_low_used = 0;
 	hunk_high_used = 0;
 
-	Cache_Init ();
 	p = COM_CheckParm ("-zone");
 	if (p)
 	{
@@ -740,5 +739,7 @@ void Memory_Init (void *buf, int size)
 	}
 	mainzone = (memzone_t *)Hunk_AllocName (zonesize, "zone" );
 	Z_ClearZone (mainzone, zonesize);
+
+	Cache_Init ();
 }
 

@@ -84,14 +84,14 @@ CVar *CVar::findNextServerCVar (const char *name){
  * @param variable
  */
 void CVar::registerCVar(CVar* variable){
-// first check to see if it has allready been defined
+	// first check to see if it has already been defined
 	if (CVar::findCVar(variable->getName())) {
 		Con_Printf ("Can't register variable %s, allready defined\n", variable->name);
 		return;
 	}
 
-// check for overlap with a command
-	if (Cmd_Exists (variable->getName())){
+	// check for overlap with a command
+	if (Cmd::findCmd(variable->getName())){
 		Con_Printf ("Cvar_RegisterVariable: %s is a command\n", variable->name);
 		return;
 	}
@@ -200,18 +200,18 @@ char *CVar::completeVariable(char *partial){
  * @return true if the variable was found, false otherwise
  */
 bool CVar::consoleCommand(void){
-	CVar *v;
+	CVar *var;
 
 // check variables
-	v = CVar::findCVar(Cmd_Argv(0));
-	if (!v)
+	var = CVar::findCVar(CmdArgs::getArg(0));
+	if (!var)
 		return false;
 
 // perform a variable print or set
-	if (Cmd_Argc() == 1){
-		Con_Printf ("\"%s\" is \"%s\"\n", v->getName(), v->getString());
+	if (CmdArgs::getArgCount() == 1){
+		Con_Printf ("\"%s\" is \"%s\"\n", var->getName(), var->getString());
 	} else {
-		v->set(Cmd_Argv(1));
+		var->set(CmdArgs::getArg(1));
 	}
 	return true;
 }

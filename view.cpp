@@ -178,7 +178,7 @@ void V_DriftPitch (void)
 // don't count small mouse motion
 	if (cl.nodrift)
 	{
-		if ( fabs(cl.cmd.forwardmove) < cl_forwardspeed.getFloat())
+		if ( fabs(cl.alias.forwardmove) < cl_forwardspeed.getFloat())
 			cl.driftmove = 0;
 		else
 			cl.driftmove += host_frametime;
@@ -368,10 +368,10 @@ V_cshift_f
 */
 void V_cshift_f (void)
 {
-	cshift_empty.destcolor[0] = Q_atoi(Cmd_Argv(1));
-	cshift_empty.destcolor[1] = Q_atoi(Cmd_Argv(2));
-	cshift_empty.destcolor[2] = Q_atoi(Cmd_Argv(3));
-	cshift_empty.percent = Q_atoi(Cmd_Argv(4));
+	cshift_empty.destcolor[0] = Q_atoi(CmdArgs::getArg(1));
+	cshift_empty.destcolor[1] = Q_atoi(CmdArgs::getArg(2));
+	cshift_empty.destcolor[2] = Q_atoi(CmdArgs::getArg(3));
+	cshift_empty.percent = Q_atoi(CmdArgs::getArg(4));
 }
 
 
@@ -964,9 +964,9 @@ V_Init
 */
 void V_Init (void)
 {
-	Cmd_AddCommand ("v_cshift", V_cshift_f);
-	Cmd_AddCommand ("bf", V_BonusFlash_f);
-	Cmd_AddCommand ("centerview", V_StartPitchDrift);
+	Cmd::addCmd("v_cshift", V_cshift_f);
+	Cmd::addCmd("bf", V_BonusFlash_f);
+	Cmd::addCmd("centerview", V_StartPitchDrift);
 
 	CVar::registerCVar(&v_centermove);
 	CVar::registerCVar(&v_centerspeed);

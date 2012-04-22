@@ -158,7 +158,7 @@ typedef struct
 								// throw out the first couple, so the player
 								// doesn't accidentally do something the
 								// first frame
-	usercmd_t	cmd;			// last command sent to the server
+	usercmd_t	alias;			// last command sent to the server
 
 // information for local display
 	int			stats[MAX_CL_STATS];	// health, etc

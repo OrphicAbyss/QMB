@@ -140,8 +140,8 @@ int Q_strcmp (const char *s1, const char *s2);
 int Q_strncmp (const char *s1, const char *s2, int count);
 int Q_strcasecmp (const char *s1, const char *s2);
 int Q_strncasecmp (const char *s1, const char *s2, int n);
-int	Q_atoi (char *str);
-float Q_atof (char *str);
+int	Q_atoi (const char *str);
+float Q_atof (const char *str);
 
 //============================================================================
 

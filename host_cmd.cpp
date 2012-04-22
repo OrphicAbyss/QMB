@@ -63,11 +63,11 @@ void Host_Status_f (void)
 	int			j;
 	void		(*print)(const char *fmt, ...);
 
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
 		if (!sv.active)
 		{
-			Cmd_ForwardToServer ();
+			CmdArgs::forwardToServer();
 			return;
 		}
 		print = Con_Printf;
@@ -113,9 +113,9 @@ Sets client to godmode
 */
 void Host_God_f (void)
 {
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
-		Cmd_ForwardToServer ();
+		CmdArgs::forwardToServer();
 		return;
 	}
 
@@ -131,9 +131,9 @@ void Host_God_f (void)
 
 void Host_Notarget_f (void)
 {
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
-		Cmd_ForwardToServer ();
+		CmdArgs::forwardToServer();
 		return;
 	}
 
@@ -151,9 +151,9 @@ qboolean noclip_anglehack;
 
 void Host_Noclip_f (void)
 {
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
-		Cmd_ForwardToServer ();
+		CmdArgs::forwardToServer();
 		return;
 	}
 
@@ -183,9 +183,9 @@ Sets client to flymode
 */
 void Host_Fly_f (void)
 {
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
-		Cmd_ForwardToServer ();
+		CmdArgs::forwardToServer();
 		return;
 	}
 
@@ -215,9 +215,9 @@ Sets client to snowboard mode
 //qmb: snowboard
 void Host_Snowboard_f (void)
 {
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
-		Cmd_ForwardToServer ();
+		CmdArgs::forwardToServer();
 		return;
 	}
 
@@ -248,9 +248,9 @@ void Host_Ping_f (void)
 	float	total;
 	client_t	*client;
 
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
-		Cmd_ForwardToServer ();
+		CmdArgs::forwardToServer();
 		return;
 	}
 
@@ -290,7 +290,7 @@ void Host_Map_f (void)
 	int		i;
 	char	name[MAX_QPATH];
 
-	if (cmd_source != src_command)
+	if (CmdArgs::getSource() != CmdArgs::COMMAND)
 		return;
 
 	cls.demonum = -1;		// stop demo loop in case this fails
@@ -302,15 +302,15 @@ void Host_Map_f (void)
 	SCR_BeginLoadingPlaque ();
 
 	cls.mapstring[0] = 0;
-	for (i=0 ; i<Cmd_Argc() ; i++)
+	for (i=0 ; i<CmdArgs::getArgCount() ; i++)
 	{
-		Q_strcat (cls.mapstring, Cmd_Argv(i));
+		Q_strcat (cls.mapstring, CmdArgs::getArg(i));
 		Q_strcat (cls.mapstring, " ");
 	}
 	Q_strcat (cls.mapstring, "\n");
 
 	svs.serverflags = 0;			// haven't completed an episode yet
-	Q_strcpy (name, Cmd_Argv(1));
+	Q_strcpy (name, CmdArgs::getArg(1));
 	SV_SpawnServer (name);
 	if (!sv.active)
 		return;
@@ -319,13 +319,13 @@ void Host_Map_f (void)
 	{
 		Q_strcpy (cls.spawnparms, "");
 
-		for (i=2 ; i<Cmd_Argc() ; i++)
+		for (i=2 ; i<CmdArgs::getArgCount() ; i++)
 		{
-			Q_strcat (cls.spawnparms, Cmd_Argv(i));
+			Q_strcat (cls.spawnparms, CmdArgs::getArg(i));
 			Q_strcat (cls.spawnparms, " ");
 		}
 
-		Cmd_ExecuteString ("connect local", src_command);
+		CmdArgs::executeString("connect local", CmdArgs::COMMAND);
 	}
 }
 
@@ -340,7 +340,7 @@ void Host_Changelevel_f (void)
 {
 	char	level[MAX_QPATH];
 
-	if (Cmd_Argc() != 2)
+	if (CmdArgs::getArgCount() != 2)
 	{
 		Con_Printf ("changelevel <levelname> : continue game on a new level\n");
 		return;
@@ -351,7 +351,7 @@ void Host_Changelevel_f (void)
 		return;
 	}
 	SV_SaveSpawnparms ();
-	Q_strcpy (level, Cmd_Argv(1));
+	Q_strcpy (level, CmdArgs::getArg(1));
 	SV_SpawnServer (level);
 }
 
@@ -372,7 +372,7 @@ void Host_Restart_f (void)
 	if (cls.demoplayback || !sv.active)
 		return;
 
-	if (cmd_source != src_command)
+	if (CmdArgs::getSource() != CmdArgs::COMMAND)
 		return;
 	Q_strcpy (mapname, sv.name);	// must copy out, because it gets cleared
 								// in sv_spawnserver
@@ -415,7 +415,7 @@ void Host_Connect_f (void)
 		CL_StopPlayback ();
 		CL_Disconnect ();
 	}
-	Q_strcpy (name, Cmd_Argv(1));
+	Q_strcpy (name, CmdArgs::getArg(1));
 	CL_EstablishConnection (name);
 	Host_Reconnect_f ();
 }
@@ -468,7 +468,7 @@ void Host_Savegame_f (void)
 	int		i;
 	char	comment[SAVEGAME_COMMENT_LENGTH+1];
 
-	if (cmd_source != src_command)
+	if (CmdArgs::getSource() != CmdArgs::COMMAND)
 		return;
 
 	if (!sv.active)
@@ -489,13 +489,13 @@ void Host_Savegame_f (void)
 		return;
 	}
 
-	if (Cmd_Argc() != 2)
+	if (CmdArgs::getArgCount() != 2)
 	{
 		Con_Printf ("save <savename> : save a game\n");
 		return;
 	}
 
-	if (strstr(Cmd_Argv(1), ".."))
+	if (strstr(CmdArgs::getArg(1), ".."))
 	{
 		Con_Printf ("Relative pathnames are not allowed.\n");
 		return;
@@ -510,7 +510,7 @@ void Host_Savegame_f (void)
 		}
 	}
 
-	sprintf (name, "%s/%s", com_gamedir, Cmd_Argv(1));
+	sprintf (name, "%s/%s", com_gamedir, CmdArgs::getArg(1));
 	COM_DefaultExtension (name, ".sav");
 
 	Con_Printf ("Saving game to %s...\n", name);
@@ -570,10 +570,10 @@ void Host_Loadgame_f (void)
 	int		version;
 	float			spawn_parms[NUM_SPAWN_PARMS];
 
-	if (cmd_source != src_command)
+	if (CmdArgs::getSource() != CmdArgs::COMMAND)
 		return;
 
-	if (Cmd_Argc() != 2)
+	if (CmdArgs::getArgCount() != 2)
 	{
 		Con_Printf ("load <savename> : load a game\n");
 		return;
@@ -581,7 +581,7 @@ void Host_Loadgame_f (void)
 
 	cls.demonum = -1;		// stop demo loop in case this fails
 
-	sprintf (name, "%s/%s", com_gamedir, Cmd_Argv(1));
+	sprintf (name, "%s/%s", com_gamedir, CmdArgs::getArg(1));
 	COM_DefaultExtension (name, ".sav");
 
 // we can't call SCR_BeginLoadingPlaque, because too much stack space has
@@ -707,25 +707,24 @@ void Host_Name_f (void)
 {
 	char	*newName;
 
-	if (Cmd_Argc () == 1)
+	if (CmdArgs::getArgCount () == 1)
 	{
 		Con_Printf ("\"name\" is \"%s\"\n", cl_name.getString());
 		return;
 	}
-	if (Cmd_Argc () == 2)
-		newName = Cmd_Argv(1);
+	if (CmdArgs::getArgCount () == 2)
+		newName = CmdArgs::getArg(1);
 	else
-		newName = Cmd_Args();
+		newName = CmdArgs::Cmd_Args();
 	newName[15] = 0;
 
-	if (cmd_source == src_command)
-	{
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)	{
 		if (Q_strcmp(cl_name.getString(), newName) == 0)
 			return;
 
 		cl_name.set(newName);
 		if (cls.state == ca_connected)
-			Cmd_ForwardToServer ();
+			CmdArgs::forwardToServer();
 		return;
 	}
 
@@ -755,12 +754,12 @@ void Host_Please_f (void)
 	client_t *cl;
 	int			j;
 
-	if (cmd_source != src_command)
+	if (CmdArgs::getSource() != CmdArgs::COMMAND)
 		return;
 
-	if ((Cmd_Argc () == 3) && Q_strcmp(Cmd_Argv(1), "#") == 0)
+	if ((CmdArgs::getArgCount () == 3) && Q_strcmp(CmdArgs::getArg(1), "#") == 0)
 	{
-		j = Q_atof(Cmd_Argv(2)) - 1;
+		j = Q_atof(CmdArgs::getArg(2)) - 1;
 		if (j < 0 || j >= svs.maxclients)
 			return;
 		if (!svs.clients[j].active)
@@ -777,14 +776,14 @@ void Host_Please_f (void)
 			cl->privileged = true;
 	}
 
-	if (Cmd_Argc () != 2)
+	if (CmdArgs::getArgCount () != 2)
 		return;
 
 	for (j=0, cl = svs.clients ; j<svs.maxclients ; j++, cl++)
 	{
 		if (!cl->active)
 			continue;
-		if (Q_strcasecmp(cl->name, Cmd_Argv(1)) == 0)
+		if (Q_strcasecmp(cl->name, CmdArgs::getArg(1)) == 0)
 		{
 			if (cl->privileged)
 			{
@@ -811,7 +810,7 @@ void Host_Say(qboolean teamonly)
 	char	text[64];
 	qboolean	fromServer = false;
 
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
 		if (cls.state == ca_dedicated)
 		{
@@ -820,17 +819,17 @@ void Host_Say(qboolean teamonly)
 		}
 		else
 		{
-			Cmd_ForwardToServer ();
+			CmdArgs::forwardToServer();
 			return;
 		}
 	}
 
-	if (Cmd_Argc () < 2)
+	if (CmdArgs::getArgCount () < 2)
 		return;
 
 	save = host_client;
 
-	p = Cmd_Args();
+	p = CmdArgs::Cmd_Args();
 // remove quotes if present
 	if (*p == '"')
 	{
@@ -888,19 +887,19 @@ void Host_Tell_f(void)
 	char	*p;
 	char	text[64];
 
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
-		Cmd_ForwardToServer ();
+		CmdArgs::forwardToServer();
 		return;
 	}
 
-	if (Cmd_Argc () < 3)
+	if (CmdArgs::getArgCount () < 3)
 		return;
 
 	Q_strcpy(text, host_client->name);
 	Q_strcat(text, ": ");
 
-	p = Cmd_Args();
+	p = CmdArgs::Cmd_Args();
 
 // remove quotes if present
 	if (*p == '"')
@@ -922,7 +921,7 @@ void Host_Tell_f(void)
 	{
 		if (!client->active || !client->spawned)
 			continue;
-		if (Q_strcasecmp(client->name, Cmd_Argv(1)))
+		if (Q_strcasecmp(client->name, CmdArgs::getArg(1)))
 			continue;
 		host_client = client;
 		SV_ClientPrintf("%s", text);
@@ -942,19 +941,19 @@ void Host_Color_f(void)
 	int		top, bottom;
 	int		playercolor;
 
-	if (Cmd_Argc() == 1)
+	if (CmdArgs::getArgCount() == 1)
 	{
 		Con_Printf ("\"color\" is \"%i %i\"\n", cl_color.getInt() >> 4, cl_color.getInt() & 0x0f);
 		Con_Printf ("color <0-13> [0-13]\n");
 		return;
 	}
 
-	if (Cmd_Argc() == 2)
-		top = bottom = Q_atoi(Cmd_Argv(1));
+	if (CmdArgs::getArgCount() == 2)
+		top = bottom = Q_atoi(CmdArgs::getArg(1));
 	else
 	{
-		top = Q_atoi(Cmd_Argv(1));
-		bottom = Q_atoi(Cmd_Argv(2));
+		top = Q_atoi(CmdArgs::getArg(1));
+		bottom = Q_atoi(CmdArgs::getArg(2));
 	}
 
 	top &= 15;
@@ -966,11 +965,11 @@ void Host_Color_f(void)
 
 	playercolor = top*16 + bottom;
 
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
 		cl_color.set((float)playercolor);
 		if (cls.state == ca_connected)
-			Cmd_ForwardToServer ();
+			CmdArgs::forwardToServer();
 		return;
 	}
 
@@ -990,9 +989,9 @@ Host_Kill_f
 */
 void Host_Kill_f (void)
 {
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
-		Cmd_ForwardToServer ();
+		CmdArgs::forwardToServer();
 		return;
 	}
 
@@ -1016,9 +1015,9 @@ Host_Pause_f
 void Host_Pause_f (void)
 {
 
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
-		Cmd_ForwardToServer ();
+		CmdArgs::forwardToServer();
 		return;
 	}
 	if (!pausable.getBool())
@@ -1048,7 +1047,7 @@ Host_PreSpawn_f
 */
 void Host_PreSpawn_f (void)
 {
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
 		Con_Printf ("prespawn is not valid from the console\n");
 		return;
@@ -1077,7 +1076,7 @@ void Host_Spawn_f (void)
 	client_t	*client;
 	edict_t	*ent;
 
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
 		Con_Printf ("spawn is not valid from the console\n");
 		return;
@@ -1197,7 +1196,7 @@ Host_Begin_f
 */
 void Host_Begin_f (void)
 {
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
 		Con_Printf ("begin is not valid from the console\n");
 		return;
@@ -1225,11 +1224,11 @@ void Host_Kick_f (void)
 	int			i;
 	qboolean	byNumber = false;
 
-	if (cmd_source == src_command)
+	if (CmdArgs::getSource() == CmdArgs::COMMAND)
 	{
 		if (!sv.active)
 		{
-			Cmd_ForwardToServer ();
+			CmdArgs::forwardToServer();
 			return;
 		}
 	}
@@ -1238,9 +1237,9 @@ void Host_Kick_f (void)
 
 	save = host_client;
 
-	if (Cmd_Argc() > 2 && Q_strcmp(Cmd_Argv(1), "#") == 0)
+	if (CmdArgs::getArgCount() > 2 && Q_strcmp(CmdArgs::getArg(1), "#") == 0)
 	{
-		i = Q_atof(Cmd_Argv(2)) - 1;
+		i = Q_atof(CmdArgs::getArg(2)) - 1;
 		if (i < 0 || i >= svs.maxclients)
 			return;
 		if (!svs.clients[i].active)
@@ -1254,14 +1253,14 @@ void Host_Kick_f (void)
 		{
 			if (!host_client->active)
 				continue;
-			if (Q_strcasecmp(host_client->name, Cmd_Argv(1)) == 0)
+			if (Q_strcasecmp(host_client->name, CmdArgs::getArg(1)) == 0)
 				break;
 		}
 	}
 
 	if (i < svs.maxclients)
 	{
-		if (cmd_source == src_command)
+		if (CmdArgs::getSource() == CmdArgs::COMMAND)
 			if (cls.state == ca_dedicated)
 				who = "Console";
 			else
@@ -1273,15 +1272,15 @@ void Host_Kick_f (void)
 		if (host_client == save)
 			return;
 
-		if (Cmd_Argc() > 2)
+		if (CmdArgs::getArgCount() > 2)
 		{
-			message = COM_Parse(Cmd_Args());
+			message = COM_Parse(CmdArgs::Cmd_Args());
 			if (byNumber)
 			{
 				message++;							// skip the #
 				while (*message == ' ')				// skip white space
 					message++;
-				message += Q_strlen(Cmd_Argv(2));	// skip the number
+				message += Q_strlen(CmdArgs::getArg(2));	// skip the number
 			}
 			while (*message && *message == ' ')
 				message++;
@@ -1315,17 +1314,16 @@ void Host_Give_f (void)
 	int		v;
 	eval_t	*val;
 
-	if (cmd_source == src_command)
-	{
-		Cmd_ForwardToServer ();
+	if (CmdArgs::getSource() == CmdArgs::COMMAND){
+		CmdArgs::forwardToServer();
 		return;
 	}
 
 	if (pr_global_struct->deathmatch && !host_client->privileged)
 		return;
 
-	t = Cmd_Argv(1);
-	v = Q_atoi (Cmd_Argv(2));
+	t = CmdArgs::getArg(1);
+	v = Q_atoi (CmdArgs::getArg(2));
 
 	switch (t[0])
 	{
@@ -1492,10 +1490,10 @@ void Host_Viewmodel_f (void)
 	if (!e)
 		return;
 
-	m = Mod_ForName (Cmd_Argv(1), false);
+	m = Mod_ForName (CmdArgs::getArg(1), false);
 	if (!m)
 	{
-		Con_Printf ("Can't load %s\n", Cmd_Argv(1));
+		Con_Printf ("Can't load %s\n", CmdArgs::getArg(1));
 		return;
 	}
 
@@ -1519,7 +1517,7 @@ void Host_Viewframe_f (void)
 		return;
 	m = cl.model_precache[(int)e->v.modelindex];
 
-	f = Q_atoi(Cmd_Argv(1));
+	f = Q_atoi(CmdArgs::getArg(1));
 	if (f >= m->numframes)
 		f = m->numframes-1;
 
@@ -1610,7 +1608,7 @@ void Host_Startdemos_f (void)
 		return;
 	}
 
-	c = Cmd_Argc() - 1;
+	c = CmdArgs::getArgCount() - 1;
 	if (c > MAX_DEMOS)
 	{
 		Con_Printf ("Max %i demos in demoloop\n", MAX_DEMOS);
@@ -1619,7 +1617,7 @@ void Host_Startdemos_f (void)
 	Con_Printf ("%i demo(s) in loop\n", c);
 
 	for (i=1 ; i<c+1 ; i++)
-		Q_strncpy (cls.demos[i-1], Cmd_Argv(i), sizeof(cls.demos[0])-1);
+		Q_strncpy (cls.demos[i-1], CmdArgs::getArg(i), sizeof(cls.demos[0])-1);
 
 	if (!sv.active && cls.demonum != -1 && !cls.demoplayback)
 	{
@@ -1674,43 +1672,43 @@ Host_InitCommands
 */
 void Host_InitCommands (void)
 {
-	Cmd_AddCommand ("status", Host_Status_f);
-	Cmd_AddCommand ("quit", Host_Quit_f);
-	Cmd_AddCommand ("god", Host_God_f);
-	Cmd_AddCommand ("notarget", Host_Notarget_f);
-	Cmd_AddCommand ("fly", Host_Fly_f);
-	Cmd_AddCommand ("snowboard", Host_Snowboard_f);
-	Cmd_AddCommand ("map", Host_Map_f);
-	Cmd_AddCommand ("restart", Host_Restart_f);
-	Cmd_AddCommand ("changelevel", Host_Changelevel_f);
-	Cmd_AddCommand ("connect", Host_Connect_f);
-	Cmd_AddCommand ("reconnect", Host_Reconnect_f);
-	Cmd_AddCommand ("name", Host_Name_f);
-	Cmd_AddCommand ("noclip", Host_Noclip_f);
-	Cmd_AddCommand ("version", Host_Version_f);
-	Cmd_AddCommand ("say", Host_Say_f);
-	Cmd_AddCommand ("say_team", Host_Say_Team_f);
-	Cmd_AddCommand ("tell", Host_Tell_f);
-	Cmd_AddCommand ("color", Host_Color_f);
-	Cmd_AddCommand ("kill", Host_Kill_f);
-	Cmd_AddCommand ("pause", Host_Pause_f);
-	Cmd_AddCommand ("spawn", Host_Spawn_f);
-	Cmd_AddCommand ("begin", Host_Begin_f);
-	Cmd_AddCommand ("prespawn", Host_PreSpawn_f);
-	Cmd_AddCommand ("kick", Host_Kick_f);
-	Cmd_AddCommand ("ping", Host_Ping_f);
-	Cmd_AddCommand ("load", Host_Loadgame_f);
-	Cmd_AddCommand ("save", Host_Savegame_f);
-	Cmd_AddCommand ("give", Host_Give_f);
+	Cmd::addCmd("status", Host_Status_f);
+	Cmd::addCmd("quit", Host_Quit_f);
+	Cmd::addCmd("god", Host_God_f);
+	Cmd::addCmd("notarget", Host_Notarget_f);
+	Cmd::addCmd("fly", Host_Fly_f);
+	Cmd::addCmd("snowboard", Host_Snowboard_f);
+	Cmd::addCmd("map", Host_Map_f);
+	Cmd::addCmd("restart", Host_Restart_f);
+	Cmd::addCmd("changelevel", Host_Changelevel_f);
+	Cmd::addCmd("connect", Host_Connect_f);
+	Cmd::addCmd("reconnect", Host_Reconnect_f);
+	Cmd::addCmd("name", Host_Name_f);
+	Cmd::addCmd("noclip", Host_Noclip_f);
+	Cmd::addCmd("version", Host_Version_f);
+	Cmd::addCmd("say", Host_Say_f);
+	Cmd::addCmd("say_team", Host_Say_Team_f);
+	Cmd::addCmd("tell", Host_Tell_f);
+	Cmd::addCmd("color", Host_Color_f);
+	Cmd::addCmd("kill", Host_Kill_f);
+	Cmd::addCmd("pause", Host_Pause_f);
+	Cmd::addCmd("spawn", Host_Spawn_f);
+	Cmd::addCmd("begin", Host_Begin_f);
+	Cmd::addCmd("prespawn", Host_PreSpawn_f);
+	Cmd::addCmd("kick", Host_Kick_f);
+	Cmd::addCmd("ping", Host_Ping_f);
+	Cmd::addCmd("load", Host_Loadgame_f);
+	Cmd::addCmd("save", Host_Savegame_f);
+	Cmd::addCmd("give", Host_Give_f);
 
-	Cmd_AddCommand ("startdemos", Host_Startdemos_f);
-	Cmd_AddCommand ("demos", Host_Demos_f);
-	Cmd_AddCommand ("stopdemo", Host_Stopdemo_f);
+	Cmd::addCmd("startdemos", Host_Startdemos_f);
+	Cmd::addCmd("demos", Host_Demos_f);
+	Cmd::addCmd("stopdemo", Host_Stopdemo_f);
 
-	Cmd_AddCommand ("viewmodel", Host_Viewmodel_f);
-	Cmd_AddCommand ("viewframe", Host_Viewframe_f);
-	Cmd_AddCommand ("viewnext", Host_Viewnext_f);
-	Cmd_AddCommand ("viewprev", Host_Viewprev_f);
+	Cmd::addCmd("viewmodel", Host_Viewmodel_f);
+	Cmd::addCmd("viewframe", Host_Viewframe_f);
+	Cmd::addCmd("viewnext", Host_Viewnext_f);
+	Cmd::addCmd("viewprev", Host_Viewprev_f);
 
-	Cmd_AddCommand ("mcache", Mod_Print);
+	Cmd::addCmd("mcache", Mod_Print);
 }

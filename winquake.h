@@ -60,7 +60,7 @@ int		(PASCAL FAR *pWSAStartup)		(WORD wVersionRequired, LPWSADATA lpWSAData);
 int		(PASCAL FAR *pWSACleanup)		(void);
 int		(PASCAL FAR *pWSAGetLastError)	(void);
 SOCKET	(PASCAL FAR *psocket)			(int af, int type, int protocol);
-int		(PASCAL FAR *pioctlsocket)		(SOCKET s, long cmd, u_long FAR *argp);
+int		(PASCAL FAR *pioctlsocket)		(SOCKET s, long alias, u_long FAR *argp);
 int		(PASCAL FAR *psetsockopt)		(SOCKET s, int level, int optname, const char FAR * optval, int optlen);
 int		(PASCAL FAR *precvfrom)			(SOCKET s, char FAR * buf, int len, int flags, struct sockaddr FAR *from, int FAR * fromlen);
 int		(PASCAL FAR *psendto)			(SOCKET s, const char FAR * buf, int len, int flags, const struct sockaddr FAR *to, int tolen);

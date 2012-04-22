@@ -520,7 +520,7 @@ int R_LoadSky (char *newname)
 // LordHavoc: added LoadSky console command
 void R_LoadSky_f (void)
 {
-	switch (Cmd_Argc())
+	switch (CmdArgs::getArgCount())
 	{
 	case 1:
 		if (skyname[0])
@@ -529,7 +529,7 @@ void R_LoadSky_f (void)
 			Con_Printf("no skybox has been set\n");
 		break;
 	case 2:
-		if (R_LoadSky(Cmd_Argv(1)))
+		if (R_LoadSky(CmdArgs::getArg(1)))
 		{
 			if (skyname[0])
 				Con_Printf("skybox set to %s\n", skyname);
@@ -537,7 +537,7 @@ void R_LoadSky_f (void)
 				Con_Printf("skybox disabled\n");
 		}
 		else
-			Con_Printf("failed to load skybox %s\n", Cmd_Argv(1));
+			Con_Printf("failed to load skybox %s\n", CmdArgs::getArg(1));
 		break;
 	default:
 		Con_Printf("usage: loadsky skyname\n");

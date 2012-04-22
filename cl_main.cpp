@@ -747,11 +747,11 @@ void CL_Init (void)
 	CVar::registerCVar(&m_forward);
 	CVar::registerCVar(&m_side);
 
-	Cmd_AddCommand ("entities", CL_PrintEntities_f);
-	Cmd_AddCommand ("disconnect", CL_Disconnect_f);
-	Cmd_AddCommand ("record", CL_Record_f);
-	Cmd_AddCommand ("stop", CL_Stop_f);
-	Cmd_AddCommand ("playdemo", CL_PlayDemo_f);
-	Cmd_AddCommand ("timedemo", CL_TimeDemo_f);
+	Cmd::addCmd("entities", CL_PrintEntities_f);
+	Cmd::addCmd("disconnect", CL_Disconnect_f);
+	Cmd::addCmd("record", CL_Record_f);
+	Cmd::addCmd("stop", CL_Stop_f);
+	Cmd::addCmd("playdemo", CL_PlayDemo_f);
+	Cmd::addCmd("timedemo", CL_TimeDemo_f);
 }
 

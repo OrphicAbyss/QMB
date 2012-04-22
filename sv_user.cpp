@@ -42,7 +42,7 @@ float	*velocity;
 
 qboolean	onground;
 
-usercmd_t	cmd;
+usercmd_t	alias;
 
 /*
 ===============
@@ -231,12 +231,12 @@ void SV_WaterMove (void)
 	AngleVectors (sv_player->v.v_angle, forward, right, up);
 
 	for (i=0 ; i<3 ; i++)
-		wishvel[i] = forward[i]*cmd.forwardmove + right[i]*cmd.sidemove;
+		wishvel[i] = forward[i]*alias.forwardmove + right[i]*alias.sidemove;
 
-	if (!cmd.forwardmove && !cmd.sidemove && !cmd.upmove)
+	if (!alias.forwardmove && !alias.sidemove && !alias.upmove)
 		wishvel[2] -= 60;		// drift towards bottom
 	else
-		wishvel[2] += cmd.upmove;
+		wishvel[2] += alias.upmove;
 
 	wishspeed = Length(wishvel);
 	if (wishspeed > sv_maxspeed.getFloat())
@@ -306,8 +306,8 @@ void SV_AirMove (void)
 
 	AngleVectors (sv_player->v.angles, forward, right, up);
 
-	fmove = cmd.forwardmove;
-	smove = cmd.sidemove;
+	fmove = alias.forwardmove;
+	smove = alias.sidemove;
 
 // hack to not let you back into teleporter
 	if (sv.time < sv_player->v.teleport_time && fmove < 0)
@@ -317,7 +317,7 @@ void SV_AirMove (void)
 		wishvel[i] = forward[i]*fmove + right[i]*smove;
 
 	if ( (int)sv_player->v.movetype != MOVETYPE_WALK)
-		wishvel[2] = cmd.upmove;
+		wishvel[2] = alias.upmove;
 	else
 		wishvel[2] = 0;
 
@@ -374,7 +374,7 @@ void SV_ClientThink (void)
 //
 // angles
 // show 1/3 the pitch angle and all the roll angle
-	cmd = host_client->cmd;
+	alias = host_client->cmd;
 	angles = sv_player->v.angles;
 
 	VectorAdd (sv_player->v.v_angle, sv_player->v.punchangle, v_angle);
@@ -548,7 +548,7 @@ nextmsg:
 				if (ret == 2)
 					Cbuf_InsertText (s);
 				else if (ret == 1)
-					Cmd_ExecuteString (s, src_client);
+					CmdArgs::executeString(s, CmdArgs::CLIENT);
 				else
 					Con_DPrintf("%s tried to %s\n", host_client->name, s);
 				break;

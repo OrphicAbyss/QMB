@@ -244,7 +244,7 @@ void Draw_TextureMode_f (void)
 	int		i;
 	gltexture_t	*glt;
 
-	if (Cmd_Argc() == 1)
+	if (CmdArgs::getArgCount() == 1)
 	{
 		for (i=0 ; i< 6 ; i++)
 			if (gl_filter_min == modes[i].minimize)
@@ -258,7 +258,7 @@ void Draw_TextureMode_f (void)
 
 	for (i=0 ; i< 6 ; i++)
 	{
-		if (!Q_strcasecmp (modes[i].name, Cmd_Argv(1) ) )
+		if (!Q_strcasecmp (modes[i].name, CmdArgs::getArg(1) ) )
 			break;
 	}
 	if (i == 6)
@@ -300,7 +300,7 @@ void Draw_Init (void)
 	CVar::registerCVar(&gl_quick_texture_reload);
 	CVar::registerCVar(&gl_sincity);
 
-	Cmd_AddCommand ("gl_texturemode", &Draw_TextureMode_f);
+	Cmd::addCmd("gl_texturemode", &Draw_TextureMode_f);
 
 	// load the console background and the charset
 	// by hand, because we need to write the version

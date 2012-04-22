@@ -169,7 +169,7 @@ stop recording a demo
 */
 void CL_Stop_f (void)
 {
-	if (cmd_source != src_command)
+	if (CmdArgs::getSource() != CmdArgs::COMMAND)
 		return;
 
 	if (!cls.demorecording)
@@ -203,17 +203,17 @@ void CL_Record_f (void)
 	char	name[MAX_OSPATH];
 	int		track;
 
-	if (cmd_source != src_command)
+	if (CmdArgs::getSource() != CmdArgs::COMMAND)
 		return;
 
-	c = Cmd_Argc();
+	c = CmdArgs::getArgCount();
 	if (c != 2 && c != 3 && c != 4)
 	{
 		Con_Printf ("record <demoname> [<map> [cd track]]\n");
 		return;
 	}
 
-	if (strstr(Cmd_Argv(1), ".."))
+	if (strstr(CmdArgs::getArg(1), ".."))
 	{
 		Con_Printf ("Relative pathnames are not allowed.\n");
 		return;
@@ -228,19 +228,19 @@ void CL_Record_f (void)
 // write the forced cd track number, or -1
 	if (c == 4)
 	{
-		track = Q_atoi(Cmd_Argv(3));
+		track = Q_atoi(CmdArgs::getArg(3));
 		Con_Printf ("Forcing CD track to %i\n", cls.forcetrack);
 	}
 	else
 		track = -1;
 
-	sprintf (name, "%s/%s", com_gamedir, Cmd_Argv(1));
+	sprintf (name, "%s/%s", com_gamedir, CmdArgs::getArg(1));
 
 //
 // start the map up
 //
 	if (c > 2)
-		Cmd_ExecuteString ( va("map %s", Cmd_Argv(2)), src_command);
+		CmdArgs::executeString( va("map %s", CmdArgs::getArg(2)), CmdArgs::COMMAND);
 
 //
 // open the demo file
@@ -275,10 +275,10 @@ void CL_PlayDemo_f (void)
 	int c;
 	qboolean neg = false;
 
-	if (cmd_source != src_command)
+	if (CmdArgs::getSource() != CmdArgs::COMMAND)
 		return;
 
-	if (Cmd_Argc() != 2)
+	if (CmdArgs::getArgCount() != 2)
 	{
 		Con_Printf ("play <demoname> : plays a demo\n");
 		return;
@@ -292,7 +292,7 @@ void CL_PlayDemo_f (void)
 //
 // open the demo file
 //
-	Q_strcpy (name, Cmd_Argv(1));
+	Q_strcpy (name, CmdArgs::getArg(1));
 	COM_DefaultExtension (name, ".dem");
 
 	Con_Printf ("Playing demo from %s.\n", name);
@@ -356,10 +356,10 @@ timedemo [demoname]
 */
 void CL_TimeDemo_f (void)
 {
-	if (cmd_source != src_command)
+	if (CmdArgs::getSource() != CmdArgs::COMMAND)
 		return;
 
-	if (Cmd_Argc() != 2)
+	if (CmdArgs::getArgCount() != 2)
 	{
 		Con_Printf ("timedemo <demoname> : gets demo speeds\n");
 		return;

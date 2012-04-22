@@ -184,7 +184,7 @@ void JVM_Init (void){
 	j_env = JVM_CreateVM();
 	JVM_SetupCallback(j_env);
 
-	Cmd_AddCommand ("java", JVM_Quake_f);
+	Cmd::addCmd("java", JVM_Quake_f);
 }
 
 #endif

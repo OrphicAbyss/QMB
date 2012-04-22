@@ -731,5 +731,5 @@ the command "addbot" from the console
 */
 void Bot_Init (void)
 {
-	Cmd_AddCommand ("addbot", NextFreeClient);
+	Cmd::addCmd("addbot", NextFreeClient);
 }
