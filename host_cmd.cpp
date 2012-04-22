@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "common.h"
 
-extern cvar_t	pausable;
+extern CVar	pausable;
 
 int	current_skill;
 
@@ -75,7 +75,7 @@ void Host_Status_f (void)
 	else
 		print = SV_ClientPrintf;
 
-	print ("host:    %s\n", Cvar_VariableString ("hostname"));
+	print ("host:    %s\n", hostname.getString());
 	print ("version: %4.2f\n", VERSION);
 	if (tcpipAvailable)
 		print ("tcp/ip:  %s\n", my_tcpip_address);
@@ -609,7 +609,7 @@ void Host_Loadgame_f (void)
 // this silliness is so we can load 1.06 save files, which have float skill values
 	fscanf (f, "%f\n", &tfloat);
 	current_skill = (int)(tfloat + 0.1);
-	Cvar_SetValue ("skill", (float)current_skill);
+	skill.set((float)current_skill);
 
 	fscanf (f, "%s\n",mapname);
 	fscanf (f, "%f\n",&time);
@@ -709,7 +709,7 @@ void Host_Name_f (void)
 
 	if (Cmd_Argc () == 1)
 	{
-		Con_Printf ("\"name\" is \"%s\"\n", cl_name.string);
+		Con_Printf ("\"name\" is \"%s\"\n", cl_name.getString());
 		return;
 	}
 	if (Cmd_Argc () == 2)
@@ -720,9 +720,10 @@ void Host_Name_f (void)
 
 	if (cmd_source == src_command)
 	{
-		if (Q_strcmp(cl_name.string, newName) == 0)
+		if (Q_strcmp(cl_name.getString(), newName) == 0)
 			return;
-		setValue ("_cl_name", newName);
+
+		cl_name.set(newName);
 		if (cls.state == ca_connected)
 			Cmd_ForwardToServer ();
 		return;
@@ -842,7 +843,7 @@ void Host_Say(qboolean teamonly)
 		sprintf (text, "%c%s: ", 1, save->name);
 		//sprintf (text, "%s: ", save->name);
 	else
-		sprintf (text, "%c<%s> ", 1, hostname.string);
+		sprintf (text, "%c<%s> ", 1, hostname.getString());
 		//sprintf (text, "<%s> ", hostname.string);
 
 	j = sizeof(text) - 2 - Q_strlen(text);  // -2 for /n and null terminator
@@ -856,7 +857,7 @@ void Host_Say(qboolean teamonly)
 	{
 		if (!client || !client->active || !client->spawned)
 			continue;
-		if (teamplay.value && teamonly && client->edict->v.team != save->edict->v.team)
+		if (teamplay.getBool() && teamonly && client->edict->v.team != save->edict->v.team)
 			continue;
 		host_client = client;
 		SV_ClientPrintf("%s", text);
@@ -943,7 +944,7 @@ void Host_Color_f(void)
 
 	if (Cmd_Argc() == 1)
 	{
-		Con_Printf ("\"color\" is \"%i %i\"\n", ((int)cl_color.value) >> 4, ((int)cl_color.value) & 0x0f);
+		Con_Printf ("\"color\" is \"%i %i\"\n", cl_color.getInt() >> 4, cl_color.getInt() & 0x0f);
 		Con_Printf ("color <0-13> [0-13]\n");
 		return;
 	}
@@ -967,7 +968,7 @@ void Host_Color_f(void)
 
 	if (cmd_source == src_command)
 	{
-		Cvar_SetValue ("_cl_color", playercolor);
+		cl_color.set((float)playercolor);
 		if (cls.state == ca_connected)
 			Cmd_ForwardToServer ();
 		return;
@@ -1020,18 +1021,14 @@ void Host_Pause_f (void)
 		Cmd_ForwardToServer ();
 		return;
 	}
-	if (!pausable.value)
+	if (!pausable.getBool())
 		SV_ClientPrintf ("Pause not allowed.\n");
-	else
-	{
+	else {
 		sv.paused ^= 1;
 
-		if (sv.paused)
-		{
+		if (sv.paused) {
 			SV_BroadcastPrintf ("%s paused the game\n", pr_strings + sv_player->v.netname);
-		}
-		else
-		{
+		} else {
 			SV_BroadcastPrintf ("%s unpaused the game\n",pr_strings + sv_player->v.netname);
 		}
 
@@ -1268,7 +1265,7 @@ void Host_Kick_f (void)
 			if (cls.state == ca_dedicated)
 				who = "Console";
 			else
-				who = cl_name.string;
+				who = cl_name.getString();
 		else
 			who = save->name;
 
@@ -1691,9 +1688,6 @@ void Host_InitCommands (void)
 	Cmd_AddCommand ("name", Host_Name_f);
 	Cmd_AddCommand ("noclip", Host_Noclip_f);
 	Cmd_AddCommand ("version", Host_Version_f);
-#ifdef IDGODS
-	Cmd_AddCommand ("please", Host_Please_f);
-#endif
 	Cmd_AddCommand ("say", Host_Say_f);
 	Cmd_AddCommand ("say_team", Host_Say_Team_f);
 	Cmd_AddCommand ("tell", Host_Tell_f);

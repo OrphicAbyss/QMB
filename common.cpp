@@ -23,14 +23,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define NUM_SAFE_ARGVS  7
 
-static char     *largv[MAX_NUM_ARGVS + NUM_SAFE_ARGVS + 1];
-static char     *argvdummy = " ";
+static char *largv[MAX_NUM_ARGVS + NUM_SAFE_ARGVS + 1];
+static char *argvdummy = " ";
 
-static char     *safeargvs[NUM_SAFE_ARGVS] =
-	{"-stdvid", "-nolan", "-nosound", "-nocdaudio", "-nojoy", "-nomouse", "-dibonly"};
+static char *safeargvs[NUM_SAFE_ARGVS] = {"-stdvid", "-nolan", "-nosound", "-nocdaudio", "-nojoy", "-nomouse", "-dibonly"};
 
-cvar_t  registered = {"registered","0"};
-cvar_t  cmdline = {"cmdline","0", false, true};
+CVar registered("registered","0");
+CVar cmdline("cmdline","0", false, true);
 
 qboolean        com_modified;   // set true if using non-id files
 
@@ -300,6 +299,9 @@ int Q_strncmp (const char *s1, const char *s2, int count)
 
 int Q_strncasecmp (const char *s1, const char *s2, int n)
 {
+#ifdef uselib
+	return strncasecmp(s1,s2,n);
+#else
 	int             c1, c2;
 
 	while (1)
@@ -321,16 +323,38 @@ int Q_strncasecmp (const char *s1, const char *s2, int n)
 		}
 		if (!c1)
 			return 0;               // strings are equal
-//              s1++;
-//              s2++;
 	}
 
 	return -1;
+#endif
 }
 
 int Q_strcasecmp (const char *s1, const char *s2)
 {
-	return Q_strncasecmp (s1, s2, 99999);
+#ifdef uselib
+	return strcasecmp(s1, s2);
+#else
+	int             c1, c2;
+
+	while (1)
+	{
+		c1 = *s1++;
+		c2 = *s2++;
+
+		if (c1 != c2){
+			if (c1 >= 'a' && c1 <= 'z')
+				c1 -= ('a' - 'A');
+			if (c2 >= 'a' && c2 <= 'z')
+				c2 -= ('a' - 'A');
+			if (c1 != c2)
+				return -1;              // strings not equal
+		}
+		if (!c1)
+			return 0;               // strings are equal
+	}
+
+	return -1;
+#endif
 }
 
 int Q_atoi (char *str)
@@ -626,7 +650,7 @@ void MSG_WriteFloat (sizebuf_t *sb, float f)
 	SZ_Write (sb, &dat.l, 4);
 }
 
-void MSG_WriteString (sizebuf_t *sb, char *s)
+void MSG_WriteString (sizebuf_t *sb, const char *s)
 {
 	if (!s)
 		SZ_Write (sb, "", 1);
@@ -842,7 +866,7 @@ void SZ_Write (sizebuf_t *buf, const void *data, int length)
 	Q_memcpy (SZ_GetSpace(buf,length),data,length);
 }
 
-void SZ_Print (sizebuf_t *buf, char *data)
+void SZ_Print (sizebuf_t *buf, const char *data)
 {
 	int             len;
 
@@ -1078,8 +1102,8 @@ being registered.
 */
 void COM_CheckRegistered (void)
 {
-	setValue ("cmdline", com_cmdline);
-	setValue ("registered", "1");
+	CVar::setValue("cmdline", com_cmdline);
+	CVar::setValue("registered", "1");
 	Con_Printf ("Playing registered version.\n");
 }
 
@@ -1127,8 +1151,7 @@ void COM_InitArgv (int argc, char **argv)
 			safe = true;
 	}
 
-	if (safe)
-	{
+	if (safe) {
 	// force all the safe-mode switches. Note that we reserved extra space in
 	// case we need to add these, so we don't need an overflow check
 		for (i=0 ; i<NUM_SAFE_ARGVS ; i++)
@@ -1186,8 +1209,8 @@ void COM_Init (char *basedir)
 		LittleFloat = FloatSwap;
 	}
 
-	Cvar_RegisterVariable (&registered);
-	Cvar_RegisterVariable (&cmdline);
+	CVar::registerCVar(&registered);
+	CVar::registerCVar(&cmdline);
 	Cmd_AddCommand ("path", COM_Path_f);
 
 	COM_InitFilesystem ();
@@ -1204,7 +1227,7 @@ varargs versions of all text functions.
 FIXME: make this buffer size safe someday
 ============
 */
-char    *va(char *format, ...)
+char    *va(const char *format, ...)
 {
 	va_list         argptr;
 	static char             string[1024];
@@ -1377,9 +1400,8 @@ void COM_CopyFile (char *netpath, char *cachepath)
 	COM_CreatePath (cachepath);     // create directories up to the cache file
 	out = Sys_FileOpenWrite (cachepath);
 
-	while (remaining)
-	{
-		if (remaining < sizeof(buf))
+	while (remaining){
+		if (remaining < (int)sizeof(buf))
 			count = remaining;
 		else
 			count = sizeof(buf);

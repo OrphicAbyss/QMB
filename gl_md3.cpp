@@ -19,11 +19,6 @@
 #include "quakedef.h"
 #include "gl_md3.h"
 
-#define TEMPHACK 1
-#ifdef TEMPHACK
-extern cvar_t temp1;
-#endif
-
 extern char loadname[32];
 
 void R_MD3TagRotate (entity_t *e, model_t *tagmodel, char *tagname)
@@ -37,17 +32,10 @@ void R_MD3TagRotate (entity_t *e, model_t *tagmodel, char *tagname)
 	{
 		md3tag_t *tags = (md3tag_t *)((byte *)model + model->tag_offs);
 		if(Q_strcmp(tags[i].name, tagname)==0)
-#if TEMPHACK
-			if(temp1.value > model->num_frames)
-				tag = &tags[(model->num_frames-1) * model->num_tags + i];
-			else
-				tag = &tags[(int)temp1.value * model->num_tags + i];
-#else
 			if(e->frame > model->num_frames)
 				tag = &tags[(model->num_frames-1) * model->num_tags + i];
 			else
 				tag = &tags[e->frame * model->num_tags + i];
-#endif
 	}
 
 	if(!tag)
@@ -96,14 +84,14 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline)
 		return;
 	}
 
-	if ((r_celshading.value || r_vertexshading.value) && !outline)
+	if ((r_celshading.getBool() || r_vertexshading.getBool()) && !outline)
 	{
 	//setup for shading
 		GL_SelectTexture(GL_TEXTURE1_ARB);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glDisable(GL_TEXTURE_2D);
 		glEnable(GL_TEXTURE_1D);
-		if (r_celshading.value)
+		if (r_celshading.getBool())
 			glBindTexture (GL_TEXTURE_1D, celtexture);
 		else
 			glBindTexture (GL_TEXTURE_1D, vertextexture);
@@ -112,7 +100,7 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline)
 		usevertexarray = false;
 	}
 
-	if (gl_ammoflash.value && (model->flags & EF_MODELFLASH)){
+	if (gl_ammoflash.getBool() && (model->flags & EF_MODELFLASH)){
 		lightcolor[0] += sin(2 * cl.time * M_PI)/4;
 		lightcolor[1] += sin(2 * cl.time * M_PI)/4;
 		lightcolor[2] += sin(2 * cl.time * M_PI)/4;
@@ -246,7 +234,7 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline)
 	}
 	glPopMatrix();
 
-	if ((r_celshading.value || r_vertexshading.value) && !outline)
+	if ((r_celshading.getBool() || r_vertexshading.getBool()) && !outline)
 	{
 		//setup for shading
 		GL_SelectTexture(GL_TEXTURE1_ARB);
@@ -429,7 +417,7 @@ void Mod_LoadQ3Model(model_t *mod, void *buffer)
 				//try loading texture here
 				sprintf(&name[0],"progs/%s",shader[j].name);
 
-				shader[j].texnum = GL_LoadTexImage(&name[0], false, true, gl_sincity.value);
+				shader[j].texnum = GL_LoadTexImage(&name[0], false, true, gl_sincity.getBool());
 				if (shader[j].texnum == 0){
 					Con_Printf("Model: %s  Texture missing: %s\n", mod->name, shader[j].name);
 				}

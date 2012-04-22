@@ -136,7 +136,7 @@ void Cvar_SetValue (const char *var_name, float value)
 {
 	char	val[32];
 
-	sprintf (val, "%f",value);
+	snprintf (val,32,"%f",value);
 	setValue (var_name, val);
 }
 

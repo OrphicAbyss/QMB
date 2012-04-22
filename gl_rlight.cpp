@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -32,7 +32,7 @@ R_AnimateLight
 void R_AnimateLight (void)
 {
 	int			i,j,k;
-	
+
 //
 // light animations
 // 'm' is normal light, 'a' is no light, 'z' is double bright
@@ -48,7 +48,7 @@ void R_AnimateLight (void)
 		k = cl_lightstyle[j].map[k] - 'a';
 		k = k*22;
 		d_lightstylevalue[j] = k;
-	}	
+	}
 }
 
 /*
@@ -123,7 +123,7 @@ void R_RenderDlights (void)
 	int		i;
 	dlight_t	*l;
 
-	if (!gl_flashblend.value)
+	if (!gl_flashblend.getBool())
 		return;
 
 	r_dlightframecount = r_framecount + 1;	// because the count hasn't
@@ -185,7 +185,7 @@ loc0:
 	else
 		dist = DotProduct (light->origin, splitplane->normal) - splitplane->dist; // LordHavoc: original code
 	// LordHavoc: .lit support end
-	
+
 	if (dist > light->radius)
 	{
 		// LordHavoc: .lit support begin (actually this is just a major lighting speedup, no relation to color :)
@@ -249,7 +249,7 @@ void R_PushDlights (void)
 	int		i;
 	dlight_t	*l;
 
-	if (gl_flashblend.value)
+	if (gl_flashblend.getBool())
 		return;
 
 	r_dlightframecount = r_framecount + 1;	// because the count hasn't
@@ -283,7 +283,7 @@ int RecursiveLightPoint (vec3_t color, mnode_t *node, vec3_t start, vec3_t end)
 loc0:
 	if (node->contents < 0)
 		return false;		// didn't hit anything
-	
+
 // calculate mid point
 	if (node->plane->type < 3)
 	{
@@ -302,12 +302,12 @@ loc0:
 		node = node->children[front < 0];
 		goto loc0;
 	}
-	
+
 	frac = front / (front-back);
 	mid[0] = start[0] + (end[0] - start[0])*frac;
 	mid[1] = start[1] + (end[1] - start[1])*frac;
 	mid[2] = start[2] + (end[2] - start[2])*frac;
-	
+
 // go down front side
 	if (RecursiveLightPoint (color, node->children[front < 0], start, mid))
 		return true;	// hit something
@@ -327,10 +327,10 @@ loc0:
 			dt = (int) ((float) DotProduct (mid, surf->texinfo->vecs[1]) + surf->texinfo->vecs[1][3]);
 			if (ds < surf->texturemins[0] || dt < surf->texturemins[1])
 				continue;
-			
+
 			ds -= surf->texturemins[0];
 			dt -= surf->texturemins[1];
-			
+
 			if (ds > surf->extents[0] || dt > surf->extents[1])
 				continue;
 			if (surf->samples)
@@ -364,13 +364,13 @@ vec3_t lightcolor; // LordHavoc: used by model rendering
 int R_LightPoint (vec3_t p)
 {
 	vec3_t		end;
-	
+
 	if (!cl.worldmodel->lightdata)
 	{
 		lightcolor[0] = lightcolor[1] = lightcolor[2] = 255;
 		return 255;
 	}
-	
+
 	end[0] = p[0];
 	end[1] = p[1];
 	end[2] = p[2] - 2048;

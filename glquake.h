@@ -77,71 +77,59 @@ extern	int shinetex_glass, shinetex_chrome, underwatertexture, highlighttexture;
 
 extern	int	playertextures;
 
-extern	cvar_t	r_drawentities;
-extern	cvar_t	r_drawworld;
-extern	cvar_t	r_drawviewmodel;
-extern	cvar_t	r_speeds;
-extern	cvar_t	r_wateralpha;
-extern	cvar_t	r_dynamic;
-extern	cvar_t	r_novis;
-
-extern	cvar_t	gl_clear;
-extern	cvar_t	gl_cull;
-extern	cvar_t	gl_polyblend;
-extern	cvar_t	gl_keeptjunctions;
-extern	cvar_t	gl_flashblend;
-extern	cvar_t	gl_nocolors;
-
-//qmb :extra cvars
-extern  cvar_t  gl_detail;
-extern  cvar_t  gl_shiny;
-extern  cvar_t  gl_caustics;
-extern  cvar_t  gl_dualwater;
-extern  cvar_t  gl_ammoflash;
-// fenix@io.com: model interpolation
-extern  cvar_t  r_interpolate_model_animation;
-extern  cvar_t  r_interpolate_model_transform;
-extern	cvar_t	r_wave;
-extern	cvar_t	gl_fog;
-extern	cvar_t	gl_fogglobal;
-extern	cvar_t	gl_fogred;
-extern	cvar_t	gl_foggreen;
-extern	cvar_t	gl_fogblue;
-extern	cvar_t	gl_fogstart;
-extern	cvar_t	gl_fogend;
-extern	cvar_t	gl_test;
-extern	cvar_t	gl_conalpha;
-extern	cvar_t	gl_checkleak;
-extern	cvar_t	r_skydetail;
-extern	cvar_t	r_sky_x;
-extern	cvar_t	r_sky_y;
-extern	cvar_t	r_sky_z;
-
-extern	cvar_t	r_errors;
-extern	cvar_t	r_fullbright;
-
-extern	cvar_t	r_modeltexture;
-extern	cvar_t	r_celshading;
-extern	cvar_t	r_vertexshading;
-
-extern	cvar_t	gl_npatches;
-
-extern	cvar_t	gl_anisotropic;
-
-extern	cvar_t	r_outline;
-extern	cvar_t	gl_24bitmaptex;
-extern	cvar_t	gl_sincity;
-
-extern	cvar_t	sv_stepheight;
-extern	cvar_t	sv_jumpstep;
-//qmb :end
-
+extern	CVar	r_drawentities;
+extern	CVar	r_drawworld;
+extern	CVar	r_drawviewmodel;
+extern	CVar	r_speeds;
+extern	CVar	r_wateralpha;
+extern	CVar	r_dynamic;
+extern	CVar	r_novis;
+extern	CVar	gl_clear;
+extern	CVar	gl_cull;
+extern	CVar	gl_polyblend;
+extern	CVar	gl_keeptjunctions;
+extern	CVar	gl_flashblend;
+extern	CVar	gl_nocolors;
+extern  CVar	gl_detail;
+extern  CVar	gl_shiny;
+extern  CVar	gl_caustics;
+extern  CVar	gl_dualwater;
+extern  CVar	gl_ammoflash;
+extern  CVar	r_interpolate_model_animation;
+extern  CVar	r_interpolate_model_transform;
+extern	CVar	r_wave;
+extern	CVar	gl_fog;
+extern	CVar	gl_fogglobal;
+extern	CVar	gl_fogred;
+extern	CVar	gl_foggreen;
+extern	CVar	gl_fogblue;
+extern	CVar	gl_fogstart;
+extern	CVar	gl_fogend;
+extern	CVar	gl_test;
+extern	CVar	gl_conalpha;
+extern	CVar	gl_checkleak;
+extern	CVar	gl_max_size;
+extern	CVar	r_skydetail;
+extern	CVar	r_sky_x;
+extern	CVar	r_sky_y;
+extern	CVar	r_sky_z;
+extern	CVar	r_errors;
+extern	CVar	r_fullbright;
+extern	CVar	r_modeltexture;
+extern	CVar	r_celshading;
+extern	CVar	r_vertexshading;
+extern	CVar	gl_npatches;
+extern	CVar	gl_anisotropic;
+extern	CVar	r_outline;
+extern	CVar	gl_24bitmaptex;
+extern	CVar	gl_sincity;
+extern	CVar	hostname;
+extern	CVar	sv_stepheight;
+extern	CVar	sv_jumpstep;
 
 extern	int		gl_lightmap_format;
 extern	int		gl_solid_format;
 extern	int		gl_alpha_format;
-
-extern	cvar_t	gl_max_size;
 
 extern	const char *gl_vendor;
 extern	const char *gl_renderer;
@@ -149,7 +137,6 @@ extern	const char *gl_version;
 extern	const char *gl_extensions;
 
 void R_TranslatePlayerSkin (int playernum);
-void GL_Bind (int texnum);
 
 // Multitexture
 //QMB :arb multitexture

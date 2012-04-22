@@ -177,13 +177,10 @@ void GL_Init (void)
 /*
 =================
 GL_BeginRendering
-
 =================
 */
 void GL_BeginRendering (int *x, int *y, int *width, int *height)
 {
-	extern cvar_t gl_clear;
-
 	*x = 0;
 	*y = 0;
 	*width = vid.width;
@@ -464,27 +461,28 @@ void IN_Move (usercmd_t *cmd)
     if (!mouse_avail)
         return;
 
-    mouse_x *= sensitivity.value;
-    mouse_y *= sensitivity.value;
+    mouse_x *= sensitivity.getFloat();
+    mouse_y *= sensitivity.getFloat();
 
-    if ( (in_strafe.state & 1) || (lookstrafe.value && (in_mlook.value != 0) ))
-        cmd->sidemove += m_side.value * mouse_x;
+    if ( (in_strafe.state & 1) || (lookstrafe.getBool() && in_mlook.getBool()))
+        cmd->sidemove += m_side.getFloat() * mouse_x;
     else
-        cl.viewangles[YAW] -= m_yaw.value * mouse_x;
-    if (in_mlook.value != 0)
+        cl.viewangles[YAW] -= m_yaw.getFloat() * mouse_x;
+
+    if (in_mlook.getBool())
         V_StopPitchDrift ();
 
-    if ( (in_mlook.value != 0) && !(in_strafe.state & 1)) {
-        cl.viewangles[PITCH] += m_pitch.value * mouse_y;
+    if (in_mlook.getBool() && !(in_strafe.state & 1)) {
+        cl.viewangles[PITCH] += m_pitch.getFloat() * mouse_y;
         if (cl.viewangles[PITCH] > 80)
             cl.viewangles[PITCH] = 80;
         if (cl.viewangles[PITCH] < -70)
             cl.viewangles[PITCH] = -70;
     } else {
         if ((in_strafe.state & 1) && noclip_anglehack)
-            cmd->upmove -= m_forward.value * mouse_y;
+            cmd->upmove -= m_forward.getFloat() * mouse_y;
         else
-            cmd->forwardmove -= m_forward.value * mouse_y;
+            cmd->forwardmove -= m_forward.getFloat() * mouse_y;
     }
     mouse_x = mouse_y = 0.0;
 }

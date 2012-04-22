@@ -23,9 +23,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 edict_t	*sv_player;
 
-extern	cvar_t	sv_friction;
-cvar_t	sv_edgefriction = {"edgefriction", "2"};
-extern	cvar_t	sv_stopspeed;
+extern	CVar	sv_friction;
+extern	CVar	sv_stopspeed;
+CVar	sv_edgefriction("edgefriction", "2");
+CVar	sv_idealpitchscale("sv_idealpitchscale","0.8");
+CVar	sv_maxspeed("sv_maxspeed", "320", false, true);
+CVar	sv_accelerate("sv_accelerate", "10");
 
 static	vec3_t		forward, right, up;
 
@@ -40,9 +43,6 @@ float	*velocity;
 qboolean	onground;
 
 usercmd_t	cmd;
-
-cvar_t	sv_idealpitchscale = {"sv_idealpitchscale","0.8"};
-
 
 /*
 ===============
@@ -88,8 +88,7 @@ void SV_SetIdealPitch (void)
 
 	dir = 0;
 	steps = 0;
-	for (j=1 ; j<i ; j++)
-	{
+	for (j=1 ; j<i ; j++){
 		step = z[j] - z[j-1];
 		if (step > -ON_EPSILON && step < ON_EPSILON)
 			continue;
@@ -101,15 +100,14 @@ void SV_SetIdealPitch (void)
 		dir = step;
 	}
 
-	if (!dir)
-	{
+	if (!dir){
 		sv_player->v.idealpitch = 0;
 		return;
 	}
 
 	if (steps < 2)
 		return;
-	sv_player->v.idealpitch = -dir * sv_idealpitchscale.value;
+	sv_player->v.idealpitch = -dir * sv_idealpitchscale.getFloat();
 }
 
 
@@ -142,12 +140,12 @@ void SV_UserFriction (void)
 	trace = SV_Move (start, vec3_origin, vec3_origin, stop, true, sv_player);
 
 	if (trace.fraction == 1.0)
-		friction = sv_friction.value*sv_edgefriction.value;
+		friction = sv_friction.getFloat()*sv_edgefriction.getFloat();
 	else
-		friction = sv_friction.value;
+		friction = sv_friction.getFloat();
 
 // apply friction
-	control = speed < sv_stopspeed.value ? sv_stopspeed.value : speed;
+	control = speed < sv_stopspeed.getFloat() ? sv_stopspeed.getFloat() : speed;
 	newspeed = speed - host_frametime*control*friction;
 
 	if (newspeed < 0)
@@ -164,9 +162,6 @@ void SV_UserFriction (void)
 SV_Accelerate
 ==============
 */
-cvar_t	sv_maxspeed = {"sv_maxspeed", "320", false, true};
-cvar_t	sv_accelerate = {"sv_accelerate", "10"};
-
 void SV_Accelerate (void)
 {
 	int			i;
@@ -176,7 +171,7 @@ void SV_Accelerate (void)
 	addspeed = wishspeed - currentspeed;
 	if (addspeed <= 0)
 		return;
-	accelspeed = sv_accelerate.value*host_frametime*wishspeed;
+	accelspeed = sv_accelerate.getFloat()*host_frametime*wishspeed;
 	if (accelspeed > addspeed)
 		accelspeed = addspeed;
 
@@ -197,7 +192,7 @@ void SV_AirAccelerate (vec3_t wishveloc)
 	if (addspeed <= 0)
 		return;
 //	accelspeed = sv_accelerate.value * host_frametime;
-	accelspeed = sv_accelerate.value*wishspeed * host_frametime;
+	accelspeed = sv_accelerate.getFloat() * wishspeed * host_frametime;
 	if (accelspeed > addspeed)
 		accelspeed = addspeed;
 
@@ -244,10 +239,10 @@ void SV_WaterMove (void)
 		wishvel[2] += cmd.upmove;
 
 	wishspeed = Length(wishvel);
-	if (wishspeed > sv_maxspeed.value)
+	if (wishspeed > sv_maxspeed.getFloat())
 	{
-		VectorScale (wishvel, sv_maxspeed.value/wishspeed, wishvel);
-		wishspeed = sv_maxspeed.value;
+		VectorScale (wishvel, sv_maxspeed.getFloat()/wishspeed, wishvel);
+		wishspeed = sv_maxspeed.getFloat();
 	}
 	wishspeed *= 0.7f;
 
@@ -257,7 +252,7 @@ void SV_WaterMove (void)
 	speed = Length (velocity);
 	if (speed)
 	{
-		newspeed = speed - host_frametime * speed * sv_friction.value;
+		newspeed = speed - host_frametime * speed * sv_friction.getFloat();
 		if (newspeed < 0)
 			newspeed = 0;
 		VectorScale (velocity, newspeed/speed, velocity);
@@ -276,7 +271,7 @@ void SV_WaterMove (void)
 		return;
 
 	VectorNormalize (wishvel);
-	accelspeed = sv_accelerate.value * wishspeed * host_frametime;
+	accelspeed = sv_accelerate.getFloat() * wishspeed * host_frametime;
 	if (accelspeed > addspeed)
 		accelspeed = addspeed;
 
@@ -328,10 +323,9 @@ void SV_AirMove (void)
 
 	VectorCopy (wishvel, wishdir);
 	wishspeed = VectorNormalize(wishdir);
-	if (wishspeed > sv_maxspeed.value)
-	{
-		VectorScale (wishvel, sv_maxspeed.value/wishspeed, wishvel);
-		wishspeed = sv_maxspeed.value;
+	if (wishspeed > sv_maxspeed.getFloat()) {
+		VectorScale (wishvel, sv_maxspeed.getFloat()/wishspeed, wishvel);
+		wishspeed = sv_maxspeed.getFloat();
 	}
 
 	if ( sv_player->v.movetype == MOVETYPE_NOCLIP)

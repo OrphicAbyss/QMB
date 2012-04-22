@@ -200,9 +200,8 @@ void Key_Console (int key)
 	{	// command completion
 		cmd = Cmd_CompleteCommand (key_lines[edit_line]+1);
 		if (!cmd)
-			cmd = Cvar_CompleteVariable (key_lines[edit_line]+1);
-		if (cmd)
-		{
+			cmd = CVar::completeVariable(key_lines[edit_line]+1);
+		if (cmd){
 			Q_strcpy (key_lines[edit_line]+1, cmd);
 			key_linepos = Q_strlen(cmd)+1;
 			key_lines[edit_line][key_linepos] = ' ';

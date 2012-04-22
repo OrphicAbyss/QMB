@@ -52,40 +52,29 @@ client_t	*host_client;			// current client
 
 jmp_buf 	host_abortserver;
 
-byte		*host_basepal;
-byte		*host_colormap;
+byte	*host_basepal;
+byte	*host_colormap;
 
-cvar_t	host_framerate = {"host_framerate","0"};	// set for slow motion
-cvar_t	host_speeds = {"host_speeds","0"};			// set for running times
+CVar	host_framerate("host_framerate","0");	// set for slow motion
+CVar	host_speeds("host_speeds","0");			// set for running times
+CVar	sys_ticrate("sys_ticrate","0.05");
+CVar	serverprofile("serverprofile","0");
+CVar	fraglimit("fraglimit","0",false,true);
+CVar	timelimit("timelimit","0",false,true);
+CVar	teamplay("teamplay","0",false,true);
+CVar	samelevel("samelevel","0");
+CVar	noexit("noexit","0",false,true);
+CVar	developer("developer","0");
+CVar	skill("skill","1");						// 0 - 3
+CVar	deathmatch("deathmatch","0");			// 0, 1, or 2
+CVar	coop("coop","0");			// 0 or 1
+CVar	pausable("pausable","1");
+CVar	temp1("temp1","0");
+CVar	max_fps("max_fps","72",true);	// set the max fps
+CVar	show_fps("show_fps","1",true);	// set for running times - muff
 
-cvar_t	sys_ticrate = {"sys_ticrate","0.05"};
-cvar_t	serverprofile = {"serverprofile","0"};
+int		fps_count;
 
-cvar_t	fraglimit = {"fraglimit","0",false,true};
-cvar_t	timelimit = {"timelimit","0",false,true};
-cvar_t	teamplay = {"teamplay","0",false,true};
-
-cvar_t	samelevel = {"samelevel","0"};
-cvar_t	noexit = {"noexit","0",false,true};
-
-#ifdef QUAKE2
-cvar_t	developer = {"developer","1"};	// should be 0 for release!
-#else
-cvar_t	developer = {"developer","0"};
-#endif
-
-cvar_t	skill = {"skill","1"};						// 0 - 3
-cvar_t	deathmatch = {"deathmatch","0"};			// 0, 1, or 2
-cvar_t	coop = {"coop","0"};			// 0 or 1
-
-cvar_t	pausable = {"pausable","1"};
-
-cvar_t	temp1 = {"temp1","0"};
-
-//QMB
-cvar_t	max_fps = {"max_fps","72",true};	// set the max fps
-cvar_t	show_fps = {"show_fps","1",true};	// set for running times - muff
-int			fps_count;
 // CSL - epca@powerup.com.au
 // Use bspextensions to determine changes in format to bsp files
 int bspextensions = 0;
@@ -207,9 +196,9 @@ void	Host_FindMaxClients (void)
 	svs.clients = (client_t *)Hunk_AllocName (svs.maxclientslimit*sizeof(client_t), "clients");
 
 	if (svs.maxclients > 1)
-		Cvar_SetValue ("deathmatch", 1.0);
+		deathmatch.set(1.0f);
 	else
-		Cvar_SetValue ("deathmatch", 0.0);
+		deathmatch.set(0.0f);
 }
 
 
@@ -222,31 +211,25 @@ void Host_InitLocal (void)
 {
 	Host_InitCommands ();
 
-	Cvar_RegisterVariable (&host_framerate);
-	Cvar_RegisterVariable (&host_speeds);
-
-	Cvar_RegisterVariable (&sys_ticrate);
-	Cvar_RegisterVariable (&serverprofile);
-
-	Cvar_RegisterVariable (&fraglimit);
-	Cvar_RegisterVariable (&timelimit);
-	Cvar_RegisterVariable (&teamplay);
-	Cvar_RegisterVariable (&samelevel);
-	Cvar_RegisterVariable (&noexit);
-	Cvar_RegisterVariable (&skill);
-	Cvar_RegisterVariable (&developer);
-	Cvar_RegisterVariable (&deathmatch);
-	Cvar_RegisterVariable (&coop);
-
-	Cvar_RegisterVariable (&pausable);
-
-	Cvar_RegisterVariable (&temp1);
+	CVar::registerCVar(&host_framerate);
+	CVar::registerCVar(&host_speeds);
+	CVar::registerCVar(&sys_ticrate);
+	CVar::registerCVar(&serverprofile);
+	CVar::registerCVar(&fraglimit);
+	CVar::registerCVar(&timelimit);
+	CVar::registerCVar(&teamplay);
+	CVar::registerCVar(&samelevel);
+	CVar::registerCVar(&noexit);
+	CVar::registerCVar(&skill);
+	CVar::registerCVar(&developer);
+	CVar::registerCVar(&deathmatch);
+	CVar::registerCVar(&coop);
+	CVar::registerCVar(&pausable);
+	CVar::registerCVar(&temp1);
+	CVar::registerCVar(&show_fps);
+	CVar::registerCVar(&max_fps);
 
 	Host_FindMaxClients ();
-
-	Cvar_RegisterVariable (&show_fps); // muff QMB
-	Cvar_RegisterVariable (&max_fps);
-
 	host_time = 1.0;		// so a think at time 0 won't get called
 }
 
@@ -274,7 +257,7 @@ void Host_WriteConfiguration (void)
 		}
 
 		Key_WriteBindings (f);
-		Cvar_WriteVariables (f);
+		CVar::writeVariables(f);
 
 		fclose (f);
 	}
@@ -516,19 +499,18 @@ qboolean Host_FilterTime (float time)
 {
 	realtime += time;
 
-	if (max_fps.value>0)
-	{
-		    // CAPTURE <anthony@planetquake.com>
+	if (max_fps.getInt()>0)	{
+		// CAPTURE <anthony@planetquake.com>
 		if (!cls.capturedemo) // only allow the following early return if not capturing:
-			if (!cls.timedemo && realtime - oldrealtime < 1.0/max_fps.value)
+			if (!cls.timedemo && realtime - oldrealtime < 1.0/max_fps.getFloat())
 				return false;		// framerate is too high
 	}
 
 	host_frametime = realtime - oldrealtime;
 	oldrealtime = realtime;
 
-	if (host_framerate.value > 0)
-		host_frametime = (float)host_framerate.value;
+	if (host_framerate.getFloat() > 0)
+		host_frametime = host_framerate.getFloat();
 	else
 	{	// don't allow really long or short frames
 		if (host_frametime > 0.1)
@@ -716,27 +698,24 @@ void _Host_Frame (float time)
 	}
 
 // update video
-	if (host_speeds.value)
+	if (host_speeds.getBool())
 		time1 = Sys_FloatTime ();
 
 	SCR_UpdateScreen ();
 
-	if (host_speeds.value)
+	if (host_speeds.getBool())
 		time2 = Sys_FloatTime ();
 
 // update audio
-	if (cls.signon == SIGNONS)
-	{
+	if (cls.signon == SIGNONS){
 		S_Update (r_origin, vpn, vright, vup);
 		CL_DecayLights ();
-	}
-	else
+	} else
 		S_Update (vec3_origin, vec3_origin, vec3_origin, vec3_origin);
 
 	CDAudio_Update();
 
-	if (host_speeds.value)
-	{
+	if (host_speeds.getBool()) {
 		pass1 = (time1 - time3)*1000;
 		time3 = Sys_FloatTime ();
 		pass2 = (time2 - time1)*1000;
@@ -755,7 +734,7 @@ void Host_Frame (float time)
 	static int		timecount;
 	int		i, c, m;
 
-	if (!serverprofile.value)
+	if (!serverprofile.getBool())
 	{
 		_Host_Frame (time);
 		return;
@@ -796,9 +775,7 @@ Host_Init
 */
 //qmb :globot
 void Bot_Init (void);
-void Host_Init (quakeparms_t *parms)
-{
-
+void Host_Init (quakeparms_t *parms){
 	if (standard_quake)
 		minimum_memory = MINIMUM_MEMORY;
 	else
@@ -819,9 +796,7 @@ void Host_Init (quakeparms_t *parms)
 	Cbuf_Init ();
 	Cmd_Init ();
 	V_Init ();
-	//Qmb :NeuralNets
 	NN_init();
-
 	Chase_Init ();
 	COM_Init (parms->basedir);
 	Host_InitLocal ();
@@ -833,7 +808,6 @@ void Host_Init (quakeparms_t *parms)
 	Mod_Init ();
 	NET_Init ();
 	SV_Init ();
-	//Qmb :globot
 	Bot_Init ();
 
 	Con_Printf ("Exe: "__TIME__" "__DATE__"\n");
@@ -850,32 +824,15 @@ void Host_Init (quakeparms_t *parms)
 		if (!host_colormap)
 			Sys_Error ("Couldn't load gfx/colormap.lmp");
 
-#ifndef _WIN32 // on non win32, mouse comes before video for security reasons
 		IN_Init ();
-#endif
 		VID_Init (host_basepal);
-
 		Draw_Init ();
 		SCR_Init ();
 		R_Init ();
-#ifndef	_WIN32
-	// on Win32, sound initialization has to come before video initialization, so we
-	// can put up a popup if the sound hardware is in use
 		S_Init ();
-#else
-
-#ifdef	GLQUAKE
-	// FIXME: doesn't use the new one-window approach yet
-		S_Init ();
-#endif
-
-#endif	// _WIN32
 		CDAudio_Init ();
 		Sbar_Init ();
 		CL_Init ();
-#ifdef _WIN32 // on non win32, mouse comes before video for security reasons
-		IN_Init ();
-#endif
 	}
 
 	Cbuf_InsertText ("exec quake.rc\n");

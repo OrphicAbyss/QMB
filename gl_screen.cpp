@@ -80,16 +80,17 @@ float		scr_con_current;
 float		scr_conlines;		// lines of console to display
 
 float		oldscreensize, oldfov;
-cvar_t		scr_viewsize = {"viewsize","100", true};
-cvar_t		scr_fov = {"fov","90", true};	// 10 - 170
-cvar_t		scr_conspeed = {"scr_conspeed","600", true};
-cvar_t		scr_centertime = {"scr_centertime","2"};
-cvar_t		scr_showturtle = {"showturtle","0"};
-cvar_t		scr_showpause = {"showpause","1"};
-cvar_t		scr_printspeed = {"scr_printspeed","8"};
-cvar_t		gl_triplebuffer = {"gl_triplebuffer", "1", true };
 
-extern	cvar_t	crosshair;
+CVar		scr_viewsize("viewsize","100", true);
+CVar		scr_fov("fov","90", true);	// 10 - 170
+CVar		scr_conspeed("scr_conspeed","600", true);
+CVar		scr_centertime("scr_centertime","2");
+CVar		scr_showturtle("showturtle","0");
+CVar		scr_showpause("showpause","1");
+CVar		scr_printspeed("scr_printspeed","8");
+CVar		gl_triplebuffer("gl_triplebuffer", "1", true );
+
+extern	CVar	crosshair;
 
 qboolean	scr_initialized;		// ready to draw
 
@@ -110,9 +111,7 @@ float		scr_disabled_time;
 
 void SCR_ScreenShot_f (void);
 
-//QMB: hud stuff
-//JHL; for modified resize functions
-extern	cvar_t	hud;
+extern	CVar	hud;
 
 /*
 ===============================================================================
@@ -140,13 +139,12 @@ for a few moments
 void SCR_CenterPrint (char *str)
 {
 	Q_strncpy (scr_centerstring, str, sizeof(scr_centerstring)-1);
-	scr_centertime_off = scr_centertime.value;
+	scr_centertime_off = scr_centertime.getFloat();
 	scr_centertime_start = cl.time;
 
 // count the number of lines for centering
 	scr_center_lines = 1;
-	while (*str)
-	{
+	while (*str){
 		if (*str == '\n')
 			scr_center_lines++;
 		str++;
@@ -164,7 +162,7 @@ void SCR_DrawCenterString (void)
 
 // the finale prints the characters one at a time
 	if (cl.intermission)
-		remaining = scr_printspeed.value * (cl.time - scr_centertime_start);
+		remaining = scr_printspeed.getFloat() * (cl.time - scr_centertime_start);
 	else
 		remaining = 9999;
 
@@ -251,42 +249,43 @@ Internal use only
 */
 static void SCR_CalcRefdef (void)
 {
-	float		size;
-	int		h;
-	qboolean		full = false;
+	float		size, fov;
+	int			h;
+	qboolean	full = false;
 
 	scr_fullupdate = 0;		// force a background redraw
 	vid.recalc_refdef = 0;
 
 //========================================
+	size = scr_viewsize.getFloat();
+	fov = scr_fov.getFloat();
 
 // bound viewsize
-	if (scr_viewsize.value < 30)
-		setValue ("viewsize","30");
-	if (scr_viewsize.value > 100)
-		setValue ("viewsize","120");
+	size = max(30,size);
+	size = min(120,size);
 
 // bound field of view
-	if (scr_fov.value < 10)
-		setValue ("fov","10");
-	if (scr_fov.value > 170)
-		setValue ("fov","170");
+	fov = max(10,fov);
+	fov = min(170,fov);
 
-	size = scr_viewsize.value;
+	if (size != scr_viewsize.getFloat())
+		scr_viewsize.set(size);
+	if (fov != scr_fov.getFloat())
+		scr_fov.set(fov);
+
 	sb_lines = 24+16+8;
-
-	if (scr_viewsize.value >= 100.0) {
+	if (size >= 100.0) {
 		full = true;
 		size = 100.0;
-	} else
-		size = scr_viewsize.value;
-	if (cl.intermission)
-	{
+	}
+
+	if (cl.intermission){
 		full = true;
 		size = 100;
 		sb_lines = 0;
 	}
-	size /= 100.0;
+
+	size /= 100.0f;
 
 	// TODO: remove sb_lines variable
 	h = vid.height;// - sb_lines;
@@ -310,7 +309,7 @@ static void SCR_CalcRefdef (void)
 	else
 		r_refdef.vrect.y = (h - r_refdef.vrect.height)/2;
 
-	r_refdef.fov_x = scr_fov.value;
+	r_refdef.fov_x = fov;
 	r_refdef.fov_y = CalcFov (r_refdef.fov_x, r_refdef.vrect.width, r_refdef.vrect.height);
 
 	scr_vrect = r_refdef.vrect;
@@ -327,9 +326,9 @@ Keybinding command
 void SCR_SizeUp_f (void)
 {
 	//JHL:HACK; changed to affect the HUD, not SCR size
-	if (hud.value < 3)
+	if (hud.getInt() < 3)
 	{
-		Cvar_SetValue ("hud", hud.value+1);
+		hud.set(hud.getFloat()+1);
 		vid.recalc_refdef = 1;
 	}
 	//qmb :hud
@@ -348,9 +347,9 @@ Keybinding command
 void SCR_SizeDown_f (void)
 {
 	//JHL:HACK; changed to affect the HUD, not SCR size
-	if (hud.value > 0)
+	if (hud.getInt() > 0)
 	{
-		Cvar_SetValue ("hud", hud.value-1);
+		hud.set(hud.getFloat()-1);
 		vid.recalc_refdef = 1;
 	}
 	//qmb :hud
@@ -367,19 +366,16 @@ SCR_Init
 */
 void SCR_Init (void)
 {
+	CVar::registerCVar(&scr_fov);
+	CVar::registerCVar(&scr_viewsize);
+	CVar::registerCVar(&scr_conspeed);
+	CVar::registerCVar(&scr_showturtle);
+	CVar::registerCVar(&scr_showpause);
+	CVar::registerCVar(&scr_centertime);
+	CVar::registerCVar(&scr_printspeed);
+	CVar::registerCVar(&gl_triplebuffer);
 
-	Cvar_RegisterVariable (&scr_fov);
-	Cvar_RegisterVariable (&scr_viewsize);
-	Cvar_RegisterVariable (&scr_conspeed);
-	Cvar_RegisterVariable (&scr_showturtle);
-	Cvar_RegisterVariable (&scr_showpause);
-	Cvar_RegisterVariable (&scr_centertime);
-	Cvar_RegisterVariable (&scr_printspeed);
-	Cvar_RegisterVariable (&gl_triplebuffer);
-
-//
 // register our commands
-//
 	Cmd_AddCommand ("screenshot",SCR_ScreenShot_f);
 	Cmd_AddCommand ("sizeup",SCR_SizeUp_f);
 	Cmd_AddCommand ("sizedown",SCR_SizeDown_f);
@@ -417,11 +413,10 @@ void SCR_DrawTurtle (void)
 {
 	static int	count;
 
-	if (!scr_showturtle.value)
+	if (!scr_showturtle.getBool())
 		return;
 
-	if (host_frametime < 0.1)
-	{
+	if (host_frametime < 0.1){
 		count = 0;
 		return;
 	}
@@ -456,7 +451,7 @@ SCR_DrawFPS
 */
 void SCR_DrawFPS (void)
 {
-	extern cvar_t show_fps;
+	extern CVar show_fps;
 	static double lastframetime;
 	double t;
 	extern int fps_count;
@@ -466,7 +461,7 @@ void SCR_DrawFPS (void)
 	int x, y;
 	char st[80];
 
-	if (!show_fps.value)
+	if (!show_fps.getBool())
 		return;
 
 	t = Sys_FloatTime ();
@@ -493,12 +488,12 @@ void SCR_DrawFPS (void)
 
 void Scr_ShowNumP (void)
 {
-	extern cvar_t show_fps;
+	extern CVar show_fps;
 	int x, y;
 	char st[80];
 	extern int numParticles;
 
-	if (!show_fps.value)
+	if (!show_fps.getBool())
 		return;
 
 	sprintf(st, "%i Particles in world", numParticles);
@@ -518,7 +513,7 @@ void SCR_DrawPause (void)
 {
 	qpic_t	*pic;
 
-	if (!scr_showpause.value)		// turn off for screenshots
+	if (!scr_showpause.getBool())		// turn off for screenshots
 		return;
 
 	if (!cl.paused)
@@ -578,14 +573,14 @@ void SCR_SetUpToDrawConsole (void)
 
 	if (scr_conlines < scr_con_current)
 	{
-		scr_con_current -= scr_conspeed.value*host_frametime;
+		scr_con_current -= scr_conspeed.getFloat()*host_frametime;
 		if (scr_conlines > scr_con_current)
 			scr_con_current = scr_conlines;
 
 	}
 	else if (scr_conlines > scr_con_current)
 	{
-		scr_con_current += scr_conspeed.value*host_frametime;
+		scr_con_current += scr_conspeed.getFloat()*host_frametime;
 		if (scr_conlines < scr_con_current)
 			scr_con_current = scr_conlines;
 	}
@@ -859,25 +854,21 @@ needs almost the entire 256k of stack space!
 */
 void SCR_UpdateScreen (void)
 {
-	GLenum error;
-	static float	oldscr_viewsize;
 	extern int	crosshair_tex[32];
-	extern cvar_t hud_r, hud_g, hud_b, hud_a;
+	extern CVar hud_r, hud_g, hud_b, hud_a;
 	vec3_t	colour;
 
-	colour[0] = hud_r.value;
-	colour[1] = hud_g.value;
-	colour[2] = hud_b.value;
+	colour[0] = hud_r.getFloat();
+	colour[1] = hud_g.getFloat();
+	colour[2] = hud_b.getFloat();
 
-	vid.numpages = 2 + gl_triplebuffer.value;
+	vid.numpages = 2 + gl_triplebuffer.getInt();
 
 	scr_copytop = 0;
 	scr_copyeverything = 0;
 
-	if (scr_disabled_for_loading)
-	{
-		if (realtime - scr_disabled_time > 60)
-		{
+	if (scr_disabled_for_loading){
+		if (realtime - scr_disabled_time > 60){
 			scr_disabled_for_loading = false;
 			Con_Printf ("load failed.\n");
 		}
@@ -891,18 +882,14 @@ void SCR_UpdateScreen (void)
 
 	GL_BeginRendering (&glx, &gly, &glwidth, &glheight);
 
-	//
 	// determine size of refresh window
-	//
-	if (oldfov != scr_fov.value)
-	{
-		oldfov = scr_fov.value;
+	if (oldfov != scr_fov.getInt()){
+		oldfov = scr_fov.getInt();
 		vid.recalc_refdef = true;
 	}
 
-	if (oldscreensize != scr_viewsize.value)
-	{
-		oldscreensize = scr_viewsize.value;
+	if (oldscreensize != scr_viewsize.getFloat()){
+		oldscreensize = scr_viewsize.getFloat();
 		vid.recalc_refdef = true;
 	}
 
@@ -947,10 +934,10 @@ void SCR_UpdateScreen (void)
 	}
 	else
 	{
-		if (crosshair.value<32 && crosshair_tex[(int)crosshair.value] != 0)
-			Draw_Crosshair (crosshair_tex[(int)crosshair.value], colour, 0.7f);
+		if (crosshair.getInt()<32 && crosshair_tex[(int)crosshair.getInt()] != 0)
+			Draw_Crosshair (crosshair_tex[(int)crosshair.getInt()], colour, 0.7f);
 		else
-			if (crosshair.value){
+			if (crosshair.getBool()){
 				float x = (vid.conwidth /2) - 0;
 				float y = (vid.conheight/2) - 0;
 				Draw_Character (x, y, '+');
@@ -970,7 +957,7 @@ void SCR_UpdateScreen (void)
 		M_Draw ();
 	}
 
-	if (r_errors.value && developer.value)
+	if (r_errors.getBool() && developer.getBool())
 		checkGLError("After drawing HUD:");
 
 	V_UpdatePalette ();

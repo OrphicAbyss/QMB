@@ -8,6 +8,7 @@ class CVar {
 	bool server;
 	float fValue;
 	int	iValue;
+	bool bValue;
 private:
 	void init(char *name,char *sValue,bool archive,bool server);
 	void parseValue();
@@ -19,15 +20,20 @@ public:
 
 	void reg();
 	void set(const char *value);
+	void set(float value);
+	void set(bool value);
 	char *getName();
 	char *getString();
+	bool getBool();
 	int getInt();
 	float getFloat();
 	bool isArchived();
+	bool isServer();
 
-	static CVar *findCVar(char *name);
+	static CVar *findCVar(const char *name);
+	static CVar *findNextServerCVar (const char *name);
 	static void registerCVar(CVar *variable);
-	static void setValue(char *name, char *value);
+	static void setValue(const char *name, const char *value);
 	static float getFloatValue(char *name);
 	static const char *getStringValue(char *name);
 	static char *completeVariable(char *partial);

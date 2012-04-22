@@ -425,14 +425,14 @@ void GL_DrawAliasFrame (aliashdr_t *paliashdr, int posenum, int shell, int cell)
 	verts += posenum * paliashdr->poseverts;
 	order = (int *)((byte *)paliashdr + paliashdr->commands);
 
-	if (r_celshading.value || r_vertexshading.value)
+	if (r_celshading.getBool() || r_vertexshading.getBool())
 	{
 	//setup for shading
 		GL_SelectTexture(GL_TEXTURE1_ARB);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glDisable(GL_TEXTURE_2D);
 		glEnable(GL_TEXTURE_1D);
-		if (r_celshading.value)
+		if (r_celshading.getBool())
 			glBindTexture (GL_TEXTURE_1D, celtexture);
 		else
 			glBindTexture (GL_TEXTURE_1D, vertextexture);
@@ -491,7 +491,7 @@ void GL_DrawAliasFrame (aliashdr_t *paliashdr, int posenum, int shell, int cell)
 	}
 
 
-	if (r_celshading.value || r_vertexshading.value)
+	if (r_celshading.getBool() || r_vertexshading.getBool())
 	{
 	//setup for shading
 		glDisable(GL_TEXTURE_1D);
@@ -591,14 +591,14 @@ void GL_DrawAliasBlendedFrame (aliashdr_t *paliashdr, int pose1, int pose2, floa
 	lightVector[1] = 0;
 	lightVector[2] = 1;
 
-	if (r_celshading.value || r_vertexshading.value)
+	if (r_celshading.getBool() || r_vertexshading.getBool())
 	{
 	//setup for shading
 		GL_SelectTexture(GL_TEXTURE1_ARB);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glDisable(GL_TEXTURE_2D);
 		glEnable(GL_TEXTURE_1D);
-		if (r_celshading.value)
+		if (r_celshading.getBool())
 			glBindTexture (GL_TEXTURE_1D, celtexture);
 		else
 			glBindTexture (GL_TEXTURE_1D, vertextexture);
@@ -680,7 +680,7 @@ void GL_DrawAliasBlendedFrame (aliashdr_t *paliashdr, int pose1, int pose2, floa
 		glEnd ();
 	}
 
-	if (r_celshading.value || r_vertexshading.value)
+	if (r_celshading.getBool() || r_vertexshading.getBool())
 	{
 	//setup for shading
 		glDisable(GL_TEXTURE_1D);
@@ -1030,9 +1030,9 @@ void R_DrawAliasModel (entity_t *e)
 	//
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	if (gl_n_patches && gl_npatches.value){
+	if (gl_n_patches && gl_npatches.getBool()){
 		glEnable(GL_PN_TRIANGLES_ATI);
-		glPNTrianglesiATI( GL_PN_TRIANGLES_TESSELATION_LEVEL_ATI, gl_npatches.value);
+		glPNTrianglesiATI( GL_PN_TRIANGLES_TESSELATION_LEVEL_ATI, gl_npatches.getInt());
 
 	   if (true)
 		  glPNTrianglesiATI( GL_PN_TRIANGLES_POINT_MODE_ATI, GL_PN_TRIANGLES_POINT_MODE_CUBIC_ATI);
@@ -1047,13 +1047,13 @@ void R_DrawAliasModel (entity_t *e)
 
 	if (clmodel->aliastype == MD3IDHEADER){
 		//do nothing for testing
-		if (!r_modeltexture.value){	GL_DisableTMU(GL_TEXTURE0_ARB); }//disable texture if needed
+		if (!r_modeltexture.getBool()){	GL_DisableTMU(GL_TEXTURE0_ARB); }//disable texture if needed
 
 		R_DrawQ3Model (e, false, false);
 
-		if (!r_modeltexture.value){	GL_EnableTMU(GL_TEXTURE0_ARB); }//enable texture if needed
+		if (!r_modeltexture.getBool()){	GL_EnableTMU(GL_TEXTURE0_ARB); }//enable texture if needed
 
-		if (r_celshading.value || r_outline.value)
+		if (r_celshading.getBool() || r_outline.getBool())
 		{
 			glCullFace (GL_BACK);
 			glEnable(GL_BLEND);
@@ -1109,7 +1109,7 @@ void R_DrawAliasModel (entity_t *e)
     //
     // draw all the triangles
     //
-		if (!r_modeltexture.value){
+		if (!r_modeltexture.getBool()){
 			GL_DisableTMU(GL_TEXTURE0_ARB);
 		}else {
 			//highlighting test code
@@ -1135,14 +1135,14 @@ void R_DrawAliasModel (entity_t *e)
 		R_SetupAliasBlendedFrame (e->frame, paliashdr, e, false, false);
 		glDisable(GL_TEXTURE_1D);
 
-		if (r_celshading.value || r_outline.value)
+		if (r_celshading.getBool() || r_outline.getBool())
 		{
 			glColor3f(0.0,0.0,0.0);
 			R_SetupAliasBlendedFrame (e->frame, paliashdr, e, false, true);
 			glColor3f(1.0,1.0,1.0);
 		}
 
-		if (!r_modeltexture.value){
+		if (!r_modeltexture.getBool()){
 			GL_EnableTMU(GL_TEXTURE0_ARB);
 		}else {
 			if (0 && gl_textureunits>2){
@@ -1187,7 +1187,7 @@ void R_DrawAliasModel (entity_t *e)
 		R_SetupQ2AliasFrame (e, pheader);
 	}
 
-	if (gl_n_patches && gl_npatches.value)
+	if (gl_n_patches && gl_npatches.getBool())
 	{
 		glDisable(GL_PN_TRIANGLES_ATI);
 	}

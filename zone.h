@@ -132,7 +132,7 @@ public:
 	static MemoryObj *Alloc(MemType type, char *name, int size);
 	static void Free(MemoryObj *obj);
 	static void Flush(MemType type);
-	static void Print();
+	static void Print(MemType type);
 	static void Report();
 };
 

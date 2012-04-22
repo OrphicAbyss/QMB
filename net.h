@@ -200,16 +200,15 @@ typedef struct
 	int			controlSock;
 } net_driver_t;
 
-extern int			net_numdrivers;
+extern int		net_numdrivers;
 extern net_driver_t	net_drivers[MAX_NET_DRIVERS];
 
-extern int			DEFAULTnet_hostport;
-extern int			net_hostport;
+extern int		DEFAULTnet_hostport;
+extern int		net_hostport;
 
 extern int net_driverlevel;
-extern cvar_t		hostname;
-extern char			playername[];
-extern int			playercolor;
+extern char		playername[];
+extern int		playercolor;
 
 extern int		messagesSent;
 extern int		messagesReceived;

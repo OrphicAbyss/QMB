@@ -232,51 +232,33 @@ typedef struct
 
 // frag scoreboard
 	scoreboard_t	*scores;		// [cl.maxclients]
-
-#ifdef QUAKE2
-// light level at player's position including dlights
-// this is sent back to the server each frame
-// architectually ugly but it works
-	int			light_level;
-#endif
 } client_state_t;
 
 
 //
 // cvars
 //
-extern	cvar_t	cl_name;
-extern	cvar_t	cl_color;
-
-extern	cvar_t	cl_upspeed;
-extern	cvar_t	cl_forwardspeed;
-extern	cvar_t	cl_backspeed;
-extern	cvar_t	cl_sidespeed;
-
-extern	cvar_t	cl_movespeedkey;
-
-extern	cvar_t	cl_yawspeed;
-extern	cvar_t	cl_pitchspeed;
-
-extern	cvar_t	cl_anglespeedkey;
-
-extern	cvar_t	cl_autofire;
-
-extern	cvar_t	cl_shownet;
-extern	cvar_t	cl_nolerp;
-
-extern	cvar_t	cl_pitchdriftspeed;
-extern	cvar_t	lookspring;
-extern	cvar_t	lookstrafe;
-extern	cvar_t	sensitivity;
-
-//qmb :mouse look cvar
-extern	cvar_t	in_mlook;
-
-extern	cvar_t	m_pitch;
-extern	cvar_t	m_yaw;
-extern	cvar_t	m_forward;
-extern	cvar_t	m_side;
+extern	CVar	cl_name;
+extern	CVar	cl_color;
+extern	CVar	cl_upspeed;
+extern	CVar	cl_forwardspeed;
+extern	CVar	cl_backspeed;
+extern	CVar	cl_sidespeed;
+extern	CVar	cl_movespeedkey;
+extern	CVar	cl_yawspeed;
+extern	CVar	cl_pitchspeed;
+extern	CVar	cl_anglespeedkey;
+extern	CVar	cl_shownet;
+extern	CVar	cl_nolerp;
+extern	CVar	cl_pitchdriftspeed;
+extern	CVar	lookspring;
+extern	CVar	lookstrafe;
+extern	CVar	sensitivity;
+extern	CVar	in_mlook;
+extern	CVar	m_pitch;
+extern	CVar	m_yaw;
+extern	CVar	m_forward;
+extern	CVar	m_side;
 
 
 #define	MAX_TEMP_ENTITIES	64			// lightning bolts, etc

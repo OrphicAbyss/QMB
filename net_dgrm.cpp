@@ -876,7 +876,7 @@ static qsocket_t *_Datagram_CheckNewConnections (void)
 		MSG_WriteByte(&net_message, CCREP_SERVER_INFO);
 		dfunc.GetSocketAddr(acceptsock, &newaddr);
 		MSG_WriteString(&net_message, dfunc.AddrToString(&newaddr));
-		MSG_WriteString(&net_message, hostname.string);
+		MSG_WriteString(&net_message, hostname.getString());
 		MSG_WriteString(&net_message, sv.name);
 		MSG_WriteByte(&net_message, net_activeconnections);
 		MSG_WriteByte(&net_message, svs.maxclients);
@@ -925,30 +925,19 @@ static qsocket_t *_Datagram_CheckNewConnections (void)
 		return NULL;
 	}
 
-	if (command == CCREQ_RULE_INFO)
-	{
+	if (command == CCREQ_RULE_INFO){
 		char	*prevCvarName;
-		cvar_t	*var;
+		CVar	*var;
 
 		// find the search start location
 		prevCvarName = MSG_ReadString();
 		if (*prevCvarName)
-		{
-			var = Cvar_FindVar (prevCvarName);
-			if (!var)
-				return NULL;
-			var = var->next;
-		}
+			var = CVar::findNextServerCVar(prevCvarName);
 		else
-			var = cvar_vars;
+			var = CVar::findNextServerCVar(NULL);
 
-		// search for the next server cvar
-		while (var)
-		{
-			if (var->server)
-				break;
-			var = var->next;
-		}
+		if (!var)
+			return NULL;
 
 		// send the response
 
@@ -958,8 +947,8 @@ static qsocket_t *_Datagram_CheckNewConnections (void)
 		MSG_WriteByte(&net_message, CCREP_RULE_INFO);
 		if (var)
 		{
-			MSG_WriteString(&net_message, var->name);
-			MSG_WriteString(&net_message, var->string);
+			MSG_WriteString(&net_message, var->getName());
+			MSG_WriteString(&net_message, var->getString());
 		}
 		*((int *)net_message.data) = BigLong(NETFLAG_CTL | (net_message.cursize & NETFLAG_LENGTH_MASK));
 		dfunc.Write (acceptsock, net_message.data, net_message.cursize, &clientaddr);

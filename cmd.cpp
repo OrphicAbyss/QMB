@@ -84,7 +84,7 @@ Cbuf_AddText
 Adds command text at the end of the buffer
 ============
 */
-void Cbuf_AddText (char *text)
+void Cbuf_AddText (const char *text)
 {
 	int		l;
 
@@ -411,10 +411,10 @@ typedef struct cmd_function_s
 
 #define	MAX_ARGS		80
 
-static	int			cmd_argc;
-static	char		*cmd_argv[MAX_ARGS];
-static	char		*cmd_null_string = "";
-static	char		*cmd_args = NULL;
+static	int		cmd_argc;
+static	char	*cmd_argv[MAX_ARGS];
+static	char	*cmd_null_string = "";
+static	char	*cmd_args = NULL;
 
 cmd_source_t	cmd_source;
 
@@ -538,8 +538,7 @@ void	Cmd_AddCommand (const char *cmd_name, xcommand_t function)
 		Sys_Error ("Cmd_AddCommand after host_initialized");
 
 // fail if the command is a variable name
-	if (Cvar_VariableString(cmd_name)[0])
-	{
+	if (CVar::findCVar(cmd_name)){
 		Con_Printf ("Cmd_AddCommand: %s already defined as a var\n", cmd_name);
 		return;
 	}
@@ -588,8 +587,10 @@ Cmd_CompleteCommand
 */
 char *Cmd_CompleteCommand (char *partial)
 {
-	cmd_function_t	*cmd;
+	cmd_function_t	*cmd = NULL;
+	cmd_function_t	*found = NULL;
 	int				len;
+	bool			multiple = false;
 
 	len = Q_strlen(partial);
 
@@ -597,11 +598,38 @@ char *Cmd_CompleteCommand (char *partial)
 		return NULL;
 
 // check functions
-	for (cmd=cmd_functions ; cmd ; cmd=cmd->next)
-		if (!Q_strncmp (partial,cmd->name, len))
-			return cmd->name;
+	for (cmd=cmd_functions ; cmd && !multiple ; cmd=cmd->next){
+		if (!Q_strncmp (partial,cmd->name, len)){
+			if (found != NULL)
+				found = cmd;
+			else
+				multiple = true;
+		}
+	}
 
-	return NULL;
+// Found multiple matches, print out all options
+	if (multiple){
+		bool first = true;
+		Con_Printf("Commands: ");
+		for (cmd=cmd_functions ; cmd ; cmd=cmd->next){
+			if (!Q_strncmp (partial,cmd->name, len)){
+				if (first){
+					first = false;
+					Con_Printf(cmd->name);
+				} else {
+					Con_Printf(", %s",cmd->name);
+				}
+			}
+		}
+		Con_Printf("\n");
+
+		found = NULL;
+	}
+
+	if (found != NULL)
+		return found->name;
+	else
+		return NULL;
 }
 
 /*
@@ -645,7 +673,7 @@ void	Cmd_ExecuteString (char *text, cmd_source_t src)
 	}
 
 // check cvars
-	if (!Cvar_Command ())
+	if (!CVar::consoleCommand())
 		Con_Printf ("Unknown command \"%s\"\n", Cmd_Argv(0));
 
 }

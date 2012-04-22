@@ -82,7 +82,6 @@ void R_InitOtherTextures (void)
 		crosshair_tex[i] = GL_LoadTexImage (crossfound[i], false, false, false);
 		Z_Free(crossfound[i]);
 	}
-	Con_Printf("\n");
 
 	for (i=0;i<32;i++)
 		cellFull[i][0] = cellFull[i][1] = cellFull[i][2] = cellData[i];
@@ -118,67 +117,56 @@ R_Init
 void R_Init (void)
 {
 	extern byte *hunk_base;
-	extern cvar_t gl_finish;
+	extern CVar gl_finish;
 
 	Cmd_AddCommand ("timerefresh", R_TimeRefresh_f);
 	Cmd_AddCommand ("loadsky", R_LoadSky_f);
 	Cmd_AddCommand ("currentcoord", R_CurrentCoord_f);
 
-	Cvar_RegisterVariable (&r_drawentities);
-	Cvar_RegisterVariable (&r_drawviewmodel);
-	Cvar_RegisterVariable (&r_wateralpha);
-	Cvar_RegisterVariable (&r_dynamic);
-	Cvar_RegisterVariable (&r_novis);
-	Cvar_RegisterVariable (&r_speeds);
-
-	Cvar_RegisterVariable (&gl_finish);
-	Cvar_RegisterVariable (&gl_clear);
-
-	Cvar_RegisterVariable (&gl_cull);
-	Cvar_RegisterVariable (&gl_polyblend);
-	Cvar_RegisterVariable (&gl_flashblend);
-	Cvar_RegisterVariable (&gl_nocolors);
-
-	Cvar_RegisterVariable (&gl_keeptjunctions);
-
-	//qmb :extra cvars
-	Cvar_RegisterVariable (&gl_detail);
-	Cvar_RegisterVariable (&gl_shiny);
-	Cvar_RegisterVariable (&gl_caustics);
-	Cvar_RegisterVariable (&gl_dualwater);
-	Cvar_RegisterVariable (&gl_ammoflash);
-	// fenix@io.com: register new cvars for model interpolation
-	Cvar_RegisterVariable (&r_interpolate_model_animation);
-	Cvar_RegisterVariable (&r_interpolate_model_transform);
-	Cvar_RegisterVariable (&r_wave);
-	Cvar_RegisterVariable (&gl_fog);
-	Cvar_RegisterVariable (&gl_fogglobal);
-	Cvar_RegisterVariable (&gl_fogred);
-	Cvar_RegisterVariable (&gl_foggreen);
-	Cvar_RegisterVariable (&gl_fogblue);
-	Cvar_RegisterVariable (&gl_fogstart);
-	Cvar_RegisterVariable (&gl_fogend);
-	Cvar_RegisterVariable (&gl_conalpha);
-	Cvar_RegisterVariable (&gl_test);
-	Cvar_RegisterVariable (&gl_checkleak);
-	Cvar_RegisterVariable (&r_skydetail);
-	Cvar_RegisterVariable (&r_sky_x);
-	Cvar_RegisterVariable (&r_sky_y);
-	Cvar_RegisterVariable (&r_sky_z);
-
-	Cvar_RegisterVariable (&r_errors);
-	Cvar_RegisterVariable (&r_fullbright);
-
-	Cvar_RegisterVariable (&r_modeltexture);
-	Cvar_RegisterVariable (&r_celshading);
-	Cvar_RegisterVariable (&r_outline);
-	Cvar_RegisterVariable (&r_vertexshading);
-	Cvar_RegisterVariable (&gl_npatches);
-
-	Cvar_RegisterVariable (&gl_anisotropic);
-
-	Cvar_RegisterVariable (&gl_24bitmaptex);
-	//qmb :end
+	CVar::registerCVar(&r_drawentities);
+	CVar::registerCVar(&r_drawviewmodel);
+	CVar::registerCVar(&r_wateralpha);
+	CVar::registerCVar(&r_dynamic);
+	CVar::registerCVar(&r_novis);
+	CVar::registerCVar(&r_speeds);
+	CVar::registerCVar(&gl_finish);
+	CVar::registerCVar(&gl_clear);
+	CVar::registerCVar(&gl_cull);
+	CVar::registerCVar(&gl_polyblend);
+	CVar::registerCVar(&gl_flashblend);
+	CVar::registerCVar(&gl_nocolors);
+	CVar::registerCVar(&gl_keeptjunctions);
+	CVar::registerCVar(&gl_detail);
+	CVar::registerCVar(&gl_shiny);
+	CVar::registerCVar(&gl_caustics);
+	CVar::registerCVar(&gl_dualwater);
+	CVar::registerCVar(&gl_ammoflash);
+	CVar::registerCVar(&r_interpolate_model_animation);
+	CVar::registerCVar(&r_interpolate_model_transform);
+	CVar::registerCVar(&r_wave);
+	CVar::registerCVar(&gl_fog);
+	CVar::registerCVar(&gl_fogglobal);
+	CVar::registerCVar(&gl_fogred);
+	CVar::registerCVar(&gl_foggreen);
+	CVar::registerCVar(&gl_fogblue);
+	CVar::registerCVar(&gl_fogstart);
+	CVar::registerCVar(&gl_fogend);
+	CVar::registerCVar(&gl_conalpha);
+	CVar::registerCVar(&gl_test);
+	CVar::registerCVar(&gl_checkleak);
+	CVar::registerCVar(&r_skydetail);
+	CVar::registerCVar(&r_sky_x);
+	CVar::registerCVar(&r_sky_y);
+	CVar::registerCVar(&r_sky_z);
+	CVar::registerCVar(&r_errors);
+	CVar::registerCVar(&r_fullbright);
+	CVar::registerCVar(&r_modeltexture);
+	CVar::registerCVar(&r_celshading);
+	CVar::registerCVar(&r_outline);
+	CVar::registerCVar(&r_vertexshading);
+	CVar::registerCVar(&gl_npatches);
+	CVar::registerCVar(&gl_anisotropic);
+	CVar::registerCVar(&gl_24bitmaptex);
 
 	R_InitParticles ();
 	//qmb :no longer used

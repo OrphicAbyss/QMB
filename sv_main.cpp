@@ -36,31 +36,31 @@ SV_Init
 void SV_Init (void)
 {
 	int		i;
-	extern	cvar_t	sv_maxvelocity;
-	extern	cvar_t	sv_gravity;
-	extern	cvar_t	sv_nostep;
-	extern	cvar_t	sv_friction;
-	extern	cvar_t	sv_edgefriction;
-	extern	cvar_t	sv_stopspeed;
-	extern	cvar_t	sv_maxspeed;
-	extern	cvar_t	sv_accelerate;
-	extern	cvar_t	sv_idealpitchscale;
-	extern	cvar_t	sv_aim;
-	extern	cvar_t	sv_fastswitch;
+	extern	CVar	sv_maxvelocity;
+	extern	CVar	sv_gravity;
+	extern	CVar	sv_nostep;
+	extern	CVar	sv_friction;
+	extern	CVar	sv_edgefriction;
+	extern	CVar	sv_stopspeed;
+	extern	CVar	sv_maxspeed;
+	extern	CVar	sv_accelerate;
+	extern	CVar	sv_idealpitchscale;
+	extern	CVar	sv_aim;
+	extern	CVar	sv_fastswitch;
 
-	Cvar_RegisterVariable (&sv_maxvelocity);
-	Cvar_RegisterVariable (&sv_gravity);
-	Cvar_RegisterVariable (&sv_friction);
-	Cvar_RegisterVariable (&sv_edgefriction);
-	Cvar_RegisterVariable (&sv_stopspeed);
-	Cvar_RegisterVariable (&sv_maxspeed);
-	Cvar_RegisterVariable (&sv_accelerate);
-	Cvar_RegisterVariable (&sv_idealpitchscale);
-	Cvar_RegisterVariable (&sv_aim);
-	Cvar_RegisterVariable (&sv_nostep);
-	Cvar_RegisterVariable (&sv_stepheight);
-	Cvar_RegisterVariable (&sv_jumpstep);
-	Cvar_RegisterVariable (&sv_fastswitch);
+	CVar::registerCVar(&sv_maxvelocity);
+	CVar::registerCVar(&sv_gravity);
+	CVar::registerCVar(&sv_friction);
+	CVar::registerCVar(&sv_edgefriction);
+	CVar::registerCVar(&sv_stopspeed);
+	CVar::registerCVar(&sv_maxspeed);
+	CVar::registerCVar(&sv_accelerate);
+	CVar::registerCVar(&sv_idealpitchscale);
+	CVar::registerCVar(&sv_aim);
+	CVar::registerCVar(&sv_nostep);
+	CVar::registerCVar(&sv_stepheight);
+	CVar::registerCVar(&sv_jumpstep);
+	CVar::registerCVar(&sv_fastswitch);
 
 	for (i=0 ; i<MAX_MODELS ; i++)
 		sprintf (localmodels[i], "*%i", i);
@@ -119,7 +119,7 @@ Larger attenuations will drop off.  (max 4 attenuation)
 
 ==================
 */
-void SV_StartSound (edict_t *entity, int channel, char *sample, int volume,
+void SV_StartSound (edict_t *entity, int channel, const char *sample, int volume,
     float attenuation)
 {
     int         sound_num;
@@ -203,7 +203,7 @@ void SV_SendServerinfo (client_t *client)
 	MSG_WriteLong (&client->message, PROTOCOL_VERSION);
 	MSG_WriteByte (&client->message, svs.maxclients);
 
-	if (!coop.value && deathmatch.value)
+	if (!coop.getBool() && deathmatch.getBool())
 		MSG_WriteByte (&client->message, GAME_DEATHMATCH);
 	else
 		MSG_WriteByte (&client->message, GAME_COOP);
@@ -989,11 +989,7 @@ void SV_SendReconnect (void)
 	NET_SendToAll (&msg, 5);
 
 	if (cls.state != ca_dedicated)
-#ifdef QUAKE2
-		Cbuf_InsertText ("reconnect\n");
-#else
 		Cmd_ExecuteString ("reconnect\n", src_command);
-#endif
 }
 
 
@@ -1036,12 +1032,14 @@ extern float		scr_centertime_off;
 
 void SV_SpawnServer (char *server)
 {
+	extern CVar hostname;
 	edict_t		*ent;
 	int			i;
 
 	// let's not have any servers with no name
-	if (hostname.string[0] == 0)
-		setValue ("hostname", "QMB UNNAMED");
+	if (hostname.getString()[0] == 0)
+		hostname.set("QMB UNNAMED");
+
 	scr_centertime_off = 0;
 
 	Con_DPrintf ("SpawnServer: %s\n",server);
@@ -1050,23 +1048,22 @@ void SV_SpawnServer (char *server)
 //
 // tell all connected clients that we are going to a new level
 //
-	if (sv.active)
-	{
+	if (sv.active){
 		SV_SendReconnect ();
 	}
 
 //
 // make cvars consistant
 //
-	if (coop.value)
-		Cvar_SetValue ("deathmatch", 0);
-	current_skill = (int)(skill.value + 0.5);
+	if (coop.getBool())
+		deathmatch.set("0");
+	current_skill = (int)(skill.getFloat() + 0.5);
 	if (current_skill < 0)
 		current_skill = 0;
 	if (current_skill > 3)
 		current_skill = 3;
 
-	Cvar_SetValue ("skill", (float)current_skill);
+	skill.set((float)current_skill);
 
 //
 // set up the new server
@@ -1075,7 +1072,6 @@ void SV_SpawnServer (char *server)
 	Host_ClearMemory ();
 
 	Q_memset (&sv, 0, sizeof(sv));
-
 	Q_strcpy (sv.name, server);
 
 // load progs to get entity field count
@@ -1148,10 +1144,10 @@ void SV_SpawnServer (char *server)
 	ent->v.solid = SOLID_BSP;
 	ent->v.movetype = MOVETYPE_PUSH;
 
-	if (coop.value)
-		pr_global_struct->coop = coop.value;
+	if (coop.getBool())
+		pr_global_struct->coop = coop.getFloat();
 	else
-		pr_global_struct->deathmatch = deathmatch.value;
+		pr_global_struct->deathmatch = deathmatch.getFloat();
 
 	pr_global_struct->mapname = sv.name - pr_strings;
 

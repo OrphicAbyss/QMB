@@ -32,4 +32,3 @@ void	R_BlendedRotateRotateForEntity (entity_t *e);
 void	R_StoreEfrags (efrag_t **ppefrag);
 void	GL_Set2D (void);
 //LONG	CDAudio_MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-void	IN_Accumulate (void);

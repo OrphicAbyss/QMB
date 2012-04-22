@@ -34,10 +34,10 @@ extern int	detailtexture2;
 extern int	quadtexture;
 byte *jpeg_rgba;
 
-cvar_t		gl_nobind = {"gl_nobind", "0"};
-cvar_t		gl_max_size = {"gl_max_size", "4096"};
-cvar_t		gl_quick_texture_reload = {"gl_quick_texture_reload", "1", true};
-cvar_t		gl_sincity = {"gl_sincity", "0", true};
+CVar		gl_nobind("gl_nobind", "0");
+CVar		gl_max_size("gl_max_size", "4096");
+CVar		gl_quick_texture_reload("gl_quick_texture_reload", "1", true);
+CVar		gl_sincity("gl_sincity", "0", true);
 
 byte		*draw_chars;				// 8*8 graphic characters
 qpic_t		*draw_disc;
@@ -86,15 +86,6 @@ int		image_width;
 int		image_height;
 // Tomaz end
 
-/*
-void GL_Bind (int texnum)
-{
-	if (gl_nobind.value)
-		texnum = char_texture;
-	glBindTexture(GL_TEXTURE_2D, texnum);
-}
-*/
-
 //=============================================================================
 /* Support Routines */
 
@@ -125,30 +116,20 @@ qpic_t *Draw_PicFromWad (const char *name)
 	gl = (glpic_t *)p->data;
 
 	sprintf(texname,"textures/wad/%s", name);
-	if (texnum = GL_LoadTexImage(&texname[0], false, false, gl_sincity.value)){
+	texnum = GL_LoadTexImage(&texname[0], false, false, gl_sincity.getBool());
+	if (!texnum){
+		sprintf(texname,"gfx/%s", name);
+		GL_LoadTexImage(&texname[0], false, false, gl_sincity.getBool());
+	}
+
+	if (texnum){
 		p->height = image_height;
 		p->width = image_width;
 		gl->texnum = texnum;
-		gl->sl = 0;
-		gl->sh = 1;
-		gl->tl = 0;
-		gl->th = 1;
-		return p;
+	} else {
+		gl->texnum = GL_LoadTexture ("", p->width, p->height, p->data, false, true, 1, gl_sincity.getBool());
 	}
 
-	sprintf(texname,"gfx/%s", name);
-	if (texnum = GL_LoadTexImage(&texname[0], false, false, gl_sincity.value)){
-		p->height = image_height;
-		p->width = image_width;
-		gl->texnum = texnum;
-		gl->sl = 0;
-		gl->sh = 1;
-		gl->tl = 0;
-		gl->th = 1;
-		return p;
-	}
-
-	gl->texnum = GL_LoadTexture ("", p->width, p->height, p->data, false, true, 1, gl_sincity.value);
 	gl->sl = 0;
 	gl->sh = 1;
 	gl->tl = 0;
@@ -168,30 +149,20 @@ qpic_t *Draw_PicFromWadXY (const char *name, int height, int width)
 	gl = (glpic_t *)p->data;
 
 	sprintf(texname,"textures/wad/%s", name);
-	if (texnum = GL_LoadTexImage(&texname[0], false, false, gl_sincity.value)){
+	texnum = GL_LoadTexImage(&texname[0], false, false, gl_sincity.getBool());
+	if (!texnum){
+		sprintf(texname,"gfx/%s", name);
+		texnum = GL_LoadTexImage(&texname[0], false, false, gl_sincity.getBool());
+	}
+
+	if (texnum){
 		p->height = height;
 		p->width = width;
 		gl->texnum = texnum;
-		gl->sl = 0;
-		gl->sh = 1;
-		gl->tl = 0;
-		gl->th = 1;
-		return p;
+	} else {
+		gl->texnum = GL_LoadTexture ("", p->width, p->height, p->data, false, true, 1, gl_sincity.getBool());
 	}
 
-	sprintf(texname,"gfx/%s", name);
-	if (texnum = GL_LoadTexImage(&texname[0], false, false, gl_sincity.value)){
-		p->height = height;
-		p->width = width;
-		gl->texnum = texnum;
-		gl->sl = 0;
-		gl->sh = 1;
-		gl->tl = 0;
-		gl->th = 1;
-		return p;
-	}
-
-	gl->texnum = GL_LoadTexture ("", p->width, p->height, p->data, false, true, 1, gl_sincity.value);
 	gl->sl = 0;
 	gl->sh = 1;
 	gl->tl = 0;
@@ -199,24 +170,6 @@ qpic_t *Draw_PicFromWadXY (const char *name, int height, int width)
 
 	return p;
 }
-/*
-qpic_t *Draw_PicFromWad (char *name)
-{
-	qpic_t	*p;
-	glpic_t	*gl;
-
-	p = W_GetLumpName (name);
-	gl = (glpic_t *)p->data;
-
-	gl->texnum = GL_LoadTexture ("", p->width, p->height, p->data, false, true, 1);
-	gl->sl = 0;
-	gl->sh = 1;
-	gl->tl = 0;
-	gl->th = 1;
-
-	return p;
-}*/
-
 
 /*
 ================
@@ -257,7 +210,7 @@ qpic_t	*Draw_CachePic (const char *path)
 	pic->pic.height = dat->height;
 
 	gl = (glpic_t *)pic->pic.data;
-	gl->texnum = GL_LoadTexture ("", dat->width, dat->height, dat->data, false, true, 1, gl_sincity.value);
+	gl->texnum = GL_LoadTexture ("", dat->width, dat->height, dat->data, false, true, 1, gl_sincity.getBool());
 	gl->sl = 0;
 	gl->sh = 1;
 	gl->tl = 0;
@@ -342,16 +295,10 @@ void Draw_Init (void)
 	int		start;
 	byte	*ncdata;
 
-	Cvar_RegisterVariable (&gl_nobind);
-	Cvar_RegisterVariable (&gl_max_size);
-	Cvar_RegisterVariable (&gl_quick_texture_reload);
-	Cvar_RegisterVariable (&gl_sincity);
-
-	// 3dfx can only handle 256 wide textures
-	if (!Q_strncasecmp ((char *)gl_renderer, "3dfx",4) || strstr((char *)gl_renderer, "Glide")){
-		setValue ("gl_max_size", "256");
-		Con_Printf("Setting max texture size to 256x256 since 3dfx cards cant handle bigger ones");
-	}
+	CVar::registerCVar(&gl_nobind);
+	CVar::registerCVar(&gl_max_size);
+	CVar::registerCVar(&gl_quick_texture_reload);
+	CVar::registerCVar(&gl_sincity);
 
 	Cmd_AddCommand ("gl_texturemode", &Draw_TextureMode_f);
 
@@ -360,7 +307,7 @@ void Draw_Init (void)
 	// string into the background before turning
 	// it into a texture
 	//TGA: begin
-	char_texture = GL_LoadTexImage ("gfx/charset", false, true, gl_sincity.value);
+	char_texture = GL_LoadTexImage ("gfx/charset", false, true, gl_sincity.getBool());
 	if (char_texture == 0)// did not find a matching TGA...
 	{
 		draw_chars = (byte *)W_GetLumpName ("conchars");
@@ -376,7 +323,7 @@ void Draw_Init (void)
 
 	gl = (glpic_t *)conback->data;
 	//TGA: begin
-	gl->texnum = GL_LoadTexImage ("gfx/conback", false, true, gl_sincity.value);
+	gl->texnum = GL_LoadTexImage ("gfx/conback", false, true, gl_sincity.getBool());
 	if (gl->texnum == 0)// did not find a matching TGA...
 	{
 		start = Hunk_LowMark();
@@ -416,8 +363,8 @@ void Draw_Init (void)
 	draw_disc = Draw_PicFromWadXY ("disc",48,48);
 	draw_backtile = Draw_PicFromWad ("backtile");
 	//qmb :detail texture
-	detailtexture = GL_LoadTexImage("textures/detail", false, true, gl_sincity.value);
-	detailtexture2 = GL_LoadTexImage("textures/detail2", false, true, gl_sincity.value);
+	detailtexture = GL_LoadTexImage("textures/detail", false, true, gl_sincity.getBool());
+	detailtexture2 = GL_LoadTexImage("textures/detail2", false, true, gl_sincity.getBool());
 	quadtexture = GL_LoadTexImage("textures/quad", false, true, false);
 }
 
@@ -472,7 +419,7 @@ void Draw_Character (int x, int y, int num)
 Draw_String
 ================
 */
-void Draw_String (int x, int y, char *str)
+void Draw_String (int x, int y, const char *str)
 {
 	while (*str)
 	{
@@ -638,7 +585,7 @@ void Draw_ConsoleBackground (int lines)
 	if (lines > y)
 		Draw_AlphaPic(0, lines - vid.conheight, conback, 1);
 	else
-		Draw_AlphaPic (0, lines - vid.conheight, conback, (float)(gl_conalpha.value * lines)/y);
+		Draw_AlphaPic (0, lines - vid.conheight, conback, (float)(gl_conalpha.getFloat() * lines)/y);
 }
 
 
@@ -1425,8 +1372,8 @@ void GL_Upload32 (unsigned int *data, int width, int height, qboolean mipmap, qb
 		scaled_height = 1 << (int) ceil(log(height) / log(2.0));
 
 		//this seems buggered (will squash really large textures, but then again, not may huge textures around)
-		if (scaled_width > gl_max_size.value) scaled_width = gl_max_size.value; //make sure its not bigger than the max size
-		if (scaled_height > gl_max_size.value)scaled_height = gl_max_size.value;//make sure its not bigger than the max size
+		scaled_width = min(scaled_width,gl_max_size.getInt()); //make sure its not bigger than the max size
+		scaled_height = min(scaled_height,gl_max_size.getInt()); //make sure its not bigger than the max size
 	}
 
 	samples = alpha ? gl_alpha_format : gl_solid_format;					//internal format
@@ -1446,7 +1393,7 @@ void GL_Upload32 (unsigned int *data, int width, int height, qboolean mipmap, qb
 	if (scaled_width == width && scaled_height == height)					//if we dont need to scale
 	{
 		//not being scaled
-		if (grayscale && gl_sincity.value == 1){
+		if (grayscale && gl_sincity.getBool()){
 			//go through data and convert
 			size = width * height;
 			for (i=0;i<size;i++){
@@ -1485,7 +1432,7 @@ void GL_Upload32 (unsigned int *data, int width, int height, qboolean mipmap, qb
 		Image_Resample (data, width, height, 1, scaled, scaled_width, scaled_height, 1, 4, 1);
 
 		//was scaled
-		if (grayscale && gl_sincity.value == 1){
+		if (grayscale && gl_sincity.getBool()){
 			//go through data and convert
 			size = scaled_width * scaled_height;
 			for (i=0;i<size;i++){
@@ -1509,13 +1456,13 @@ void GL_Upload32 (unsigned int *data, int width, int height, qboolean mipmap, qb
 	{
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, gl_anisotropic.value);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, gl_anisotropic.getBool());
 	}
 	else
 	{
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_max);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, gl_anisotropic.value);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, gl_anisotropic.getBool());
 	}
 }
 
@@ -1577,7 +1524,7 @@ int GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean al
 		//	Sys_Error ("GL_Upload8: s&3");
 		for (i=0 ; i<s ; i+=4)
 		{
-			if (gl_sincity.value == 1){
+			if (gl_sincity.getBool()){
 				trans[i] = RGBAtoGrayscale(d_8to24table[data[i]]);
 				trans[i+1] = RGBAtoGrayscale(d_8to24table[data[i+1]]);
 				trans[i+2] = RGBAtoGrayscale(d_8to24table[data[i+2]]);
@@ -1780,8 +1727,7 @@ int GL_LoadTexImage (char* filename, qboolean complain, qboolean mipmap, qboolea
 	int texnum;
 	byte *data;
 
-	if (gl_quick_texture_reload.value)
-	{
+	if (gl_quick_texture_reload.getBool()){
 		texnum = GL_FindTexture (filename);
 		if (-1!=texnum)
 			return texnum;

@@ -123,11 +123,6 @@ typedef struct client_s
 #define	MOVETYPE_NOCLIP			8
 #define	MOVETYPE_FLYMISSILE		9		// extra size to monsters
 #define	MOVETYPE_BOUNCE			10
-#ifdef QUAKE2
-#define MOVETYPE_BOUNCEMISSILE	11		// bounce w/o gravity
-#define MOVETYPE_FOLLOW			12		// track movement of aiment
-#endif
-//qmb :ladder
 #define	MOVETYPE_LADDER			13	//JHL:ADD; Ladder movement fix
 #define	MOVETYPE_SNOWBOARD		14	//JHL:ADD; Ladder movement fix
 
@@ -186,25 +181,14 @@ typedef struct client_s
 #define	SPAWNFLAG_NOT_HARD			1024
 #define	SPAWNFLAG_NOT_DEATHMATCH	2048
 
-#ifdef QUAKE2
-// server flags
-#define	SFL_EPISODE_1		1
-#define	SFL_EPISODE_2		2
-#define	SFL_EPISODE_3		4
-#define	SFL_EPISODE_4		8
-#define	SFL_NEW_UNIT		16
-#define	SFL_NEW_EPISODE		32
-#define	SFL_CROSS_TRIGGERS	65280
-#endif
-
 //============================================================================
 
-extern	cvar_t	teamplay;
-extern	cvar_t	skill;
-extern	cvar_t	deathmatch;
-extern	cvar_t	coop;
-extern	cvar_t	fraglimit;
-extern	cvar_t	timelimit;
+extern	CVar	teamplay;
+extern	CVar	skill;
+extern	CVar	deathmatch;
+extern	CVar	coop;
+extern	CVar	fraglimit;
+extern	CVar	timelimit;
 
 extern	server_static_t	svs;				// persistant server info
 extern	server_t		sv;					// local server
@@ -220,7 +204,7 @@ extern	edict_t		*sv_player;
 void SV_Init (void);
 
 void SV_StartParticle (vec3_t org, vec3_t dir, int color, int count);
-void SV_StartSound (edict_t *entity, int channel, char *sample, int volume,
+void SV_StartSound (edict_t *entity, int channel, const char *sample, int volume,
     float attenuation);
 
 void SV_DropClient (qboolean crash);

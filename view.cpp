@@ -30,35 +30,30 @@ when crossing a water boudnary.
 
 */
 
-cvar_t	scr_ofsx = {"scr_ofsx","0", false};
-cvar_t	scr_ofsy = {"scr_ofsy","0", false};
-cvar_t	scr_ofsz = {"scr_ofsz","0", false};
-
-cvar_t	cl_rollspeed = {"cl_rollspeed", "200"};
-cvar_t	cl_rollangle = {"cl_rollangle", "2.0"};
-
-cvar_t	cl_bob = {"cl_bob","0.02", false};
-cvar_t	cl_bobcycle = {"cl_bobcycle","0.6", false};
-cvar_t	cl_bobup = {"cl_bobup","0.5", false};
-
-cvar_t	v_kicktime = {"v_kicktime", "0.5", false};
-cvar_t	v_kickroll = {"v_kickroll", "0.6", false};
-cvar_t	v_kickpitch = {"v_kickpitch", "0.6", false};
-
-cvar_t	v_iyaw_cycle = {"v_iyaw_cycle", "2", false};
-cvar_t	v_iroll_cycle = {"v_iroll_cycle", "0.5", false};
-cvar_t	v_ipitch_cycle = {"v_ipitch_cycle", "1", false};
-cvar_t	v_iyaw_level = {"v_iyaw_level", "0.4", false}; //qmb :was 3
-cvar_t	v_iroll_level = {"v_iroll_level", "0.2", false}; //qmb :was 1
-cvar_t	v_ipitch_level = {"v_ipitch_level", "0.3", false};
-
-cvar_t	v_idlescale = {"v_idlescale", "0", false};
-
-cvar_t	crosshair = {"crosshair", "0", true};
-cvar_t	cl_crossx = {"cl_crossx", "0", false};
-cvar_t	cl_crossy = {"cl_crossy", "0", false};
-
-cvar_t	gl_cshiftpercent = {"gl_cshiftpercent", "100", false};
+CVar	scr_ofsx("scr_ofsx","0", false);
+CVar	scr_ofsy("scr_ofsy","0", false);
+CVar	scr_ofsz("scr_ofsz","0", false);
+CVar	cl_rollspeed("cl_rollspeed", "200");
+CVar	cl_rollangle("cl_rollangle", "2.0");
+CVar	cl_bob("cl_bob","0.02", false);
+CVar	cl_bobcycle("cl_bobcycle","0.6", false);
+CVar	cl_bobup("cl_bobup","0.5", false);
+CVar	v_kicktime("v_kicktime", "0.5", false);
+CVar	v_kickroll("v_kickroll", "0.6", false);
+CVar	v_kickpitch("v_kickpitch", "0.6", false);
+CVar	v_iyaw_cycle("v_iyaw_cycle", "2", false);
+CVar	v_iroll_cycle("v_iroll_cycle", "0.5", false);
+CVar	v_ipitch_cycle("v_ipitch_cycle", "1", false);
+CVar	v_iyaw_level("v_iyaw_level", "0.4", false); //qmb :was 3
+CVar	v_iroll_level("v_iroll_level", "0.2", false); //qmb :was 1
+CVar	v_ipitch_level("v_ipitch_level", "0.3", false);
+CVar	v_idlescale("v_idlescale", "0", false);
+CVar	crosshair("crosshair", "0", true);
+CVar	cl_crossx("cl_crossx", "0", false);
+CVar	cl_crossy("cl_crossy", "0", false);
+CVar	gl_cshiftpercent("gl_cshiftpercent", "100", false);
+CVar	v_centermove("v_centermove", "0.15", false);
+CVar	v_centerspeed("v_centerspeed","500");
 
 float	v_dmg_time, v_dmg_roll, v_dmg_pitch;
 
@@ -85,12 +80,12 @@ float V_CalcRoll (vec3_t angles, vec3_t velocity)
 	sign = side < 0 ? -1 : 1;
 	side = fabs(side);
 
-	value = cl_rollangle.value;
+	value = cl_rollangle.getFloat();
 //	if (cl.inwater)
 //		value *= 6;
 
-	if (side < cl_rollspeed.value)
-		side = side * value / cl_rollspeed.value;
+	if (side < cl_rollspeed.getFloat())
+		side = side * value / cl_rollspeed.getFloat();
 	else
 		side = value;
 
@@ -110,17 +105,17 @@ float V_CalcBob (void)
 	float	bob;
 	float	cycle;
 
-	cycle = cl.time - (int)(cl.time/cl_bobcycle.value)*cl_bobcycle.value;
-	cycle /= cl_bobcycle.value;
-	if (cycle < cl_bobup.value)
-		cycle = M_PI * cycle / cl_bobup.value;
+	cycle = cl.time - (int)(cl.time/cl_bobcycle.getFloat())*cl_bobcycle.getFloat();
+	cycle /= cl_bobcycle.getFloat();
+	if (cycle < cl_bobup.getFloat())
+		cycle = M_PI * cycle / cl_bobup.getFloat();
 	else
-		cycle = M_PI + M_PI*(cycle-cl_bobup.value)/(1.0 - cl_bobup.value);
+		cycle = M_PI + M_PI*(cycle-cl_bobup.getFloat())/(1.0 - cl_bobup.getFloat());
 
 // bob is proportional to velocity in the xy plane
 // (don't count Z, or jumping messes it up)
 
-	bob = sqrt(cl.velocity[0]*cl.velocity[0] + cl.velocity[1]*cl.velocity[1]) * cl_bob.value;
+	bob = sqrt(cl.velocity[0]*cl.velocity[0] + cl.velocity[1]*cl.velocity[1]) * cl_bob.getFloat();
 //Con_Printf ("speed: %5.1f\n", Length(cl.velocity));
 	bob = bob*0.3 + bob*0.7*sin(cycle);
 	if (bob > 4)
@@ -135,10 +130,6 @@ float V_CalcBob (void)
 //=============================================================================
 
 
-cvar_t	v_centermove = {"v_centermove", "0.15", false};
-cvar_t	v_centerspeed = {"v_centerspeed","500"};
-
-
 void V_StartPitchDrift (void)
 {
 	if (cl.laststop == cl.time)
@@ -147,7 +138,7 @@ void V_StartPitchDrift (void)
 	}
 	if (cl.nodrift || !cl.pitchvel)
 	{
-		cl.pitchvel = v_centerspeed.value;
+		cl.pitchvel = v_centerspeed.getFloat();
 		cl.nodrift = false;
 		cl.driftmove = 0;
 	}
@@ -187,12 +178,12 @@ void V_DriftPitch (void)
 // don't count small mouse motion
 	if (cl.nodrift)
 	{
-		if ( fabs(cl.cmd.forwardmove) < cl_forwardspeed.value)
+		if ( fabs(cl.cmd.forwardmove) < cl_forwardspeed.getFloat())
 			cl.driftmove = 0;
 		else
 			cl.driftmove += host_frametime;
 
-		if ( cl.driftmove > v_centermove.value)
+		if ( cl.driftmove > v_centermove.getFloat())
 		{
 			V_StartPitchDrift ();
 		}
@@ -208,7 +199,7 @@ void V_DriftPitch (void)
 	}
 
 	move = host_frametime * cl.pitchvel;
-	cl.pitchvel += host_frametime * v_centerspeed.value;
+	cl.pitchvel += host_frametime * v_centerspeed.getFloat();
 
 //Con_Printf ("move: %f (%f)\n", move, host_frametime);
 
@@ -250,8 +241,8 @@ cshift_t	cshift_water = { {130,80,50}, 128 };
 cshift_t	cshift_slime = { {0,25,5}, 150 };
 cshift_t	cshift_lava = { {255,80,0}, 150 };
 
-cvar_t		v_gamma = {"gamma", "1", true};
-cvar_t		v_contrast = {"contrast", "1", true};
+CVar		v_gamma("gamma", "1", true);
+CVar		v_contrast("contrast", "1", true);
 float		v_blend[4];		// rgba 0.0 - 1.0
 byte		gammatable[256];	// palette is sent through this
 byte		ramps[3][256];
@@ -287,11 +278,11 @@ qboolean V_CheckGamma (void)
 {
 	static float oldgammavalue;
 
-	if (v_gamma.value == oldgammavalue)
+	if (v_gamma.getFloat() == oldgammavalue)
 		return false;
-	oldgammavalue = v_gamma.value;
+	oldgammavalue = v_gamma.getFloat();
 
-	BuildGammaTable (v_gamma.value);
+	BuildGammaTable (v_gamma.getFloat());
 	vid.recalc_refdef = 1;				// force a surface cache flush
 
 	return true;
@@ -361,12 +352,12 @@ void V_ParseDamage (void)
 	AngleVectors (ent->angles, forward, right, up);
 
 	side = DotProduct (from, right);
-	v_dmg_roll = count*side*v_kickroll.value;
+	v_dmg_roll = count*side*v_kickroll.getFloat();
 
 	side = DotProduct (from, forward);
-	v_dmg_pitch = count*side*v_kickpitch.value;
+	v_dmg_pitch = count*side*v_kickpitch.getFloat();
 
-	v_dmg_time = v_kicktime.value;
+	v_dmg_time = v_kicktime.getFloat();
 }
 
 
@@ -439,7 +430,7 @@ void V_SetContentsColor (int contents)
 			colors[i]=water[i];
 	}
 
-	if (gl_fog.value){
+	if (gl_fog.getBool()){
 		if (contents!=CONTENTS_EMPTY&&contents!=CONTENTS_SOLID)	// laverick@bigfoot.com - Underwater foggining
 		{
 			glFogi(GL_FOG_MODE, GL_LINEAR);
@@ -510,10 +501,10 @@ void V_CalcBlend (void)
 
 	for (j=0 ; j<NUM_CSHIFTS ; j++)
 	{
-		if (!gl_cshiftpercent.value)
+		if (!gl_cshiftpercent.getFloat())
 			continue;
 
-		a2 = ((cl.cshifts[j].percent * gl_cshiftpercent.value) / 100.0) / 255.0;
+		a2 = ((cl.cshifts[j].percent * gl_cshiftpercent.getFloat()) / 100.0) / 255.0;
 
 //		a2 = cl.cshifts[j].percent/255.0;
 		if (!a2)
@@ -698,9 +689,9 @@ void CalcGunAngle (void)
 	cl.viewent.angles[YAW] = r_refdef.viewangles[YAW] + yaw;
 	cl.viewent.angles[PITCH] = - (r_refdef.viewangles[PITCH] + pitch);
 
-	cl.viewent.angles[ROLL] -= v_idlescale.value * sin(cl.time*v_iroll_cycle.value) * v_iroll_level.value;
-	cl.viewent.angles[PITCH] -= v_idlescale.value * sin(cl.time*v_ipitch_cycle.value) * v_ipitch_level.value;
-	cl.viewent.angles[YAW] -= v_idlescale.value * sin(cl.time*v_iyaw_cycle.value) * v_iyaw_level.value;
+	cl.viewent.angles[ROLL] -= v_idlescale.getFloat() * sin(cl.time*v_iroll_cycle.getFloat()) * v_iroll_level.getFloat();
+	cl.viewent.angles[PITCH] -= v_idlescale.getFloat() * sin(cl.time*v_ipitch_cycle.getFloat()) * v_ipitch_level.getFloat();
+	cl.viewent.angles[YAW] -= v_idlescale.getFloat() * sin(cl.time*v_iyaw_cycle.getFloat()) * v_iyaw_level.getFloat();
 }
 
 /*
@@ -740,9 +731,9 @@ Idle swaying
 */
 void V_AddIdle (void)
 {
-	r_refdef.viewangles[ROLL] += v_idlescale.value * sin(cl.time*v_iroll_cycle.value) * v_iroll_level.value;
-	r_refdef.viewangles[PITCH] += v_idlescale.value * sin(cl.time*v_ipitch_cycle.value) * v_ipitch_level.value;
-	r_refdef.viewangles[YAW] += v_idlescale.value * sin(cl.time*v_iyaw_cycle.value) * v_iyaw_level.value;
+	r_refdef.viewangles[ROLL] += v_idlescale.getFloat() * sin(cl.time*v_iroll_cycle.getFloat()) * v_iroll_level.getFloat();
+	r_refdef.viewangles[PITCH] += v_idlescale.getFloat() * sin(cl.time*v_ipitch_cycle.getFloat()) * v_ipitch_level.getFloat();
+	r_refdef.viewangles[YAW] += v_idlescale.getFloat() * sin(cl.time*v_iyaw_cycle.getFloat()) * v_iyaw_level.getFloat();
 }
 
 
@@ -762,8 +753,8 @@ void V_CalcViewRoll (void)
 
 	if (v_dmg_time > 0)
 	{
-		r_refdef.viewangles[ROLL] += v_dmg_time/v_kicktime.value*v_dmg_roll;
-		r_refdef.viewangles[PITCH] += v_dmg_time/v_kicktime.value*v_dmg_pitch;
+		r_refdef.viewangles[ROLL] += v_dmg_time/v_kicktime.getFloat()*v_dmg_roll;
+		r_refdef.viewangles[PITCH] += v_dmg_time/v_kicktime.getFloat()*v_dmg_pitch;
 		v_dmg_time -= host_frametime;
 	}
 
@@ -797,10 +788,10 @@ void V_CalcIntermissionRefdef (void)
 	view->model = NULL;
 
 // allways idle in intermission
-	old = v_idlescale.value;
-	v_idlescale.value = 1;
+	old = v_idlescale.getFloat();
+	v_idlescale.set(1.0f);
 	V_AddIdle ();
-	v_idlescale.value = old;
+	v_idlescale.set(old);
 }
 
 /*
@@ -860,9 +851,9 @@ void V_CalcRefdef (void)
 	AngleVectors (angles, forward, right, up);
 
 	for (i=0 ; i<3 ; i++)
-		r_refdef.vieworg[i] += scr_ofsx.value*forward[i]
-			+ scr_ofsy.value*right[i]
-			+ scr_ofsz.value*up[i];
+		r_refdef.vieworg[i] += scr_ofsx.getFloat()*forward[i]
+			+ scr_ofsy.getFloat()*right[i]
+			+ scr_ofsz.getFloat()*up[i];
 
 
 	V_BoundOffsets ();
@@ -886,13 +877,13 @@ void V_CalcRefdef (void)
 // fudge position around to keep amount of weapon visible
 // roughly equal with different FOV
 
-	if (scr_viewsize.value == 110)
+	if (scr_viewsize.getInt() == 110)
 		view->origin[2] += 1;
-	else if (scr_viewsize.value == 100)
+	else if (scr_viewsize.getInt() == 100)
 		view->origin[2] += 2;
-	else if (scr_viewsize.value == 90)
+	else if (scr_viewsize.getInt() == 90)
 		view->origin[2] += 1;
-	else if (scr_viewsize.value == 80)
+	else if (scr_viewsize.getInt() == 80)
 		view->origin[2] += 0.5;
 
 	view->model = cl.model_precache[cl.stats[STAT_WEAPON]];
@@ -923,7 +914,7 @@ void V_CalcRefdef (void)
 	else
 		oldz = ent->origin[2];
 
-	if (chase_active.value)
+	if (chase_active.getBool())
 		Chase_Update ();
 }
 
@@ -943,11 +934,10 @@ void V_RenderView (void)
 		return;
 
 // don't allow cheats in multiplayer
-	if (cl.maxclients > 1)
-	{
-		setValue ("scr_ofsx", "0");
-		setValue ("scr_ofsy", "0");
-		setValue ("scr_ofsz", "0");
+	if (cl.maxclients > 1){
+		scr_ofsx.set(0.0f);
+		scr_ofsy.set(0.0f);
+		scr_ofsz.set(0.0f);
 	}
 
 	if (cl.intermission)
@@ -978,38 +968,34 @@ void V_Init (void)
 	Cmd_AddCommand ("bf", V_BonusFlash_f);
 	Cmd_AddCommand ("centerview", V_StartPitchDrift);
 
-	Cvar_RegisterVariable (&v_centermove);
-	Cvar_RegisterVariable (&v_centerspeed);
-
-	Cvar_RegisterVariable (&v_iyaw_cycle);
-	Cvar_RegisterVariable (&v_iroll_cycle);
-	Cvar_RegisterVariable (&v_ipitch_cycle);
-	Cvar_RegisterVariable (&v_iyaw_level);
-	Cvar_RegisterVariable (&v_iroll_level);
-	Cvar_RegisterVariable (&v_ipitch_level);
-
-	Cvar_RegisterVariable (&v_idlescale);
-	Cvar_RegisterVariable (&crosshair);
-	Cvar_RegisterVariable (&cl_crossx);
-	Cvar_RegisterVariable (&cl_crossy);
-	Cvar_RegisterVariable (&gl_cshiftpercent);
-
-	Cvar_RegisterVariable (&scr_ofsx);
-	Cvar_RegisterVariable (&scr_ofsy);
-	Cvar_RegisterVariable (&scr_ofsz);
-	Cvar_RegisterVariable (&cl_rollspeed);
-	Cvar_RegisterVariable (&cl_rollangle);
-	Cvar_RegisterVariable (&cl_bob);
-	Cvar_RegisterVariable (&cl_bobcycle);
-	Cvar_RegisterVariable (&cl_bobup);
-
-	Cvar_RegisterVariable (&v_kicktime);
-	Cvar_RegisterVariable (&v_kickroll);
-	Cvar_RegisterVariable (&v_kickpitch);
+	CVar::registerCVar(&v_centermove);
+	CVar::registerCVar(&v_centerspeed);
+	CVar::registerCVar(&v_iyaw_cycle);
+	CVar::registerCVar(&v_iroll_cycle);
+	CVar::registerCVar(&v_ipitch_cycle);
+	CVar::registerCVar(&v_iyaw_level);
+	CVar::registerCVar(&v_iroll_level);
+	CVar::registerCVar(&v_ipitch_level);
+	CVar::registerCVar(&v_idlescale);
+	CVar::registerCVar(&crosshair);
+	CVar::registerCVar(&cl_crossx);
+	CVar::registerCVar(&cl_crossy);
+	CVar::registerCVar(&gl_cshiftpercent);
+	CVar::registerCVar(&scr_ofsx);
+	CVar::registerCVar(&scr_ofsy);
+	CVar::registerCVar(&scr_ofsz);
+	CVar::registerCVar(&cl_rollspeed);
+	CVar::registerCVar(&cl_rollangle);
+	CVar::registerCVar(&cl_bob);
+	CVar::registerCVar(&cl_bobcycle);
+	CVar::registerCVar(&cl_bobup);
+	CVar::registerCVar(&v_kicktime);
+	CVar::registerCVar(&v_kickroll);
+	CVar::registerCVar(&v_kickpitch);
 
 	BuildGammaTable (1.0);	// no gamma yet
-	Cvar_RegisterVariable (&v_gamma);
-	Cvar_RegisterVariable (&v_contrast);
+	CVar::registerCVar(&v_gamma);
+	CVar::registerCVar(&v_contrast);
 }
 
 

@@ -92,19 +92,16 @@ void CDAudio_Resume()
 void CDAudio_Update()
 {
 	if(!cd_id || !enabled) return;
-	if(bgmvolume.value != cdvolume)
+	if(bgmvolume.getFloat() != cdvolume)
 	{
-		if(cdvolume)
-		{
-			Cvar_SetValue("bgmvolume",0.0);
+		if(cdvolume){
+			bgmvolume.set(0.0f);
 			CDAudio_Pause();
-		}
-		else
-		{
-			Cvar_SetValue("bgmvolume",1.0);
+		} else {
+			bgmvolume.set(1.0f);
 			CDAudio_Resume();
 		}
-		cdvolume = bgmvolume.value;
+		cdvolume = bgmvolume.getFloat();
 		return;
 	}
 	if(playLooping && (SDL_CDStatus(cd_id) != CD_PLAYING)

@@ -227,7 +227,7 @@ void R_RecursiveWorldNode (mnode_t *node, float *modelorg)
 	R_RecursiveWorldNode (node->children[side], modelorg);
 
 // recurse down the back side
-	if (r_outline.value)
+	if (r_outline.getBool())
 		R_RecursiveWorldNode (node->children[!side], modelorg);
 
 // draw stuff
@@ -255,13 +255,16 @@ void R_RecursiveWorldNode (mnode_t *node, float *modelorg)
 					surf->texinfo->texture->texturechain = surf;
 
 					//setup eyecandy chain
-					if ((gl_detail.value&&gl_textureunits<4)||(surf->flags & SURF_UNDERWATER && gl_caustics.value)||(surf->texinfo->texture->gl_fullbright!=0&&gl_textureunits < 3)||(surf->flags & SURF_SHINY_METAL && gl_shiny.value)||(surf->flags & SURF_SHINY_GLASS && gl_shiny.value))
-					{
+					if ((gl_detail.getBool()&&gl_textureunits<4) ||
+						(surf->flags & SURF_UNDERWATER && gl_caustics.getBool()) ||
+						(surf->texinfo->texture->gl_fullbright!=0&&gl_textureunits < 3) ||
+						(surf->flags & SURF_SHINY_METAL && gl_shiny.getBool()) ||
+						(surf->flags & SURF_SHINY_GLASS && gl_shiny.getBool())) {
 						surf->extra=extrachain;
 						extrachain = surf;
 					}
 
-					if (r_outline.value){
+					if (r_outline.getBool()){
 						surf->outline=outlinechain;
 						outlinechain = surf;
 					}
@@ -271,7 +274,7 @@ void R_RecursiveWorldNode (mnode_t *node, float *modelorg)
 	}
 
 // recurse down the back side
-	if (!r_outline.value)
+	if (!r_outline.getBool())
 		R_RecursiveWorldNode (node->children[!side], modelorg);
 }
 
@@ -337,7 +340,7 @@ void R_DrawBrushModel (entity_t *e)
 		}
 		VectorScale(lightcolor, 1.0f / 100.0f, lightcolor);
 
-		if (gl_ammoflash.value){
+		if (gl_ammoflash.getBool()){
 			lightcolor[0] += sin(2 * cl.time * M_PI)/4;
 			lightcolor[1] += sin(2 * cl.time * M_PI)/4;
 			lightcolor[2] += sin(2 * cl.time * M_PI)/4;
@@ -369,7 +372,7 @@ void R_DrawBrushModel (entity_t *e)
 
 // calculate dynamic lighting for bmodel if it's not an
 // instanced model
-	if (clmodel->firstmodelsurface != 0 && !gl_flashblend.value)
+	if (clmodel->firstmodelsurface != 0 && !gl_flashblend.getBool())
 	{
 		for (k=0 ; k<MAX_DLIGHTS ; k++)
 		{
@@ -420,7 +423,7 @@ void R_DrawBrush (model_t *clmodel, float *modelorg)
 		}
 
 	// draw the polygon
-		if (r_outline.value||
+		if (r_outline.getBool() ||
 			((surf->flags & SURF_PLANEBACK) && (dot < -BACKFACE_EPSILON)) ||
 			(!(surf->flags & SURF_PLANEBACK) && (dot > BACKFACE_EPSILON)))
 		{
@@ -436,14 +439,17 @@ void R_DrawBrush (model_t *clmodel, float *modelorg)
 				surf->texinfo->texture->texturechain = surf;
 
 				//setup eyecandy chain
-				if ((gl_detail.value&&gl_textureunits<4)||(surf->flags & SURF_UNDERWATER && gl_caustics.value)||(surf->texinfo->texture->gl_fullbright!=0&&gl_textureunits < 3)||(surf->flags & SURF_SHINY_METAL && gl_shiny.value)||(surf->flags & SURF_SHINY_GLASS && gl_shiny.value))
-				{
+				if ((gl_detail.getBool()&&gl_textureunits<4) ||
+					(surf->flags & SURF_UNDERWATER && gl_caustics.getBool()) ||
+					(surf->texinfo->texture->gl_fullbright!=0&&gl_textureunits < 3) ||
+					(surf->flags & SURF_SHINY_METAL && gl_shiny.getBool()) ||
+					(surf->flags & SURF_SHINY_GLASS && gl_shiny.getBool()))	{
 					if (!R_Skybox){
 						surf->extra=extrachain;
 						extrachain = surf;
 					}
 				}
-				if (r_outline.value){
+				if (r_outline.getBool()){
 					surf->outline=outlinechain;
 					outlinechain = surf;
 				}
@@ -499,13 +505,13 @@ void R_MarkLeaves (void)
 	int		i;
 	byte	solid[4096];
 
-	if (r_oldviewleaf == r_viewleaf && !r_novis.value)
+	if (r_oldviewleaf == r_viewleaf && !r_novis.getBool())
 		return;
 
 	r_visframecount++;
 	r_oldviewleaf = r_viewleaf;
 
-	if (r_novis.value)
+	if (r_novis.getBool())
 	{
 		vis = solid;
 		Q_memset (solid, 0xff, (cl.worldmodel->numleafs+7)>>3);
@@ -613,7 +619,7 @@ void BuildSurfaceDisplayList (model_t *m, msurface_t *fa)
 	//
 	// remove co-linear points - Ed
 	//
-	if (!gl_keeptjunctions.value && !(fa->flags & SURF_UNDERWATER) )
+	if (!gl_keeptjunctions.getBool() && !(fa->flags & SURF_UNDERWATER) )
 	{
 		for (i = 0 ; i < lnumverts ; ++i)
 		{
@@ -884,7 +890,7 @@ __inline void RGBtoGrayscale(unsigned *rgb){
 	unsigned value;
 	//unsigned output;
 
-	if (gl_sincity.value == 1){
+	if (gl_sincity.getBool()){
 	//value = rgb[0] * 0.2125 + rgb[1] * 0.7154 + rgb[2] * 0.0721;
 	//value = max(max(rgb[0],rgb[1]),rgb[2]);
 		value = rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114;
@@ -1025,8 +1031,7 @@ void R_RenderDynamicLightmaps (msurface_t *fa)
 		|| fa->cached_dlight)			// dynamic previously
 	{
 dynamic:
-		if (r_dynamic.value)
-		{
+		if (r_dynamic.getBool()){
 			lightmap_modified[fa->lightmaptexturenum] = true;
 			theRect = &lightmap_rectchange[fa->lightmaptexturenum];
 			if (fa->light_t < theRect->t) {

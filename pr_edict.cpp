@@ -40,18 +40,18 @@ qboolean ED_ParseEpair (void *base, ddef_t *key, char *s);
 char *PR_GetString(int num);
 int PR_SetString(char *s);
 
-cvar_t pr_checkextension = {"pr_checkextension", "1"}; //LH's checkextensions
-cvar_t nomonsters = {"nomonsters", "0"};
-cvar_t gamecfg = {"gamecfg", "0"};
-cvar_t scratch1 = {"scratch1", "0"};
-cvar_t scratch2 = {"scratch2", "0"};
-cvar_t scratch3 = {"scratch3", "0"};
-cvar_t scratch4 = {"scratch4", "0"};
-cvar_t savedgamecfg = {"savedgamecfg", "0", true};
-cvar_t saved1 = {"saved1", "0", true};
-cvar_t saved2 = {"saved2", "0", true};
-cvar_t saved3 = {"saved3", "0", true};
-cvar_t saved4 = {"saved4", "0", true};
+CVar pr_checkextension("pr_checkextension", "1"); //LH's checkextensions
+CVar nomonsters("nomonsters", "0");
+CVar gamecfg("gamecfg", "0");
+CVar scratch1("scratch1", "0");
+CVar scratch2("scratch2", "0");
+CVar scratch3("scratch3", "0");
+CVar scratch4("scratch4", "0");
+CVar savedgamecfg("savedgamecfg", "0", true);
+CVar saved1("saved1", "0", true);
+CVar saved2("saved2", "0", true);
+CVar saved3("saved3", "0", true);
+CVar saved4("saved4", "0", true);
 
 #define	MAX_FIELD_LEN	64
 #define GEFV_CACHESIZE	2
@@ -186,7 +186,7 @@ ddef_t *ED_FieldAtOfs (int ofs)
 ED_FindField
 ============
 */
-ddef_t *ED_FindField (char *name)
+ddef_t *ED_FindField (const char *name)
 {
 	ddef_t		*def;
 	int			i;
@@ -241,7 +241,7 @@ dfunction_t *ED_FindFunction (char *name)
 }
 
 
-eval_t *GetEdictFieldValue(edict_t *ed, char *field)
+eval_t *GetEdictFieldValue(edict_t *ed, const char *field)
 {
 	ddef_t			*def = NULL;
 	int				i;
@@ -933,8 +933,7 @@ void ED_LoadFromFile (char *data)
 		data = ED_ParseEdict (data, ent);
 
 // remove things from different skill levels or deathmatch
-		if (deathmatch.value)
-		{
+		if (deathmatch.getBool()){
 			if (((int)ent->v.spawnflags & SPAWNFLAG_NOT_DEATHMATCH))
 			{
 				ED_Free (ent);
@@ -1076,24 +1075,23 @@ PR_Init
 void JVM_Init (void);
 #endif
 
-void PR_Init (void)
-{
+void PR_Init (void){
 	Cmd_AddCommand ("edict", ED_PrintEdict_f);
 	Cmd_AddCommand ("edicts", ED_PrintEdicts);
 	Cmd_AddCommand ("edictcount", ED_Count);
 	Cmd_AddCommand ("profile", PR_Profile_f);
-	Cvar_RegisterVariable (&pr_checkextension); //LH's checkextensions
-	Cvar_RegisterVariable (&nomonsters);
-	Cvar_RegisterVariable (&gamecfg);
-	Cvar_RegisterVariable (&scratch1);
-	Cvar_RegisterVariable (&scratch2);
-	Cvar_RegisterVariable (&scratch3);
-	Cvar_RegisterVariable (&scratch4);
-	Cvar_RegisterVariable (&savedgamecfg);
-	Cvar_RegisterVariable (&saved1);
-	Cvar_RegisterVariable (&saved2);
-	Cvar_RegisterVariable (&saved3);
-	Cvar_RegisterVariable (&saved4);
+	CVar::registerCVar(&pr_checkextension); //LH's checkextensions
+	CVar::registerCVar(&nomonsters);
+	CVar::registerCVar(&gamecfg);
+	CVar::registerCVar(&scratch1);
+	CVar::registerCVar(&scratch2);
+	CVar::registerCVar(&scratch3);
+	CVar::registerCVar(&scratch4);
+	CVar::registerCVar(&savedgamecfg);
+	CVar::registerCVar(&saved1);
+	CVar::registerCVar(&saved2);
+	CVar::registerCVar(&saved3);
+	CVar::registerCVar(&saved4);
 #ifdef JAVA
 	JVM_Init();
 #endif

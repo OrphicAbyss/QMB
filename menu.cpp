@@ -115,7 +115,7 @@ void M_ConfigureNetSubsystem(void);
 void Draw_AlphaFill (int x, int y, int w, int h, vec3_t c, float alpha);
 void Draw_AlphaFillFade (int x, int y, int width, int height, vec3_t colour, float alpha[2]);
 
-extern cvar_t	crosshair;
+extern CVar	crosshair;
 
 #define BUTTON_HEIGHT	10
 #define BUTTON_START	50
@@ -168,7 +168,7 @@ void M_Centerprint (int cy, const char *str)
 	}
 }
 //JHL:ADD; center print
-void M_CenterprintWhite (int cy, char *str)
+void M_CenterprintWhite (int cy, const char *str)
 {
 	int cx;
 	cx = vid.conwidth/2 - (Q_strlen(str)*4);
@@ -538,7 +538,7 @@ void M_SinglePlayer_Draw (void)
 	dim_save = false;
 
 	//JHL:HACK; dim "save"/"load" if we can't choose 'em!
-	if (svs.maxclients != 1 || deathmatch.value || coop.value)
+	if (svs.maxclients != 1 || deathmatch.getBool() || coop.getBool())
 	{
 		dim_load = true;
 		dim_save = true;
@@ -675,7 +675,7 @@ void M_ScanSaves (void)
 void M_Menu_Load_f (void)
 {
 	dim_load = false;
-	if (svs.maxclients != 1 || deathmatch.value || coop.value)
+	if (svs.maxclients != 1 || deathmatch.getBool() || coop.getBool())
 		dim_load = true;
 
 	if (dim_load == true)
@@ -691,7 +691,7 @@ void M_Menu_Load_f (void)
 void M_Menu_Save_f (void)
 {
 	dim_save = false;
-	if (svs.maxclients != 1 || deathmatch.value || coop.value)
+	if (svs.maxclients != 1 || deathmatch.getBool() || coop.getBool())
 		dim_save = true;
 
 	if (!sv.active || cl.intermission)
@@ -835,7 +835,7 @@ void M_Menu_MultiPlayer_f (void)
 void M_MultiPlayer_Draw (void)
 {
 	qpic_t	*p;
-	char	*names[] =
+	const char	*names[] =
 	{
 		"Join game",
 		"Create game",
@@ -926,10 +926,10 @@ void M_Menu_Setup_f (void)
 	key_dest = key_menu;
 	m_state = m_setup;
 	m_entersound = true;
-	Q_strcpy(setup_myname, cl_name.string);
-	Q_strcpy(setup_hostname, hostname.string);
-	setup_top = setup_oldtop = ((int)cl_color.value) >> 4;
-	setup_bottom = setup_oldbottom = ((int)cl_color.value) & 15;
+	Q_strcpy(setup_myname, cl_name.getString());
+	Q_strcpy(setup_hostname, hostname.getString());
+	setup_top = setup_oldtop = cl_color.getInt() >> 4;
+	setup_bottom = setup_oldbottom = cl_color.getInt() & 15;
 }
 
 
@@ -1021,10 +1021,10 @@ forward:
 			goto forward;
 
 		// setup_cursor == 4 (OK)
-		if (Q_strcmp(cl_name.string, setup_myname) != 0)
+		if (Q_strcmp(cl_name.getString(), setup_myname) != 0)
 			Cbuf_AddText ( va ("name \"%s\"\n", setup_myname) );
-		if (Q_strcmp(hostname.string, setup_hostname) != 0)
-			setValue("hostname", setup_hostname);
+		if (Q_strcmp(hostname.getString(), setup_hostname) != 0)
+			hostname.set(setup_hostname);
 		if (setup_top != setup_oldtop || setup_bottom != setup_oldbottom)
 			Cbuf_AddText( va ("color %i %i\n", setup_top, setup_bottom) );
 		m_entersound = true;
@@ -1086,7 +1086,7 @@ int	m_net_cursor;
 int m_net_items;
 int m_net_saveHeight;
 
-char *net_helpMessage [] =
+const char *net_helpMessage [] =
 {
   "",
   "Two computers connected through two modems.",
@@ -1274,66 +1274,53 @@ void M_Menu_Options_f (void)
 
 void M_AdjustSliders (int dir)
 {
+	float value;
 	S_LocalSound ("misc/menu3.wav");
 
-	switch (options_cursor)
-	{
+	switch (options_cursor){
 	case ITEM_SPEED:	// mouse speed
-		sensitivity.value += dir * 0.5;
-		if (sensitivity.value < 1)
-			sensitivity.value = 1;
-		if (sensitivity.value > 11)
-			sensitivity.value = 11;
-		Cvar_SetValue ("sensitivity", sensitivity.value);
+		value = sensitivity.getFloat() + dir * 0.5f;
+		value = max(value,1);
+		value = min(value,11);
+		sensitivity.set(value);
 		break;
 	case ITEM_CD_VOLUME:// music volume
-#ifdef _WIN32
-		bgmvolume.value += dir * 1.0;
-#else
-		bgmvolume.value += dir * 0.1;
-#endif
-		if (bgmvolume.value < 0)
-			bgmvolume.value = 0;
-		if (bgmvolume.value > 1)
-			bgmvolume.value = 1;
-		Cvar_SetValue ("bgmvolume", bgmvolume.value);
+		value = bgmvolume.getFloat() + dir * 0.1;
+		value = max(value,0);
+		value = min(value,1);
+		bgmvolume.set(value);
 		break;
 	case ITEM_VOLUME:	// sfx volume
-		volume.value += dir * 0.1;
-		if (volume.value < 0)
-			volume.value = 0;
-		if (volume.value > 1)
-			volume.value = 1;
-		Cvar_SetValue ("volume", volume.value);
+		value = volume.getFloat() + dir * 0.1;
+		value = max(value,0);
+		value = min(value,1);
+		volume.set(value);
 		break;
 
 	case ITEM_CROSSHAIR:// crosshair
-		Cvar_SetValue ("crosshair", !crosshair.value);
+		crosshair.set(!crosshair.getBool());
 		break;
 
 	case ITEM_AUTORUN:	// allways run
-		if (cl_forwardspeed.value > 200)
-		{
-			Cvar_SetValue ("cl_forwardspeed", 200);
-			Cvar_SetValue ("cl_backspeed", 200);
-		}
-		else
-		{
-			Cvar_SetValue ("cl_forwardspeed", 400);
-			Cvar_SetValue ("cl_backspeed", 400);
+		if (cl_forwardspeed.getFloat() > 200) {
+			cl_forwardspeed.set(200.0f);
+			cl_backspeed.set(200.0f);
+		} else {
+			cl_forwardspeed.set(400.0f);
+			cl_backspeed.set(400.0f);
 		}
 		break;
 
 	case ITEM_REVERSE:	// invert mouse
-		Cvar_SetValue ("m_pitch", -m_pitch.value);
+		m_pitch.set(m_pitch.getFloat());
 		break;
 
 	case ITEM_SPRING:	// lookspring
-		Cvar_SetValue ("lookspring", !lookspring.value);
+		lookspring.set(lookspring.getBool());
 		break;
 
 	case ITEM_STRAFE:	// lookstrafe
-		Cvar_SetValue ("lookstrafe", !lookstrafe.value);
+		lookstrafe.set(!lookstrafe.getBool());
 		break;
 
 #ifdef _WIN32
@@ -1367,9 +1354,7 @@ void M_DrawCheckbox (int x, int y, int on)
 		M_Print (x, y, "off");
 }
 
-void M_Options_Draw (void)
-{
-	float	r;
+void M_Options_Draw (void){
 	int		y;
 	qpic_t	*p;
 
@@ -1387,38 +1372,35 @@ void M_Options_Draw (void)
 
 	y = options_cursor_table[ITEM_SPEED];
 	M_Print (16, y, "           Mouse Speed");
-	r = (sensitivity.value - 1)/10;
-	M_DrawSlider (220, y, r);
+	M_DrawSlider (220, y, (sensitivity.getInt() - 1)/10);
 
 	y = options_cursor_table[ITEM_CD_VOLUME];
 	M_Print (16, y, "       CD Music Volume");
-	r = bgmvolume.value;
-	M_DrawSlider (220, y, r);
+	M_DrawSlider (220, y, bgmvolume.getInt());
 
 	y = options_cursor_table[ITEM_VOLUME];
 	M_Print (16, y, "          Sound Volume");
-	r = volume.value;
-	M_DrawSlider (220, y, r);
+	M_DrawSlider (220, y, volume.getInt());
 
 	y = options_cursor_table[ITEM_CROSSHAIR];
 	M_Print (16, y,  "             Crosshair");
-	M_DrawCheckbox (220, y, crosshair.value);
+	M_DrawCheckbox (220, y, crosshair.getInt());
 
 	y = options_cursor_table[ITEM_AUTORUN];
 	M_Print (16, y,  "            Always Run");
-	M_DrawCheckbox (220, y, cl_forwardspeed.value > 200);
+	M_DrawCheckbox (220, y, cl_forwardspeed.getFloat() > 200);
 
 	y = options_cursor_table[ITEM_REVERSE];
 	M_Print (16, y, "          Invert Mouse");
-	M_DrawCheckbox (220, y, m_pitch.value < 0);
+	M_DrawCheckbox (220, y, m_pitch.getFloat() < 0);
 
 	y = options_cursor_table[ITEM_SPRING];
 	M_Print (16, y, "            Lookspring");
-	M_DrawCheckbox (220, y, lookspring.value);
+	M_DrawCheckbox (220, y, lookspring.getInt());
 
 	y = options_cursor_table[ITEM_STRAFE];
 	M_Print (16, y, "            Lookstrafe");
-	M_DrawCheckbox (220, y, lookstrafe.value);
+	M_DrawCheckbox (220, y, lookstrafe.getInt());
 
 #ifdef _WIN32
 	if (modestate == MS_WINDOWED)
@@ -1551,61 +1533,45 @@ void M_Menu_Video_f (void)
 
 void M_AdjustVideoSliders (int dir)
 {
-	extern cvar_t show_fps, hud_r, hud_g, hud_b, hud_a, hud;
+	extern CVar hud, show_fps;//hud_r, hud_g, hud_b, hud_a,
+	float value;
 
 	S_LocalSound ("misc/menu3.wav");
 
 	switch (vid_options_cursor)
 	{
 	case ITEM_SCR_SIZE:	// screen size
-		scr_viewsize.value += dir * 10;
-		if (scr_viewsize.value < 30)
-			scr_viewsize.value = 30;
-		if (scr_viewsize.value > 120)
-			scr_viewsize.value = 120;
-		Cvar_SetValue ("viewsize", scr_viewsize.value);
+		value = scr_viewsize.getInt() + dir * 10;
+		value = max(value,30);
+		value = min(value,120);
+		scr_viewsize.set(value);
 		break;
 	case ITEM_GAMMA:	// gamma
-		v_gamma.value -= dir * 0.05;
-		if (v_gamma.value < 0.5)
-			v_gamma.value = 0.5;
-		if (v_gamma.value > 1)
-			v_gamma.value = 1;
-		Cvar_SetValue ("gamma", v_gamma.value);
+		value -= v_gamma.getFloat() + dir * 0.05;
+		value = max(value,0.5f);
+		value = min(value,1.0f);
+		v_gamma.set(value);
 		break;
 	case ITEM_DLIGHTS:	// dynamic lighting
-		if (gl_flashblend.value == 0)
-			gl_flashblend.value = 1;
-		else if (gl_flashblend.value == 1)
-			gl_flashblend.value = 0;
-		else
-			gl_flashblend.value = 0;
-		Cvar_SetValue ("gl_flashblend", gl_flashblend.value);
+		gl_flashblend.set(!gl_flashblend.getBool());
 		break;
 	case ITEM_DETAILTEX:// detail textures
-		if (gl_detail.value == 0)
-			gl_detail.value = 1;
-		else if (gl_detail.value == 1)
-			gl_detail.value = 0;
-		else
-			gl_detail.value = 0;
-		Cvar_SetValue ("gl_detail", gl_detail.value);
+		gl_detail.set(!gl_detail.getBool());
 		break;
 	case ITEM_CAUSTICS:	// underwater caustics
-		Cvar_SetValue ("gl_caustics", !gl_caustics.value);
+		gl_caustics.set(!gl_caustics.getBool());
 		break;
 	case ITEM_SHINY:	// shiny textures
-		Cvar_SetValue ("gl_shiny", !gl_shiny.value);
+		gl_shiny.set(!gl_shiny.getBool());
 		break;
 	case ITEM_SHOWFPS:	// show fps
-		Cvar_SetValue ("show_fps", !show_fps.value);
+		show_fps.set (!show_fps.getBool());
 		break;
 	case ITEM_HUD:
-		hud.value += dir;
-		if (hud.value > 3)
-			hud.value = 3;
-		else if (hud.value < 0)
-			hud.value = 0;
+		value = hud.getInt() + dir;
+		value = max(value,0);
+		value = min(value,3);
+		hud.set(value);
 		break;
 /*
 	case ITEM_HUDR:
@@ -1636,7 +1602,7 @@ void M_AdjustVideoSliders (int dir)
 
 void M_Video_Draw (void)
 {
-	extern cvar_t show_fps, hud_r, hud_g, hud_b, hud_a, hud;
+	extern CVar show_fps, hud_r, hud_g, hud_b, hud_a, hud;
 	float	r;
 	int		y;
 	qpic_t	*p;
@@ -1658,37 +1624,37 @@ void M_Video_Draw (void)
 
 	y = vid_options_cursor_table[ITEM_SCR_SIZE];
 	M_Print (16, y, "           Screen size");
-	r = (scr_viewsize.value - 30) / (120 - 30);
+	r = (scr_viewsize.getInt() - 30) / (120 - 30);
 	M_DrawSlider (220, y, r);
 
 	y = vid_options_cursor_table[ITEM_GAMMA];
 	M_Print (16, y, "            Brightness");
-	r = (1.0 - v_gamma.value) / 0.5;
+	r = (1.0 - v_gamma.getFloat()) / 0.5;
 	M_DrawSlider (220, y, r);
 
 	y = vid_options_cursor_table[ITEM_DLIGHTS];
 	M_Print (16, y, "        Dynamic lights");
-	M_DrawCheckbox (220, y, gl_flashblend.value - 1);
+	M_DrawCheckbox (220, y, gl_flashblend.getInt() - 1);
 
 	y = vid_options_cursor_table[ITEM_DETAILTEX];
 	M_Print (16, y, "       Detail textures");
-	M_DrawCheckbox (220, y, gl_detail.value);
+	M_DrawCheckbox (220, y, gl_detail.getInt());
 
 	y = vid_options_cursor_table[ITEM_CAUSTICS];
 	M_Print (16, y, "   underwater caustics");
-	M_DrawCheckbox (220, y, gl_caustics.value);
+	M_DrawCheckbox (220, y, gl_caustics.getInt());
 
 	y = vid_options_cursor_table[ITEM_SHINY];
 	M_Print (16, y, "        shiny textures");
-	M_DrawCheckbox (220, y, gl_shiny.value);
+	M_DrawCheckbox (220, y, gl_shiny.getInt());
 
 	y = vid_options_cursor_table[ITEM_SHOWFPS];
 	M_Print (16, y, "              Show fps");
-	M_DrawCheckbox (220, y, show_fps.value);
+	M_DrawCheckbox (220, y, show_fps.getInt());
 
 	y = vid_options_cursor_table[ITEM_HUD];
 	M_Print (16, y, "              Show HUD");
-	r = (hud.value)/3;
+	r = (hud.getInt())/3;
 	M_DrawSlider (220, y, r);
 /*
 	y = vid_options_cursor_table[ITEM_HUDR];
@@ -3236,7 +3202,7 @@ void M_GameOptions_Draw (void)
 {
 	qpic_t	*p;
 	int		y;
-	char *msg;
+	const char *msg;
 
 	M_Main_Layout (M_M_MULTI, false);
 
@@ -3253,7 +3219,7 @@ void M_GameOptions_Draw (void)
 
 	y = gameoptions_cursor_table[ITEM_M_RULES];
 	M_Print (0, y, "        Game type");
-	if (coop.value)
+	if (coop.getBool())
 		M_PrintWhite (160, y, "Cooperative");
 	else
 		M_PrintWhite (160, y, "Deathmatch");
@@ -3263,7 +3229,7 @@ void M_GameOptions_Draw (void)
 
 	if (rogue)
 	{
-		switch((int)teamplay.value)
+		switch(teamplay.getInt())
 		{
 			case 1: msg = "No Friendly Fire"; break;
 			case 2: msg = "Friendly Fire"; break;
@@ -3274,11 +3240,8 @@ void M_GameOptions_Draw (void)
 			default: msg = "Off"; break;
 		}
 		M_PrintWhite (160, y, msg);
-	}
-	else
-	{
-		switch((int)teamplay.value)
-		{
+	} else {
+		switch(teamplay.getInt()) {
 			case 1: msg = "No Friendly Fire"; break;
 			case 2: msg = "Friendly Fire"; break;
 			default: msg = "Off"; break;
@@ -3289,28 +3252,28 @@ void M_GameOptions_Draw (void)
 
 	y = gameoptions_cursor_table[ITEM_M_SKILL];
 	M_Print (0, y, "            Skill");
-	if (skill.value == 0)
+	if (skill.getInt() == 0)
 		M_PrintWhite (160, y, "Easy difficulty");
-	else if (skill.value == 1)
+	else if (skill.getInt() == 1)
 		M_PrintWhite (160, y, "Normal difficulty");
-	else if (skill.value == 2)
+	else if (skill.getInt() == 2)
 		M_PrintWhite (160, y, "Hard difficulty");
 	else
 		M_PrintWhite (160, y, "Nightmare difficulty");
 
 	y = gameoptions_cursor_table[ITEM_M_FRAGS];
 	M_Print (0, y, "       Frag Limit");
-	if (fraglimit.value == 0)
+	if (fraglimit.getInt() == 0)
 		M_PrintWhite (160, y, "none");
 	else
-		M_PrintWhite (160, y, va("%i frags", (int)fraglimit.value));
+		M_PrintWhite (160, y, va("%i frags", fraglimit.getInt()));
 
 	y = gameoptions_cursor_table[ITEM_M_TIME];
 	M_Print (0, y, "       Time Limit");
-	if (timelimit.value == 0)
+	if (timelimit.getInt() == 0)
 		M_PrintWhite (160, y, "none");
 	else
-		M_PrintWhite (160, y, va("%i minutes", (int)timelimit.value));
+		M_PrintWhite (160, y, va("%i minutes", timelimit.getInt()));
 
 	y = gameoptions_cursor_table[ITEM_M_EPISODE];
 	M_Print (0, y, "          Episode");
@@ -3336,6 +3299,7 @@ void M_GameOptions_Draw (void)
 void M_NetStart_Change (int dir)
 {
 	int count;
+	int value;
 
 	switch (gameoptions_cursor)
 	{
@@ -3352,7 +3316,7 @@ void M_NetStart_Change (int dir)
 		break;
 
 	case 2:
-		Cvar_SetValue ("coop", coop.value ? 0 : 1);
+		coop.set(!coop.getBool());
 		break;
 
 	case 3:
@@ -3361,35 +3325,47 @@ void M_NetStart_Change (int dir)
 		else
 			count = 2;
 
-		Cvar_SetValue ("teamplay", teamplay.value + dir);
-		if (teamplay.value > count)
-			Cvar_SetValue ("teamplay", 0);
-		else if (teamplay.value < 0)
-			Cvar_SetValue ("teamplay", count);
+		value = teamplay.getInt() + dir;
+
+		if (value > count)
+			value = 0;
+		else if (value < 0)
+			value = count;
+
+		teamplay.set((float)value);
 		break;
 
 	case 4:
-		Cvar_SetValue ("skill", skill.value + dir);
-		if (skill.value > 3)
-			Cvar_SetValue ("skill", 0);
-		if (skill.value < 0)
-			Cvar_SetValue ("skill", 3);
+		value = skill.getInt() + dir;
+
+		if (value > 3)
+			value = 0;
+		if (value < 0)
+			value = 3;
+
+		skill.set((float)value);
 		break;
 
 	case 5:
-		Cvar_SetValue ("fraglimit", fraglimit.value + dir*10);
-		if (fraglimit.value > 100)
-			Cvar_SetValue ("fraglimit", 0);
-		if (fraglimit.value < 0)
-			Cvar_SetValue ("fraglimit", 100);
+		value = fraglimit.getInt() + dir * 10;
+
+		if (value > 100)
+			value = 0;
+		if (value < 0)
+			value = 100;
+
+		fraglimit.set((float)value);
 		break;
 
 	case 6:
-		Cvar_SetValue ("timelimit", timelimit.value + dir*5);
-		if (timelimit.value > 60)
-			Cvar_SetValue ("timelimit", 0);
-		if (timelimit.value < 0)
-			Cvar_SetValue ("timelimit", 60);
+		value = timelimit.getInt() + dir * 5;
+
+		if (value > 60)
+			value = 0;
+		if (value < 0)
+			value = 60;
+
+		timelimit.set((float)value);
 		break;
 
 	case 7:
@@ -3401,7 +3377,7 @@ void M_NetStart_Change (int dir)
 	//PGM 03/02/97 added 1 for dmatch episode
 		else if (rogue)
 			count = 4;
-		else if (registered.value)
+		else if (registered.getBool())
 			count = 7;
 		else
 			count = 2;

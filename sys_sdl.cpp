@@ -30,8 +30,7 @@ int noconinput = 0;
 char *basedir = ".";
 char *cachedir = "/tmp";
 
-cvar_t  sys_linerefresh = {"sys_linerefresh","0"};// set for entity display
-cvar_t  sys_nostdout = {"sys_nostdout","0"};
+CVar sys_nostdout("sys_nostdout","0");
 
 // =======================================================================
 // General routines
@@ -312,17 +311,9 @@ byte *Sys_ZoneBase (int *size)
 
 }
 
-void Sys_LineRefresh(void)
-{
-}
-
 void Sys_Sleep(void)
 {
 	SDL_Delay(1);
-}
-
-void moncontrol(int x)
-{
 }
 
 int main (int c, char **v)
@@ -333,8 +324,6 @@ int main (int c, char **v)
 	extern int recording;
 	static int frame;
 	int value;
-
-	moncontrol(0);
 
 	//signal(SIGFPE, SIG_IGN);
 
@@ -354,38 +343,30 @@ int main (int c, char **v)
 
 	Sys_Init();
 	Host_Init(&parms);
-	Cvar_RegisterVariable (&sys_nostdout);
+	CVar::registerCVar(&sys_nostdout);
 
     oldtime = Sys_FloatTime () - 0.1;
-    while (1)
-    {
+    while (1) {
 // find time spent rendering last frame
         newtime = Sys_FloatTime ();
         time = newtime - oldtime;
 
         if (cls.state == ca_dedicated)
         {   // play vcrfiles at max speed
-            if (time < sys_ticrate.value && (vcrFile == -1 || recording) )
+            if (time < sys_ticrate.getFloat() && (vcrFile == -1 || recording) )
             {
                 SDL_Delay (1);
                 continue;       // not time to run a server only tic yet
             }
-            time = sys_ticrate.value;
+            time = sys_ticrate.getFloat();
         }
 
-        if (time > sys_ticrate.value*2)
+        if (time > sys_ticrate.getFloat()*2)
             oldtime = newtime;
         else
             oldtime += time;
 
-        if (++frame > 10)
-            moncontrol(1);      // profile only while we do each Quake frame
         Host_Frame (time);
-        moncontrol(0);
-
-// graphic debugging aids
-        if (sys_linerefresh.value)
-            Sys_LineRefresh ();
     }
 
 }

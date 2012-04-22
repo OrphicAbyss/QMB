@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "cvar_cpp.h"
 
-extern cvar_t host_framerate;
+extern CVar host_framerate;
 extern float scr_con_current;
 extern qboolean scr_drawloading;
 extern short* snd_out;
@@ -40,8 +40,7 @@ int frames;
 // Code in engine is written relatively independent of kind of capture.
 // When wired to AVI as currently, capture_codec is a fourcc.
 // "0" indicates no compression codec.
-//cvar_t capture_codec = {"capture_codec", "0", true };
-CVar *capture_codec;
+CVar capture_codec("capture_codec","0",true);
 
 
 qboolean CaptureHelper_IsActive(void)
@@ -68,11 +67,11 @@ void CaptureHelper_Start_f (void)
 		return;
 	}
 
-    if (!host_framerate.value) {
+    if (!host_framerate.getBool()) {
         Con_Printf("Set a non-zero host_framerate before starting capture.\n");
         return;
     }
-    fps = 1/(float)(host_framerate.value);
+    fps = 1/host_framerate.getFloat();
 
     Q_strcpy(filename, Cmd_Argv(1));
 	COM_DefaultExtension (filename, Capture_DOTEXTENSION); // currently we capture AVI
@@ -80,14 +79,14 @@ void CaptureHelper_Start_f (void)
 	if (shm){
 		Capture_Open(
 			filename,
-			(*capture_codec->getString() != '0') ? capture_codec->getString() : 0,
+			(*capture_codec.getString() != '0') ? capture_codec.getString() : 0,
 			fps,
 			shm->speed
 		);
 	}else{
 		Capture_Open(
 			filename,
-			(*capture_codec->getString() != '0') ? capture_codec->getString() : 0,
+			(*capture_codec.getString() != '0') ? capture_codec.getString() : 0,
 			fps,
 			0
 		);
@@ -113,7 +112,8 @@ void CaptureHelper_CaptureDemo_f(void)
 
 	Con_Printf ("Capturing %s.dem\n", Cmd_Argv(1), Cmd_Argv(1));
 
-    if (!host_framerate.value) Cvar_SetValue("host_framerate", 1/30.0f); // 15fps default
+    if (!host_framerate.getBool())
+		host_framerate.set(1/30.0f); // 15fps default
 
     CL_PlayDemo_f ();
     if (!cls.demoplayback) return;
@@ -132,8 +132,8 @@ void CaptureHelper_Init(void)
     Cmd_AddCommand ("capture_start", CaptureHelper_Start_f);
     Cmd_AddCommand ("capture_stop", CaptureHelper_Stop_f);
     Cmd_AddCommand ("capturedemo", CaptureHelper_CaptureDemo_f);
-	capture_codec = new CVar("capture_codec", "0", true);
-    CVar::registerCVar(capture_codec);
+	//capture_codec = new CVar("capture_codec", "0", true);
+    CVar::registerCVar(&capture_codec);
 }
 
 
@@ -180,7 +180,7 @@ void CaptureHelper_OnTransferStereo16(void)
     Q_memcpy(capture_audio_samples + 2 * captured_audio_samples, snd_out, snd_linear_count * shm->channels);
     captured_audio_samples += snd_linear_count / 2;
 
-    if (captured_audio_samples >= (int)(0.5 + host_framerate.value * shm->speed)) {
+    if (captured_audio_samples >= (int)(0.5 + host_framerate.getFloat() * shm->speed)) {
         // We have enough audio samples to match one frame of video
 
         if (!Capture_WriteAudio(captured_audio_samples, (unsigned char*)capture_audio_samples)) {
@@ -194,7 +194,7 @@ void CaptureHelper_OnTransferStereo16(void)
 qboolean CaptureHelper_GetSoundtime(void)
 {
     if (CaptureHelper_IsActive()) {
-        soundtime += (int)(0.5 + host_framerate.value * shm->speed);
+        soundtime += (int)(0.5 + host_framerate.getFloat() * shm->speed);
         return true;
     } else {
         return false;

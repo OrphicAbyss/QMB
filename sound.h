@@ -156,9 +156,9 @@ extern volatile		dma_t *shm;
 extern volatile		dma_t sn;
 extern float		sound_nominal_clip_dist;
 
-extern	cvar_t loadas8bit;
-extern	cvar_t bgmvolume;
-extern	cvar_t volume;
+extern	CVar loadas8bit;
+extern	CVar bgmvolume;
+extern	CVar volume;
 
 extern qboolean	snd_initialized;
 

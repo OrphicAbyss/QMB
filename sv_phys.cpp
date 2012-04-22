@@ -37,13 +37,13 @@ solid_edge items only clip against bsp models.
 
 */
 
-cvar_t	sv_friction = {"sv_friction","4",false,true};
-cvar_t	sv_stopspeed = {"sv_stopspeed","100"};
-cvar_t	sv_gravity = {"sv_gravity","800",false,true};
-cvar_t	sv_maxvelocity = {"sv_maxvelocity","2000"};
-cvar_t	sv_nostep = {"sv_nostep","0"};
-cvar_t	sv_stepheight = {"sv_stepheight","18"};
-cvar_t	sv_jumpstep = {"sv_jumpstep","1"};
+CVar	sv_friction("sv_friction","4",false,true);
+CVar	sv_stopspeed("sv_stopspeed","100");
+CVar	sv_gravity("sv_gravity","800",false,true);
+CVar	sv_maxvelocity("sv_maxvelocity","2000");
+CVar	sv_nostep("sv_nostep","0");
+CVar	sv_stepheight("sv_stepheight","18");
+CVar	sv_jumpstep("sv_jumpstep","1");
 
 #define	MOVE_EPSILON	0.01
 
@@ -107,10 +107,10 @@ void SV_CheckVelocity (edict_t *ent)
 	}
 
 	wishspeed = Length(ent->v.velocity);
-	if (wishspeed > sv_maxvelocity.value)
+	if (wishspeed > sv_maxvelocity.getFloat())
 	{
-		VectorScale (ent->v.velocity, sv_maxvelocity.value/wishspeed, ent->v.velocity);
-		wishspeed = sv_maxvelocity.value;
+		VectorScale (ent->v.velocity, sv_maxvelocity.getFloat()/wishspeed, ent->v.velocity);
+		wishspeed = sv_maxvelocity.getFloat();
 	}
 }
 
@@ -380,7 +380,7 @@ void SV_AddGravity (edict_t *ent)
 	else
 		ent_gravity = 1.0;
 
-	ent->v.velocity[2] -= ent_gravity * sv_gravity.value * host_frametime;
+	ent->v.velocity[2] -= ent_gravity * sv_gravity.getFloat() * host_frametime;
 }
 
 
@@ -801,13 +801,13 @@ void SV_WalkMove (edict_t *ent)
 		return;		// move didn't block on a step
 	}
 
-	if (!oldonground && ent->v.waterlevel == 0 && sv_jumpstep.value == 0)
+	if (!oldonground && ent->v.waterlevel == 0 && !sv_jumpstep.getBool())
 		return;		// don't stair up while jumping
 
 	if (ent->v.movetype != MOVETYPE_WALK)
 		return;		// gibbed by a trigger
 
-	if (sv_nostep.value)
+	if (sv_nostep.getFloat())
 		return;
 
 	if ( (int)sv_player->v.flags & FL_WATERJUMP )
@@ -823,8 +823,8 @@ void SV_WalkMove (edict_t *ent)
 
 	VectorCopy (vec3_origin, upmove);
 	VectorCopy (vec3_origin, downmove);
-	upmove[2] = sv_stepheight.value;
-	downmove[2] = -sv_stepheight.value + oldvel[2]*host_frametime;
+	upmove[2] = sv_stepheight.getFloat();
+	downmove[2] = -sv_stepheight.getFloat() + oldvel[2]*host_frametime;
 
 // move up
 	SV_PushEntity (ent, upmove);	// FIXME: don't link?
@@ -1174,7 +1174,7 @@ void SV_Physics_Step (edict_t *ent)
 // freefall if not onground
 	if ( ! ((int)ent->v.flags & (FL_ONGROUND | FL_FLY | FL_SWIM) ) )
 	{
-		if (ent->v.velocity[2] < sv_gravity.value*-0.1)
+		if (ent->v.velocity[2] < sv_gravity.getFloat()*-0.1)
 			hitsound = true;
 		else
 			hitsound = false;

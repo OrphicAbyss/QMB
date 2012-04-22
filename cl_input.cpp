@@ -209,19 +209,15 @@ float CL_KeyState (kbutton_t *key)
 
 //==========================================================================
 
-cvar_t	cl_upspeed = {"cl_upspeed","200"};
-cvar_t	cl_forwardspeed = {"cl_forwardspeed","200", true};
-cvar_t	cl_backspeed = {"cl_backspeed","200", true};
-cvar_t	cl_sidespeed = {"cl_sidespeed","350"};
-
-cvar_t	cl_movespeedkey = {"cl_movespeedkey","2.0"};
-
-cvar_t	cl_yawspeed = {"cl_yawspeed","140"};
-cvar_t	cl_pitchspeed = {"cl_pitchspeed","150"};
-
-cvar_t	cl_anglespeedkey = {"cl_anglespeedkey","1.5"};
-
-cvar_t	in_mlook = {"in_mlook", "1", true}; //qmb :mlook cvar
+CVar cl_upspeed("cl_upspeed","200");
+CVar cl_forwardspeed("cl_forwardspeed","200", true);
+CVar cl_backspeed("cl_backspeed","200", true);
+CVar cl_sidespeed("cl_sidespeed","350");
+CVar cl_movespeedkey("cl_movespeedkey","2.0");
+CVar cl_yawspeed("cl_yawspeed","140");
+CVar cl_pitchspeed("cl_pitchspeed","150");
+CVar cl_anglespeedkey("cl_anglespeedkey","1.5");
+CVar in_mlook("in_mlook", "1", true);
 
 /*
 ================
@@ -236,28 +232,25 @@ void CL_AdjustAngles (void)
 	float	up, down;
 
 	if (in_speed.state & 1)
-		speed = host_frametime * cl_anglespeedkey.value;
+		speed = host_frametime * cl_anglespeedkey.getFloat();
 	else
 		speed = host_frametime;
 
-	if (!(in_strafe.state & 1))
-	{
-		cl.viewangles[YAW] -= speed*cl_yawspeed.value*CL_KeyState (&in_right);
-		cl.viewangles[YAW] += speed*cl_yawspeed.value*CL_KeyState (&in_left);
+	if (!(in_strafe.state & 1))	{
+		cl.viewangles[YAW] -= speed*cl_yawspeed.getFloat()*CL_KeyState(&in_right);
+		cl.viewangles[YAW] += speed*cl_yawspeed.getFloat()*CL_KeyState(&in_left);
 		cl.viewangles[YAW] = anglemod(cl.viewangles[YAW]);
 	}
-	if (in_klook.state & 1)
-	{
+	if (in_klook.state & 1)	{
 		V_StopPitchDrift ();
-		cl.viewangles[PITCH] -= speed*cl_pitchspeed.value * CL_KeyState (&in_forward);
-		cl.viewangles[PITCH] += speed*cl_pitchspeed.value * CL_KeyState (&in_back);
+		cl.viewangles[PITCH] -= speed*cl_pitchspeed.getFloat() * CL_KeyState(&in_forward);
+		cl.viewangles[PITCH] += speed*cl_pitchspeed.getFloat() * CL_KeyState(&in_back);
 	}
 
-	up = CL_KeyState (&in_lookup);
+	up = CL_KeyState(&in_lookup);
 	down = CL_KeyState(&in_lookdown);
-
-	cl.viewangles[PITCH] -= speed*cl_pitchspeed.value * up;
-	cl.viewangles[PITCH] += speed*cl_pitchspeed.value * down;
+	cl.viewangles[PITCH] -= speed*cl_pitchspeed.getFloat() * up;
+	cl.viewangles[PITCH] += speed*cl_pitchspeed.getFloat() * down;
 
 	if (up || down)
 		V_StopPitchDrift ();
@@ -292,35 +285,30 @@ void CL_BaseMove (usercmd_t *cmd)
 
 	if (in_strafe.state & 1)
 	{
-		cmd->sidemove += cl_sidespeed.value * CL_KeyState (&in_right);
-		cmd->sidemove -= cl_sidespeed.value * CL_KeyState (&in_left);
+		cmd->sidemove += cl_sidespeed.getFloat() * CL_KeyState (&in_right);
+		cmd->sidemove -= cl_sidespeed.getFloat() * CL_KeyState (&in_left);
 	}
 
-	cmd->sidemove += cl_sidespeed.value * CL_KeyState (&in_moveright);
-	cmd->sidemove -= cl_sidespeed.value * CL_KeyState (&in_moveleft);
+	cmd->sidemove += cl_sidespeed.getFloat() * CL_KeyState (&in_moveright);
+	cmd->sidemove -= cl_sidespeed.getFloat() * CL_KeyState (&in_moveleft);
 
-	cmd->upmove += cl_upspeed.value * CL_KeyState (&in_up);
-	cmd->upmove -= cl_upspeed.value * CL_KeyState (&in_down);
+	cmd->upmove += cl_upspeed.getFloat() * CL_KeyState (&in_up);
+	cmd->upmove -= cl_upspeed.getFloat() * CL_KeyState (&in_down);
 
 	if (! (in_klook.state & 1) )
 	{
-		cmd->forwardmove += cl_forwardspeed.value * CL_KeyState (&in_forward);
-		cmd->forwardmove -= cl_backspeed.value * CL_KeyState (&in_back);
+		cmd->forwardmove += cl_forwardspeed.getFloat() * CL_KeyState (&in_forward);
+		cmd->forwardmove -= cl_backspeed.getFloat() * CL_KeyState (&in_back);
 	}
 
 //
 // adjust for speed key
 //
-	if (in_speed.state & 1)
-	{
-		cmd->forwardmove *= cl_movespeedkey.value;
-		cmd->sidemove *= cl_movespeedkey.value;
-		cmd->upmove *= cl_movespeedkey.value;
+	if (in_speed.state & 1){
+		cmd->forwardmove *= cl_movespeedkey.getFloat();
+		cmd->sidemove *= cl_movespeedkey.getFloat();
+		cmd->upmove *= cl_movespeedkey.getFloat();
 	}
-
-#ifdef QUAKE2
-	cmd->lightlevel = cl.light_level;
-#endif
 }
 
 

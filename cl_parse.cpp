@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "common.h"
 
-char *svc_strings[] =
+const char *svc_strings[] =
 {
 	"svc_bad",
 	"svc_nop",
@@ -690,7 +690,7 @@ void CL_ParseStaticSound (void)
 }
 
 
-#define SHOWNET(x) if(cl_shownet.value==2)Con_Printf ("%3i:%s\n", msg_readcount-1, x);
+#define SHOWNET(x) if(cl_shownet.getInt()==2)Con_Printf ("%3i:%s\n", msg_readcount-1, x);
 
 /*
 =====================
@@ -705,9 +705,9 @@ void CL_ParseServerMessage (void)
 //
 // if recording demos, copy the message out
 //
-	if (cl_shownet.value == 1)
+	if (cl_shownet.getInt() == 1)
 		Con_Printf ("%i ",net_message.cursize);
-	else if (cl_shownet.value == 2)
+	else if (cl_shownet.getInt() == 2)
 		Con_Printf ("------------------\n");
 
 	cl.onground = false;	// unless the server says otherwise

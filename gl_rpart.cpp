@@ -83,11 +83,10 @@ vec3_t		zero = {0,0,0};
 vec3_t		coord[4];				//used in drawing, saves working it out for each particle
 
 float		grav;
-//was to stop particles not draw particles which were too close to the screen
-//currently not used
+//was to stop particles not draw particles which were too close to the screen currently not used
 //may be used again after depth sorting is implemented
-cvar_t	gl_clipparticles = {"gl_clipparticles","0",true};
-cvar_t	gl_smoketrail = {"gl_smoketrail","0",true};
+CVar	gl_clipparticles("gl_clipparticles","0",true);
+CVar	gl_smoketrail("gl_smoketrail","0",true);
 
 //used for nv_pointsprits
 //pointsprits dont work right anyway (prob some crazy quake matrix stuff)
@@ -108,7 +107,7 @@ int CL_TruePointContents (vec3_t p)
 __inline void RGBtoGrayscalef(vec3_t rgb){
 	float value;
 
-	if (gl_sincity.value == 1){
+	if (gl_sincity.getBool()){
 		//value = min(255,rgb[0] * 0.2125 + rgb[1] * 0.7154 + rgb[2] * 0.0721);
 		//value = min(255,max(max(rgb[0],rgb[1]),rgb[2]));
 		value = min(1,rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114);
@@ -257,7 +256,7 @@ R_InitParticles
 */
 void R_InitParticles (void)
 {
-	extern cvar_t sv_gravity;
+	extern CVar sv_gravity;
 	int		i;
 
 	//check the command line to see if a number of particles was given particle
@@ -285,10 +284,10 @@ void R_InitParticles (void)
 	R_ClearParticles();
 
 	//Regester particle cvars
-	Cvar_RegisterVariable (&gl_clipparticles);
-	Cvar_RegisterVariable (&gl_smoketrail);
+	CVar::registerCVar(&gl_clipparticles);
+	CVar::registerCVar(&gl_smoketrail);
 
-	grav = 9.8*(sv_gravity.value/800);
+	grav = 9.8*(sv_gravity.getFloat()/800.0f);
 }
 
 /*
@@ -618,7 +617,7 @@ void R_RunParticleEffect (vec3_t org, vec3_t dir, int color, int count)
 		{
 			//JHL:HACK; make blood brighter...
 			if (color == 73){
-                if (gl_sincity.value == 1)
+                if (gl_sincity.getBool())
 					colour[0] = max(1.0f,colour[0]*2);
 				//colour[1] = 0f;
 				//colour[2] = 0f;
@@ -831,7 +830,7 @@ void DrawParticles(void)
 				for (p=pt->start; p ; p=p->next){
 
 					//test to see if particle is too close to the screen (high fill rate usage)
-					if (gl_clipparticles.value && drawncount >= 4) {
+					if (gl_clipparticles.getBool() && drawncount >= 4) {
 						VectorSubtract(p->org, r_origin, distance);
 						if (distance[0] * distance[0] + distance[1] * distance[1] + distance[2] * distance[2] < 3200)
 							continue;
@@ -972,7 +971,7 @@ void DrawParticles(void)
 				}
 
 				glEnd();
-				if (gl_cull.value)
+				if (gl_cull.getBool())
 					glEnable(GL_CULL_FACE);
 			}
 		}else{
@@ -1008,7 +1007,7 @@ void DrawParticles(void)
 					glEnd();
 				}
 
-				if (gl_cull.value)
+				if (gl_cull.getBool())
 					glEnable(GL_CULL_FACE);
 			} else {
 				glBindTexture(GL_TEXTURE_2D,pt->texture);
@@ -1072,7 +1071,7 @@ void DrawParticles(void)
  */
 void R_UpdateAll(void)
 {
-	extern cvar_t sv_gravity;
+	extern CVar sv_gravity;
 	particle_tree_t	*pt;
 	particle_t		*p, *kill;
 	float			frametime, dist;
@@ -1082,7 +1081,7 @@ void R_UpdateAll(void)
 	vec3_t			oldOrg, stop, normal;//, tempVec;
 
 	//Work out gravity and time
-	grav = 9.8*(sv_gravity.value/800);	//just incase sv_gravity has changed
+	grav = 9.8*(sv_gravity.getFloat()/800.0f);	//just incase sv_gravity has changed
 	frametime = (cl.time - cl.oldtime);
 
 	//for each particle type
@@ -1383,7 +1382,7 @@ void AddParticle(vec3_t org, int count, float size, float time, int type, vec3_t
 		RGBtoGrayscalef(colour);
 		break;
 	case (p_blood):
-		if (gl_sincity.value == 1){
+		if (gl_sincity.getBool()){
 			colour[0] = (rand()%128)/256.0+0.45f;;
 		}else{
 			colour[0] = (rand()%128)/256.0+0.25f;;
@@ -1743,7 +1742,7 @@ void AddTrail(vec3_t start, vec3_t end, int type, float time, float size, vec3_t
 		RGBtoGrayscalef(colour);
 		break;
 	case (p_blood):
-		if (gl_sincity.value == 1){
+		if (gl_sincity.getBool()){
 			colour[0] = 0.9f;
 		}else{
 			colour[0] = 0.75f;
@@ -1812,7 +1811,7 @@ particle_t *AddTrailColor(vec3_t start, vec3_t end, int type, float time, float 
 			}
 		}
 
-		if ((type == p_smoke && !bubble && gl_smoketrail.value != 0) || type != p_smoke){
+		if ((type == p_smoke && !bubble && gl_smoketrail.getBool() != 0) || type != p_smoke){
 			p = free_particles;
 			free_particles = p->next;
 			p->next = pt->start;
@@ -1839,7 +1838,7 @@ particle_t *AddTrailColor(vec3_t start, vec3_t end, int type, float time, float 
 
 			numParticles++;
 
-			if (type != p_smoke || gl_smoketrail.value == 1)
+			if (type != p_smoke || gl_smoketrail.getBool())
 				return p;
 		}
 		for (pt = particle_type_active; (pt) && (pt->id != type); pt = pt->next);
@@ -1973,7 +1972,7 @@ particle_t *AddTrailColor(vec3_t start, vec3_t end, int type, float time, float 
 //==================================================
 int LoadParticleTexture (char *texture)
 {
-	return GL_LoadTexImage (texture, false, true, gl_sincity.value);
+	return GL_LoadTexImage (texture, false, true, gl_sincity.getBool());
 }
 
 /** MakeParticleTexture
@@ -2005,7 +2004,7 @@ void MakeParticleTexure(void)
         }
     }
 	//Load the texture into vid mem and save the number for later use
-	part_tex = GL_LoadTexture ("particle", 128, 128, &data[0][0][0], true, true, 4, gl_sincity.value);
+	part_tex = GL_LoadTexture ("particle", 128, 128, &data[0][0][0], true, true, 4, gl_sincity.getBool());
 
 	//Clear the data
 	max=64;
@@ -2031,7 +2030,7 @@ void MakeParticleTexure(void)
 			}
 	    }
 	}
-	trail_tex = GL_LoadTexture ("trail_part", 128, 128, &data[0][0][0], false, true, 4, gl_sincity.value);
+	trail_tex = GL_LoadTexture ("trail_part", 128, 128, &data[0][0][0], false, true, 4, gl_sincity.getBool());
 
 	blood_tex = LoadParticleTexture	("textures/particles/blood");
 	bubble_tex =LoadParticleTexture	("textures/particles/bubble");

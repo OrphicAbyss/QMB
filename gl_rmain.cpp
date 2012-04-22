@@ -66,86 +66,79 @@ int		gl_textureunits;
 
 void R_MarkLeaves (void);
 
-cvar_t	r_drawentities = {"r_drawentities","1"};
-cvar_t	r_drawviewmodel = {"r_drawviewmodel","1"};
-cvar_t	r_speeds = {"r_speeds","0"};
-cvar_t	r_wateralpha = {"r_wateralpha","1", true};
-cvar_t	r_dynamic = {"r_dynamic","1"};
-cvar_t	r_novis = {"r_novis","0", true};
+CVar r_drawentities("r_drawentities","1");
+CVar r_drawviewmodel("r_drawviewmodel","1");
+CVar r_speeds("r_speeds","0");
+CVar r_wateralpha("r_wateralpha","1", true);
+CVar r_dynamic("r_dynamic","1");
+CVar r_novis("r_novis","0", true);
+CVar gl_finish("gl_finish","0");
+CVar gl_clear("gl_clear","1", true);
+CVar gl_24bitmaptex("gl_24bitmaptex","1",true);
+CVar gl_cull("gl_cull","1");
+CVar gl_polyblend("gl_polyblend","1");
+CVar gl_flashblend("gl_flashblend","0", true);
+CVar gl_nocolors("gl_nocolors","0");
+CVar gl_keeptjunctions("gl_keeptjunctions","0");
+CVar gl_detail("gl_detail","1", true);
+CVar gl_shiny("gl_shiny","1", true);
+CVar gl_caustics("gl_caustics","1", true);
+CVar gl_dualwater("gl_dualwater","1", true);
+CVar gl_ammoflash("gl_ammoflash","1", true);
+CVar r_interpolate_model_animation( "r_interpolate_model_animation", "1", true );
+CVar r_interpolate_model_transform( "r_interpolate_model_transform", "1", true );
+CVar r_wave("r_wave", "1", true);
+CVar gl_fog("gl_fog", "1", true);
+CVar gl_fogglobal("gl_fogglobal", "1", true);
+CVar gl_fogred("gl_fogred", "0.5", true);
+CVar gl_foggreen("gl_foggreen", "0.4", true);
+CVar gl_fogblue("gl_fogblue", "0.3", true);
+CVar gl_fogstart("gl_fogstart", "150", true);
+CVar gl_fogend("gl_fogend", "1536", true);
+CVar sv_fastswitch("sv_fastswitch", "0", true);
 
-cvar_t	gl_finish = {"gl_finish","0"};
-cvar_t	gl_clear = {"gl_clear","1", true};
-cvar_t	gl_24bitmaptex = {"gl_24bitmaptex","1",true};
-cvar_t	gl_cull = {"gl_cull","1"};
-cvar_t	gl_polyblend = {"gl_polyblend","1"};
-cvar_t	gl_flashblend = {"gl_flashblend","0", true};
-cvar_t	gl_nocolors = {"gl_nocolors","0"};
-cvar_t	gl_keeptjunctions = {"gl_keeptjunctions","0"};
+CVar gl_conalpha("gl_conalpha", "0.5", true);
+CVar gl_checkleak("gl_checkleak","0", true);
+CVar r_skydetail("r_skydetail","1", true);
+CVar r_sky_x("r_sky_x","0", true);
+CVar r_sky_y("r_sky_y","0", true);
+CVar r_sky_z("r_sky_z","0", true);
 
-//qmb :extra cvars
-cvar_t	gl_detail = {"gl_detail","1", true};
-cvar_t	gl_shiny = {"gl_shiny","1", true};
-cvar_t	gl_caustics = {"gl_caustics","1", true};
-cvar_t	gl_dualwater = {"gl_dualwater","1", true};
-cvar_t	gl_ammoflash = {"gl_ammoflash","1", true};
-// fenix@io.com: model interpolation
-cvar_t  r_interpolate_model_animation = { "r_interpolate_model_animation", "1", true };
-cvar_t  r_interpolate_model_transform = { "r_interpolate_model_transform", "1", true };
-cvar_t  r_wave = {"r_wave", "1", true};
-cvar_t  gl_fog = {"gl_fog", "1", true};
-cvar_t  gl_fogglobal = {"gl_fogglobal", "1", true};
-cvar_t  gl_fogred = {"gl_fogred", "0.5", true};
-cvar_t  gl_foggreen = {"gl_foggreen", "0.4", true};
-cvar_t  gl_fogblue = {"gl_fogblue", "0.3", true};
-cvar_t  gl_fogstart = {"gl_fogstart", "150", true};
-cvar_t  gl_fogend = {"gl_fogend", "1536", true};
-cvar_t  sv_fastswitch = {"sv_fastswitch", "0", true};
-
-cvar_t  gl_conalpha = {"gl_conalpha", "0.5", true};
-cvar_t	gl_checkleak = {"gl_checkleak","0", true};
-cvar_t	r_skydetail = {"r_skydetail","1", true};
-cvar_t	r_sky_x = {"r_sky_x","0", true};
-cvar_t	r_sky_y = {"r_sky_y","0", true};
-cvar_t	r_sky_z = {"r_sky_z","0", true};
-
-cvar_t	r_errors = {"r_errors","1", true};
-cvar_t	r_fullbright = {"r_fullbright", "0"};
+CVar r_errors("r_errors","1", true);
+CVar r_fullbright("r_fullbright", "0");
 
 //cel shading & vertex shading in model
-cvar_t	r_modeltexture = {"r_modeltexture","1", true};
-cvar_t	r_celshading = {"r_celshading","0", true};
-cvar_t	r_outline = {"r_outline","0", true};
-cvar_t	r_vertexshading = {"r_vertexshading","0", true};
+CVar r_modeltexture("r_modeltexture","1", true);
+CVar r_celshading("r_celshading","0", true);
+CVar r_outline("r_outline","0", true);
+CVar r_vertexshading("r_vertexshading","0", true);
 
-//ati truform
-cvar_t	gl_npatches = {"gl_npatches","1", true};
-
-//anisotropy filtering
-cvar_t	gl_anisotropic = {"gl_anisotropic","2", true};
-
+CVar gl_npatches("gl_npatches","1", true);	//ati truform
+CVar gl_anisotropic("gl_anisotropic","2", true);
 //temp var for internal testing of new features
-cvar_t  gl_test = {"gl_temp", "1", true};
-//qmb :end
-//qmb :gamma
-extern	cvar_t		v_gamma; // muff
+CVar gl_test("gl_temp", "1", true);
+
+extern CVar v_gamma;
+
 
 // idea originally nicked from LordHavoc
 // re-worked + extended - muff 5 Feb 2001
 // called inside polyblend
 void DoGamma()
 {
-	//return;
-	if (v_gamma.value < 0.2f)
-		v_gamma.value = 0.2f;
-	if (v_gamma.value >= 1)
-	{
-		v_gamma.value = 1;
+	float gamma = v_gamma.getFloat();
+	gamma = max(0.2f,gamma);
+	gamma = min(1.0f,gamma);
+
+	if (gamma != v_gamma.getFloat())
+		v_gamma.set(gamma);
+
+	if (gamma >= 1)
 		return;
-	}
 
 	//believe it or not this actually does brighten the picture!!
 	glBlendFunc (  GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-	glColor4f (1, 1, 1, v_gamma.value);
+	glColor4f (1, 1, 1, gamma);
 
 
 	glBegin (GL_QUADS);
@@ -288,7 +281,7 @@ void R_DrawEntitiesOnList (void)
 {
 	int		i;
 
-	if (!r_drawentities.value)
+	if (!r_drawentities.getBool())
 		return;
 
 	// draw sprites seperately, because of alpha blending
@@ -331,16 +324,15 @@ R_DrawViewModel
 void R_DrawViewModel (void)
 {
 	entity_t	*e;
+    bool old_interpolate_model_transform;
 
-    float old_interpolate_model_transform;
-
-    if (!r_drawviewmodel.value)
+    if (!r_drawviewmodel.getBool())
         return;
 
-    if (chase_active.value) //make sure we are in 1st person view
+    if (chase_active.getBool()) //make sure we are in 1st person view
         return;
 
-    if (!r_drawentities.value) //make sure we are drawing entities
+    if (!r_drawentities.getBool()) //make sure we are drawing entities
         return;
 
     if (cl.items & IT_INVISIBILITY) //make sure we arnt invisable
@@ -355,13 +347,13 @@ void R_DrawViewModel (void)
 
     // hack the depth range to prevent view model from poking into walls
     glDepthRange (gldepthmin, gldepthmin + 0.3*(gldepthmax-gldepthmin));
-	//qmb :interpolation
-	// fenix@io.com: model transform interpolation
-	old_interpolate_model_transform = r_interpolate_model_transform.value;
-	r_interpolate_model_transform.value = false;
+
+	// Don't do transform interpolation on the viewmodel
+	old_interpolate_model_transform = r_interpolate_model_transform.getBool();
+	r_interpolate_model_transform.set(false);
 	R_DrawAliasModel (e);
-	r_interpolate_model_transform.value = old_interpolate_model_transform;
-	//qmb :end
+	r_interpolate_model_transform.set(old_interpolate_model_transform);
+
     glDepthRange (gldepthmin, gldepthmax);
 }
 
@@ -374,7 +366,7 @@ R_PolyBlend
 //some code from LordHavoc early DP version
 void R_PolyBlend (void)
 {
-	if (!gl_polyblend.value)
+	if (!gl_polyblend.getBool())
 		return;
 
 	glEnable (GL_BLEND);
@@ -397,7 +389,7 @@ void R_PolyBlend (void)
 	glEnd ();
 
 	//gamma trick based on LordHavoc - muff
-	if (v_gamma.value != 1)
+	if (v_gamma.getFloat() != 1)
 		DoGamma();
 
 	glDisable (GL_BLEND); // muff
@@ -468,7 +460,7 @@ void R_SetupFrame (void)
 
 // don't allow cheats in multiplayer
 	if (cl.maxclients > 1)
-		setValue ("r_fullbright", "0");
+		r_fullbright.set(false);
 
 	R_AnimateLight ();
 
@@ -585,9 +577,7 @@ r_refdef must be set before the first call
 */
 void R_RenderScene (void)
 {
-	GLenum error;
-
-	if (r_errors.value && developer.value)
+	if (r_errors.getBool() && developer.getBool())
 		checkGLError("Error pre-rendering:");
 
 	R_SetupFrame ();
@@ -596,33 +586,33 @@ void R_RenderScene (void)
 
 	R_SetupGL ();
 
-	if (r_errors.value && developer.value)
+	if (r_errors.getBool() && developer.getBool())
 		checkGLError("After R_SetupGL:");
 
 	R_MarkLeaves ();	// done here so we know if we're in water
 
 	R_DrawWorld ();		// adds static entities to the list
 
-	if (r_errors.value && developer.value)
+	if (r_errors.getBool() && developer.getBool())
 		checkGLError("After R_DrawWorld:");
 
 	S_ExtraUpdate ();	// don't let sound get messed up if going slow
 
 	R_DrawEntitiesOnList ();
 
-	if (r_errors.value && developer.value)
+	if (r_errors.getBool() && developer.getBool())
 		checkGLError("After R_DrawEntitiesOnList:");
 
 	R_RenderDlights ();
 
 	R_DrawParticles ();
 
-	if (r_errors.value && developer.value)
+	if (r_errors.getBool() && developer.getBool())
 		checkGLError("After R_DrawParticles:");
 
 	R_DrawViewModel ();
 
-	if (r_errors.value && developer.value)
+	if (r_errors.getBool() && developer.getBool())
 		checkGLError("After R_DrawViewModel:");
 }
 
@@ -635,8 +625,8 @@ R_Clear
 void R_Clear (void)
 {
 	//qmb :map leak check
-	if (gl_checkleak.value){
-		gl_clear.value = 1;
+	if (gl_checkleak.getBool()){
+		gl_clear.set(true);
 		glClearColor (1,0,0,1);
 	}else
 		glClearColor (0,0,0,0);
@@ -644,12 +634,12 @@ void R_Clear (void)
 	if (gl_stencil){
 		glClearStencil(1);
 
-		if (gl_clear.value)
+		if (gl_clear.getBool())
 			glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);	//stencil bit ignored when no stencil buffer
 		else
 			glClear (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);	//stencil bit ignored when no stencil buffer
 	}else {
-		if (gl_clear.value)
+		if (gl_clear.getBool())
 			glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//stencil bit ignored when no stencil buffer
 		else
 			glClear (GL_DEPTH_BUFFER_BIT);	//stencil bit ignored when no stencil buffer
@@ -671,63 +661,60 @@ r_refdef must be set before the first call
 */
 void R_RenderView (void)
 {
-	GLenum error;
 	double	time1, time2;
 	float colors[4] = {0.0, 0.0, 0.0, 1.0};
 
 	if (!r_worldentity.model || !cl.worldmodel)
 		Sys_Error ("R_RenderView: NULL worldmodel");
 
-	if (r_speeds.value)
-	{
+	if (r_speeds.getBool())	{
 		glFinish ();
 		time1 = Sys_FloatTime ();
 		c_brush_polys = 0;
 		c_alias_polys = 0;
 	}
 
-	if (gl_finish.value)
+	if (gl_finish.getBool())
 		glFinish ();
 
-	if (r_errors.value && developer.value)
+	if (r_errors.getBool() && developer.getBool())
 		checkGLError("Finished:");
 
 	R_Clear ();
 
-	if (r_errors.value && developer.value)
+	if (r_errors.getBool() && developer.getBool())
 		checkGLError("After R_Clear:");
 
 	// render normal view
 
-	if ((gl_fogglobal.value))//&&(CONTENTS_EMPTY==r_viewleaf->contents))
+	if ((gl_fogglobal.getBool()))//&&(CONTENTS_EMPTY==r_viewleaf->contents))
 	{
 		glFogi(GL_FOG_MODE, GL_LINEAR);
-			colors[0] = gl_fogred.value;
-			colors[1] = gl_foggreen.value;
-			colors[2] = gl_fogblue.value;
+			colors[0] = gl_fogred.getFloat();
+			colors[1] = gl_foggreen.getFloat();
+			colors[2] = gl_fogblue.getFloat();
 		glFogfv(GL_FOG_COLOR, colors);
-		glFogf(GL_FOG_START, gl_fogstart.value);
-		glFogf(GL_FOG_END, gl_fogend.value);
+		glFogf(GL_FOG_START, gl_fogstart.getFloat());
+		glFogf(GL_FOG_END, gl_fogend.getFloat());
 		glFogf(GL_FOG_DENSITY, 0.2f);
 		glEnable(GL_FOG);
 
-		if (r_errors.value && developer.value)
+		if (r_errors.getBool() && developer.getBool())
 			checkGLError("After fog setup:");
 	}
 
 	R_RenderScene ();
 
-	if (gl_fogglobal.value)
+	if (gl_fogglobal.getBool())
 		glDisable(GL_FOG);
 
 	R_PolyBlend ();
 
-	if (r_speeds.value)
-	{
+	if (r_speeds.getBool()){
 		time2 = Sys_FloatTime ();
 		Con_Printf ("%3i ms  %4i wpoly %4i epoly\n", (int)((time2-time1)*1000), c_brush_polys, c_alias_polys);
 	}
 
-	if (r_errors.value && developer.value)
+	if (r_errors.getBool() && developer.getBool())
 		checkGLError("After R_RenderScene and R_PolyBlend:");
 }

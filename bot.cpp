@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -47,7 +47,7 @@ edict_t *Nextent (edict_t *edict)
 {
 	int		e;
 	edict_t	*ent;
-	
+
 	e = NUM_FOR_EDICT (edict);	// Get the edictnum
 
 	while (true)				// Loop until we get a return
@@ -82,7 +82,7 @@ qboolean bot_movestep (edict_t *ent, vec3_t move)
 //	int			i;
 //	edict_t		*enemy;
 
-// try the move	
+// try the move
 
 	//get the bots org
 	VectorCopy (ent->v.origin, oldorg);
@@ -90,9 +90,9 @@ qboolean bot_movestep (edict_t *ent, vec3_t move)
 	VectorAdd (ent->v.origin, move, neworg);
 
 // push down from a step height above the wished position to a step below
-	neworg[2] += sv_stepheight.value;
+	neworg[2] += sv_stepheight.getFloat();
 	VectorCopy (neworg, end);
-	end[2] -= sv_stepheight.value*2;
+	end[2] -= sv_stepheight.getFloat()*2;
 
 //trace down to check if there was a floor
 	trace = SV_Move (neworg, ent->v.mins, ent->v.maxs, end, MOVE_NOMONSTERS, ent);
@@ -106,7 +106,7 @@ qboolean bot_movestep (edict_t *ent, vec3_t move)
 	if (trace.startsolid)
 	{
 		//start inside a wall?
-		neworg[2] -= sv_stepheight.value;
+		neworg[2] -= sv_stepheight.getFloat();
 		trace = SV_Move (neworg, ent->v.mins, ent->v.maxs, end, MOVE_NOMONSTERS, ent);
 		if (trace.allsolid || trace.startsolid){
 			//Con_Printf("Trace start solid...\n");
@@ -119,17 +119,17 @@ qboolean bot_movestep (edict_t *ent, vec3_t move)
 		if ( (int)ent->v.flags & FL_PARTIALGROUND )
 		{
 //			ent->v.flags = (int)ent->v.flags & ~FL_ONGROUND;
-//	Con_Printf ("fall down\n"); 
+//	Con_Printf ("fall down\n");
 			return true;
 		}
-	
+
 		//Con_Printf("Walked off edge...\n");
 		return false;		// walked off an edge
 	}
 
 // check point traces down for dangling corners
 //	VectorCopy (trace.endpos, ent->v.origin);
-	
+
 /*	if (!SV_CheckBottom (ent))
 	{
 		if ( (int)ent->v.flags & FL_PARTIALGROUND )
@@ -144,7 +144,7 @@ qboolean bot_movestep (edict_t *ent, vec3_t move)
 
 	if ( (int)ent->v.flags & FL_PARTIALGROUND )
 	{
-//		Con_Printf ("back on ground\n"); 
+//		Con_Printf ("back on ground\n");
 		//ent->v.flags = (int)ent->v.flags & ~FL_PARTIALGROUND;
 	}
 //	ent->v.groundentity = EDICT_TO_PROG(trace.ent);
@@ -171,7 +171,7 @@ qboolean bot_walkmove (edict_t *ent, float yaw, float dist)
 	}
 
 	yaw = yaw*M_PI / 180;
-	
+
 	move[0] = cos(yaw)*dist;
 	move[1] = sin(yaw)*dist;
 	move[2] = 0;
@@ -201,7 +201,7 @@ qboolean Traceline (vec3_t start, vec3_t end, edict_t *self, edict_t *enemy)
 		if (trace.ent==enemy)	// And there were no other entities in the way
 			return true;			// Then the bot can see him
 	}
-		
+
 	return false;				// Otherwise he cant
 }
 
@@ -234,7 +234,7 @@ void CalcAngles (vec3_t oldvector, vec3_t newvector)
 {
 	float	forward;
 	float	yaw, pitch;
-	
+
 	if (oldvector[1] == 0 && oldvector[0] == 0)
 	{
 		yaw = 0;
@@ -371,8 +371,8 @@ float onLedge(vec3_t org, vec3_t angle, edict_t *bot){
 		VectorMA(ledgestart[i],20*(i+1),angle,ledgestart[i]);		//add forward vector scaled
 		VectorCopy(ledgestart[i], ledgeend[i]);						//copy to end position
 
-		ledgestart[i][2] += sv_stepheight.value;					//move up a step
-		ledgeend[i][2] -= sv_stepheight.value * 4;					//move down 4 steps
+		ledgestart[i][2] += sv_stepheight.getFloat();					//move up a step
+		ledgeend[i][2] -= sv_stepheight.getFloat() * 4;					//move down 4 steps
 
 		//AddTrail(ledgestart[i],ledgeend[i],0,0.05f,0.75f,zerodir);	//add trails for each
 
@@ -417,7 +417,7 @@ void AttackMoveBot (client_t *client, qboolean fire, qboolean move, qboolean str
 		else if (client->cmd.sidemove < -400)			// If strafing to fast
 			client->cmd.sidemove = -400;				// Then limit the strafe speed
 	}
-	else												// If he has no enemy 
+	else												// If he has no enemy
 	{
 		vec3_t	origin;
 
@@ -434,8 +434,7 @@ void AttackMoveBot (client_t *client, qboolean fire, qboolean move, qboolean str
 		client->cmd.sidemove		= 0;				// Let him run stright
 	}
 
-	switch ((int)skill.value)
-	{
+	switch (skill.getInt()){
 		case 1:		// Medium
 			client->edict->v.v_angle[0]		= client->edict->v.angles[0] + (rand()&15)-8;
 			client->edict->v.v_angle[1]		= client->edict->v.angles[1] + (rand()&15)-8;	// Adjust him to aim where he looks and make it not 100% accurate
@@ -476,7 +475,7 @@ something for the bot to shoot at
 void SearchForEnemy (client_t *client)
 {//for a normal game
 	edict_t	*bot = client->edict;
-	edict_t	*nmy = bot->bot.enemy;					
+	edict_t	*nmy = bot->bot.enemy;
 	vec3_t	eyes1, eyes2, test;
 	int		num;
 
@@ -505,11 +504,11 @@ void SearchForEnemy (client_t *client)
 
 	while (num < globot.MaxClients)		// Keep looping as long as there are clients
 	{
-		if (nmy->bot.Active		&&		// Enemy is playing 
+		if (nmy->bot.Active		&&		// Enemy is playing
 			nmy != bot			&&		// and is not the bot himself
 			nmy->v.health > 0)//	&&		// and is alive
 			//nmy->v.team != bot->v.team)	// and in another team
-		
+
 		{
 			VectorAdd (nmy->v.origin, nmy->v.view_ofs, eyes1);	// We want the origin of the clients eyes
 
@@ -545,7 +544,7 @@ void BotMove(client_t *client){
 
 	//get our forward trace
 	VectorCopy(bot->v.origin,org);
-	
+
 	//copy current position
 	for (i=0;i<5;i++)
 		VectorCopy(bot->v.origin,end[i]);
@@ -704,7 +703,7 @@ void BotPostFrame (client_t *client)
 			bot->bot.chase = NULL;	// Then find a new client to chase
 		}
 	}
-	
+
 	// This last piece here is only used by Team Fortress
 
 	if (!bot->bot.menudone)								// If we have not gone past the class selection menu
@@ -717,7 +716,7 @@ void BotPostFrame (client_t *client)
 		else if (sv.time > bot->bot.connecttime + 2)	// If bot has been active more then 2 seconds then choose a random class and leave the menu
 			bot->v.impulse = 10;
 		else if (sv.time > bot->bot.connecttime + 1 &&	// If bot has been active between 1 and 2 secs
-				 teamplay.value)						// and we are playing teamplay
+				 teamplay.getBool())						// and we are playing teamplay
 			bot->v.impulse = 5;							// Then choose a random team
 	}
 }

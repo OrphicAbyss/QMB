@@ -25,20 +25,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // references them even when on a unix system.
 
 // these two are not intended to be set directly
-cvar_t	cl_name = {"_cl_name", "player", true};
-cvar_t	cl_color = {"_cl_color", "0", true};
+CVar cl_name("_cl_name", "player", true);
+CVar cl_color("_cl_color", "0", true);
 
-cvar_t	cl_shownet = {"cl_shownet","0"};	// can be 0, 1, or 2
-cvar_t	cl_nolerp = {"cl_nolerp","0"};
+CVar cl_shownet("cl_shownet","0");	// can be 0, 1, or 2
+CVar cl_nolerp("cl_nolerp","0");
 
-cvar_t	lookspring = {"lookspring","0", true};
-cvar_t	lookstrafe = {"lookstrafe","0", true};
-cvar_t	sensitivity = {"sensitivity","3", true};
+CVar lookspring("lookspring","0", true);
+CVar lookstrafe("lookstrafe","0", true);
+CVar sensitivity("sensitivity","3", true);
 
-cvar_t	m_pitch = {"m_pitch","0.022", true};
-cvar_t	m_yaw = {"m_yaw","0.022", true};
-cvar_t	m_forward = {"m_forward","1", true};
-cvar_t	m_side = {"m_side","0.8", true};
+CVar m_pitch("m_pitch","0.022", true);
+CVar m_yaw("m_yaw","0.022", true);
+CVar m_forward("m_forward","1", true);
+CVar m_side("m_side","0.8", true);
 
 
 client_static_t	cls;
@@ -187,10 +187,10 @@ Con_DPrintf ("CL_SignonReply: %i\n", cls.signon);
 
 	case 2:
 		MSG_WriteByte (&cls.message, clc_stringcmd);
-		MSG_WriteString (&cls.message, va("name \"%s\"\n", cl_name.string));
+		MSG_WriteString (&cls.message, va("name \"%s\"\n", cl_name.getString()));
 
 		MSG_WriteByte (&cls.message, clc_stringcmd);
-		MSG_WriteString (&cls.message, va("color %i %i\n", ((int)cl_color.value)>>4, ((int)cl_color.value)&15));
+		MSG_WriteString (&cls.message, va("color %i %i\n", cl_color.getInt()>>4, cl_color.getInt()&15));
 
 		MSG_WriteByte (&cls.message, clc_stringcmd);
 		sprintf (str, "spawn %s", cls.spawnparms);
@@ -378,7 +378,7 @@ float	CL_LerpPoint (void)
 
 	f = cl.mtime[0] - cl.mtime[1];
 
-	if (!f || cl_nolerp.value || cls.timedemo || sv.active)
+	if (!f || cl_nolerp.getBool() || cls.timedemo || sv.active)
 	{
 		cl.time = cl.mtime[0];
 		return 1;
@@ -609,7 +609,7 @@ void CL_RelinkEntities (void)
 
 		ent->forcelink = false;
 
-		if (i == cl.viewentity && !chase_active.value)
+		if (i == cl.viewentity && !chase_active.getBool())
 			continue;
 
 #ifdef QUAKE2
@@ -652,7 +652,7 @@ int CL_ReadFromServer (void)
 		CL_ParseServerMessage ();
 	} while (ret && cls.state == ca_connected);
 
-	if (cl_shownet.value)
+	if (cl_shownet.getBool())
 		Con_Printf ("\n");
 
 	CL_RelinkEntities ();
@@ -726,30 +726,26 @@ void CL_Init (void)
 //
 // register our commands
 //
-	Cvar_RegisterVariable (&cl_name);
-	Cvar_RegisterVariable (&cl_color);
-	Cvar_RegisterVariable (&cl_upspeed);
-	Cvar_RegisterVariable (&cl_forwardspeed);
-	Cvar_RegisterVariable (&cl_backspeed);
-	Cvar_RegisterVariable (&cl_sidespeed);
-	Cvar_RegisterVariable (&cl_movespeedkey);
-	Cvar_RegisterVariable (&cl_yawspeed);
-	Cvar_RegisterVariable (&cl_pitchspeed);
-	Cvar_RegisterVariable (&cl_anglespeedkey);
-	Cvar_RegisterVariable (&cl_shownet);
-	Cvar_RegisterVariable (&cl_nolerp);
-	Cvar_RegisterVariable (&lookspring);
-	Cvar_RegisterVariable (&lookstrafe);
-	Cvar_RegisterVariable (&sensitivity);
-
-	Cvar_RegisterVariable (&in_mlook); //qmb :mlook;
-
-	Cvar_RegisterVariable (&m_pitch);
-	Cvar_RegisterVariable (&m_yaw);
-	Cvar_RegisterVariable (&m_forward);
-	Cvar_RegisterVariable (&m_side);
-
-//	Cvar_RegisterVariable (&cl_autofire);
+	CVar::registerCVar(&cl_name);
+	CVar::registerCVar(&cl_color);
+	CVar::registerCVar(&cl_upspeed);
+	CVar::registerCVar(&cl_forwardspeed);
+	CVar::registerCVar(&cl_backspeed);
+	CVar::registerCVar(&cl_sidespeed);
+	CVar::registerCVar(&cl_movespeedkey);
+	CVar::registerCVar(&cl_yawspeed);
+	CVar::registerCVar(&cl_pitchspeed);
+	CVar::registerCVar(&cl_anglespeedkey);
+	CVar::registerCVar(&cl_shownet);
+	CVar::registerCVar(&cl_nolerp);
+	CVar::registerCVar(&lookspring);
+	CVar::registerCVar(&lookstrafe);
+	CVar::registerCVar(&sensitivity);
+	CVar::registerCVar(&in_mlook);
+	CVar::registerCVar(&m_pitch);
+	CVar::registerCVar(&m_yaw);
+	CVar::registerCVar(&m_forward);
+	CVar::registerCVar(&m_side);
 
 	Cmd_AddCommand ("entities", CL_PrintEntities_f);
 	Cmd_AddCommand ("disconnect", CL_Disconnect_f);

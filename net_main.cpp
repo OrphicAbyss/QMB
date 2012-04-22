@@ -63,22 +63,18 @@ int messagesReceived = 0;
 int unreliableMessagesSent = 0;
 int unreliableMessagesReceived = 0;
 
-cvar_t	net_messagetimeout = {"net_messagetimeout","300"};
-cvar_t	hostname = {"hostname", "UNNAMED"};
-
 qboolean	configRestored = false;
-cvar_t	config_com_port = {"_config_com_port", "0x3f8", true};
-cvar_t	config_com_irq = {"_config_com_irq", "4", true};
-cvar_t	config_com_baud = {"_config_com_baud", "57600", true};
-cvar_t	config_com_modem = {"_config_com_modem", "1", true};
-cvar_t	config_modem_dialtype = {"_config_modem_dialtype", "T", true};
-cvar_t	config_modem_clear = {"_config_modem_clear", "ATZ", true};
-cvar_t	config_modem_init = {"_config_modem_init", "", true};
-cvar_t	config_modem_hangup = {"_config_modem_hangup", "AT H", true};
 
-#ifdef IDGODS
-cvar_t	idgods = {"idgods", "0"};
-#endif
+CVar net_messagetimeout("net_messagetimeout","300");
+CVar hostname("hostname", "UNNAMED");
+CVar config_com_port("_config_com_port", "0x3f8", true);
+CVar config_com_irq("_config_com_irq", "4", true);
+CVar config_com_baud("_config_com_baud", "57600", true);
+CVar config_com_modem("_config_com_modem", "1", true);
+CVar config_modem_dialtype("_config_modem_dialtype", "T", true);
+CVar config_modem_clear("_config_modem_clear", "ATZ", true);
+CVar config_modem_init("_config_modem_init", "", true);
+CVar config_modem_hangup("_config_modem_hangup", "AT H", true);
 
 int	vcrFile = -1;
 qboolean recording = false;
@@ -224,9 +220,9 @@ static void MaxPlayers_f (void)
 
 	svs.maxclients = n;
 	if (n == 1)
-		setValue ("deathmatch", "0");
+		deathmatch.set(0.0f);
 	else
-		setValue ("deathmatch", "1");
+		deathmatch.set(1.0f);
 }
 
 
@@ -557,7 +553,7 @@ int	NET_GetMessage (qsocket_t *sock)
 	// see if this connection has timed out
 	if (ret == 0 && sock->driver)
 	{
-		if (net_time - sock->lastMessageTime > net_messagetimeout.value)
+		if (net_time - sock->lastMessageTime > net_messagetimeout.getFloat())
 		{
 			NET_Close(sock);
 			return -1;
@@ -850,19 +846,16 @@ void NET_Init (void)
 	// allocate space for network message buffer
 	SZ_Alloc (&net_message, NET_MAXMESSAGE);
 
-	Cvar_RegisterVariable (&net_messagetimeout);
-	Cvar_RegisterVariable (&hostname);
-	Cvar_RegisterVariable (&config_com_port);
-	Cvar_RegisterVariable (&config_com_irq);
-	Cvar_RegisterVariable (&config_com_baud);
-	Cvar_RegisterVariable (&config_com_modem);
-	Cvar_RegisterVariable (&config_modem_dialtype);
-	Cvar_RegisterVariable (&config_modem_clear);
-	Cvar_RegisterVariable (&config_modem_init);
-	Cvar_RegisterVariable (&config_modem_hangup);
-#ifdef IDGODS
-	Cvar_RegisterVariable (&idgods);
-#endif
+	CVar::registerCVar(&net_messagetimeout);
+	CVar::registerCVar(&hostname);
+	CVar::registerCVar(&config_com_port);
+	CVar::registerCVar(&config_com_irq);
+	CVar::registerCVar(&config_com_baud);
+	CVar::registerCVar(&config_com_modem);
+	CVar::registerCVar(&config_modem_dialtype);
+	CVar::registerCVar(&config_modem_clear);
+	CVar::registerCVar(&config_modem_init);
+	CVar::registerCVar(&config_modem_hangup);
 
 	Cmd_AddCommand ("slist", NET_Slist_f);
 	Cmd_AddCommand ("listen", NET_Listen_f);
@@ -933,12 +926,12 @@ void NET_Poll(void)
 	{
 		if (serialAvailable)
 		{
-			if (config_com_modem.value == 1.0)
+			if (config_com_modem.getInt() == 1.0)
 				useModem = true;
 			else
 				useModem = false;
-			SetComPortConfig (0, (int)config_com_port.value, (int)config_com_irq.value, (int)config_com_baud.value, useModem);
-			SetModemConfig (0, config_modem_dialtype.string, config_modem_clear.string, config_modem_init.string, config_modem_hangup.string);
+			SetComPortConfig (0, config_com_port.getInt(), config_com_irq.getInt(), config_com_baud.getInt(), useModem);
+			SetModemConfig (0, config_modem_dialtype.getString(), config_modem_clear.getString(), config_modem_init.getString(), config_modem_hangup.getString());
 		}
 		configRestored = true;
 	}
@@ -977,21 +970,3 @@ void SchedulePollProcedure(PollProcedure *proc, double timeOffset)
 	proc->next = pp;
 	prev->next = proc;
 }
-
-
-#ifdef IDGODS
-#define IDNET	0xc0f62800
-
-qboolean IsID(struct qsockaddr *addr)
-{
-	if (idgods.value == 0.0)
-		return false;
-
-	if (addr->sa_family != 2)
-		return false;
-
-	if ((BigLong(*(int *)&addr->sa_data[2]) & 0xffffff00) == IDNET)
-		return true;
-	return false;
-}
-#endif

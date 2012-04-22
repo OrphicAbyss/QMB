@@ -35,7 +35,7 @@ int		R_Skybox = false;
 
 msurface_t	*warpface;
 
-extern cvar_t gl_subdivide_size;
+extern CVar gl_subdivide_size;
 
 void BoundPoly (int numverts, float *verts, vec3_t mins, vec3_t maxs)
 {
@@ -76,7 +76,7 @@ void SubdividePolygon (int numverts, float *verts)
 	for (i=0 ; i<3 ; i++)
 	{
 		m = (mins[i] + maxs[i]) * 0.5;
-		m = gl_subdivide_size.value * floor (m/gl_subdivide_size.value + 0.5);
+		m = gl_subdivide_size.getFloat() * floor (m/gl_subdivide_size.getFloat() + 0.5);
 		if (maxs[i] - m < 8)
 			continue;
 		if (m - mins[i] < 8)
@@ -264,13 +264,6 @@ void EmitWaterPolysMulti (msurface_t *fa)
 	//Texture shader
 	float		args[4] = {0.05f,0.0f,0.0f,0.02f};
 
-	/*
-	args[0] = gl_test0.value;
-	args[1] = gl_test1.value;
-	args[2] = gl_test2.value;
-	args[3] = gl_test3.value;
-	*/
-
 	GL_SelectTexture(GL_TEXTURE0_ARB);
 	glBindTexture(GL_TEXTURE_2D,fa->texinfo->texture->gl_texturenum);
 
@@ -310,7 +303,7 @@ void EmitWaterPolysMulti (msurface_t *fa)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable (GL_BLEND);
-	glColor4f (1,1,1,r_wateralpha.value);
+	glColor4f (1,1,1,r_wateralpha.getFloat());
 
 	for (p=fa->polys ; p ; p=p->next)
 	{
@@ -334,8 +327,8 @@ void EmitWaterPolysMulti (msurface_t *fa)
 
 			VectorCopy(v, nv);
 
-			if (r_wave.value)
-				nv[2] = v[2] + r_wave.value *sin(v[0]*0.02+cl.time)*sin(v[1]*0.02+cl.time)*sin(v[2]*0.02+cl.time);
+			if (r_wave.getBool())
+				nv[2] = v[2] + r_wave.getFloat() *sin(v[0]*0.02+cl.time)*sin(v[1]*0.02+cl.time)*sin(v[2]*0.02+cl.time);
 
 			qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, s, t);
 			qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, ss + cl.time/10, tt + cl.time/10);
@@ -372,7 +365,7 @@ void R_DrawWaterChain (msurface_t *s)
 {
 	msurface_t *removelink;
 
-	if ((r_wateralpha.value == 0)||!s)
+	if ((r_wateralpha.getInt() == 0)||!s)
 		return;
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -484,22 +477,22 @@ int R_LoadSky (char *newname)
 	//find where the sky is
 	//some are in /env others /gfx/env
 	//some have skyname?? others skyname_??
-	skytex[0]=GL_LoadTexImage(name,false,false, gl_sincity.value);
+	skytex[0]=GL_LoadTexImage(name,false,false, gl_sincity.getBool());
 	if (skytex[0]==0)
 	{
 		sprintf (dirname,"env/");
 		sprintf (name, "%s%s%s", dirname, skyname, suf[0]);
-		skytex[0]=GL_LoadTexImage(name,false,false, gl_sincity.value);
+		skytex[0]=GL_LoadTexImage(name,false,false, gl_sincity.getBool());
 		if (skytex[0]==0)
 		{
 			sprintf (skyname,"%s_",skyname);
 			sprintf (name, "%s%s%s", dirname, skyname, suf[0]);
-			skytex[0]=GL_LoadTexImage(name,false,false, gl_sincity.value);
+			skytex[0]=GL_LoadTexImage(name,false,false, gl_sincity.getBool());
 			if (skytex[0]==0)
 			{
 				sprintf (dirname,"gfx/env/");
 				sprintf (name, "%s%s%s", dirname, skyname, suf[0]);
-				skytex[0]=GL_LoadTexImage(name,false,false, gl_sincity.value);
+				skytex[0]=GL_LoadTexImage(name,false,false, gl_sincity.getBool());
 				if (skytex[0]==0)
 				{
 					oldsky=true;
@@ -572,8 +565,7 @@ void R_DrawSkyBox (void)
 	glPushMatrix();
 	glLoadIdentity();
 
-	if (r_skydetail.value>=2)
-	{
+	if (r_skydetail.getInt()>=2){
 		glRotatef (-90,  1, 0, 0);	    // put Z going up
 		glRotatef (90,  0, 0, 1);	    // put Z going up
 		glRotatef (-r_refdef.viewangles[2],  1, 0, 0);
@@ -586,8 +578,7 @@ void R_DrawSkyBox (void)
 	}
 
 
-	if ((r_skydetail.value==1))
-	{
+	if ((r_skydetail.getInt()==1)){
 		glDisable(GL_DEPTH_TEST);
 		glBindTexture(GL_TEXTURE_2D,skytex[skytexorder[0]]);
 		glBegin (GL_QUADS);
@@ -662,15 +653,15 @@ void R_DrawSkyBox (void)
 
 		R_Skybox = true;
 
-		modelorg[0] = r_sky_x.value;
-		modelorg[1] = r_sky_y.value;
-		modelorg[2] = r_sky_z.value;
+		modelorg[0] = r_sky_x.getFloat();
+		modelorg[1] = r_sky_y.getFloat();
+		modelorg[2] = r_sky_z.getFloat();
 
 		//VectorCopy (r_refdef.vieworg, modelorg);
 
 		glTranslatef(-modelorg[0],-modelorg[1]-10,-modelorg[2]);
 
-		if (r_skydetail.value==2)
+		if (r_skydetail.getInt()==2)
 			R_DrawBrush(cl.worldmodel, &modelorg[0]);	//doesnt work yet, needs some fiddleing because of draw order
 		else
 			R_DrawBrush(skymodel, &modelorg[0]);
@@ -691,7 +682,7 @@ void R_DrawSkyChain (msurface_t *s)
 	const float zero = 1.0/512 + realtime * 0.1;
 	const float one = 511.0/512 + realtime * 0.1;
 
-	if (((r_skydetail.value!=0 && oldsky!=true)||r_skydetail.value==2) && !R_Skybox)
+	if (((r_skydetail.getInt()!=0 && oldsky!=true)||r_skydetail.getInt()==2) && !R_Skybox)
 	{
 		glpoly_t	*p;
 		float		*v;
@@ -710,7 +701,7 @@ void R_DrawSkyChain (msurface_t *s)
 
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		if (r_skydetail.value==1)
+		if (r_skydetail.getInt()==1)
 			glColorMask(0,0,0,0);	//if its the sky cube all the sky will be covered
 		else
 			glColor3f(0,0,0);		//else clear all the missed bits to black

@@ -7,10 +7,12 @@
 #include "cvar_cpp.h"
 #include <list>
 
-static std::list<CVar *> CVars;
+using std::list;
+
+static list<CVar *> CVars;
 
 void clearCVars(void){
-	std::list<CVar *>::iterator i = CVars.begin();
+	list<CVar *>::iterator i = CVars.begin();
 
 	while (i != CVars.end()){
 		delete (*i);
@@ -33,14 +35,47 @@ void CVar::addCVar(CVar *cvar){
  * @param name The cvar name to search for
  * @return The cvar object, or null if none found
  */
-CVar *CVar::findCVar (char *name){
-	std::list<CVar *>::iterator i;
+CVar *CVar::findCVar (const char *name){
+	list<CVar *>::iterator i;
 
-	for (i = CVars.begin(); i != CVars.end(); ){
+	for (i = CVars.begin(); i != CVars.end(); i++){
 		CVar *cvar = *i;
 
-		if (Q_strcmp(cvar->getString(),name)){
+		if (0 == Q_strcmp(cvar->getName(),name)){
 			return cvar;
+		}
+	}
+
+	return NULL;
+}
+
+CVar *CVar::findNextServerCVar (const char *name){
+	list<CVar *>::iterator i;
+	bool found = false;
+
+	if (name != NULL){
+		//Find the old cvar first
+		for (i = CVars.begin(); i != CVars.end(); i++){
+			CVar *cvar = *i;
+
+			if (0 == Q_strcmp(cvar->getName(),name)){
+				found = true;
+			}
+		}
+	} else {
+		// Start search for the server replicated CVars at start
+		found = true;
+		i = CVars.begin();
+	}
+
+	if (found){
+		//Find the next server cvar
+		for (; i != CVars.end(); i++){
+			CVar *cvar = *i;
+
+			if (cvar->isServer()){
+				return cvar;
+			}
 		}
 	}
 
@@ -55,7 +90,7 @@ CVar *CVar::findCVar (char *name){
  */
 void CVar::registerCVar(CVar* variable){
 // first check to see if it has allready been defined
-	if (Cvar_FindVar (variable->getName())) {
+	if (CVar::findCVar(variable->getName())) {
 		Con_Printf ("Can't register variable %s, allready defined\n", variable->name);
 		return;
 	}
@@ -79,7 +114,7 @@ void CVar::registerCVar(CVar* variable){
  * @param var_name The name of the cvar to set
  * @param value The value to set the cvar to
  */
-void CVar::setValue(char *var_name, char *value){
+void CVar::setValue(const char *var_name, const char *value){
 	CVar *var = CVar::findCVar(var_name);
 
 	if (var != NULL){
@@ -122,15 +157,15 @@ const char *CVar::getStringValue(char *name){
  * @return the fullname of the cvar, NULL if none match or if more than one match
  */
 char *CVar::completeVariable(char *partial){
-	std::list<CVar *>::iterator i;
+	list<CVar *>::iterator i;
 	CVar *match = NULL;
 	int sizeOfStr = Q_strlen(partial);
 	bool multiple = false;
 
-	for (i = CVars.begin(); i != CVars.end() && !multiple; ){
+	for (i = CVars.begin(); i != CVars.end() && !multiple; i++){
 		CVar *cvar = *i;
 
-		if (Q_strncmp(cvar->getString(),partial,sizeOfStr)){
+		if (0 == Q_strncmp(cvar->getName(),partial,sizeOfStr)){
 			if (match != NULL){
 				multiple = true;
 			} else {
@@ -141,15 +176,16 @@ char *CVar::completeVariable(char *partial){
 
 	if (multiple){
 		bool first = true;
-		for (i = CVars.begin(); i != CVars.end(); ){
+		Con_Printf("CVars: ");
+		for (i = CVars.begin(); i != CVars.end(); i++){
 			CVar *cvar = *i;
 
-			if (Q_strncmp(cvar->getString(),partial,sizeOfStr)){
+			if (0 == Q_strncmp(cvar->getName(),partial,sizeOfStr)){
 				if (first){
 					first = false;
-					Con_Printf(cvar->getString());
+					Con_Printf(cvar->getName());
 				} else {
-					Con_Printf(", %s",cvar->getString());
+					Con_Printf(", %s",cvar->getName());
 				}
 			}
 		}
@@ -157,7 +193,10 @@ char *CVar::completeVariable(char *partial){
 		match = NULL;
 	}
 
-	return match->getString();
+	if (match != NULL)
+		return match->getString();
+	else
+		return NULL;
 }
 
 /**
@@ -188,11 +227,10 @@ bool CVar::consoleCommand(void){
  *
  * @param f File to write the variables to
  */
-void CVar::writeVariables (FILE *f)
-{
-	std::list<CVar *>::iterator i;
+void CVar::writeVariables (FILE *f){
+	list<CVar *>::iterator i;
 
-	for (i = CVars.begin(); i != CVars.end(); ){
+	for (i = CVars.begin(); i != CVars.end(); i++){
 		CVar *cvar = *i;
 
 		if (cvar->isArchived())
@@ -230,6 +268,7 @@ void CVar::init(char *name,char *sValue,bool archive,bool server){
 	this->sValue = sValue;
 	this->fValue = 0;
 	this->iValue = 0;
+	this->bValue = false;
 
 	parseValue();
 }
@@ -249,6 +288,7 @@ void CVar::reg(){
 void CVar::parseValue(){
 	this->fValue = Q_atof(this->sValue);
 	this->iValue = Q_atoi(this->sValue);
+	this->bValue = this->iValue != 0;
 }
 
 /**
@@ -274,12 +314,30 @@ void CVar::set(const char *value){
 	}
 }
 
+void CVar::set(float value){
+	char strValue[32];
+
+	snprintf(strValue,32,"%f",value);
+	this->set(strValue);
+}
+
+void CVar::set(bool value){
+	if (value)
+		this->set("1");
+	else
+		this->set("0");
+}
+
 char *CVar::getName(){
 	return this->name;
 }
 
 char *CVar::getString(){
 	return this->sValue;
+}
+
+bool CVar::getBool(){
+	return this->bValue;
 }
 
 int CVar::getInt(){
@@ -292,4 +350,8 @@ float CVar::getFloat(){
 
 bool CVar::isArchived(){
 	return this->archive;
+}
+
+bool CVar::isServer(){
+	return this->server;
 }

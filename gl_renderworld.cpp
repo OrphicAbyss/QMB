@@ -210,8 +210,7 @@ void Surf_DrawTextureChainsFour(model_t *model)
 	GL_SelectTexture(GL_TEXTURE2_ARB);
 	Surf_EnableFullbright();
 
-	if (gl_detail.value)
-	{
+	if (gl_detail.getBool()) {
 		GL_EnableTMU(GL_TEXTURE3_ARB);
 		glBindTexture(GL_TEXTURE_2D,detailtexture);
 		Surf_EnableDetail();
@@ -310,7 +309,7 @@ void Surf_DrawTextureChainsFour(model_t *model)
 	GL_SelectTexture(GL_TEXTURE0_ARB);
 	Surf_Reset();
 
-	if (r_outline.value){
+	if (r_outline.getBool()){
 		Surf_Outline(outlinechain);
 		outlinechain = NULL;
 	}
@@ -359,7 +358,7 @@ void Surf_DrawExtraChainsFour(msurface_t *extrachain){
 
 	for (surf = extrachain; surf; )
 	{
-		if (!caustic && surf->flags & SURF_UNDERWATER && gl_caustics.value)
+		if (!caustic && surf->flags & SURF_UNDERWATER && gl_caustics.getBool())
 		{
 			GL_EnableTMU(GL_TEXTURE0_ARB);
 			GL_EnableTMU(GL_TEXTURE1_ARB);
@@ -367,7 +366,7 @@ void Surf_DrawExtraChainsFour(msurface_t *extrachain){
 			caustic = true;
 		}
 
-		if (!shiny_glass && surf->flags & SURF_SHINY_GLASS && gl_shiny.value)
+		if (!shiny_glass && surf->flags & SURF_SHINY_GLASS && gl_shiny.getBool())
 		{
 			GL_EnableTMU(GL_TEXTURE2_ARB);
 
@@ -379,7 +378,7 @@ void Surf_DrawExtraChainsFour(msurface_t *extrachain){
 			shiny_glass = true;
 		}
 
-		if (!shiny_metal && surf->flags & SURF_SHINY_METAL && gl_shiny.value)
+		if (!shiny_metal && surf->flags & SURF_SHINY_METAL && gl_shiny.getBool())
 		{
 			GL_EnableTMU(GL_TEXTURE3_ARB);
 
@@ -422,7 +421,7 @@ void Surf_DrawExtraChainsFour(msurface_t *extrachain){
 		glEnd ();
 
 		if (surf->extra){
-			if (!surf->extra->flags & SURF_UNDERWATER && caustic && gl_caustics.value)
+			if (!surf->extra->flags & SURF_UNDERWATER && caustic && gl_caustics.getBool())
 			{
 				GL_DisableTMU(GL_TEXTURE0_ARB);
 				GL_DisableTMU(GL_TEXTURE1_ARB);
@@ -430,7 +429,7 @@ void Surf_DrawExtraChainsFour(msurface_t *extrachain){
 				caustic = false;
 			}
 
-			if (!(surf->extra->flags & SURF_SHINY_GLASS) && shiny_glass && gl_shiny.value)
+			if (!(surf->extra->flags & SURF_SHINY_GLASS) && shiny_glass && gl_shiny.getBool())
 			{
 				GL_DisableTMU(GL_TEXTURE2_ARB);
 
@@ -440,7 +439,7 @@ void Surf_DrawExtraChainsFour(msurface_t *extrachain){
 				shiny_glass = false;
 			}
 
-			if (!surf->extra->flags & SURF_SHINY_METAL && shiny_metal && gl_shiny.value)
+			if (!surf->extra->flags & SURF_SHINY_METAL && shiny_metal && gl_shiny.getBool())
 			{
 				GL_DisableTMU(GL_TEXTURE3_ARB);
 
@@ -563,14 +562,14 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 				qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, v[5], v[6]);
 				if (t->gl_fullbright)
 					qglMultiTexCoord2fARB (GL_TEXTURE2_ARB, v[3], v[4]);
-				if (gl_detail.value)
+				if (gl_detail.getBool())
 					qglMultiTexCoord2fARB (GL_TEXTURE3_ARB, v[7]*18, v[8]*18);
 
 				glVertex3fv (v);
 			}
 			glEnd ();
 
-			if (!t->gl_fullbright && !gl_detail.value){
+			if (!t->gl_fullbright && !gl_detail.getBool()){
 				if (prev){								//we arnt the first texture of a chain
 					removelink = s;						//we want to remove this surface from the list.
 					s = s->texturechain;				//continue to next surface
@@ -605,7 +604,7 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 	GL_SelectTexture(GL_TEXTURE0_ARB);
 	Surf_EnableFullbright();
 
-	if (gl_detail.value)
+	if (gl_detail.getBool())
 	{
 		GL_EnableTMU(GL_TEXTURE1_ARB);
 		glBindTexture(GL_TEXTURE_2D,detailtexture);
@@ -631,7 +630,7 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 
 		for (s = model->textures[i]->texturechain; s; )
 		{
-			if (!gl_detail.value && !t->gl_fullbright){
+			if (!gl_detail.getBool() && !t->gl_fullbright){
 		// Draw the polys
 				glBegin(GL_POLYGON);
 				v = s->polys->verts[0];
@@ -639,7 +638,7 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 				{
 					if (t->gl_fullbright)
 						qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, v[3], v[4]);
-					if (gl_detail.value)
+					if (gl_detail.getBool())
 						qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, v[7]*18, v[8]*18);
 
 					glVertex3fv (v);
@@ -660,7 +659,7 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 	}
 
 	// Disable detail texture
-	if (gl_detail.value)
+	if (gl_detail.getBool())
 	{
 		GL_DisableTMU(GL_TEXTURE1_ARB);
 		Surf_Reset();
@@ -674,7 +673,7 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColor4f(1,1,1,1);
 
-	if (r_outline.value){
+	if (r_outline.getBool()){
 		Surf_Outline(outlinechain);
 		outlinechain = NULL;
 	}
@@ -712,7 +711,7 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain){
 
 	for (surf = extrachain; surf; )
 	{
-		if (!caustic && surf->flags & SURF_UNDERWATER && gl_caustics.value)
+		if (!caustic && surf->flags & SURF_UNDERWATER && gl_caustics.getBool())
 		{
 			GL_EnableTMU(GL_TEXTURE0_ARB);
 			GL_EnableTMU(GL_TEXTURE1_ARB);
@@ -746,7 +745,7 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain){
 		//check for another in the chain
 		if (surf->extra){
 			//if the next in the chain isnt a caustic surface and the current one was turn off caustics
-			if (caustic && !surf->extra->flags & SURF_UNDERWATER && gl_caustics.value)
+			if (caustic && !surf->extra->flags & SURF_UNDERWATER && gl_caustics.getBool())
 			{
 				GL_DisableTMU(GL_TEXTURE0_ARB);
 				GL_DisableTMU(GL_TEXTURE1_ARB);
@@ -755,7 +754,7 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain){
 			}
 		}
 		//if the surface isnt a shiny surface drop it
-		if ((surf->flags & SURF_SHINY_GLASS && surf->flags & SURF_SHINY_METAL) || !gl_shiny.value){
+		if ((surf->flags & SURF_SHINY_GLASS && surf->flags & SURF_SHINY_METAL) || !gl_shiny.getBool()){
 			removelink = surf;			//we want to remove this surface from the list.
 			surf = surf->extra;			//continue to next surface
 			removelink->extra = NULL;	//remove the surface from the chain
@@ -787,7 +786,7 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain){
 
 	for (surf = extrachain; surf; )
 	{
-		if (!shiny_glass && surf->flags & SURF_SHINY_GLASS && gl_shiny.value)
+		if (!shiny_glass && surf->flags & SURF_SHINY_GLASS && gl_shiny.getBool())
 		{
 			GL_EnableTMU(GL_TEXTURE0_ARB);
 
@@ -799,7 +798,7 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain){
 			shiny_glass = true;
 		}
 
-		if (!shiny_metal && surf->flags & SURF_SHINY_METAL && gl_shiny.value)
+		if (!shiny_metal && surf->flags & SURF_SHINY_METAL && gl_shiny.getBool())
 		{
 			GL_EnableTMU(GL_TEXTURE1_ARB);
 
@@ -829,7 +828,7 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain){
 		}
 
 		if (surf->extra){
-			if (!surf->extra->flags & SURF_SHINY_GLASS && surf->flags & SURF_SHINY_GLASS && gl_shiny.value)
+			if (!surf->extra->flags & SURF_SHINY_GLASS && surf->flags & SURF_SHINY_GLASS && gl_shiny.getBool())
 			{
 				GL_DisableTMU(GL_TEXTURE2_ARB);
 
@@ -839,7 +838,7 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain){
 				shiny_glass = false;
 			}
 
-			if (!surf->extra->flags & SURF_SHINY_METAL && surf->flags & SURF_SHINY_METAL && gl_shiny.value)
+			if (!surf->extra->flags & SURF_SHINY_METAL && surf->flags & SURF_SHINY_METAL && gl_shiny.getBool())
 			{
 				GL_DisableTMU(GL_TEXTURE3_ARB);
 

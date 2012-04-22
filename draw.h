@@ -33,7 +33,7 @@ void Draw_ConsoleBackground (int lines);
 void Draw_TileClear (int x, int y, int w, int h);
 void Draw_Fill (int x, int y, int w, int h, int c);
 void Draw_FadeScreen (void);
-void Draw_String (int x, int y, char *str);
+void Draw_String (int x, int y, const char *str);
 qpic_t *Draw_PicFromWad (const char *name);
 qpic_t *Draw_PicFromWadXY (const char *name, int height, int width);
 qpic_t *Draw_CachePic (const char *path);

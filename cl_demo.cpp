@@ -320,7 +320,7 @@ void CL_PlayDemo_f (void)
 //	fscanf (cls.demofile, "%i\n", &cls.forcetrack);
 }
 
-extern	cvar_t	scr_conspeed;
+extern	CVar	scr_conspeed;
 float	saveconspeed;
 
 /*
@@ -344,7 +344,7 @@ void CL_FinishTimeDemo (void)
 	Con_Printf ("%i frames %5.1f seconds %5.1f fps\n", frames, time, frames/time);
 
 	//restore console speed
-	scr_conspeed.value = saveconspeed;
+	scr_conspeed.set(saveconspeed);
 }
 
 /*
@@ -367,8 +367,8 @@ void CL_TimeDemo_f (void)
 
 	if (key_dest == key_console){
 		//make console disappare fast
-		saveconspeed = scr_conspeed.value;
-		scr_conspeed.value = 1000000;
+		saveconspeed = scr_conspeed.getFloat();
+		scr_conspeed.set(1000000.0f);
 		Con_ToggleConsole_f();
 	}
 

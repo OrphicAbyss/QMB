@@ -43,7 +43,7 @@ int			con_current;		// where next message will be printed
 int			con_x;				// offset in current line for next print
 char		*con_text=0;
 
-cvar_t		con_notifytime = {"con_notifytime","3"};		//seconds
+CVar		con_notifytime("con_notifytime","3");	//seconds
 
 #define	NUM_CON_TIMES 4
 float		con_times[NUM_CON_TIMES];	// realtime time the line was generated
@@ -238,10 +238,8 @@ void Con_Init (void)
 
 	Con_Printf ("Console initialized.\n");
 
-//
 // register our commands
-//
-	Cvar_RegisterVariable (&con_notifytime);
+	CVar::registerCVar(&con_notifytime);
 
 	Cmd_AddCommand ("toggleconsole", Con_ToggleConsole_f);
 	Cmd_AddCommand ("messagemode", Con_MessageMode_f);
@@ -273,7 +271,7 @@ All console printing must go through this in order to be logged to disk
 If no console is visible, the notify window will pop up.
 ================
 */
-void Con_Print (char *txt)
+void Con_Print (const char *txt)
 {
 	int		y;
 	int		c, l;
@@ -485,7 +483,7 @@ void Con_DPrintf (const char *fmt, ...)
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
 
-	if (!developer.value)
+	if (!developer.getBool())
 		return;			// don't confuse non-developers with techie stuff...
 
 	va_start (argptr,fmt);
@@ -533,7 +531,7 @@ void Con_SafeDPrintf (const char *fmt, ...)
 	char		msg[1024];
 	int			temp;
 
-	if (!developer.value)
+	if (!developer.getBool())
 		return;			// don't confuse non-developers with techie stuff...
 
 	va_start (argptr,fmt);
@@ -648,7 +646,7 @@ void Con_DrawNotify (void)
 			continue;
 
 		time = realtime - time;
-		if (time > con_notifytime.value)
+		if (time > con_notifytime.getFloat())
 			continue;
 
 		text = con_text + (i % con_totallines)*con_linewidth;

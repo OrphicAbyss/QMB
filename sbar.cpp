@@ -65,11 +65,11 @@ void M_DrawPic (int x, int y, qpic_t *pic);
 void Draw_AlphaFill (int x, int y, int w, int h, vec3_t c, float alpha);
 void Draw_AlphaFillFade (int x, int y, int width, int height, vec3_t colour, float alpha[2]);
 
-cvar_t	hud = {"hud","2", true};
-cvar_t	hud_r = {"hud_red","255", true};
-cvar_t	hud_g = {"hud_green","255", true};
-cvar_t	hud_b = {"hud_blue","255", true};
-cvar_t	hud_a = {"hud_alpha","178", true};
+CVar	hud("hud", "2", true);
+CVar	hud_r("hud_red", "255", true);
+CVar	hud_g("hud_green", "255", true);
+CVar	hud_b("hud_blue", "255", true);
+CVar	hud_a("hud_alpha", "178", true);
 
 //#define	SBAR_COLOR_BG	5
 
@@ -243,11 +243,11 @@ void Sbar_Init (void)
 		rsb_ammo[2] = Draw_PicFromWad ("r_ammoplasma");
 	}
 	//JHL:QMB; the hud size cvar...
-	Cvar_RegisterVariable (&hud);
-	Cvar_RegisterVariable (&hud_r);
-	Cvar_RegisterVariable (&hud_g);
-	Cvar_RegisterVariable (&hud_b);
-	Cvar_RegisterVariable (&hud_a);
+	CVar::registerCVar(&hud);
+	CVar::registerCVar(&hud_r);
+	CVar::registerCVar(&hud_g);
+	CVar::registerCVar(&hud_b);
+	CVar::registerCVar(&hud_a);
 }
 
 
@@ -355,12 +355,12 @@ void Sbar_DrawFade (int x, int y, int height, int side)
 	if (side)
 	{
 		alpha[0] = 0;
-		alpha[1] = hud_a.value;
+		alpha[1] = hud_a.getFloat();
 		Draw_AlphaFillFade (x, y, 10, height, colour, alpha);
 	}
 	else
 	{
-		alpha[0] = hud_a.value;
+		alpha[0] = hud_a.getFloat();
 		alpha[1] = 0;
 		Draw_AlphaFillFade (x-10, y, 10, height, colour, alpha);
 	}
@@ -378,9 +378,9 @@ void Sbar_DrawNum (int x, int y, int num, int digits, int color)
 	int				l, frame;
 	vec3_t	colour;
 
-	colour[0] = hud_r.value;
-	colour[1] = hud_g.value;
-	colour[2] = hud_b.value;
+//	colour[0] = hud_r.value;
+//	colour[1] = hud_g.value;
+//	colour[2] = hud_b.value;
 
 	//Sbar_DrawFade (x, y+vid.conheight-24, 24, false);
 	//Draw_AlphaFill(x, y+vid.conheight-24, 24*digits, 24, colour, hud_a.value);
@@ -501,7 +501,7 @@ void Sbar_SoloScoreboard (void)
 	x = vid.conwidth/2-160;
 
 	Sbar_DrawFade (x, vid.conheight-24, 24, false);
-	Draw_AlphaFill(x, vid.conheight-24, 320, 24, colour, hud_a.value);
+	Draw_AlphaFill(x, vid.conheight-24, 320, 24, colour, hud_a.getFloat());
 	Sbar_DrawFade (x+320, vid.conheight-24, 24, true);
 
 	sprintf (str,"Monsters:%3i /%3i", cl.stats[STAT_MONSTERS], cl.stats[STAT_TOTALMONSTERS]);
@@ -550,9 +550,9 @@ void Sbar_DrawInventory (void)
 	int		flashon;
 	vec3_t	colour;
 
-	colour[0] = hud_r.value;
-	colour[1] = hud_g.value;
-	colour[2] = hud_b.value;
+//	colour[0] = hud_r.value;
+//	colour[1] = hud_g.value;
+//	colour[2] = hud_b.value;
 
 	if (rogue)
 	{
@@ -563,7 +563,7 @@ void Sbar_DrawInventory (void)
 	}
 
 // weapons
-	if (hud.value >= 3 || sb_showscores) { //JHL - start
+	if (hud.getInt() >= 3 || sb_showscores) { //JHL - start
 
 		//Sbar_DrawFade (vid.conwidth-50, vid.conheight/2 - 24, 112, false);
 		//Draw_AlphaFill(vid.conwidth-50, vid.conheight/2 - 24, 48, 112, colour, hud_a.value);
@@ -672,7 +672,7 @@ void Sbar_DrawInventory (void)
 	} //JHL - end
 
 	//JHL - start
-	if (hud.value >= 2 || sb_showscores) {
+	if (hud.getInt() >= 2 || sb_showscores) {
 
 		//Sbar_DrawFade (vid.conwidth-96, vid.conheight-40, 16, false);
 		//Draw_AlphaFill(vid.conwidth-96, vid.conheight-40, 96, 16, colour, hud_a.value);
@@ -819,8 +819,8 @@ void Sbar_DrawFace (int x, int y)
 // PGM 03/02/97 - fixed so color swatch only appears in CTF modes
 	if (rogue &&
         (cl.maxclients != 1) &&
-        (teamplay.value>3) &&
-        (teamplay.value<7))
+        (teamplay.getInt()>3) &&
+        (teamplay.getInt()<7))
 	{
 		int				top, bottom;
 		int				xofs;
@@ -920,7 +920,7 @@ void Sbar_Draw (void)
 		Sbar_DrawScoreboard ();
 	}
 
-	if ((hud.value || sb_showscores) && cl.stats[STAT_HEALTH] > 0)
+	if ((hud.getBool() || sb_showscores) && cl.stats[STAT_HEALTH] > 0)
 	{
    // keys (hipnotic only)
       //MED 01/04/97 moved keys here so they would not be overwritten
@@ -972,7 +972,7 @@ void Sbar_Draw (void)
 	// face
 		Sbar_DrawFace (0, 0);
 
-		if (hud.value >= 2 || sb_showscores)
+		if (hud.getInt() >= 2 || sb_showscores)
 		{
 	// ammo count
 			Sbar_DrawNum (vid.conwidth-48-32-32-32, 16, cl.stats[STAT_AMMO], 3, cl.stats[STAT_AMMO] <= 10);
