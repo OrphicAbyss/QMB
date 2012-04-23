@@ -316,6 +316,18 @@ void Sys_Sleep(void)
 	SDL_Delay(1);
 }
 
+#ifdef WIN32
+#include <windows.h>
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
+	int rc;
+	
+	rc = main(__argc, __argv);
+	
+	return rc;
+}
+#endif
+
 int main (int c, char **v)
 {
 	double		time, oldtime, newtime;
@@ -377,23 +389,23 @@ int main (int c, char **v)
 Sys_MakeCodeWriteable
 ================
 */
-void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
-{
-
-	int r;
-	unsigned long addr;
-	int psize = getpagesize();
-
-	fprintf(stderr, "writable code %lx-%lx\n", startaddr, startaddr+length);
-
-	addr = startaddr & ~(psize-1);
-
-	r = mprotect((char*)addr, length + startaddr - addr, 7);
-
-	if (r < 0)
-    		Sys_Error("Protection change failed\n");
-
-}
+//void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
+//{
+//
+//	int r;
+//	unsigned long addr;
+//	int psize = getpagesize();
+//
+//	fprintf(stderr, "writable code %lx-%lx\n", startaddr, startaddr+length);
+//
+//	addr = startaddr & ~(psize-1);
+//
+//	r = mprotect((char*)addr, length + startaddr - addr, 7);
+//
+//	if (r < 0)
+//    		Sys_Error("Protection change failed\n");
+//
+//}
 
 /*
 ================

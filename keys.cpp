@@ -283,7 +283,7 @@ void Key_Console (int key)
 	}
 
 	// 01-22-2000 FrikaC Begin PASTE
-#ifdef _WIN32
+#ifdef FALSE_WIN32
 	if ((key=='V' || key=='v') && GetKeyState(VK_CONTROL)<0) {
 		if (OpenClipboard(NULL)) {
 			th = GetClipboardData(CF_TEXT);

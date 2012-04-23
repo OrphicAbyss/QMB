@@ -1740,7 +1740,7 @@ int COM_MultipleSearch (char *searchstring, char **found, int max)
 	char			basestring[MAX_QPATH];
 	int				baselen, numfound = 0;
 
-#ifdef WIN32
+#ifdef FALSE_WIN32
 	baselen = (void *)COM_SkipPath(searchstring) - (void *)searchstring;
 	Q_strncpy(basestring, searchstring, baselen);
 	basestring[baselen]='\0';

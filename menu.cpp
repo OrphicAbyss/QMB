@@ -1263,13 +1263,6 @@ void M_Menu_Options_f (void)
 	key_dest = key_menu;
 	m_state = m_options;
 	m_entersound = true;
-
-#ifdef _WIN32
-	if ((options_cursor == ITEM_WINMOUSE) && (modestate != MS_WINDOWED))
-	{
-		options_cursor = 0;
-	}
-#endif
 }
 
 void M_AdjustSliders (int dir)
@@ -1322,12 +1315,6 @@ void M_AdjustSliders (int dir)
 	case ITEM_STRAFE:	// lookstrafe
 		lookstrafe.set(!lookstrafe.getBool());
 		break;
-
-#ifdef _WIN32
-	case ITEM_WINMOUSE:	// _windowed_mouse
-		Cvar_SetValue ("_windowed_mouse", !_windowed_mouse.value);
-		break;
-#endif
 	}
 }
 
@@ -1402,15 +1389,6 @@ void M_Options_Draw (void){
 	M_Print (16, y, "            Lookstrafe");
 	M_DrawCheckbox (220, y, lookstrafe.getInt());
 
-#ifdef _WIN32
-	if (modestate == MS_WINDOWED)
-	{
-		y = options_cursor_table[ITEM_WINMOUSE];
-		M_Print (16, y, "             Use Mouse");
-		M_DrawCheckbox (220, y, _windowed_mouse.value);
-	}
-#endif
-
 // cursor
 	M_DrawCharacter (200, options_cursor_table[options_cursor], 12+((int)(realtime*4)&1));
 }
@@ -1450,14 +1428,7 @@ void M_Options_Key (int k)
 		options_cursor--;
 		if (options_cursor < 0)
 		{
-#ifdef _WIN32
-			if (modestate == MS_WINDOWED)
-				options_cursor = OPTIONS_ITEMS-1;
-			else
-				options_cursor = OPTIONS_ITEMS-2;
-#else
 			options_cursor = OPTIONS_ITEMS-1;
-#endif
 		}
 		break;
 
@@ -1476,16 +1447,6 @@ void M_Options_Key (int k)
 		M_AdjustSliders (1);
 		break;
 	}
-
-#ifdef _WIN32
-	if ((options_cursor == ITEM_WINMOUSE) && (modestate != MS_WINDOWED))
-	{
-		if (k == K_UPARROW)
-			options_cursor = OPTIONS_ITEMS - 1;
-		else
-			options_cursor = 0;
-	}
-#endif
 }
 
 //=============================================================================

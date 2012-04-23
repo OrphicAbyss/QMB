@@ -28,7 +28,7 @@ extern int image_height;
 //jpg loading
 byte *LoadJPG (FILE *f)
 {
-    struct jpeg_decompress_struct cinfo;
+	struct jpeg_decompress_struct cinfo;
     JDIMENSION num_scanlines;
     JSAMPARRAY in;
     struct jpeg_error_mgr jerr;
@@ -41,8 +41,9 @@ byte *LoadJPG (FILE *f)
     byte *image_rgba;
 
     // set up the decompression.
-    cinfo.err = jpeg_std_error(&jerr);
-    jpeg_create_decompress (&cinfo);
+    //cinfo.err = jpeg_std_error(&jerr);
+	cinfo.err = jpeg_std_error();	
+    jpeg_create_decompress(&cinfo);
 
     // inititalize the source
     jpeg_stdio_src (&cinfo, f);

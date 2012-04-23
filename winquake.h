@@ -21,22 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma warning( disable : 4229 )  // mgraph gets this
 
-#include <windows.h>
-#define WM_MOUSEWHEEL                   0x020A
-
-#ifndef SERVERONLY
-#include <dsound.h>
-#endif
+#if FALSE
 
 extern	HINSTANCE	global_hInstance;
-
-#ifndef SERVERONLY
-extern LPDIRECTSOUND pDS;
-extern LPDIRECTSOUNDBUFFER pDSBuf;
-
-extern DWORD gSndBufSize;
-//#define SNDBUFSIZE 65536
-#endif
 
 typedef enum {MS_WINDOWED, MS_FULLSCREEN, MS_FULLDIB, MS_UNINIT} modestate_t;
 
@@ -69,3 +56,5 @@ int		(PASCAL FAR *pgethostname)		(char FAR * name, int namelen);
 struct	hostent FAR * (PASCAL FAR *pgethostbyname)(const char FAR * name);
 struct	hostent FAR * (PASCAL FAR *pgethostbyaddr)(const char FAR * addr, int len, int type);
 int		(PASCAL FAR *pgetsockname)		(SOCKET s, struct sockaddr FAR *name, int FAR * namelen);
+
+#endif

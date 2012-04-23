@@ -268,6 +268,7 @@ float VectorNormalize (vec3_t v)
 	return length;
 }
 
+#ifndef WIN32
 // min and max math functions (missing on linux?)
 float min(float a, float b){
 	return a<b ? a : b;
@@ -276,3 +277,4 @@ float min(float a, float b){
 float max(float a, float b){
 	return a>b ? a : b;
 }
+#endif

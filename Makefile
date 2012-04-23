@@ -57,18 +57,21 @@ OBJ  =	bot.o bot_misc.o bot_setup.o  \
 	gl_pcx.o gl_png.o gl_refrag.o gl_rlight.o gl_rmain.o gl_rmisc.o \
 	gl_rpart.o gl_rsurf.o gl_renderworld.o gl_screen.o gl_sprite.o \
 	gl_tga.o  gl_warp.o \
-	net_bsd.o net_dgrm.o net_loop.o net_main.o net_udp.o net_vcr.o \
+	 net_loop.o net_main.o net_vcr.o net_none.o \
 	pr_cmds.o pr_edict.o pr_exec.o nn_main.o \
 	cd_sdl.o snd_dma.o snd_mem.o snd_mix.o snd_sdl.o \
 	sv_main.o sv_move.o sv_phys.o sv_user.o \
 	CaptureAvi.o CaptureHelpers.o \
 	sys_sdl.o gl_vid_sdl.o
+#net_udp.o net_bsd.o net_dgrm.o
 
 LINKOBJ  = $(OBJ)
 
 ifeq ($(TARGET_PLATFORM),windows)
-    LIBS = -L"C:/msys/1.0/local/lib" -L"C:/MinGW/lib" -L"./dxsdk/sdk/lib/" -mwindows -luser32 -lgdi32 -lopengl32 -lglu32 -lwsock32 -lwinmm -lcomctl32 -ldxguid -ljpeg -llibpng
-    INCS = -I"C:/msys/1.0/local/include" -I"C:/MinGW/include"  -I"./dxsdk/sdk/inc"
+    LIBS = -L"C:/msys/1.0/local/lib" -L"C:/MinGW/lib" -lGLee -lopengl32 -lglu32 -ljpeg -lpng -lSDL 
+	#-lGLee
+	#-mwindows -luser32 -lgdi32  -lwsock32 -lwinmm -lcomctl32 -ldxguid 
+    INCS = -I"C:/msys/1.0/local/include" -I"C:/MinGW/include" 
 else
     LIBS = -lc -lGL -lGLU -ljpeg -lpng -lSDL $(shell if test -e /usr/lib/libGLee.so; then echo -lGLee; else echo -lglee; fi)
     INCS =
