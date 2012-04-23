@@ -9,6 +9,7 @@ class CVar {
 	float fValue;
 	int	iValue;
 	bool bValue;
+	bool registered;
 private:
 	void init(char *name,char *sValue,bool archive,bool server);
 	void parseValue();

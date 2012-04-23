@@ -85,14 +85,6 @@ Zone block
 
 void Memory_Init (void *buf, int size);
 
-void Z_Free (void *ptr);
-void *Z_Malloc (int size);			// returns 0 filled memory
-void *Z_TagMalloc (int size, int tag);
-
-void Z_DumpHeap (void);
-void Z_CheckHeap (void);
-int Z_FreeMemory (void);
-
 void *Hunk_Alloc (int size);		// returns 0 filled memory
 void *Hunk_AllocName (int size, const char *name);
 
@@ -110,6 +102,8 @@ void Hunk_Check (void);
 
 /**
  * CacheObj represents allocated space for a cached object.
+ *
+ * TODO: Look into using a slotted memory system for Zone objects.
  */
 class MemoryObj {
 public:
@@ -124,15 +118,71 @@ private:
 	MemoryObj(MemType type, char *name, int size);
 	~MemoryObj();
 public:
+	/**
+     * @return Name of the memory object
+     */
 	char *getName();
+	/**
+     * @return A pointer to the memory data
+     */
 	void *getData();
+	/**
+     * @return Size of the allocated memory data
+     */
 	int getSize();
+	/**
+	 * Free the allocated memmory data
+     */
 	void freeData();
-
+	/**
+	 * Used to allocate cache memory
+	 *
+     * @param type Type of memory to allocate
+     * @param name Name of the memory object
+     * @param size Size of memory to allocate
+     * @return Pointer to a memory object which includes the allocated memory
+     */
 	static MemoryObj *Alloc(MemType type, char *name, int size);
+	/**
+	 * Used to allocate zone memory.
+	 *
+	 * Note that zone memory doesn't use the MemoryObj wrappers. We use them
+	 * internally to track the allocation and deallocation, but zone memory
+	 * works more like malloc/free. This could be a problem when trying to move
+	 * zone memory to reclaim lost space.
+	 *
+     * @param size Size of memory to allocate
+     * @return Pointer to the allocated memory
+     */
+	static void *ZAlloc(int size);
+	/**
+	 * Deallocate the memory attached to the passed in MemoryObj.
+	 *
+     * @param obj The memory object to deallocate
+     */
 	static void Free(MemoryObj *obj);
+	/**
+	 * Deallocate the zone memory and the tracking object.
+	 *
+     * @param data Pointer to the memory allocated
+     */
+	static void ZFree(void *data);
+	/**
+	 * Not currently used, but in the future should be used to deallocate cache
+	 * memory. Should not be used for Zone memory.
+	 *
+     * @param type Type of memory to flush.
+     */
 	static void Flush(MemType type);
+	/**
+	 * Print out all objects of the given memory type.
+	 *
+     * @param type Type of memory to print data for.
+     */
 	static void Print(MemType type);
+	/**
+	 * Print out a report of the amount of memory used by each type of memory.
+     */
 	static void Report();
 };
 

@@ -445,7 +445,7 @@ void Mod_LoadQ3MultiModel (model_t *mod)
 		COM_CloseFile(handle);
 		//Load player
 		lower = Mod_AddMultiModel(NULL, mod);//Allocate a mmodel
-		lower->model = Z_Malloc(sizeof(model_t));
+		lower->model = MemoryObj::ZAlloc(sizeof(model_t));
 		Q_strcpy(lower->model->name, va("%slower.md3", mod->name));
 		lower->model->needload = TRUE;
 		Mod_LoadModel(lower->model, 1);
@@ -455,7 +455,7 @@ void Mod_LoadQ3MultiModel (model_t *mod)
 
 
 		upper = Mod_AddMultiModel(NULL, mod);//Allocate a mmodel
-		upper->model = Z_Malloc(sizeof(model_t));
+		upper->model = MemoryObj::ZAlloc(sizeof(model_t));
 		Q_strcpy(upper->model->name, va("%supper.md3", mod->name));
 		upper->model->needload = TRUE;
 		Mod_LoadModel(upper->model, 1);
@@ -467,7 +467,7 @@ void Mod_LoadQ3MultiModel (model_t *mod)
 
 
 		head = Mod_AddMultiModel(NULL, mod);//Allocate a mmodel
-		head->model = Z_Malloc(sizeof(model_t));
+		head->model = MemoryObj::ZAlloc(sizeof(model_t));
 		Q_strcpy(head->model->name, va("%shead.md3", mod->name));
 		head->model->needload = TRUE;
 		Mod_LoadModel(head->model, 1);

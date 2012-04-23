@@ -452,13 +452,13 @@ void Key_SetBinding (int keynum, const char *binding)
 // free old bindings
 	if (keybindings[keynum])
 	{
-		Z_Free (keybindings[keynum]);
+		MemoryObj::ZFree (keybindings[keynum]);
 		keybindings[keynum] = NULL;
 	}
 
 // allocate memory for new binding
 	l = Q_strlen (binding);
-	newKeyBinding = (char *)Z_Malloc (l+1);
+	newKeyBinding = (char *)MemoryObj::ZAlloc (l+1);
 	Q_strcpy (newKeyBinding, binding);
 	keybindings[keynum] = newKeyBinding;
 }

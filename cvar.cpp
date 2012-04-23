@@ -258,6 +258,7 @@ void CVar::init(char *name,char *sValue,bool archive,bool server){
 	this->name = name;
 	this->archive = archive;
 	this->server = server;
+	this->registered = false;
 
 	// use this until we register then make a copy of the string
 	this->sValue = sValue;
@@ -272,9 +273,12 @@ void CVar::init(char *name,char *sValue,bool archive,bool server){
  * Make a copy of the string into temp memory
  */
 void CVar::reg(){
-	char *value = this->sValue;
-	this->sValue = (char *)Z_Malloc (Q_strlen(value)+1);
-	Q_strcpy (this->sValue, value);
+	if (!this->registered){
+		registered = true;
+		char *value = this->sValue;
+		this->sValue = (char *)MemoryObj::ZAlloc (Q_strlen(value)+1);
+		Q_strcpy (this->sValue, value);
+	}
 }
 
 /**
@@ -292,20 +296,25 @@ void CVar::parseValue(){
  * @param value The new string value
  */
 void CVar::set(const char *value){
-	bool changed;
+	bool changed = Q_strcmp(this->sValue, value);
+	// If it's a new value
+	if (changed != 0) {
+		// Overwrite if it's the same length
+		if (Q_strlen(this->sValue) == Q_strlen(value)){
+			Q_strcpy(this->sValue, value);
+		} else {
+			// Allocate new space for the string
+			MemoryObj::ZFree(this->sValue);
+			this->sValue = (char *)MemoryObj::ZAlloc(Q_strlen(value)+1);
+			Q_strcpy(this->sValue, value);
+			// Convert the value to a float
+			this->parseValue();
 
-	changed = Q_strcmp(this->sValue, value);
-
-	// Allocate new space for the string
-	Z_Free (this->sValue);
-	this->sValue = (char *)Z_Malloc (Q_strlen(value)+1);
-	Q_strcpy (this->sValue, value);
-	// Convert the value to a float
-	this->parseValue();
-
-	if (this->server && changed) {
-		if (sv.active)
-			SV_BroadcastPrintf ("\"%s\" changed to \"%s\"\n", this->name, this->sValue);
+			if (this->server && changed) {
+				if (sv.active)
+					SV_BroadcastPrintf ("\"%s\" changed to \"%s\"\n", this->name, this->sValue);
+			}
+		}
 	}
 }
 

@@ -2656,13 +2656,13 @@ void PF_fopen (void)
 				G_FLOAT(OFS_RETURN) = (float) h;
 				return;
 			}
-			ftemp = (char *)Z_Malloc(fsize + 1);
+			ftemp = (char *)MemoryObj::ZAlloc(fsize + 1);
 			Sys_FileRead(h, ftemp, fsize);
 			Sys_FileClose(h);
 			// spit it back out
 			h = Sys_FileOpenWrite(va("%s/%s",com_gamedir, p));
 			Sys_FileWrite(h, ftemp, fsize);
-			Z_Free(ftemp); // free it from memory
+			MemoryObj::ZFree(ftemp); // free it from memory
 			G_FLOAT(OFS_RETURN) = (float) h;  // return still open handle
 			return;
 		default: // write
@@ -2794,7 +2794,7 @@ void PF_strzone(void)
 {
 	char *m, *p;
 	m = G_STRING(OFS_PARM0);
-	p = (char *)Z_Malloc(Q_strlen(m) + 1);
+	p = (char *)MemoryObj::ZAlloc(Q_strlen(m) + 1);
 	Q_strcpy(p, m);
 
 	G_INT(OFS_RETURN) = p - pr_strings;
@@ -2803,7 +2803,7 @@ void PF_strzone(void)
 //void(string s) strunzone = #119; // removes a copy of a string from the string zone (you can not use that string again or it may crash!!!)
 void PF_strunzone(void)
 {
-	Z_Free(G_STRING(OFS_PARM0));
+	MemoryObj::ZFree(G_STRING(OFS_PARM0));
 	G_INT(OFS_PARM0) = OFS_NULL; // empty the def
 }
 

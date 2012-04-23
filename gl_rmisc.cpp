@@ -80,7 +80,7 @@ void R_InitOtherTextures (void)
 	{
 		Con_DPrintf("%i. %s\n",i,crossfound[i]);
 		crosshair_tex[i] = GL_LoadTexImage (crossfound[i], false, false, false);
-		Z_Free(crossfound[i]);
+		MemoryObj::ZFree(crossfound[i]);
 	}
 
 	for (i=0;i<32;i++)

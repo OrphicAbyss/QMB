@@ -825,14 +825,6 @@ void SZ_Alloc (sizebuf_t *buf, int startsize)
 }
 
 
-void SZ_Free (sizebuf_t *buf)
-{
-//      Z_Free (buf->data);
-//      buf->data = NULL;
-//      buf->maxsize = 0;
-	buf->cursize = 0;
-}
-
 void SZ_Clear (sizebuf_t *buf)
 {
 	buf->cursize = 0;
@@ -1605,7 +1597,7 @@ byte *COM_LoadFile (const char *path, int usehunk)
 	else if (usehunk == 2)
 		buf = Hunk_TempAlloc (len+1);
 	else if (usehunk == 0)
-		buf = Z_Malloc (len+1);
+		buf = MemoryObj::ZAlloc (len+1);
 	else if (usehunk == 3){
 		// TODO: Shouldn't pass back the buffer, should only pass around CacheObj
 		// TODO: Require memory object base
@@ -1780,7 +1772,7 @@ int COM_MultipleSearch (char *searchstring, char **found, int max)
 								goto next;
 							else
 							{//Found it!
-								found[numfound] = Z_Malloc(Q_strlen(pak->files[i].name)*sizeof(char));
+								found[numfound] = MemoryObj::ZAlloc(Q_strlen(pak->files[i].name)*sizeof(char));
 								Q_strcpy(found[numfound],pak->files[i].name);
 								numfound++;
 							}
@@ -1803,7 +1795,7 @@ int COM_MultipleSearch (char *searchstring, char **found, int max)
 						n++;
 						substr++;
 					}
-					found[numfound] = Z_Malloc(Q_strlen(pak->files[i].name)*sizeof(char));
+					found[numfound] = MemoryObj::ZAlloc(Q_strlen(pak->files[i].name)*sizeof(char));
 					Q_strcpy(found[numfound], pak->files[i].name);
 					numfound++;
 next:;
@@ -1826,7 +1818,7 @@ next:;
 
 				sprintf(filestring,"%s%s", basestring, fileinfo.name);
 
-				found[numfound] = Z_Malloc(Q_strlen(filestring)*sizeof(char));
+				found[numfound] = MemoryObj::ZAlloc(Q_strlen(filestring)*sizeof(char));
 				Q_strcpy(found[numfound],filestring);
 				numfound++;
 			} while (_findnext( handle, &fileinfo ) != -1 && numfound < max);

@@ -1681,7 +1681,7 @@ byte* loadimagepixels (char* filename, qboolean complain)
 
 			}
 		}
-		Z_Free(filefound[i]);
+		MemoryObj::ZFree(filefound[i]);
 	}
 
 	if (output != 0){

@@ -61,18 +61,18 @@ void InitializeDemData()
    // Initialize Data and RowPtrs
    if(my_png->Data)
    {
-      //Z_Free(my_png->Data);
+      //MemoryObj::ZFree(my_png->Data);
       free(my_png->Data);
       my_png->Data = 0;
    }
    if(my_png->FRowPtrs)
    {
-      //Z_Free(my_png->FRowPtrs);
+      //MemoryObj::ZFree(my_png->FRowPtrs);
       free(my_png->FRowPtrs);
       my_png->FRowPtrs = 0;
    }
-   //my_png->Data = Z_Malloc(my_png->Height * my_png->FRowBytes ); // DL Added 30/5/2000
-   //my_png->FRowPtrs = Z_Malloc(sizeof(void*) * my_png->Height);
+   //my_png->Data = MemoryObj::ZAlloc(my_png->Height * my_png->FRowBytes ); // DL Added 30/5/2000
+   //my_png->FRowPtrs = MemoryObj::ZAlloc(sizeof(void*) * my_png->Height);
    my_png->Data = (char *)malloc(my_png->Height * my_png->FRowBytes ); // DL Added 30/5/2000
    my_png->FRowPtrs = (char *)malloc(sizeof(void*) * my_png->Height);
 
@@ -90,7 +90,7 @@ void InitializeDemData()
 void mypng_struct_create()
 {
    if(my_png) return;
-   //my_png = Z_Malloc(sizeof(png_t));
+   //my_png = MemoryObj::ZAlloc(sizeof(png_t));
    my_png = (png_t *)malloc(sizeof(png_t));
    my_png->Data    = 0;
    my_png->FRowPtrs = 0;
@@ -106,12 +106,12 @@ void mypng_struct_destroy(qboolean keepData) {
    if(!my_png)
       return;
    if(my_png->Data && !keepData)
-      //Z_Free(my_png->Data);
+      //MemoryObj::ZFree(my_png->Data);
       free(my_png->Data);
    if(my_png->FRowPtrs)
-      //Z_Free(my_png->FRowPtrs);
+      //MemoryObj::ZFree(my_png->FRowPtrs);
       free(my_png->FRowPtrs);
-   //Z_Free(my_png);
+   //MemoryObj::ZFree(my_png);
    free(my_png);
    my_png = 0;
 }

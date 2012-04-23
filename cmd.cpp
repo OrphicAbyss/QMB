@@ -28,7 +28,7 @@ using std::list;
 static list<Cmd *> Cmds;
 
 Cmd::Cmd(const char* name, xcommand_t func){
-	this->name = (char *)Z_Malloc (Q_strlen(name)+1);
+	this->name = (char *)MemoryObj::ZAlloc (Q_strlen(name)+1);
 	Q_strcpy (this->name, name);
 	this->func = func;
 }
@@ -134,15 +134,15 @@ char *Cmd::completeCommand(char* partial){
 static list<Alias *> Aliases;
 
 Alias::Alias(const char* name, const char* cmdString){
-	this->name = (char *)Z_Malloc (Q_strlen(name)+1);
+	this->name = (char *)MemoryObj::ZAlloc (Q_strlen(name)+1);
 	Q_strcpy (this->name, name);
-	this->cmdString = (char *)Z_Malloc (Q_strlen(cmdString)+1);
+	this->cmdString = (char *)MemoryObj::ZAlloc (Q_strlen(cmdString)+1);
 	Q_strcpy (this->cmdString, cmdString);
 }
 
 void Alias::remove(){
-	Z_Free(this->name);
-	Z_Free(this->cmdString);
+	MemoryObj::ZFree(this->name);
+	MemoryObj::ZFree(this->cmdString);
 }
 
 char *Alias::getName(){
@@ -320,9 +320,8 @@ void Cbuf_InsertText (char *text)
 
 // copy off any commands still remaining in the exec buffer
 	templen = cmd_text.cursize;
-	if (templen)
-	{
-		temp = (char *)Z_Malloc (templen);
+	if (templen){
+		temp = (char *)MemoryObj::ZAlloc (templen);
 		Q_memcpy (temp, cmd_text.data, templen);
 		SZ_Clear (&cmd_text);
 	}
@@ -336,7 +335,7 @@ void Cbuf_InsertText (char *text)
 	if (templen)
 	{
 		SZ_Write (&cmd_text, temp, templen);
-		Z_Free (temp);
+		MemoryObj::ZFree(temp);
 	}
 }
 
@@ -438,7 +437,7 @@ void Cmd_StuffCmds_f (void)
 	if (!s)
 		return;
 
-	text = (char *)Z_Malloc (s+1);
+	text = (char *)MemoryObj::ZAlloc (s+1);
 	text[0] = 0;
 	for (i=1 ; i<com_argc ; i++)
 	{
@@ -450,7 +449,7 @@ void Cmd_StuffCmds_f (void)
 	}
 
 // pull out the commands
-	build = (char *)Z_Malloc (s+1);
+	build = (char *)MemoryObj::ZAlloc (s+1);
 	build[0] = 0;
 
 	for (i=0 ; i<s-1 ; i++)
@@ -475,8 +474,8 @@ void Cmd_StuffCmds_f (void)
 	if (build[0])
 		Cbuf_InsertText (build);
 
-	Z_Free (text);
-	Z_Free (build);
+	MemoryObj::ZFree (text);
+	MemoryObj::ZFree (build);
 }
 
 
@@ -631,7 +630,7 @@ void CmdArgs::tokenizeString(char *text){
 
 // clear the args from the last string
 	for (i=0 ; i<argumentCount ; i++)
-		Z_Free (getArg(i));
+		MemoryObj::ZFree (getArg(i));
 
 	argumentCount = 0;
 	cmd_args = NULL;
@@ -660,7 +659,7 @@ void CmdArgs::tokenizeString(char *text){
 			return;
 
 		if (argumentCount < maxArgs){
-			argv[argumentCount] = (char *)Z_Malloc (Q_strlen(com_token)+1);
+			argv[argumentCount] = (char *)MemoryObj::ZAlloc (Q_strlen(com_token)+1);
 			Q_strcpy (argv[argumentCount], com_token);
 			argumentCount++;
 		}
