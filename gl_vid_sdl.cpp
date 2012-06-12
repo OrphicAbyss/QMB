@@ -8,8 +8,8 @@ viddef_t    vid;                // global video state
 unsigned	d_8to24table[256];
 
 // Much better for high resolution displays
-#define    BASEWIDTH    (800)
-#define    BASEHEIGHT   (600)
+#define    BASEWIDTH    (640)//(800)
+#define    BASEHEIGHT   (480)//(600)
 
 static SDL_Surface *screen = NULL;
 
@@ -24,9 +24,9 @@ void (*vid_menukeyfn)(int key) = NULL;
 /*-----------------------------------------------------------------------*/
 
 //int		texture_mode = GL_NEAREST;
-//int		texture_mode = GL_NEAREST_MIPMAP_NEAREST;
+int		texture_mode = GL_NEAREST_MIPMAP_NEAREST;
 //int		texture_mode = GL_NEAREST_MIPMAP_LINEAR;
-int		texture_mode = GL_LINEAR;
+//int		texture_mode = GL_LINEAR;
 //int		texture_mode = GL_LINEAR_MIPMAP_NEAREST;
 //int		texture_mode = GL_LINEAR_MIPMAP_LINEAR;
 
@@ -57,9 +57,6 @@ void CheckMultiTextureExtensions(void)
 			gl_textureunits = 2;
 		Con_Printf("&c840Multitexture extensions found&r.\n");
 		Con_Printf("&c840Found %i texture unit support&r.\n", gl_textureunits);
-		qglMultiTexCoord2fARB = glMultiTexCoord2fARB; // (void *) wglGetProcAddress("glMultiTexCoord2fARB");
-		qglMultiTexCoord1fARB = glMultiTexCoord1fARB; //(void *) wglGetProcAddress("glMultiTexCoord1fARB");
-		qglSelectTextureARB = glActiveTextureARB; //(void *) wglGetProcAddress("glActiveTextureARB");
 		qglPointParameterfvEXT = glPointParameterfvEXT; //(void *)wglGetProcAddress("glPointParameterfvEXT");
 		qglPointParameterfEXT = glPointParameterfEXT; //(void *)wglGetProcAddress("glPointParameterfEXT");
 		glPNTrianglesiATI = glPNTrianglesiATI; //(void *)wglGetProcAddress("glPNTrianglesiATI");
@@ -100,17 +97,17 @@ void CheckCombineExtension(void)
 		gl_n_patches = true;
 	}
 
-	if (COM_CheckParm("-texture_compression") && strstr(gl_extensions, "GL_ARB_texture_compression "))
-	{
-		Con_Printf("&c055Using texture compression&r.\n");
-		gl_lightmap_format = GL_COMPRESSED_RGBA_ARB;
-		gl_solid_format = GL_COMPRESSED_RGBA_ARB;
-		gl_alpha_format = GL_COMPRESSED_RGBA_ARB;
-	} else {
-		gl_lightmap_format = GL_RGBA;
+//	if (COM_CheckParm("-texture_compression") && strstr(gl_extensions, "GL_ARB_texture_compression "))
+//	{
+//		Con_Printf("&c055Using texture compression&r.\n");
+//		gl_lightmap_format = GL_BGRA;
+//		gl_solid_format = GL_COMPRESSED_RGBA_ARB;
+//		gl_alpha_format = GL_COMPRESSED_RGBA_ARB;
+//	} else {
+		gl_lightmap_format = GL_BGRA;
 		gl_solid_format = GL_RGBA;
 		gl_alpha_format = GL_RGBA;
-	}
+//	}
 
 }
 
@@ -220,13 +217,11 @@ void    VID_SetPalette (unsigned char *palette)
     //SDL_SetColors(screen, colors, 0, 256);
 }
 
-void    VID_ShiftPalette (unsigned char *palette)
-{
+void    VID_ShiftPalette (unsigned char *palette) {
     VID_SetPalette(palette);
 }
 
-void    VID_Init (unsigned char *palette)
-{
+void    VID_Init (unsigned char *palette) {
     int pnum;
     Uint32 flags;
 	char	gldir[MAX_OSPATH];

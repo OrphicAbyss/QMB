@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 //world brush related drawing code
 #include "quakedef.h"
+#include "GLee/GLee.h"
 
 typedef struct glRect_s {
 	unsigned char l,t,w,h;
@@ -207,7 +208,7 @@ void Surf_DrawTextureChainsFour(model_t *model)
 
 	//could be a fullbright, just setup for them
 
-	GL_SelectTexture(GL_TEXTURE2_ARB);
+	glActiveTexture(GL_TEXTURE2_ARB);
 	Surf_EnableFullbright();
 
 	if (gl_detail.getBool()) {
@@ -230,7 +231,7 @@ void Surf_DrawTextureChainsFour(model_t *model)
 		//work out what texture we need if its animating texture
 		t = R_TextureAnimation (model->textures[i]->texturechain->texinfo->texture);
 	// Binds world to texture unit 0
-		GL_SelectTexture(GL_TEXTURE0_ARB);
+		glActiveTexture(GL_TEXTURE0_ARB);
 		glBindTexture(GL_TEXTURE_2D,t->gl_texturenum);
 
 		if (t->gl_fullbright != 0){
@@ -240,7 +241,7 @@ void Surf_DrawTextureChainsFour(model_t *model)
 		}
 
 
-		GL_SelectTexture(GL_TEXTURE1_ARB);
+		glActiveTexture(GL_TEXTURE1_ARB);
 
 		for (s = model->textures[i]->texturechain; s; )
 		{
@@ -251,11 +252,10 @@ void Surf_DrawTextureChainsFour(model_t *model)
 			R_RenderDynamicLightmaps (s);
 
 			k = s->lightmaptexturenum;
-			if (lightmap_modified[k])
-			{
+			if (lightmap_modified[k]) {
 				lightmap_modified[k] = false;
 				theRect = &lightmap_rectchange[k];
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t, BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE, lightmaps+(k* BLOCK_HEIGHT + theRect->t) *BLOCK_WIDTH*lightmap_bytes);
+				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t, BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_INT_8_8_8_8_REV, lightmaps+(k* BLOCK_HEIGHT + theRect->t) *BLOCK_WIDTH*lightmap_bytes);
 				theRect->l = BLOCK_WIDTH;
 				theRect->t = BLOCK_HEIGHT;
 				theRect->h = 0;
@@ -267,12 +267,12 @@ void Surf_DrawTextureChainsFour(model_t *model)
 			v = s->polys->verts[0];
 			for (k=0 ; k<s->polys->numverts ; k++, v+= VERTEXSIZE)
 			{
-				qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, v[3], v[4]);
-				qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, v[5], v[6]);
+				glMultiTexCoord2f (GL_TEXTURE0_ARB, v[3], v[4]);
+				glMultiTexCoord2f (GL_TEXTURE1_ARB, v[5], v[6]);
 				if (t->gl_fullbright)
-					qglMultiTexCoord2fARB (GL_TEXTURE2_ARB, v[3], v[4]);
+					glMultiTexCoord2f (GL_TEXTURE2_ARB, v[3], v[4]);
 				if (detail)
-					qglMultiTexCoord2fARB (GL_TEXTURE3_ARB, v[7]*18, v[8]*18);
+					glMultiTexCoord2f (GL_TEXTURE3_ARB, v[7]*18, v[8]*18);
 
 				glVertex3fv (v);
 			}
@@ -306,7 +306,7 @@ void Surf_DrawTextureChainsFour(model_t *model)
 	GL_DisableTMU(GL_TEXTURE1_ARB);
 	Surf_Reset();
 
-	GL_SelectTexture(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
 	Surf_Reset();
 
 	if (r_outline.getBool()){
@@ -337,17 +337,17 @@ void Surf_DrawExtraChainsFour(msurface_t *extrachain){
 	glBindTexture(GL_TEXTURE_2D,underwatertexture);
 
 	//the second water caustic
-	GL_SelectTexture(GL_TEXTURE1_ARB);
+	glActiveTexture(GL_TEXTURE1_ARB);
 	Surf_EnableCaustic();
 	glBindTexture(GL_TEXTURE_2D,underwatertexture);
 
 	//the glass shiny texture
-	GL_SelectTexture(GL_TEXTURE2_ARB);
+	glActiveTexture(GL_TEXTURE2_ARB);
 	Surf_EnableShiny();
 	glBindTexture(GL_TEXTURE_2D, shinetex_glass);
 
 	//the metal shiny texture
-	GL_SelectTexture(GL_TEXTURE3_ARB);
+	glActiveTexture(GL_TEXTURE3_ARB);
 	Surf_EnableShiny();
 	glBindTexture(GL_TEXTURE_2D, shinetex_chrome);
 
@@ -407,14 +407,14 @@ void Surf_DrawExtraChainsFour(msurface_t *extrachain){
 				ss= os/5 - (realtime*0.05);
 				tt= ot/5 + (realtime*0.05);
 
-				qglMultiTexCoord2fARB (GL_TEXTURE0_ARB,    s,    t);
-				qglMultiTexCoord2fARB (GL_TEXTURE1_ARB,   ss,   tt);
+				glMultiTexCoord2f (GL_TEXTURE0_ARB,    s,    t);
+				glMultiTexCoord2f (GL_TEXTURE1_ARB,   ss,   tt);
 			}
 
 			if (shiny_glass)
-				qglMultiTexCoord2fARB (GL_TEXTURE2_ARB, v[7], v[8]);
+				glMultiTexCoord2f (GL_TEXTURE2_ARB, v[7], v[8]);
 			if (shiny_metal)
-				qglMultiTexCoord2fARB (GL_TEXTURE3_ARB, v[7], v[8]);
+				glMultiTexCoord2f (GL_TEXTURE3_ARB, v[7], v[8]);
 
 			glVertex3fv (v);
 		}
@@ -472,7 +472,7 @@ void Surf_DrawExtraChainsFour(msurface_t *extrachain){
 	Surf_Reset();
 
 	// Disable caustic
-	GL_SelectTexture(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
 	Surf_Reset();
 
 	GL_EnableTMU(GL_TEXTURE0_ARB);
@@ -526,10 +526,10 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 		//work out what texture we need if its animating texture
 		t = R_TextureAnimation (model->textures[i]->texturechain->texinfo->texture);
 	// Binds world to texture unit 0
-		GL_SelectTexture(GL_TEXTURE0_ARB);
+		glActiveTexture(GL_TEXTURE0_ARB);
 		glBindTexture(GL_TEXTURE_2D,t->gl_texturenum);
 
-		GL_SelectTexture(GL_TEXTURE1_ARB);
+		glActiveTexture(GL_TEXTURE1_ARB);
 
 		prev = NULL;
 
@@ -546,7 +546,7 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 			{
 				lightmap_modified[k] = false;
 				theRect = &lightmap_rectchange[k];
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t, BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE, lightmaps+(k* BLOCK_HEIGHT + theRect->t) *BLOCK_WIDTH*lightmap_bytes);
+				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t, BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_INT_8_8_8_8_REV, lightmaps+(k* BLOCK_HEIGHT + theRect->t) *BLOCK_WIDTH*lightmap_bytes);
 				theRect->l = BLOCK_WIDTH;
 				theRect->t = BLOCK_HEIGHT;
 				theRect->h = 0;
@@ -558,12 +558,12 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 			v = s->polys->verts[0];
 			for (k=0 ; k<s->polys->numverts ; k++, v+= VERTEXSIZE)
 			{
-				qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, v[3], v[4]);
-				qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, v[5], v[6]);
+				glMultiTexCoord2f (GL_TEXTURE0_ARB, v[3], v[4]);
+				glMultiTexCoord2f (GL_TEXTURE1_ARB, v[5], v[6]);
 				if (t->gl_fullbright)
-					qglMultiTexCoord2fARB (GL_TEXTURE2_ARB, v[3], v[4]);
+					glMultiTexCoord2f (GL_TEXTURE2_ARB, v[3], v[4]);
 				if (gl_detail.getBool())
-					qglMultiTexCoord2fARB (GL_TEXTURE3_ARB, v[7]*18, v[8]*18);
+					glMultiTexCoord2f (GL_TEXTURE3_ARB, v[7]*18, v[8]*18);
 
 				glVertex3fv (v);
 			}
@@ -592,7 +592,7 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 	GL_DisableTMU(GL_TEXTURE1_ARB);
 	Surf_Reset();
 
-	GL_SelectTexture(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
 	Surf_Reset();
 
 	//second pass
@@ -601,7 +601,7 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 	glColor4f(1,1,1,1);
 
 	//could be a fullbright, just setup for them
-	GL_SelectTexture(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
 	Surf_EnableFullbright();
 
 	if (gl_detail.getBool())
@@ -637,9 +637,9 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 				for (k=0 ; k<s->polys->numverts ; k++, v+= VERTEXSIZE)
 				{
 					if (t->gl_fullbright)
-						qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, v[3], v[4]);
+						glMultiTexCoord2f (GL_TEXTURE0_ARB, v[3], v[4]);
 					if (gl_detail.getBool())
-						qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, v[7]*18, v[8]*18);
+						glMultiTexCoord2f (GL_TEXTURE1_ARB, v[7]*18, v[8]*18);
 
 					glVertex3fv (v);
 				}
@@ -666,7 +666,7 @@ void Surf_DrawTextureChainsTwo(model_t *model)
 	}
 
 	// Disable fullbright texture
-	GL_SelectTexture(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
 	Surf_Reset();
 
 	glDisable (GL_BLEND);
@@ -701,7 +701,7 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain){
 	glBindTexture(GL_TEXTURE_2D,underwatertexture);
 
 	//the second water caustic
-	GL_SelectTexture(GL_TEXTURE1_ARB);
+	glActiveTexture(GL_TEXTURE1_ARB);
 	Surf_EnableCaustic();
 	glBindTexture(GL_TEXTURE_2D,underwatertexture);
 
@@ -734,8 +734,8 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain){
 				ss= os/5 - (realtime*0.05);
 				tt= ot/5 + (realtime*0.05);
 
-				qglMultiTexCoord2fARB (GL_TEXTURE0_ARB,    s,    t);
-				qglMultiTexCoord2fARB (GL_TEXTURE1_ARB,   ss,   tt);
+				glMultiTexCoord2f (GL_TEXTURE0_ARB,    s,    t);
+				glMultiTexCoord2f (GL_TEXTURE1_ARB,   ss,   tt);
 
 				glVertex3fv (v);
 			}
@@ -770,17 +770,17 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain){
 	Surf_Reset();
 
 	// Disable caustic
-	GL_SelectTexture(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
 	Surf_Reset();
 
 //second pass
 	//the glass shiny texture
-	GL_SelectTexture(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
 	Surf_EnableShiny();
 	glBindTexture(GL_TEXTURE_2D, shinetex_glass);
 
 	//the metal shiny texture
-	GL_SelectTexture(GL_TEXTURE1_ARB);
+	glActiveTexture(GL_TEXTURE1_ARB);
 	Surf_EnableShiny();
 	glBindTexture(GL_TEXTURE_2D, shinetex_chrome);
 
@@ -818,9 +818,9 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain){
 			for (k=0 ; k<surf->polys->numverts ; k++, v+= VERTEXSIZE)
 			{
 				if (shiny_glass)
-					qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, v[7], v[8]);
+					glMultiTexCoord2f (GL_TEXTURE0_ARB, v[7], v[8]);
 				if (shiny_metal)
-					qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, v[7], v[8]);
+					glMultiTexCoord2f (GL_TEXTURE1_ARB, v[7], v[8]);
 
 				glVertex3fv (v);
 			}
@@ -861,7 +861,7 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain){
 	Surf_Reset();
 
 	// Disable shiny glass
-	GL_SelectTexture(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
 	glDisable(GL_TEXTURE_GEN_S);
 	glDisable(GL_TEXTURE_GEN_T);
 	Surf_Reset();

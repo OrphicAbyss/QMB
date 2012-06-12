@@ -68,7 +68,7 @@ OBJ  =	bot.o bot_misc.o bot_setup.o  \
 LINKOBJ  = $(OBJ)
 
 ifeq ($(TARGET_PLATFORM),windows)
-    LIBS = -L"C:/msys/1.0/local/lib" -L"C:/MinGW/lib" -lGLee -lopengl32 -lglu32 -ljpeg -lpng -lSDL 
+    LIBS = -L"C:/msys/1.0/local/lib" -L"C:/MinGW/lib" -lGLee -lopengl32 -lglu32 -ljpeg -lpng -lSDL -lSDLmain 
 	#-lGLee
 	#-mwindows -luser32 -lgdi32  -lwsock32 -lwinmm -lcomctl32 -ldxguid 
     INCS = -I"C:/msys/1.0/local/include" -I"C:/MinGW/include" 

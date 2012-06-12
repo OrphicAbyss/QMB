@@ -1,3 +1,4 @@
+
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -334,7 +335,6 @@ int main (int c, char **v)
 	quakeparms_t parms;
 	extern int vcrFile;
 	extern int recording;
-	static int frame;
 	int value;
 
 	//signal(SIGFPE, SIG_IGN);
@@ -382,30 +382,6 @@ int main (int c, char **v)
     }
 
 }
-
-
-/*
-================
-Sys_MakeCodeWriteable
-================
-*/
-//void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
-//{
-//
-//	int r;
-//	unsigned long addr;
-//	int psize = getpagesize();
-//
-//	fprintf(stderr, "writable code %lx-%lx\n", startaddr, startaddr+length);
-//
-//	addr = startaddr & ~(psize-1);
-//
-//	r = mprotect((char*)addr, length + startaddr - addr, 7);
-//
-//	if (r < 0)
-//    		Sys_Error("Protection change failed\n");
-//
-//}
 
 /*
 ================
