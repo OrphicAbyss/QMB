@@ -720,6 +720,18 @@ void GL_CreateSurfaceLightmap (msurface_t *surf)
 	R_BuildLightMap (surf, base, BLOCK_WIDTH*lightmap_bytes);
 }
 
+void UpdateLightmap(int texNum) {
+	if (lightmap_modified[texNum]) {
+		lightmap_modified[texNum] = false;
+		glRect_t *theRect = &lightmap_rectchange[texNum];
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t, BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_INT_8_8_8_8_REV, lightmaps+(texNum* BLOCK_HEIGHT + theRect->t) *BLOCK_WIDTH*lightmap_bytes);
+		theRect->l = BLOCK_WIDTH;
+		theRect->t = BLOCK_HEIGHT;
+		theRect->h = 0;
+		theRect->w = 0;
+	}	
+}
+
 void GL_UploadLightmap (void){
 	glActiveTexture(GL_TEXTURE0_ARB);
 
@@ -1011,15 +1023,6 @@ dynamic:
 			base = lightmaps + fa->lightmaptexturenum*lightmap_bytes*BLOCK_WIDTH*BLOCK_HEIGHT;
 			base += fa->light_t * BLOCK_WIDTH * lightmap_bytes + fa->light_s * lightmap_bytes;
 			R_BuildLightMap (fa, base, BLOCK_WIDTH*lightmap_bytes);
-			
-			lightmap_modified[fa->lightmaptexturenum] = false;
-			theRect = &lightmap_rectchange[fa->lightmaptexturenum];
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t, BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_INT_8_8_8_8_REV, lightmaps+(fa->lightmaptexturenum * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * lightmap_bytes);
-			theRect->l = BLOCK_WIDTH;
-			theRect->t = BLOCK_HEIGHT;
-			theRect->h = 0;
-			theRect->w = 0;
-
 		}
 	}
 }

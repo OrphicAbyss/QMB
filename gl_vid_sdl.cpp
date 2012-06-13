@@ -265,8 +265,8 @@ void    VID_Init (unsigned char *palette) {
     SDL_WM_SetCaption("Quake: QMB","Quake: QMB");
     // now know everything we need to know about the buffer
     vid.aspect = ((float)vid.height / (float)vid.width);
-	vid.conwidth = 640;
-    vid.conheight = 640 * vid.aspect;
+	vid.conwidth = 320;
+    vid.conheight = 320 * vid.aspect;
 	vid.numpages = 2;
 
     vid.colormap = host_colormap;

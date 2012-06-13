@@ -1396,7 +1396,7 @@ void GL_Upload32 (unsigned int *data, int width, int height, qboolean mipmap, qb
 		if (grayscale && gl_sincity.getBool()){
 			//go through data and convert
 			size = width * height;
-			for (i=0;i<size;i++){
+			for (i=0;i<size;i++) {
 				data[i] = RGBAtoGrayscale(data[i]);
 			}
 		}
