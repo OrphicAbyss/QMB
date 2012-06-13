@@ -428,7 +428,7 @@ void GL_DrawAliasFrame (aliashdr_t *paliashdr, int posenum, int shell, int cell)
 	if (r_celshading.getBool() || r_vertexshading.getBool())
 	{
 	//setup for shading
-		GL_SelectTexture(GL_TEXTURE1_ARB);
+		glActiveTexture(GL_TEXTURE1_ARB);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glDisable(GL_TEXTURE_2D);
 		glEnable(GL_TEXTURE_1D);
@@ -474,8 +474,8 @@ void GL_DrawAliasFrame (aliashdr_t *paliashdr, int posenum, int shell, int cell)
 
 			if (!shell){
 				// texture coordinates come from the draw list
-				qglMultiTexCoord1fARB (GL_TEXTURE1_ARB, bound(0,DotProduct(shadevector,normal),1));
-				qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, ((float *)order)[0], ((float *)order)[1]);
+				glMultiTexCoord1f(GL_TEXTURE1_ARB, bound(0,DotProduct(shadevector,normal),1));
+				glMultiTexCoord2f(GL_TEXTURE0_ARB, ((float *)order)[0], ((float *)order)[1]);
 				glVertex3f (verts->v[0], verts->v[1], verts->v[2]);
 			}else{
 				glTexCoord2f (((float *)order)[0] + realtime*2, ((float *)order)[1] + realtime*2);
@@ -495,7 +495,7 @@ void GL_DrawAliasFrame (aliashdr_t *paliashdr, int posenum, int shell, int cell)
 	{
 	//setup for shading
 		glDisable(GL_TEXTURE_1D);
-		GL_SelectTexture(GL_TEXTURE0_ARB);
+		glActiveTexture(GL_TEXTURE0_ARB);
 	}
 }
 
@@ -594,7 +594,7 @@ void GL_DrawAliasBlendedFrame (aliashdr_t *paliashdr, int pose1, int pose2, floa
 	if (r_celshading.getBool() || r_vertexshading.getBool())
 	{
 	//setup for shading
-		GL_SelectTexture(GL_TEXTURE1_ARB);
+		glActiveTexture(GL_TEXTURE1_ARB);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glDisable(GL_TEXTURE_2D);
 		glEnable(GL_TEXTURE_1D);
@@ -661,8 +661,8 @@ void GL_DrawAliasBlendedFrame (aliashdr_t *paliashdr, int pose1, int pose2, floa
 			// blend the vertex positions from each frame together
 			if (!shell){
 				// texture coordinates come from the draw list
-				qglMultiTexCoord1fARB (GL_TEXTURE1_ARB, bound(0,DotProduct(shadevector,normal),1));
-				qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, ((float *)order)[0], ((float *)order)[1]);
+				glMultiTexCoord1f(GL_TEXTURE1_ARB, bound(0,DotProduct(shadevector,normal),1));
+				glMultiTexCoord2f(GL_TEXTURE0_ARB, ((float *)order)[0], ((float *)order)[1]);
 				glVertex3f (verts1->v[0] * iblend + verts2->v[0] * blend,
 							verts1->v[1] * iblend + verts2->v[1] * blend,
 							verts1->v[2] * iblend + verts2->v[2] * blend);
@@ -684,7 +684,7 @@ void GL_DrawAliasBlendedFrame (aliashdr_t *paliashdr, int pose1, int pose2, floa
 	{
 	//setup for shading
 		glDisable(GL_TEXTURE_1D);
-		GL_SelectTexture(GL_TEXTURE0_ARB);
+		glActiveTexture(GL_TEXTURE0_ARB);
 	}
 }
 
@@ -1153,7 +1153,7 @@ void R_DrawAliasModel (entity_t *e)
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			}
 		}
-		GL_SelectTexture(GL_TEXTURE0_ARB);
+		glActiveTexture(GL_TEXTURE0_ARB);
 
 //colour map code... not working yet...
 /*		if (e->colormap != vid.colormap && !gl_nocolors.value)

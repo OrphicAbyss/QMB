@@ -55,9 +55,9 @@ typedef struct
 byte		conback_buffer[sizeof(qpic_t) + sizeof(glpic_t)];
 qpic_t		*conback = (qpic_t *)&conback_buffer;
 
-int		gl_lightmap_format = GL_RGBA;//GL_COMPRESSED_RGBA_ARB;//4;
-int		gl_solid_format = GL_RGB;//GL_COMPRESSED_RGB_ARB;//3;
-int		gl_alpha_format = GL_RGBA;//GL_COMPRESSED_RGBA_ARB;//4;
+int		gl_lightmap_format = GL_BGRA;
+int		gl_solid_format = GL_RGB;
+int		gl_alpha_format = GL_RGBA;
 
 int		gl_filter_min = GL_LINEAR_MIPMAP_LINEAR;
 int		gl_filter_max = GL_LINEAR;
@@ -1396,7 +1396,7 @@ void GL_Upload32 (unsigned int *data, int width, int height, qboolean mipmap, qb
 		if (grayscale && gl_sincity.getBool()){
 			//go through data and convert
 			size = width * height;
-			for (i=0;i<size;i++){
+			for (i=0;i<size;i++) {
 				data[i] = RGBAtoGrayscale(data[i]);
 			}
 		}
@@ -1423,9 +1423,7 @@ void GL_Upload32 (unsigned int *data, int width, int height, qboolean mipmap, qb
 				gluBuild2DMipmaps (GL_TEXTURE_2D, samples, scaled_width, scaled_height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 			}
 		}
-	}
-	else																	//if we need to scale
-	{
+	} else {																//if we need to scale
 		Con_SafeDPrintf("&c500Upload32:&r Textures too big or not a power of two in size: %ix%i...\n",width,height);
 
 		//fix size so its a power of 2
@@ -1620,16 +1618,6 @@ GL_LoadTexture_setup:
 
 /****************************************/
 
-static GLenum oldtarget = GL_TEXTURE0_ARB;
-
-void GL_SelectTexture (GLenum target)
-{
-	qglSelectTextureARB(target);
-	if (target == oldtarget)
-		return;
-	oldtarget = target;
-}
-
 extern byte *LoadPCX (FILE *f);
 extern byte *LoadTGA (FILE *f, char *name, int filesize);
 extern byte *LoadJPG (FILE *f);
@@ -1736,7 +1724,7 @@ int GL_LoadTexImage (char* filename, qboolean complain, qboolean mipmap, qboolea
 	data = loadimagepixels (filename, complain);
 	if (!data)
 		return 0;
-	texnum = GL_LoadTexture (filename, image_width, image_height, data, mipmap, true, 4, grayscale);
+	texnum = GL_LoadTexture(filename, image_width, image_height, data, mipmap, true, 4, grayscale);
 	free(data);
 	return texnum;
 }

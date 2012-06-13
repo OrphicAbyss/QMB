@@ -87,7 +87,7 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline)
 	if ((r_celshading.getBool() || r_vertexshading.getBool()) && !outline)
 	{
 	//setup for shading
-		GL_SelectTexture(GL_TEXTURE1_ARB);
+		glActiveTexture(GL_TEXTURE1_ARB);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glDisable(GL_TEXTURE_2D);
 		glEnable(GL_TEXTURE_1D);
@@ -95,7 +95,7 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline)
 			glBindTexture (GL_TEXTURE_1D, celtexture);
 		else
 			glBindTexture (GL_TEXTURE_1D, vertextexture);
-		GL_SelectTexture(GL_TEXTURE0_ARB);
+		glActiveTexture(GL_TEXTURE0_ARB);
 
 		usevertexarray = false;
 	}
@@ -218,8 +218,8 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline)
 						}
 
 						if (!shell){
-							qglMultiTexCoord1fARB (GL_TEXTURE1_ARB, bound(0,DotProduct(shadevector,normal),1));
-							qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, tc[tris[j].tri[k]].s, tc[tris[j].tri[k]].t);
+							glMultiTexCoord1f(GL_TEXTURE1_ARB, bound(0,DotProduct(shadevector,normal),1));
+							glMultiTexCoord2f(GL_TEXTURE0_ARB, tc[tris[j].tri[k]].s, tc[tris[j].tri[k]].t);
 						}else{
 							glTexCoord2f(tc[tris[j].tri[k]].s + realtime*2, tc[tris[j].tri[k]].t + realtime*2);
 						}
@@ -237,9 +237,9 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline)
 	if ((r_celshading.getBool() || r_vertexshading.getBool()) && !outline)
 	{
 		//setup for shading
-		GL_SelectTexture(GL_TEXTURE1_ARB);
+		glActiveTexture(GL_TEXTURE1_ARB);
 		glDisable(GL_TEXTURE_1D);
-		GL_SelectTexture(GL_TEXTURE0_ARB);
+		glActiveTexture(GL_TEXTURE0_ARB);
 	}
 }
 

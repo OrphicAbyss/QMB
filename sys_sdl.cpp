@@ -1,3 +1,4 @@
+
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -299,7 +300,6 @@ int main (int c, char **v)
 	quakeparms_t parms;
 	extern int vcrFile;
 	extern int recording;
-	static int frame;
 	int value;
 
 	//signal(SIGFPE, SIG_IGN);

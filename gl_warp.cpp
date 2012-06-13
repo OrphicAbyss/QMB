@@ -264,7 +264,7 @@ void EmitWaterPolysMulti (msurface_t *fa)
 	//Texture shader
 	float		args[4] = {0.05f,0.0f,0.0f,0.02f};
 
-	GL_SelectTexture(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
 	glBindTexture(GL_TEXTURE_2D,fa->texinfo->texture->gl_texturenum);
 
 	/*
@@ -330,8 +330,8 @@ void EmitWaterPolysMulti (msurface_t *fa)
 			if (r_wave.getBool())
 				nv[2] = v[2] + r_wave.getFloat() *sin(v[0]*0.02+cl.time)*sin(v[1]*0.02+cl.time)*sin(v[2]*0.02+cl.time);
 
-			qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, s, t);
-			qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, ss + cl.time/10, tt + cl.time/10);
+			glMultiTexCoord2f (GL_TEXTURE0_ARB, s, t);
+			glMultiTexCoord2f (GL_TEXTURE1_ARB, ss + cl.time/10, tt + cl.time/10);
 
 			glVertex3fv (nv);
 		}
@@ -349,7 +349,7 @@ void EmitWaterPolysMulti (msurface_t *fa)
 	GL_DisableTMU(GL_TEXTURE1_ARB);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	GL_SelectTexture(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
@@ -393,7 +393,7 @@ void EmitSkyPolysMulti (msurface_t *fa)
 	vec3_t	dir;
 	float	length;
 
-	GL_SelectTexture(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
 	glColor3f(1,1,1);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBindTexture(GL_TEXTURE_2D,fa->texinfo->texture->gl_texturenum);
@@ -424,15 +424,15 @@ void EmitSkyPolysMulti (msurface_t *fa)
 			ss = (realtime*16 + dir[0]) * (1.0/128);
 			tt = (realtime*16 + dir[1]) * (1.0/128);
 
-			qglMultiTexCoord2fARB (GL_TEXTURE0_ARB, s, t);
-			qglMultiTexCoord2fARB (GL_TEXTURE1_ARB, ss, tt);
+			glMultiTexCoord2f (GL_TEXTURE0_ARB, s, t);
+			glMultiTexCoord2f (GL_TEXTURE1_ARB, ss, tt);
 			glVertex3fv (v);
 		}
 		glEnd ();
 	}
 
 	GL_DisableTMU(GL_TEXTURE1_ARB);
-	GL_SelectTexture(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
 }
 
 /*
@@ -688,7 +688,7 @@ void R_DrawSkyChain (msurface_t *s)
 		float		*v;
 		int			i;
 
-		GL_SelectTexture(GL_TEXTURE0_ARB);
+		glActiveTexture(GL_TEXTURE0_ARB);
 		glColor3f(1,1,1);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 

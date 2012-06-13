@@ -25,9 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern int image_width;
 extern int image_height;
 
-//jpg loading
-byte *LoadJPG (FILE *f)
-{
+byte *LoadJPG (FILE *f) {
 	struct jpeg_decompress_struct cinfo;
     JDIMENSION num_scanlines;
     JSAMPARRAY in;
@@ -102,4 +100,3 @@ error:
     fclose (f);
     return NULL;
 }
-

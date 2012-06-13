@@ -139,17 +139,6 @@ extern	const char *gl_extensions;
 void R_TranslatePlayerSkin (int playernum);
 
 // Multitexture
-//QMB :arb multitexture
-//with extra texture units :)
-#define    GL_TEXTURE0_ARB					0x84C0
-#define    GL_TEXTURE1_ARB					0x84C1
-#define    GL_TEXTURE2_ARB					0x84C2
-#define    GL_TEXTURE3_ARB					0x84C3
-#define    GL_TEXTURE4_ARB					0x84C4
-#define    GL_TEXTURE5_ARB					0x84C5
-
-#define GL_ACTIVE_TEXTURE_ARB				0x84E0
-#define GL_CLIENT_ACTIVE_TEXTURE_ARB		0x84E1
 #define GL_MAX_TEXTURE_UNITS_ARB			0x84E2
 
 #define GL_TEXTURE_MAX_ANISOTROPY_EXT		0x84FE
@@ -228,9 +217,6 @@ void R_TranslatePlayerSkin (int playernum);
 #endif
 //QMB :end
 
-typedef void (APIENTRY *lpMTexFUNC) (GLenum, GLfloat, GLfloat);
-typedef void (APIENTRY *lp1DMTexFUNC) (GLenum, GLfloat);
-typedef void (APIENTRY *lpSelTexFUNC) (GLenum);
 //QMB :NV_point_sprite
 typedef void (APIENTRY *pointPramFUNCv) (GLenum pname, const GLfloat *params);
 typedef void (APIENTRY *pointPramFUNC) (GLenum pname, const GLfloat params);
@@ -238,9 +224,6 @@ typedef void (APIENTRY *pointPramFUNC) (GLenum pname, const GLfloat params);
 typedef void (APIENTRY *pnTrianglesIatiPROC)(GLenum pname, GLint param);
 typedef void (APIENTRY *pnTrianglesFaitPROC)(GLenum pname, GLfloat param);
 
-extern lpMTexFUNC qglMultiTexCoord2fARB;
-extern lp1DMTexFUNC qglMultiTexCoord1fARB;
-extern lpSelTexFUNC qglSelectTextureARB;
 extern pointPramFUNCv qglPointParameterfvEXT;
 extern pointPramFUNC qglPointParameterfEXT;
 extern pnTrianglesIatiPROC glPNTrianglesiATI;
@@ -255,6 +238,5 @@ extern qboolean gl_n_patches;
 
 extern void GL_EnableTMU(int tmu);
 extern void GL_DisableTMU(int tmu);
-extern void GL_SelectTexture (GLenum target);
 
 void   Mod_LoadMd3Model (model_t *mod, void *buffer);
