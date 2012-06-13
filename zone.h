@@ -107,7 +107,7 @@ void Hunk_Check (void);
  */
 class MemoryObj {
 public:
-	enum MemType { CACHE, ZONE };
+	enum MemType { CACHE, ZONE, HUNK, TEMP };
 private:
 	static const int maxNameLength = 32;
 	void *data;

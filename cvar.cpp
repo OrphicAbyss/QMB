@@ -6,30 +6,10 @@ using std::list;
 
 static list<CVar *> CVars;
 
-void clearCVars(void){
-	list<CVar *>::iterator i = CVars.begin();
-
-	while (i != CVars.end()){
-		delete (*i);
-		i = CVars.erase(i);
-	}
-}
-
-/**
- * Add a cvar to the list of cvars
- *
- * @param cvar The cvar to add
- */
 void CVar::addCVar(CVar *cvar){
 	CVars.push_back(cvar);
 }
 
-/**
- * Search the list of cvars for one with the given name
- *
- * @param name The cvar name to search for
- * @return The cvar object, or null if none found
- */
 CVar *CVar::findCVar (const char *name){
 	list<CVar *>::iterator i;
 
@@ -77,12 +57,6 @@ CVar *CVar::findNextServerCVar (const char *name){
 	return NULL;
 }
 
-/**
- * Register a cvar by adding it to our list of active cvars. Ensures that there
- * isn't already a cvar or command by that name.
- *
- * @param variable
- */
 void CVar::registerCVar(CVar* variable){
 	// first check to see if it has already been defined
 	if (CVar::findCVar(variable->getName())) {
@@ -103,12 +77,6 @@ void CVar::registerCVar(CVar* variable){
 	addCVar(variable);
 }
 
-/**
- * Set a cvar value given the name of the cvar and the value to set it to.
- *
- * @param var_name The name of the cvar to set
- * @param value The value to set the cvar to
- */
 void CVar::setValue(const char *var_name, const char *value){
 	CVar *var = CVar::findCVar(var_name);
 
@@ -117,13 +85,6 @@ void CVar::setValue(const char *var_name, const char *value){
 	}
 }
 
-/**
- * Get the float value of a cvar for the name passed in.
- *
- * @param name The name of the cvar
- * @return Either the value of the cvar or 0 if the cvar doesn't exist or if it
- *			doesn't have a float value (ie is a string value)
- */
 float CVar::getFloatValue(char *name){
 	CVar *var = CVar::findCVar(name);
 	if (var != NULL)
@@ -131,12 +92,6 @@ float CVar::getFloatValue(char *name){
 	return 0;
 }
 
-/**
- * Get the string value of a cvar for the name passed in.
- *
- * @param name
- * @return
- */
 const char *CVar::getStringValue(char *name){
 	CVar *var = CVar::findCVar(name);
 	if (var != NULL)
@@ -144,14 +99,7 @@ const char *CVar::getStringValue(char *name){
 	return "";
 }
 
-/**
- * Attempt to auto-complete a cvar name given the partial value. If there are
- * multiple matches, print the matched names and return NULL.
- *
- * @param partial The partial name to match against
- * @return the fullname of the cvar, NULL if none match or if more than one match
- */
-char *CVar::completeVariable(char *partial){
+const char *CVar::completeVariable(char *partial){
 	list<CVar *>::iterator i;
 	CVar *match = NULL;
 	int sizeOfStr = Q_strlen(partial);
@@ -194,11 +142,6 @@ char *CVar::completeVariable(char *partial){
 		return NULL;
 }
 
-/**
- * Handles variable inspection and changing from the console
- *
- * @return true if the variable was found, false otherwise
- */
 bool CVar::consoleCommand(void){
 	CVar *var;
 
@@ -216,12 +159,6 @@ bool CVar::consoleCommand(void){
 	return true;
 }
 
-/**
- * Writes lines containing "set variable value" for all variables with the
- *  archive flag set to true.
- *
- * @param f File to write the variables to
- */
 void CVar::writeVariables (FILE *f){
 	list<CVar *>::iterator i;
 
@@ -233,40 +170,30 @@ void CVar::writeVariables (FILE *f){
 	}
 }
 
-CVar::CVar(char *name, char *sValue){
+CVar::CVar(const char *name, const char *sValue){
 	init(name, sValue, false, false);
 }
 
-CVar::CVar(char *name, char *sValue, bool archive){
+CVar::CVar(const char *name, const char *sValue, bool archive){
 	init(name, sValue, archive, false);
 }
 
-CVar::CVar(char *name, char *sValue, bool archive, bool server){
+CVar::CVar(const char *name, const char *sValue, bool archive, bool server){
 	init(name, sValue, archive, server);
 }
 
-/**
- * Initialises the cvar data (called by the constructors).
- *
- * @param name Name of the cvar
- * @param sValue String value of the cvar
- * @param archive True if the cvar is saved to configs
- * @param server True if the cvar is sent from server to all clients when
- *				  changed
- */
-void CVar::init(char *name,char *sValue,bool archive,bool server){
+void CVar::init(const char *name, const char *sValue, bool archive, bool server){
 	this->name = name;
 	this->archive = archive;
 	this->server = server;
 	this->registered = false;
 
 	// use this until we register then make a copy of the string
-	this->sValue = sValue;
+	this->originalValue = sValue;
+	this->sValue = NULL;
 	this->fValue = 0;
 	this->iValue = 0;
 	this->bValue = false;
-
-	parseValue();
 }
 
 /**
@@ -275,9 +202,12 @@ void CVar::init(char *name,char *sValue,bool archive,bool server){
 void CVar::reg(){
 	if (!this->registered){
 		registered = true;
-		char *value = this->sValue;
+		const char *value = this->originalValue;
 		this->sValue = (char *)MemoryObj::ZAlloc (Q_strlen(value)+1);
 		Q_strcpy (this->sValue, value);
+		this->originalValue = NULL;
+
+		parseValue();
 	}
 }
 
@@ -332,30 +262,30 @@ void CVar::set(bool value){
 		this->set("0");
 }
 
-char *CVar::getName(){
+const char *CVar::getName(void){
 	return this->name;
 }
 
-char *CVar::getString(){
+char *CVar::getString(void){
 	return this->sValue;
 }
 
-bool CVar::getBool(){
+bool CVar::getBool(void){
 	return this->bValue;
 }
 
-int CVar::getInt(){
+int CVar::getInt(void){
 	return this->iValue;
 }
 
-float CVar::getFloat(){
+float CVar::getFloat(void){
 	return this->fValue;
 }
 
-bool CVar::isArchived(){
+bool CVar::isArchived(void){
 	return this->archive;
 }
 
-bool CVar::isServer(){
+bool CVar::isServer(void){
 	return this->server;
 }

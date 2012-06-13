@@ -171,7 +171,7 @@ Interactive line editing and console scrollback
 */
 void Key_Console (int key)
 {
-	char	*cmd;
+	const char	*cmd;
 	// 01-22-2000 FrikaC Begin PASTE
 #ifdef _WIN32
 	//char	*s;

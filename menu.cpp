@@ -1118,7 +1118,7 @@ void M_Menu_Net_f (void)
 void M_Net_Draw (void)
 {
 	qpic_t	*p;
-	char	*names[] =
+	const char	*names[] =
 	{
 		"Modem",
 		"Direct connect",
@@ -1508,7 +1508,7 @@ void M_AdjustVideoSliders (int dir)
 		scr_viewsize.set(value);
 		break;
 	case ITEM_GAMMA:	// gamma
-		value -= v_gamma.getFloat() + dir * 0.05;
+		value = v_gamma.getFloat() + dir * 0.05;
 		value = max(value,0.5f);
 		value = min(value,1.0f);
 		v_gamma.set(value);
@@ -2370,8 +2370,8 @@ void M_SerialConfig_Draw (void)
 {
 	qpic_t	*p;
 	int		basex;
-	char	*startJoin;
-	char	*directModem;
+	const char	*startJoin;
+	const char	*directModem;
 
 	M_Main_Layout (M_M_MULTI, false);
 
@@ -2808,8 +2808,8 @@ void M_LanConfig_Draw (void)
 {
 	qpic_t	*p;
 	int		basex;
-	char	*startJoin;
-	char	*protocol;
+	const char	*startJoin;
+	const char	*protocol;
 
 	M_Main_Layout (M_M_MULTI, false);
 

@@ -85,7 +85,7 @@ int bspextensions = 0;
 Host_EndGame
 ================
 */
-void Host_EndGame (char *message, ...)
+void Host_EndGame (const char *message, ...)
 {
 	va_list		argptr;
 	char		string[1024];
@@ -317,7 +317,7 @@ Host_ClientCommands
 Send text over to the client to be executed
 =================
 */
-void Host_ClientCommands (char *fmt, ...)
+void Host_ClientCommands (const char *fmt, ...)
 {
 	va_list		argptr;
 	char		string[1024];

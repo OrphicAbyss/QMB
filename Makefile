@@ -68,17 +68,17 @@ OBJ  =	bot.o bot_misc.o bot_setup.o  \
 LINKOBJ  = $(OBJ)
 
 ifeq ($(TARGET_PLATFORM),windows)
-    LIBS = -L"C:/msys/1.0/local/lib" -L"C:/MinGW/lib" -lGLee -lopengl32 -lglu32 -ljpeg -lpng -lSDL 
+    LIBS = -L"C:/msys/1.0/local/lib" -L"C:/MinGW/lib" -lGLee -lopengl32 -lglu32 -ljpeg -lpng -lSDL
 	#-lGLee
-	#-mwindows -luser32 -lgdi32  -lwsock32 -lwinmm -lcomctl32 -ldxguid 
-    INCS = -I"C:/msys/1.0/local/include" -I"C:/MinGW/include" 
+	#-mwindows -luser32 -lgdi32  -lwsock32 -lwinmm -lcomctl32 -ldxguid
+    INCS = -I"C:/msys/1.0/local/include" -I"C:/MinGW/include"
 else
     LIBS = -lc -lGL -lGLU -ljpeg -lpng -lSDL $(shell if test -e /usr/lib/libGLee.so; then echo -lGLee; else echo -lglee; fi)
     INCS =
 endif #ifeq ($(TARGET_PLATFORM),windows)
 
 CXXINCS =  $(INCS)
-FLAGS = -W -DSDL -DGLQUAKE -m32
+FLAGS = -W -DSDL -DGLQUAKE
 #-m32
 #-DNDEBUG
 CXXFLAGS =  $(CXXINCS)

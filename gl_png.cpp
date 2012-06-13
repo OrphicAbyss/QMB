@@ -18,7 +18,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-
 #include "quakedef.h"
 #include <png.h>
 
@@ -123,8 +122,6 @@ void PNGAPI fReadData(png_structp png,png_bytep data,png_size_t length) { // cal
 }
 //_____________________________________________________________________________
 
-extern int filelength (FILE *f);
-
 //Tei png version, ripped and adapted from sul_png.c from Quake2max
 byte * LoadPNG (FILE *f, char * name, int filesize)
 {
@@ -208,9 +205,7 @@ byte * LoadPNG (FILE *f, char * name, int filesize)
 
    png_destroy_read_struct(&png, &pnginfo, 0);
 
-
    //only load 32 bit by now...
-
 
    //Fix code BorisU
    //if (my_png->BitDepth == 8 &&  !(my_png->ColorType  & PNG_COLOR_MASK_ALPHA) )
@@ -237,5 +232,4 @@ byte * LoadPNG (FILE *f, char * name, int filesize)
    return imagedata;
 }
 //Tei png version, ripped and adapted from sul_png.c from Quake2max
-
 //_____________________________________________________________________________

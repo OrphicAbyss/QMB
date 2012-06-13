@@ -41,8 +41,7 @@ byte *LoadJPG (FILE *f)
     byte *image_rgba;
 
     // set up the decompression.
-    //cinfo.err = jpeg_std_error(&jerr);
-	cinfo.err = jpeg_std_error();	
+    cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_decompress(&cinfo);
 
     // inititalize the source

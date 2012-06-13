@@ -147,8 +147,7 @@ float Q_atof (const char *str);
 extern	char		com_token[1024];
 extern	qboolean	com_eof;
 
-char *COM_Parse (char *data);
-
+char *COM_Parse(char *data);
 
 extern	int		com_argc;
 extern	char	**com_argv;
@@ -160,7 +159,7 @@ void COM_InitArgv (int argc, char **argv);
 char *COM_SkipPath (char *pathname);
 void COM_StripExtension (char *in, char *out);
 void COM_FileBase (const char *in, char *out);
-void COM_DefaultExtension (char *path, char *extension);
+void COM_DefaultExtension (char *path, const char *extension);
 
 char	*va(const char *format, ...);
 // does a varargs printf into a temp buffer

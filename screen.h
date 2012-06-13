@@ -19,15 +19,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // screen.h
 
-void SCR_Init				(void);
-void SCR_UpdateScreen		(void);
+void SCR_Init					(void);
+void SCR_UpdateScreen			(void);
 void SCR_SizeUp				(void);
-void SCR_SizeDown			(void);
-void SCR_BringDownConsole	(void);
-void SCR_CenterPrint		(char *str);
-void SCR_BeginLoadingPlaque (void);
-void SCR_EndLoadingPlaque	(void);
-int	 SCR_ModalMessage		(char *text);
+void SCR_SizeDown				(void);
+void SCR_BringDownConsole		(void);
+void SCR_CenterPrint			(const char *str);
+void SCR_BeginLoadingPlaque	(void);
+void SCR_EndLoadingPlaque		(void);
+int	 SCR_ModalMessage			(const char *text);
 void SCR_UpdateWholeScreen	(void);
 
 extern	float		scr_con_current;

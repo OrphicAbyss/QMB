@@ -125,7 +125,7 @@ int		findhandle (void)
 filelength
 ================
 */
-int filelength (FILE *f)
+int Sys_FileLength (FILE *f)
 {
 	int		pos;
 	int		end;
@@ -154,7 +154,7 @@ int Sys_FileOpenRead (char *path, int *hndl)
 	sys_handles[i] = f;
 	*hndl = i;
 
-	return filelength(f);
+	return Sys_FileLength(f);
 }
 
 int Sys_FileOpenWrite (char *path)
@@ -281,49 +281,14 @@ double Sys_FloatTime (void)
 #endif
 }
 
-// =======================================================================
-// Sleeps for microseconds
-// =======================================================================
-
-static volatile int oktogo;
-
-void alarm_handler(int x)
-{
-	oktogo=1;
-}
-
-byte *Sys_ZoneBase (int *size)
-{
-
-	char *QUAKEOPT = getenv("QUAKEOPT");
-
-	*size = 0xc00000;
-	if (QUAKEOPT)
-	{
-		while (*QUAKEOPT)
-			if (tolower(*QUAKEOPT++) == 'm')
-			{
-				*size = atof(QUAKEOPT) * 1024*1024;
-				break;
-			}
-	}
-	return (byte *)malloc (*size);
-
-}
-
-void Sys_Sleep(void)
-{
-	SDL_Delay(1);
-}
-
 #ifdef WIN32
 #include <windows.h>
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
 	int rc;
-	
+
 	rc = main(__argc, __argv);
-	
+
 	return rc;
 }
 #endif
@@ -382,30 +347,6 @@ int main (int c, char **v)
     }
 
 }
-
-
-/*
-================
-Sys_MakeCodeWriteable
-================
-*/
-//void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
-//{
-//
-//	int r;
-//	unsigned long addr;
-//	int psize = getpagesize();
-//
-//	fprintf(stderr, "writable code %lx-%lx\n", startaddr, startaddr+length);
-//
-//	addr = startaddr & ~(psize-1);
-//
-//	r = mprotect((char*)addr, length + startaddr - addr, 7);
-//
-//	if (r < 0)
-//    		Sys_Error("Protection change failed\n");
-//
-//}
 
 /*
 ================

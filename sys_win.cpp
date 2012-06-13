@@ -113,7 +113,7 @@ int		findhandle (void)
 filelength
 ================
 */
-int filelength (FILE *f)
+int Sys_FileLength (FILE *f)
 {
 	int		pos;
 	int		end;
@@ -152,7 +152,7 @@ int Sys_FileOpenRead (char *path, int *hndl)
 	{
 		sys_handles[i] = f;
 		*hndl = i;
-		retval = filelength(f);
+		retval = Sys_FileLength(f);
 	}
 
 	VID_ForceLockState (t);
