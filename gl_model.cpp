@@ -897,8 +897,7 @@ void Mod_LoadFaces (lump_t *l)
 	loadmodel->surfaces = out;
 	loadmodel->numsurfaces = count;
 
-	for ( surfnum=0 ; surfnum<count ; surfnum++, in++, out++)
-	{
+	for ( surfnum=0 ; surfnum<count ; surfnum++, in++, out++) {
 		out->firstedge = LittleLong(in->firstedge);
 		out->numedges = LittleShort(in->numedges);
 		out->flags = 0;
@@ -915,31 +914,24 @@ void Mod_LoadFaces (lump_t *l)
 		CalcSurfaceExtents (out);
 
 	// lighting info
-
 		for (i=0 ; i<MAXLIGHTMAPS ; i++)
 			out->styles[i] = in->styles[i];
 		i = LittleLong(in->lightofs);
 		if (i == -1)
 			out->samples = NULL;
 		else
-			//out->samples = loadmodel->lightdata + i;
 			out->samples = loadmodel->lightdata + (i * 3); // LordHavoc
 
-
-
 	// set the drawing flags flag
-
-		if (!Q_strncmp(out->texinfo->texture->name,"sky",3))	// sky
-		{
+		if (!Q_strncmp(out->texinfo->texture->name,"sky",3)) {	// sky
 			out->flags |= (SURF_DRAWSKY | SURF_DRAWTILED);
+			GL_SubdivideSurface (out);	// cut up polygon for warps
 			continue;
 		}
 
-		if (!Q_strncmp(out->texinfo->texture->name,"*",1))		// turbulent
-		{
+		if (!Q_strncmp(out->texinfo->texture->name,"*",1)) {		// turbulent
 			out->flags |= (SURF_DRAWTURB | SURF_DRAWTILED);
-			for (i=0 ; i<2 ; i++)
-			{
+			for (i=0 ; i<2 ; i++) {
 				out->extents[i] = 16384;
 				out->texturemins[i] = -8192;
 			}

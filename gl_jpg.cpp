@@ -19,7 +19,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "quakedef.h"
+
+#define HAVE_UNSIGNED_CHAR
+#define HAVE_UNSIGNED_SHORT
 #include <jpeglib.h>
+
 #include <math.h>
 
 extern int image_width;

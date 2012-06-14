@@ -161,8 +161,7 @@ void GL_SubdivideSurface (msurface_t *fa)
 	// convert edges back to a normal polygon
 	//
 	numverts = 0;
-	for (i=0 ; i<fa->numedges ; i++)
-	{
+	for (i=0 ; i<fa->numedges ; i++) {
 		lindex = loadmodel->surfedges[fa->firstedge + i];
 
 		if (lindex > 0)
@@ -338,13 +337,12 @@ void EmitWaterPolysMulti (msurface_t *fa)
 		glEnd ();
 	}
 
-	glColor4f (1,1,1,1);
+	glColor4f(1,1,1,1);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable (GL_BLEND);
+	glDisable(GL_BLEND);
 
-	if (gl_shader) { // MrG - texture shader waterwarp
+	if (gl_shader) // MrG - texture shader waterwarp
 		glDisable(GL_TEXTURE_SHADER_NV);
-	}
 
 	GL_DisableTMU(GL_TEXTURE1_ARB);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -352,8 +350,6 @@ void EmitWaterPolysMulti (msurface_t *fa)
 	glActiveTexture(GL_TEXTURE0_ARB);
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-
 }
 
 /*
@@ -384,11 +380,9 @@ void R_DrawWaterChain (msurface_t *s)
 EmitSkyPolys
 =============
 */
-void EmitSkyPolysMulti (msurface_t *fa)
-{
-	glpoly_t	*p;
-	float		*v;
-	int			i, j=0;
+void EmitSkyPolysMulti (msurface_t *fa) {
+	int		i;
+	float	*v;
 	float	s, ss, t, tt;
 	vec3_t	dir;
 	float	length;
@@ -396,17 +390,15 @@ void EmitSkyPolysMulti (msurface_t *fa)
 	glActiveTexture(GL_TEXTURE0_ARB);
 	glColor3f(1,1,1);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glBindTexture(GL_TEXTURE_2D,fa->texinfo->texture->gl_texturenum);
+	glBindTexture(GL_TEXTURE_2D, fa->texinfo->texture->gl_texturenum);
 
 	GL_EnableTMU(GL_TEXTURE1_ARB);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-	glBindTexture(GL_TEXTURE_2D,fa->texinfo->texture->gl_skynum);
+	glBindTexture(GL_TEXTURE_2D, fa->texinfo->texture->gl_skynum);
 
-	for (p=fa->polys ; p ; p=p->next, j++)
-	{
+	for (glpoly_t *p=fa->polys ; p ; p=p->next) {
 		glBegin (GL_POLYGON);
-		for (i=0,v=p->verts[0] ; i<p->numverts ; i++, v+=VERTEXSIZE)
-		{
+		for (i=0, v=p->verts[0] ; i<p->numverts ; i++, v+=VERTEXSIZE) {
 			VectorSubtract (v, r_origin, dir);
 			//VectorNormalize (dir);
 			dir[2] *= 6;	// flatten the sphere
@@ -475,26 +467,22 @@ int R_LoadSky (char *newname)
 	sprintf (name, "%s%s%s", dirname, skyname, suf[0]);
 
 	//find where the sky is
-	//some are in /env others /gfx/env
+	//some are in /env others /gfx/ernv
 	//some have skyname?? others skyname_??
 	skytex[0]=GL_LoadTexImage(name,false,false, gl_sincity.getBool());
-	if (skytex[0]==0)
-	{
+	if (skytex[0]==0) {
 		sprintf (dirname,"env/");
 		sprintf (name, "%s%s%s", dirname, skyname, suf[0]);
 		skytex[0]=GL_LoadTexImage(name,false,false, gl_sincity.getBool());
-		if (skytex[0]==0)
-		{
+		if (skytex[0]==0) {
 			sprintf (skyname,"%s_",skyname);
 			sprintf (name, "%s%s%s", dirname, skyname, suf[0]);
 			skytex[0]=GL_LoadTexImage(name,false,false, gl_sincity.getBool());
-			if (skytex[0]==0)
-			{
+			if (skytex[0]==0) {
 				sprintf (dirname,"gfx/env/");
 				sprintf (name, "%s%s%s", dirname, skyname, suf[0]);
 				skytex[0]=GL_LoadTexImage(name,false,false, gl_sincity.getBool());
-				if (skytex[0]==0)
-				{
+				if (skytex[0]==0) {
 					oldsky=true;
 					return false;
 				}
@@ -502,14 +490,11 @@ int R_LoadSky (char *newname)
 		}
 	}
 
-	for (i=1 ; i<6 ; i++)
-	{
-
+	for (i=1 ; i<6 ; i++) {
 		sprintf (name, "gfx/env/%s%s", skyname, suf[i]);
 
 		skytex[i]=GL_LoadTexImage(name,false,false,false);
-		if (skytex[i]==0)
-		{
+		if (skytex[i]==0) {
 			oldsky=true;
 			return false;
 		}
@@ -518,10 +503,8 @@ int R_LoadSky (char *newname)
 }
 
 // LordHavoc: added LoadSky console command
-void R_LoadSky_f (void)
-{
-	switch (CmdArgs::getArgCount())
-	{
+void R_LoadSky_f (void) {
+	switch (CmdArgs::getArgCount()) {
 	case 1:
 		if (skyname[0])
 			Con_Printf("current sky: %s\n", skyname);
@@ -529,8 +512,7 @@ void R_LoadSky_f (void)
 			Con_Printf("no skybox has been set\n");
 		break;
 	case 2:
-		if (R_LoadSky(CmdArgs::getArg(1)))
-		{
+		if (R_LoadSky(CmdArgs::getArg(1))) {
 			if (skyname[0])
 				Con_Printf("skybox set to %s\n", skyname);
 			else
@@ -546,8 +528,7 @@ void R_LoadSky_f (void)
 }
 
 // LordHavoc: added LoadSky console command
-void R_CurrentCoord_f (void)
-{
+void R_CurrentCoord_f (void) {
 	Con_Printf("Current Position: %f,%f,%f\n", r_refdef.vieworg[0], r_refdef.vieworg[1], r_refdef.vieworg[2]);
 }
 
@@ -557,28 +538,26 @@ R_DrawSkyBox
 ==============
 */
 
-void R_DrawSkyBox (void)
-{
+void R_DrawSkyBox (void) {
 	const float zero = 1.0/512;
 	const float one = 511.0/512;
 
 	glPushMatrix();
 	glLoadIdentity();
 
-	if (r_skydetail.getInt()>=2){
+	if (r_skydetail.getInt()>=2) {
 		glRotatef (-90,  1, 0, 0);	    // put Z going up
 		glRotatef (90,  0, 0, 1);	    // put Z going up
 		glRotatef (-r_refdef.viewangles[2],  1, 0, 0);
 		glRotatef (-r_refdef.viewangles[0],  0, 1, 0);
 		glRotatef (-r_refdef.viewangles[1],  0, 0, 1);
-	}else{
+	} else {
 		glRotatef (r_refdef.viewangles[2],  0, 0, 1);
 		glRotatef (r_refdef.viewangles[0],  1, 0, 0);
 		glRotatef (r_refdef.viewangles[1],  0, -1, 0);
 	}
 
-
-	if ((r_skydetail.getInt()==1)){
+	if ((r_skydetail.getInt()==1)) {
 		glDisable(GL_DEPTH_TEST);
 		glBindTexture(GL_TEXTURE_2D,skytex[skytexorder[0]]);
 		glBegin (GL_QUADS);
@@ -647,8 +626,7 @@ void R_DrawSkyBox (void)
 			glVertex3f(-16,16,-16);
 		glEnd ();
 		glEnable(GL_DEPTH_TEST);
-	}else
-	{
+	} else {
 		float modelorg[3];
 
 		R_Skybox = true;
@@ -676,14 +654,13 @@ void R_DrawSkyBox (void)
 R_DrawSkyChain
 =================
 */
-void R_DrawSkyChain (msurface_t *s)
-{
+void R_DrawSkyChain (msurface_t *s) {
 	msurface_t	*removelink;
+	msurface_t  *surf;
 	const float zero = 1.0/512 + realtime * 0.1;
 	const float one = 511.0/512 + realtime * 0.1;
 
-	if (((r_skydetail.getInt()!=0 && oldsky!=true)||r_skydetail.getInt()==2) && !R_Skybox)
-	{
+	if (((r_skydetail.getInt()!=0 && oldsky!=true)||r_skydetail.getInt()==2) && !R_Skybox) {
 		glpoly_t	*p;
 		float		*v;
 		int			i;
@@ -711,20 +688,18 @@ void R_DrawSkyChain (msurface_t *s)
 		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 		glEnable(GL_STENCIL_TEST);
 
-		while(s)
-		{
-			for (p=s->polys ; p ; p=p->next)
-			{
+		surf = s;
+		while(surf) {
+			for (p=surf->polys ; p ; p=p->next) {
 				glBegin (GL_POLYGON);
-				for (i=0,v=p->verts[0] ; i<p->numverts ; i++, v+=VERTEXSIZE)
-				{
+				for (i=0,v=p->verts[0] ; i<p->numverts ; i++, v+=VERTEXSIZE) {
 					glVertex3fv (v);
 				}
 				glEnd ();
 			}
-			removelink = s;
-			s = s->texturechain;
-			removelink->texturechain = NULL;
+			removelink = surf;
+			surf = surf->texturechain;
+			//removelink->texturechain = NULL;
 		}
 
 		glDisable(GL_STENCIL_TEST);
@@ -735,10 +710,8 @@ void R_DrawSkyChain (msurface_t *s)
 		return;
 	}
 
-
-	while (s)
-	{
-		EmitSkyPolysMulti (s);
+	while (s) {
+		EmitSkyPolysMulti(s);
 
 		removelink = s;
 		s = s->texturechain;
