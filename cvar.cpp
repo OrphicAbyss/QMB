@@ -237,13 +237,13 @@ void CVar::set(const char *value){
 			MemoryObj::ZFree(this->sValue);
 			this->sValue = (char *)MemoryObj::ZAlloc(Q_strlen(value)+1);
 			Q_strcpy(this->sValue, value);
-			// Convert the value to a float
-			this->parseValue();
+		}
+		// Convert the value to a float
+		this->parseValue();
 
-			if (this->server && changed) {
-				if (sv.active)
-					SV_BroadcastPrintf ("\"%s\" changed to \"%s\"\n", this->name, this->sValue);
-			}
+		if (this->server && changed) {
+			if (sv.active)
+				SV_BroadcastPrintf ("\"%s\" changed to \"%s\"\n", this->name, this->sValue);
 		}
 	}
 }
