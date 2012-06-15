@@ -24,14 +24,14 @@
 
 #include "quakedef.h"
 
-qboolean			isDedicated;
+qboolean isDedicated;
 
 int noconinput = 0;
 
 char *basedir = ".";
 char *cachedir = "/tmp";
 
-CVar sys_nostdout("sys_nostdout","0");
+CVar sys_nostdout("sys_nostdout", "0");
 
 // =======================================================================
 // General routines
@@ -45,27 +45,27 @@ CVar sys_nostdout("sys_nostdout","0");
  * @param fmt
  * @param ...
  */
-void Sys_Printf (const char *fmt, ...)
-{
-	va_list		argptr;
-	char		text[1024];
-	char		output[1024];
+void Sys_Printf(const char *fmt, ...) {
+	va_list argptr;
+	char text[1024];
+	char output[1024];
 
-	int			inputPos, outputPos, inputLen;
+	int inputPos, outputPos, inputLen;
 
-	va_start (argptr,fmt);
-	vsnprintf (text,1024,fmt,argptr);
-	va_end (argptr);
+	va_start(argptr, fmt);
+	vsnprintf(text, 1024, fmt, argptr);
+	va_end(argptr);
 
 	inputLen = strlen(text) + 1;
 	outputPos = 0;
-	for (inputPos=0;inputPos<inputLen;inputPos++){
-		if (text[inputPos] == '&' && text[inputPos+1] == 'r'){
+	for (inputPos = 0; inputPos < inputLen; inputPos++) {
+		if (text[inputPos] == '&' && text[inputPos + 1] == 'r') {
 			//skip the code
 			inputPos += 2;
-		} if (text[inputPos] == '&' && text[inputPos+1] == 'c'){
+		}
+		if (text[inputPos] == '&' && text[inputPos + 1] == 'c') {
 			inputPos += 4;
-		}else {
+		} else {
 			output[outputPos++] = text[inputPos];
 		}
 	}
@@ -73,29 +73,26 @@ void Sys_Printf (const char *fmt, ...)
 	fprintf(stdout, "%s", output);
 }
 
-void Sys_Quit (void)
-{
+void Sys_Quit(void) {
 	Host_Shutdown();
 	exit(0);
 }
 
-void Sys_Init(void)
-{
+void Sys_Init(void) {
 	Math_Init();
 }
 
-void Sys_Error (const char *error, ...)
-{
-    va_list     argptr;
-    char        string[1024];
+void Sys_Error(const char *error, ...) {
+	va_list argptr;
+	char string[1024];
 
-    va_start (argptr,error);
-    vsprintf (string,error,argptr);
-    va_end (argptr);
+	va_start(argptr, error);
+	vsprintf(string, error, argptr);
+	va_end(argptr);
 	fprintf(stderr, "Error: %s\n", string);
 
-	Host_Shutdown ();
-	exit (1);
+	Host_Shutdown();
+	exit(1);
 
 }
 
@@ -105,19 +102,18 @@ void Sys_Error (const char *error, ...)
 FILE IO
 
 ===============================================================================
-*/
+ */
 
 #define	MAX_HANDLES		10
-FILE	*sys_handles[MAX_HANDLES];
+FILE *sys_handles[MAX_HANDLES];
 
-int		findhandle (void)
-{
-	int		i;
+int findhandle(void) {
+	int i;
 
-	for (i=1 ; i<MAX_HANDLES ; i++)
+	for (i = 1; i < MAX_HANDLES; i++)
 		if (!sys_handles[i])
 			return i;
-	Sys_Error ("out of handles");
+	Sys_Error("out of handles");
 	return -1;
 }
 
@@ -125,30 +121,27 @@ int		findhandle (void)
 ================
 filelength
 ================
-*/
-int Sys_FileLength (FILE *f)
-{
-	int		pos;
-	int		end;
+ */
+int Sys_FileLength(FILE *f) {
+	int pos;
+	int end;
 
-	pos = ftell (f);
-	fseek (f, 0, SEEK_END);
-	end = ftell (f);
-	fseek (f, pos, SEEK_SET);
+	pos = ftell(f);
+	fseek(f, 0, SEEK_END);
+	end = ftell(f);
+	fseek(f, pos, SEEK_SET);
 
 	return end;
 }
 
-int Sys_FileOpenRead (char *path, int *hndl)
-{
-	FILE	*f;
-	int		i;
+int Sys_FileOpenRead(char *path, int *hndl) {
+	FILE *f;
+	int i;
 
-	i = findhandle ();
+	i = findhandle();
 
 	f = fopen(path, "rb");
-	if (!f)
-	{
+	if (!f) {
 		*hndl = -1;
 		return -1;
 	}
@@ -158,47 +151,43 @@ int Sys_FileOpenRead (char *path, int *hndl)
 	return Sys_FileLength(f);
 }
 
-int Sys_FileOpenWrite (char *path)
-{
-	FILE	*f;
-	int		i;
+int Sys_FileOpenWrite(char *path) {
+	FILE *f;
+	int i;
 
-	i = findhandle ();
+	i = findhandle();
 
 	f = fopen(path, "wb");
 	if (!f)
-		Sys_Error ("Error opening %s: %s", path,strerror(errno));
+		Sys_Error("Error opening %s: %s", path, strerror(errno));
 	sys_handles[i] = f;
 
 	return i;
 }
 
-void Sys_FileClose (int handle)
-{
-	if ( handle >= 0 ) {
-		fclose (sys_handles[handle]);
+void Sys_FileClose(int handle) {
+	if (handle >= 0) {
+		fclose(sys_handles[handle]);
 		sys_handles[handle] = NULL;
 	}
 }
 
-void Sys_FileSeek (int handle, int position)
-{
-	if ( handle >= 0 ) {
-		fseek (sys_handles[handle], position, SEEK_SET);
+void Sys_FileSeek(int handle, int position) {
+	if (handle >= 0) {
+		fseek(sys_handles[handle], position, SEEK_SET);
 	}
 }
 
-int Sys_FileRead (int handle, void *dst, int count)
-{
+int Sys_FileRead(int handle, void *dst, int count) {
 	char *data;
 	int size, done;
 
 	size = 0;
-	if ( handle >= 0 ) {
-		data = (char *)dst;
-		while ( count > 0 ) {
-			done = fread (data, 1, count, sys_handles[handle]);
-			if ( done == 0 ) {
+	if (handle >= 0) {
+		data = (char *) dst;
+		while (count > 0) {
+			done = fread(data, 1, count, sys_handles[handle]);
+			if (done == 0) {
 				break;
 			}
 			data += done;
@@ -210,18 +199,15 @@ int Sys_FileRead (int handle, void *dst, int count)
 
 }
 
-int Sys_FileWrite (int handle, void *src, int count)
-{
-	fwrite (src, 1, count, sys_handles[handle]);
+int Sys_FileWrite(int handle, void *src, int count) {
+	fwrite(src, 1, count, sys_handles[handle]);
 }
 
-int	Sys_FileTime (char *path)
-{
-	FILE	*f;
+int Sys_FileTime(char *path) {
+	FILE *f;
 
 	f = fopen(path, "rb");
-	if (f)
-	{
+	if (f) {
 		fclose(f);
 		return 1;
 	}
@@ -229,55 +215,51 @@ int	Sys_FileTime (char *path)
 	return -1;
 }
 
-void Sys_mkdir (char *path)
-{
+void Sys_mkdir(char *path) {
 #ifdef __WIN32__
-    mkdir (path);
+	mkdir(path);
 #else
-    mkdir (path, 0777);
+	mkdir(path, 0777);
 #endif
 }
 
-void Sys_DebugLog(char *file, char *fmt, ...)
-{
-    va_list argptr;
-    static char data[1024];
-    FILE *fp;
+void Sys_DebugLog(char *file, char *fmt, ...) {
+	va_list argptr;
+	static char data[1024];
+	FILE *fp;
 
-    va_start(argptr, fmt);
-    vsprintf(data, fmt, argptr);
-    va_end(argptr);
-    fp = fopen(file, "a");
-    fwrite(data, Q_strlen(data), 1, fp);
-    fclose(fp);
+	va_start(argptr, fmt);
+	vsprintf(data, fmt, argptr);
+	va_end(argptr);
+	fp = fopen(file, "a");
+	fwrite(data, Q_strlen(data), 1, fp);
+	fclose(fp);
 }
 
-double Sys_FloatTime (void)
-{
+double Sys_FloatTime(void) {
 #ifdef __WIN32__
 
 	static int starttime = 0;
 
-	if ( ! starttime )
+	if (!starttime)
 		starttime = clock();
 
-	return (clock()-starttime)*1.0/1024;
+	return (clock() - starttime)*1.0 / 1024;
 
 #else
 
-    struct timeval tp;
-    struct timezone tzp;
-    static int      secbase;
+	struct timeval tp;
+	struct timezone tzp;
+	static int secbase;
 
-    gettimeofday(&tp, &tzp);
+	gettimeofday(&tp, &tzp);
 
-    if (!secbase)
-    {
-        secbase = tp.tv_sec;
-        return tp.tv_usec/1000000.0;
-    }
+	if (!secbase) {
+		secbase = tp.tv_sec;
+		return tp.tv_usec / 1000000.0;
+	}
 
-    return (tp.tv_sec - secbase) + tp.tv_usec/1000000.0;
+	return (tp.tv_sec - secbase) +tp.tv_usec / 1000000.0;
 
 #endif
 }
@@ -285,7 +267,7 @@ double Sys_FloatTime (void)
 #ifdef WIN32
 #include <windows.h>
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	int rc;
 
 	rc = main(__argc, __argv);
@@ -294,9 +276,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 }
 #endif
 
-int main (int c, char **v)
-{
-	double		time, oldtime, newtime;
+int main(int c, char **v) {
+	double time, oldtime, newtime;
 	quakeparms_t parms;
 	extern int vcrFile;
 	extern int recording;
@@ -306,11 +287,11 @@ int main (int c, char **v)
 
 	value = COM_CheckParm("-mem");
 	if (value)
-		parms.memsize = (int) (Q_atof(com_argv[value+1]) * 1024 * 1024);
+		parms.memsize = (int) (Q_atof(com_argv[value + 1]) * 1024 * 1024);
 	else
-		parms.memsize = 16*1024*1024;
+		parms.memsize = 16 * 1024 * 1024;
 
-	parms.membase = malloc (parms.memsize);
+	parms.membase = malloc(parms.memsize);
 	parms.basedir = basedir;
 	parms.cachedir = cachedir;
 
@@ -322,29 +303,27 @@ int main (int c, char **v)
 	Host_Init(&parms);
 	CVar::registerCVar(&sys_nostdout);
 
-    oldtime = Sys_FloatTime () - 0.1;
-    while (1) {
-// find time spent rendering last frame
-        newtime = Sys_FloatTime ();
-        time = newtime - oldtime;
+	oldtime = Sys_FloatTime() - 0.1;
+	while (1) {
+		// find time spent rendering last frame
+		newtime = Sys_FloatTime();
+		time = newtime - oldtime;
 
-        if (cls.state == ca_dedicated)
-        {   // play vcrfiles at max speed
-            if (time < sys_ticrate.getFloat() && (vcrFile == -1 || recording) )
-            {
-                SDL_Delay (1);
-                continue;       // not time to run a server only tic yet
-            }
-            time = sys_ticrate.getFloat();
-        }
+		if (cls.state == ca_dedicated) { // play vcrfiles at max speed
+			if (time < sys_ticrate.getFloat() && (vcrFile == -1 || recording)) {
+				SDL_Delay(1);
+				continue; // not time to run a server only tic yet
+			}
+			time = sys_ticrate.getFloat();
+		}
 
-        if (time > sys_ticrate.getFloat()*2)
-            oldtime = newtime;
-        else
-            oldtime += time;
+		if (time > sys_ticrate.getFloat()*2)
+			oldtime = newtime;
+		else
+			oldtime += time;
 
-        Host_Frame (time);
-    }
+		Host_Frame(time);
+	}
 
 }
 
@@ -352,8 +331,7 @@ int main (int c, char **v)
 ================
 Sys_ConsoleInput
 ================
-*/
-char *Sys_ConsoleInput (void)
-{
-    return 0;
+ */
+char *Sys_ConsoleInput(void) {
+	return 0;
 }
