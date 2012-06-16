@@ -209,7 +209,6 @@ typedef struct
 
 #include "gl_model.h"
 
-#include "input.h"
 #include "world.h"
 #include "keys.h"
 #include "console.h"

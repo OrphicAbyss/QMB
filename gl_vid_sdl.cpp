@@ -3,6 +3,7 @@
 #include <GL/GLee.h>
 #include <SDL/SDL.h>
 #include "quakedef.h"
+#include "input.h"
 
 viddef_t vid; // global video state
 unsigned d_8to24table[256];
@@ -12,10 +13,6 @@ unsigned d_8to24table[256];
 #define    BASEHEIGHT   (600)
 
 static SDL_Surface *screen = NULL;
-
-static qboolean mouse_avail;
-static float mouse_x, mouse_y;
-static int mouse_oldbuttonstate = 0;
 
 // No support for option menus
 void (*vid_menudrawfn)(void) = NULL;
@@ -249,7 +246,7 @@ void VID_Init(unsigned char *palette) {
 	vid.direct = 0;
 
 	// Initialise the mouse
-	SDL_ShowCursor(0);
+	IN_HideMouse();
 
 	GL_Init();
 
@@ -396,27 +393,17 @@ void Sys_SendKeyEvents(void) {
 				break;
 
 			case SDL_MOUSEMOTION:
-				if ((event.motion.x != (vid.width / 2)) ||
-						(event.motion.y != (vid.height / 2))) {
-					mouse_x = event.motion.xrel * 10;
-					mouse_y = event.motion.yrel * 10;
-					if ((event.motion.x < ((vid.width / 2)-(vid.width / 4))) ||
-							(event.motion.x > ((vid.width / 2)+(vid.width / 4))) ||
-							(event.motion.y < ((vid.height / 2)-(vid.height / 4))) ||
-							(event.motion.y > ((vid.height / 2)+(vid.height / 4)))) {
-						SDL_WarpMouse(vid.width / 2, vid.height / 2);
-					}
-				}
+				IN_MouseEvent(event);
 				break;
 
 			case SDL_MOUSEBUTTONDOWN:
 			case SDL_MOUSEBUTTONUP:
-			{
-				Uint8 button = event.button.button;
-				Uint8 state = event.button.state;
+				{
+					Uint8 button = event.button.button;
+					Uint8 state = event.button.state;
 
-				Key_Event(K_MOUSE1 + button - 1, state);
-			}
+					Key_Event(K_MOUSE1 + button - 1, state);
+				}
 				break;
 
 			case SDL_QUIT:
@@ -428,49 +415,4 @@ void Sys_SendKeyEvents(void) {
 				break;
 		}
 	}
-}
-
-void IN_Init(void) {
-	if (COM_CheckParm("-nomouse"))
-		return;
-	mouse_x = mouse_y = 0.0;
-	mouse_avail = 1;
-}
-
-void IN_Shutdown(void) {
-	mouse_avail = 0;
-}
-
-void IN_Commands(void) {
-
-}
-
-void IN_Move(usercmd_t *cmd) {
-	if (!mouse_avail)
-		return;
-
-	mouse_x *= sensitivity.getFloat();
-	mouse_y *= sensitivity.getFloat();
-
-	if ((in_strafe.state & 1) || (lookstrafe.getBool() && in_mlook.getBool()))
-		cmd->sidemove += m_side.getFloat() * mouse_x;
-	else
-		cl.viewangles[YAW] -= m_yaw.getFloat() * mouse_x;
-
-	if (in_mlook.getBool())
-		V_StopPitchDrift();
-
-	if (in_mlook.getBool() && !(in_strafe.state & 1)) {
-		cl.viewangles[PITCH] += m_pitch.getFloat() * mouse_y;
-		if (cl.viewangles[PITCH] > 80)
-			cl.viewangles[PITCH] = 80;
-		if (cl.viewangles[PITCH] < -70)
-			cl.viewangles[PITCH] = -70;
-	} else {
-		if ((in_strafe.state & 1) && noclip_anglehack)
-			cmd->upmove -= m_forward.getFloat() * mouse_y;
-		else
-			cmd->forwardmove -= m_forward.getFloat() * mouse_y;
-	}
-	mouse_x = mouse_y = 0.0;
 }

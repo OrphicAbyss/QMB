@@ -17,7 +17,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+
 // input.h -- external (non-keyboard) input devices
+#include <SDL/SDL.h>
 
 void IN_Init(void);
 void IN_Shutdown(void);
@@ -29,7 +31,6 @@ void IN_ShowMouse(void);
 void IN_DeactivateMouse(void);
 void IN_HideMouse(void);
 void IN_ActivateMouse(void);
-void IN_RestoreOriginalMouseState	(void);
+void IN_RestoreOriginalMouseState(void);
 void IN_SetQuakeMouseState(void);
-void IN_MouseEvent	(int mstate);
-void IN_UpdateClipCursor(void);
+void IN_MouseEvent(SDL_Event event);
