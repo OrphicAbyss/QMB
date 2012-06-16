@@ -80,8 +80,7 @@ else
 endif #ifeq ($(TARGET_PLATFORM),windows)
 
 CXXINCS =  $(INCS)
-FLAGS = -W -DSDL -DGLQUAKE
-#-m32
+FLAGS = -W -DSDL -DGLQUAKE -m32
 #-DNDEBUG
 CXXFLAGS =  $(CXXINCS)
 CFLAGS =  $(INCS)

@@ -115,11 +115,6 @@ void checkGLError(const char *text) {
 	} while (1);
 }
 
-/*
-===============
-GL_Init
-===============
- */
 void GL_Init(void) {
 	extern char *ENGINE_EXTENSIONS;
 
@@ -159,11 +154,6 @@ void GL_Init(void) {
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
-/*
-=================
-GL_BeginRendering
-=================
- */
 void GL_BeginRendering(int *x, int *y, int *width, int *height) {
 	*x = 0;
 	*y = 0;
@@ -270,12 +260,6 @@ void VID_Init(unsigned char *palette) {
 void VID_Shutdown(void) {
 	SDL_Quit();
 }
-
-/*
-================
-Sys_SendKeyEvents
-================
- */
 
 void Sys_SendKeyEvents(void) {
 	SDL_Event event;

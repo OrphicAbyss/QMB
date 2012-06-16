@@ -192,13 +192,14 @@ typedef struct
 } entity_state_t;
 
 
+#include "cvar.h"
+#include "cmd.h"
+
 #include "wad.h"
 #include "draw.h"
-#include "cvar.h"
 #include "screen.h"
 #include "net.h"
 #include "protocol.h"
-#include "cmd.h"
 #include "sbar.h"
 #include "sound.h"
 #include "render.h"

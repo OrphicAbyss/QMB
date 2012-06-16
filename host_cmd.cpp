@@ -716,7 +716,9 @@ void Host_Name_f (void)
 		newName = CmdArgs::getArg(1);
 	else
 		newName = CmdArgs::Cmd_Args();
-	newName[15] = 0;
+
+	if (Q_strlen(newName) > 15)
+		newName[15] = 0;
 
 	if (CmdArgs::getSource() == CmdArgs::COMMAND)	{
 		if (Q_strcmp(cl_name.getString(), newName) == 0)
@@ -747,59 +749,6 @@ void Host_Version_f (void)
 	Con_Printf ("Version %4.2f\n", VERSION);
 	Con_Printf ("Exe: "__TIME__" "__DATE__"\n");
 }
-
-#ifdef IDGODS
-void Host_Please_f (void)
-{
-	client_t *cl;
-	int			j;
-
-	if (CmdArgs::getSource() != CmdArgs::COMMAND)
-		return;
-
-	if ((CmdArgs::getArgCount () == 3) && Q_strcmp(CmdArgs::getArg(1), "#") == 0)
-	{
-		j = Q_atof(CmdArgs::getArg(2)) - 1;
-		if (j < 0 || j >= svs.maxclients)
-			return;
-		if (!svs.clients[j].active)
-			return;
-		cl = &svs.clients[j];
-		if (cl->privileged)
-		{
-			cl->privileged = false;
-			cl->edict->v.flags = (int)cl->edict->v.flags & ~(FL_GODMODE|FL_NOTARGET);
-			cl->edict->v.movetype = MOVETYPE_WALK;
-			noclip_anglehack = false;
-		}
-		else
-			cl->privileged = true;
-	}
-
-	if (CmdArgs::getArgCount () != 2)
-		return;
-
-	for (j=0, cl = svs.clients ; j<svs.maxclients ; j++, cl++)
-	{
-		if (!cl->active)
-			continue;
-		if (Q_strcasecmp(cl->name, CmdArgs::getArg(1)) == 0)
-		{
-			if (cl->privileged)
-			{
-				cl->privileged = false;
-				cl->edict->v.flags = (int)cl->edict->v.flags & ~(FL_GODMODE|FL_NOTARGET);
-				cl->edict->v.movetype = MOVETYPE_WALK;
-				noclip_anglehack = false;
-			}
-			else
-				cl->privileged = true;
-			break;
-		}
-	}
-}
-#endif
-
 
 void Host_Say(qboolean teamonly)
 {
