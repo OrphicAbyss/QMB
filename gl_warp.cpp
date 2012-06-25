@@ -774,5 +774,5 @@ void R_InitSky (texture_t *mt)
 		}
 
 	sprintf(name,"%salpha",mt->name);
-	mt->gl_skynum = GL_LoadTexture (name, 128, 128, (byte *)&trans[0], false, true, 4, false);
+	mt->gl_skynum = GL_LoadTexture (name, 128, 128, (byte *)&trans[0], false, false, 4, false);
 }

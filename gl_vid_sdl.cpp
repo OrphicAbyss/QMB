@@ -91,10 +91,6 @@ void CheckCombineExtension(void) {
 		Con_Printf("&c840TruForm (n-patches) extension found&r.\n");
 		gl_n_patches = true;
 	}
-
-	gl_lightmap_format = GL_BGRA;
-	gl_solid_format = GL_RGBA;
-	gl_alpha_format = GL_RGBA;
 }
 
 /**

@@ -2,6 +2,7 @@
 #define	CVAR_CPP_H
 
 class CVar {
+private:
 	const char *name;
 	const char *originalValue;
 	char *sValue;
@@ -11,7 +12,6 @@ class CVar {
 	int	iValue;
 	bool bValue;
 	bool registered;
-private:
 	/**
 	 * Initialises the cvar data (called by the constructors).
 	 *

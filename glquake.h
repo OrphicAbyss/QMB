@@ -34,13 +34,10 @@ extern	int		texture_extension_number;
 extern	int		texture_mode;
 extern	int		gl_textureunits;	//qmb :multitexture stuff
 
-void	GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap, qboolean alpha, qboolean grayscale);
-int		GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean alpha);
-int		GL_LoadTexture (char *identifier, int width, int height, byte *data, qboolean mipmap, qboolean alpha, int bytesperpixel, qboolean grayscale);
+void	GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap, qboolean grayscale);
+int		GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean fullbright);
+int		GL_LoadTexture (const char *identifier, int width, int height, byte *data, qboolean mipmap, qboolean fullbright, int bytesperpixel, qboolean grayscale);
 int		GL_LoadTexImage (char *filename, qboolean complain, qboolean mipmap, qboolean grayscale);
-int		GL_FindTexture (char *identifier);
-
-extern	int glx, gly, glwidth, glheight;
 
 #define BACKFACE_EPSILON	0.01
 
@@ -128,7 +125,6 @@ extern	CVar	sv_stepheight;
 extern	CVar	sv_jumpstep;
 
 extern	int		gl_lightmap_format;
-extern	int		gl_solid_format;
 extern	int		gl_alpha_format;
 
 extern	const char *gl_vendor;

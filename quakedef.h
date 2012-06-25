@@ -19,6 +19,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // quakedef.h -- primary header for client
 
+#ifndef __QUAKE_DEF__
+#define __QUAKE_DEF__ 1
+
 #define	QUAKE_GAME			// as opposed to utilities
 
 #undef VERSION
@@ -259,11 +262,6 @@ extern	byte		*host_colormap;
 extern	int			host_framecount;	// incremented every frame, never reset
 extern	double		realtime;			// not bounded in any way, changed at
 
-//qmb :bsp stuff / coloured lighting
-// CSL - epca@powerup.com.au
-extern int bspextensions;
-// CSL
-
 void Host_ClearMemory	(void);
 void Host_ServerFrame	(void);
 void Host_InitCommands (void);
@@ -276,8 +274,6 @@ void Host_Quit_f		(void);
 void Host_ClientCommands(const char *fmt, ...);
 void Host_ShutdownServer(qboolean crash);
 
-extern qboolean		msg_suppress_1;		// suppresses resolution and cache size console output
-										//  an fullscreen DIB focus gain/loss
 extern int			current_skill;		// skill level for currently loaded level (in case
 										//  the user changes the cvar while the level is
 										//  running, this reflects the level actually in use)
@@ -296,3 +292,4 @@ void Chase_Update (void);
 //JHL:QMB;
 extern	int	qmb_mod;
 
+#endif

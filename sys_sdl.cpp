@@ -117,10 +117,8 @@ int findhandle(void) {
 	return -1;
 }
 
-/*
-================
-filelength
-================
+/**
+ * Returns the length of a file
  */
 int Sys_FileLength(FILE *f) {
 	int pos;

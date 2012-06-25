@@ -156,14 +156,14 @@ int COM_CheckParm (const char *parm);
 void COM_Init (char *path);
 void COM_InitArgv (int argc, char **argv);
 
-char *COM_SkipPath (char *pathname);
-void COM_StripExtension (char *in, char *out);
-void COM_FileBase (const char *in, char *out);
-void COM_DefaultExtension (char *path, const char *extension);
+char *COM_SkipPath(char *pathname);
+void COM_MakeFilenameValid(char *data);
+void COM_StripExtension(char *in, char *out);
+void COM_FileBase(const char *in, char *out);
+void COM_DefaultExtension(char *path, const char *extension);
 
 char	*va(const char *format, ...);
 // does a varargs printf into a temp buffer
-
 
 //============================================================================
 

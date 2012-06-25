@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "mathlib.h"
+#include "Texture.h"
 
 #include <GL/glu.h>
 
@@ -32,14 +33,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern int detailtexture;
 extern int detailtexture2;
 extern int quadtexture;
-byte *jpeg_rgba;
 
 CVar gl_nobind("gl_nobind", "0");
 CVar gl_max_size("gl_max_size", "4096");
 CVar gl_quick_texture_reload("gl_quick_texture_reload", "1", true);
 CVar gl_sincity("gl_sincity", "0", true);
 
-byte *draw_chars; // 8*8 graphic characters
 qpic_t *draw_disc;
 qpic_t *draw_backtile;
 
@@ -55,39 +54,14 @@ byte conback_buffer[sizeof (qpic_t) + sizeof (glpic_t)];
 qpic_t *conback = (qpic_t *) & conback_buffer;
 
 int gl_lightmap_format = GL_BGRA;
-int gl_solid_format = GL_RGB;
 int gl_alpha_format = GL_RGBA;
 
 int gl_filter_min = GL_LINEAR_MIPMAP_LINEAR;
 int gl_filter_max = GL_LINEAR;
 
-typedef struct {
-	int texnum;
-	char identifier[64];
-	int width, height;
-	qboolean mipmap;
-
-	// Tomaz || TGA Begin
-	int bytesperpixel;
-	int lhcsum;
-	// Tomaz || TGA End
-} gltexture_t;
-
-#define	MAX_GLTEXTURES	1024
-gltexture_t gltextures[MAX_GLTEXTURES];
-int numgltextures;
-
-int GL_LoadTexImage(char* filename, qboolean complain, qboolean mipmap, qboolean grayscale);
-
-// Tomaz || TGA Begin
-int image_width;
-int image_height;
-// Tomaz end
-
 //=============================================================================
 
 /* Support Routines */
-
 typedef struct cachepic_s {
 	char name[MAX_QPATH];
 	qpic_t pic;
@@ -104,35 +78,7 @@ int pic_texels;
 int pic_count;
 
 qpic_t *Draw_PicFromWad(const char *name) {
-	qpic_t *p;
-	glpic_t *gl;
-	int texnum;
-	char texname[128];
-
-	p = (qpic_t *) W_GetLumpName(name);
-	gl = (glpic_t *) p->data;
-
-	sprintf(texname, "textures/wad/%s", name);
-	texnum = GL_LoadTexImage(&texname[0], false, false, gl_sincity.getBool());
-	if (!texnum) {
-		sprintf(texname, "gfx/%s", name);
-		GL_LoadTexImage(&texname[0], false, false, gl_sincity.getBool());
-	}
-
-	if (texnum) {
-		p->height = image_height;
-		p->width = image_width;
-		gl->texnum = texnum;
-	} else {
-		gl->texnum = GL_LoadTexture("", p->width, p->height, p->data, false, true, 1, gl_sincity.getBool());
-	}
-
-	gl->sl = 0;
-	gl->sh = 1;
-	gl->tl = 0;
-	gl->th = 1;
-
-	return p;
+	return Draw_PicFromWadXY(name,0,0);
 }
 
 qpic_t *Draw_PicFromWadXY(const char *name, int height, int width) {
@@ -156,7 +102,7 @@ qpic_t *Draw_PicFromWadXY(const char *name, int height, int width) {
 		p->width = width;
 		gl->texnum = texnum;
 	} else {
-		gl->texnum = GL_LoadTexture("", p->width, p->height, p->data, false, true, 1, gl_sincity.getBool());
+		gl->texnum = GL_LoadTexture("", p->width, p->height, p->data, false, false, true, gl_sincity.getBool());
 	}
 
 	gl->sl = 0;
@@ -205,7 +151,7 @@ qpic_t *Draw_CachePic(const char *path) {
 	pic->pic.height = dat->height;
 
 	gl = (glpic_t *) pic->pic.data;
-	gl->texnum = GL_LoadTexture("", dat->width, dat->height, dat->data, false, true, 1, gl_sincity.getBool());
+	gl->texnum = GL_LoadTexture("", dat->width, dat->height, dat->data, false, false, 1, gl_sincity.getBool());
 	gl->sl = 0;
 	gl->sh = 1;
 	gl->tl = 0;
@@ -216,7 +162,8 @@ qpic_t *Draw_CachePic(const char *path) {
 
 typedef struct {
 	char *name;
-	int minimize, maximize;
+	int minimize;
+	int maximize;
 } glmode_t;
 
 glmode_t modes[] = {
@@ -235,7 +182,6 @@ Draw_TextureMode_f
  */
 void Draw_TextureMode_f(void) {
 	int i;
-	gltexture_t *glt;
 
 	if (CmdArgs::getArgCount() == 1) {
 		for (i = 0; i < 6; i++)
@@ -260,13 +206,7 @@ void Draw_TextureMode_f(void) {
 	gl_filter_max = modes[i].maximize;
 
 	// change all the existing mipmap texture objects
-	for (i = 0, glt = gltextures; i < numgltextures; i++, glt++) {
-		if (glt->mipmap) {
-			glBindTexture(GL_TEXTURE_2D, glt->texnum);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
-		}
-	}
+	TextureManager::resetTextureModes();
 }
 
 /*
@@ -288,30 +228,20 @@ void Draw_Init(void) {
 
 	Cmd::addCmd("gl_texturemode", &Draw_TextureMode_f);
 
-	// load the console background and the charset
-	// by hand, because we need to write the version
-	// string into the background before turning
-	// it into a texture
-	//TGA: begin
 	char_texture = GL_LoadTexImage("gfx/charset", false, true, gl_sincity.getBool());
-	if (char_texture == 0)// did not find a matching TGA...
-	{
-		draw_chars = (byte *) W_GetLumpName("conchars");
+	if (char_texture == 0) {
+		byte *draw_chars = (byte *)W_GetLumpName("conchars");
 		for (i = 0; i < 256 * 64; i++)
 			if (draw_chars[i] == 0)
 				draw_chars[i] = 255; // proper transparent color
 
 		// now turn them into textures
-
 		char_texture = GL_LoadTexture("charset", 128, 128, draw_chars, false, true, 1, false);
 	}
-	//TGA: end
 
 	gl = (glpic_t *) conback->data;
-	//TGA: begin
 	gl->texnum = GL_LoadTexImage("gfx/conback", false, true, gl_sincity.getBool());
-	if (gl->texnum == 0)// did not find a matching TGA...
-	{
+	if (gl->texnum == 0) {
 		start = Hunk_LowMark();
 
 		cb = (qpic_t *) COM_LoadTempFile("gfx/conback.lmp");
@@ -323,15 +253,11 @@ void Draw_Init(void) {
 		conback->height = cb->height;
 		ncdata = cb->data;
 
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
 		gl->texnum = GL_LoadTexture("gfx/conback", conback->width, conback->height, ncdata, false, false, 1, false);
 
 		// free loaded console
 		Hunk_FreeToLowMark(start);
 	}
-	//TGA: end
 	gl->sl = 0;
 	gl->sh = 1;
 	gl->tl = 0;
@@ -1135,7 +1061,6 @@ void Image_Resample(const void *indata, int inwidth, int inheight, int indepth, 
 }
 
 // in can be the same as out
-
 void Image_MipReduce(const byte *in, byte *out, int *width, int *height, int *depth, int destwidth, int destheight, int destdepth, int bytesperpixel) {
 	int x, y, nextrow;
 	if (*depth != 1 || destdepth != 1)
@@ -1231,25 +1156,6 @@ void Image_MipReduce(const byte *in, byte *out, int *width, int *height, int *de
 	}
 }
 
-//====================================================================
-
-/*
-================
-GL_FindTexture
-================
- */
-int GL_FindTexture(char *identifier) {
-	int i;
-	gltexture_t *glt;
-
-	for (i = 0, glt = gltextures; i < numgltextures; i++, glt++) {
-		if (!Q_strcmp(identifier, glt->identifier))
-			return gltextures[i].texnum;
-	}
-
-	return -1;
-}
-
 /*
 ===============
 GL_Upload32
@@ -1258,7 +1164,6 @@ first converts strange sized textures
 to ones in the form 2^n*2^m where n is the height and m is the width
 ===============
  */
-
 static unsigned char tobig[] = {255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 255, 255};
 
 __inline unsigned RGBAtoGrayscale(unsigned rgba) {
@@ -1286,12 +1191,11 @@ __inline unsigned RGBAtoGrayscale(unsigned rgba) {
 	return output;
 }
 
-void GL_Upload32(unsigned int *data, int width, int height, qboolean mipmap, qboolean alpha, qboolean grayscale) {
+void GL_Upload32(unsigned int *data, int width, int height, qboolean mipmap, qboolean grayscale) {
 	static unsigned temp_buffer[512 * 512];
 	int samples;
 	unsigned *scaled;
 	int scaled_width, scaled_height;
-	int i, size;
 
 	if (gl_texture_non_power_of_two) {
 		scaled_width = width;
@@ -1309,7 +1213,7 @@ void GL_Upload32(unsigned int *data, int width, int height, qboolean mipmap, qbo
 		scaled_height = min(scaled_height, gl_max_size.getInt()); //make sure its not bigger than the max size
 	}
 
-	samples = alpha ? gl_alpha_format : gl_solid_format; //internal format
+	samples = gl_alpha_format; //internal format
 
 	if (scaled_width * scaled_height < 512 * 512) //see if we can use our buffer
 		scaled = &temp_buffer[0];
@@ -1322,37 +1226,24 @@ void GL_Upload32(unsigned int *data, int width, int height, qboolean mipmap, qbo
 	}
 
 
-	if (scaled_width == width && scaled_height == height) //if we dont need to scale
-	{
+	if (scaled_width == width && scaled_height == height) {
 		//not being scaled
 		if (grayscale && gl_sincity.getBool()) {
 			//go through data and convert
-			size = width * height;
-			for (i = 0; i < size; i++) {
+			int size = width * height;
+			for (int i = 0; i < size; i++) {
 				data[i] = RGBAtoGrayscale(data[i]);
 			}
 		}
-		if (!mipmap) //and we dont need to mipmap
-		{ //upload directly
+		if (!mipmap) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		} else { //else build mipmaps for it
 			if (gl_sgis_mipmap) {
 				glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-				glTexImage2D(GL_TEXTURE_2D, 0, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 				glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
 			} else {
-				/*
-				int depth = 1;
-				int mip = 0;
-
-				//upload first without mipmapping
-				glTexImage2D (GL_TEXTURE_2D, mip++, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-				while (scaled_width>1 || scaled_height>1){
-					Image_MipReduce(scaled, scaled, &scaled_width, &scaled_height, &depth, 1, 1, 1, 4);
-					glTexImage2D (GL_TEXTURE_2D, mip++, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-				}*/
-				gluBuild2DMipmaps(GL_TEXTURE_2D, samples, scaled_width, scaled_height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+				gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, scaled_width, scaled_height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 			}
 		}
 	} else { //if we need to scale
@@ -1364,8 +1255,8 @@ void GL_Upload32(unsigned int *data, int width, int height, qboolean mipmap, qbo
 		//was scaled
 		if (grayscale && gl_sincity.getBool()) {
 			//go through data and convert
-			size = scaled_width * scaled_height;
-			for (i = 0; i < size; i++) {
+			int size = scaled_width * scaled_height;
+			for (int i = 0; i < size; i++) {
 				scaled[i] = RGBAtoGrayscale(scaled[i]);
 			}
 		}
@@ -1398,53 +1289,36 @@ void GL_Upload32(unsigned int *data, int width, int height, qboolean mipmap, qbo
 GL_Upload8
 ===============
  */
-int GL_Upload8(byte *data, int width, int height, qboolean mipmap, qboolean alpha) {
+int GL_Upload8(byte *data, int width, int height, qboolean mipmap, qboolean fullbright) {
 	static unsigned temp_buffer[512 * 256];
 	unsigned *trans;
-	int i, s;
-	int p;
-
-	s = width*height;
-
+	
+	int s = width*height;
 	if (s < 512 * 256) {
 		trans = &temp_buffer[0];
-		Q_memset(trans, 0, 512 * 256 * sizeof (unsigned));
+		//Q_memset(trans, 0, 512 * 256 * sizeof (unsigned));
 	} else {
 		trans = (unsigned *) malloc(s * sizeof (unsigned));
 		Con_SafeDPrintf("&c500GL_Upload8:&r Needed Dynamic Buffer for 8bit to 24bit texture convert...\n");
 	}
 	// if there are no transparent pixels, make it a 3 component (ie: RGB not RGBA)
 	// texture even if it was specified as otherwise
-	if (alpha == 2) {
-		// when alpha 2 we are checking to see if it is fullbright
-		// this is a fullbright mask, so make all non-fullbright
-		// colors transparent
-		for (i = 0; i < s; i++) {
-			p = data[i];
+	if (fullbright) {
+		// this is a fullbright mask, so make all non-fullbright colors transparent
+		bool hasFullbright = false;
+		for (int i = 0; i < s; i++) {
+			int p = data[i];
 			if (p < 224) {
 				trans[i] = d_8to24table[255]; // transparent
 			} else {
 				trans[i] = d_8to24table[p]; // fullbright
-				alpha = 1; //found a fullbright texture, need to tell upload32 that this texture will have alpha
+				hasFullbright = true;
 			}
 		}
-		//if alpha is still == 2 then no fullbright texture was found
-		if (alpha == 2) {
+		if (!hasFullbright)
 			return false;
-		}
-		alpha = true;
-	} else if (alpha) {
-		alpha = false;
-		for (i = 0; i < s; i++) {
-			p = data[i];
-			if (p == 255)
-				alpha = true;
-			trans[i] = d_8to24table[p];
-		}
 	} else {
-		//if (s&3)
-		//	Sys_Error ("GL_Upload8: s&3");
-		for (i = 0; i < s; i += 4) {
+		for (int i = 0; i < s; i += 4) {
 			if (gl_sincity.getBool()) {
 				trans[i] = RGBAtoGrayscale(d_8to24table[data[i]]);
 				trans[i + 1] = RGBAtoGrayscale(d_8to24table[data[i + 1]]);
@@ -1459,7 +1333,7 @@ int GL_Upload8(byte *data, int width, int height, qboolean mipmap, qboolean alph
 		}
 	}
 
-	GL_Upload32(trans, width, height, mipmap, alpha, false);
+	GL_Upload32(trans, width, height, mipmap, false);
 
 	if (trans != &temp_buffer[0])
 		free(trans);
@@ -1467,180 +1341,73 @@ int GL_Upload8(byte *data, int width, int height, qboolean mipmap, qboolean alph
 	return true;
 }
 
-/*
-================
-GL_LoadTexture
-================
- */
-// Tomaz || TGA Begin
-int lhcsumtable[256];
-
-int GL_LoadTexture(char *identifier, int width, int height, byte *data, qboolean mipmap, qboolean alpha, int bytesperpixel, qboolean grayscale) {
-	int i, s, lhcsum, fullbright;
-	gltexture_t *glt;
-
-	// occurances. well this isn't exactly a checksum, it's better than that but
-	// not following any standards.
-	lhcsum = 0;
-	s = width * height*bytesperpixel;
-	for (i = 0; i < 256; i++) lhcsumtable[i] = i + 1;
-	for (i = 0; i < s; i++) lhcsum += (lhcsumtable[data[i] & 255]++);
-
-	// see if the texture is allready present
-	if (identifier[0]) {
-		for (i = 0, glt = gltextures; i < numgltextures; i++, glt++) {
-			if (!Q_strcmp(identifier, glt->identifier)) {
-				if (lhcsum != glt->lhcsum || width != glt->width || height != glt->height) {
-					Con_DPrintf("GL_LoadTexture: cache mismatch\n");
-					goto GL_LoadTexture_setup;
-				}
-				return glt->texnum;
-			}
+Texture *GL_LoadTexture(Texture *t) {
+	// See if the texture has already been loaded
+	t->calculateHash();
+	Texture *found = TextureManager::findTexture(t);
+	if (found != NULL) {
+		if (found->isMissMatch(t)) {
+			Con_DPrintf("GL_LoadTexture: cache mismatch\n");
+			TextureManager::removeTexture(found);
+			delete found;
+		} else {
+			delete t;
+			return found;
 		}
 	}
-	// whoever at id or threewave must've been half asleep...
-	glt = &gltextures[numgltextures++];
-
-	Q_strcpy(glt->identifier, identifier);
-	glt->texnum = texture_extension_number++;
-
-GL_LoadTexture_setup:
-	glt->lhcsum = lhcsum;
-	glt->width = width;
-	glt->height = height;
-	glt->mipmap = mipmap;
-	glt->bytesperpixel = bytesperpixel;
-
+	
+	t->textureId = texture_extension_number++;
+	
 	if (!isDedicated) {
-		glBindTexture(GL_TEXTURE_2D, glt->texnum);
-
-		if (bytesperpixel == 1)
-			fullbright = GL_Upload8(data, width, height, mipmap, alpha);
-		else if (bytesperpixel == 4)
-			GL_Upload32((unsigned int *) data, width, height, mipmap, true, grayscale);
-		else
-			Sys_Error("GL_LoadTexture: unknown bytesperpixel\n");
+		glBindTexture(GL_TEXTURE_2D, t->textureId);
+		
+		t->upload();
 	}
-
-	//if there wasnt a fullbright texture to load
-	if ((alpha == 2) && (fullbright == false)) {
-		numgltextures--;
-		texture_extension_number--;
-		glt->texnum = 0;
-		return 0;
-	}
-
-	return glt->texnum;
+	
+	TextureManager::addTexture(t);
+	return t;
 }
-// Tomaz || TGA End
 
-/****************************************/
+int GL_LoadTexture(const char *identifier, int width, int height, byte *data, qboolean mipmap, qboolean fullbright, int bytesperpixel, qboolean grayscale) {
+	if (fullbright)
+		return 0;
 
-extern byte *LoadPCX(FILE *f);
-extern byte *LoadTGA(FILE *f, char *name, int filesize);
-extern byte *LoadJPG(FILE *f);
-extern byte *LoadPNG(FILE *f, char * name, int filesize);
-extern char *COM_FileExtension(char *in);
-
-byte* loadimagepixels(char* filename, qboolean complain) {
-	FILE *f;
-	//	char	*data;
-	char basename[128], name[128];
-	char *c;
-	int filesize = 0;
-
-	COM_StripExtension(filename, basename); // strip the extension to allow PNG, JPG, TGA and PCX
-
-	for (c = basename; *c; c++)
-		if (*c == '*')
-			*c = '#';
-
-#if 0
-	char *filefound[8];
-	byte *output = 0;
-	int found = COM_MultipleSearch(va("%s.*", basename), filefound, 8, false);
-
-	for (int i = 0; i < found; i++) {
-		if (output == 0) {
-			if (Q_strcmp(COM_FileExtension(filefound[i]), "png") == 0) {
-				COM_FOpenFile(filefound[i], &f);
-				if (f)
-					output = LoadPNG(f, filefound[i], 0);
-			}
-			if (Q_strcmp(COM_FileExtension(filefound[i]), "tga") == 0) {
-				COM_FOpenFile(filefound[i], &f);
-				if (f)
-					output = LoadTGA(f, filefound[i], 0);
-			}
-			if (Q_strcmp(COM_FileExtension(filefound[i]), "jpg") == 0) {
-				COM_FOpenFile(filefound[i], &f);
-				if (f)
-					output = LoadJPG(f);
-
-			}
-			if (Q_strcmp(COM_FileExtension(filefound[i]), "pcx") == 0) {
-				COM_FOpenFile(filefound[i], &f);
-				if (f)
-					output = LoadPCX(f);
-
-			}
-		}
-		MemoryObj::ZFree(filefound[i]);
-	}
-
-	if (output != 0) {
-		return output;
-	}
-
-#else
-
-	//old way
-	//png loading
-	sprintf(name, "%s.png", basename);
-	filesize = COM_FOpenFile(name, &f);
-	if (f)
-		return LoadPNG(f, basename, filesize);
-
-	//tga loading
-	sprintf(name, "%s.tga", basename);
-	filesize = COM_FOpenFile(name, &f);
-	if (f)
-		return LoadTGA(f, basename, filesize);
-
-	//jpg loading
-	sprintf(name, "%s.jpg", basename);
-	filesize = COM_FOpenFile(name, &f);
-	if (f)
-		return LoadJPG(f);
-
-	//pcx loading
-	sprintf(name, "%s.pcx", basename);
-	filesize = COM_FOpenFile(name, &f);
-	if (f)
-		return LoadPCX(f);
-#endif
-
-	if (complain)
-		Con_Printf("Couldn't load %s with extension .png, .tga, .jpg or .pcx\n", filename);
-
-	return NULL;
+	Texture *t = new Texture(identifier);
+	t->data = data;
+	t->height = height;
+	t->width = width;
+	t->bytesPerPixel = bytesperpixel;
+	t->mipmap = mipmap;
+	t->grayscale = grayscale;
+	
+	t = GL_LoadTexture(t);
+	
+	return t->textureId;
 }
 
 int GL_LoadTexImage(char* filename, qboolean complain, qboolean mipmap, qboolean grayscale) {
-	int texnum;
-	byte *data;
+	Texture *t;
 
 	if (gl_quick_texture_reload.getBool()) {
-		texnum = GL_FindTexture(filename);
-		if (-1 != texnum)
-			return texnum;
+		t = TextureManager::findTexture(filename);
+		if (t != NULL)
+			return t->textureId;
 	}
 
-	data = loadimagepixels(filename, complain);
-	if (!data)
+	t = TextureManager::LoadFile(filename, complain);
+	
+	if (!t)
 		return 0;
-	texnum = GL_LoadTexture(filename, image_width, image_height, data, mipmap, true, 4, grayscale);
-	free(data);
-	return texnum;
+	
+	if (!t->data) {
+		delete t;
+		return 0;
+	}
+	
+	t->mipmap = mipmap;
+	t->bytesPerPixel = 4;
+	t->grayscale = grayscale;
+	
+	t = GL_LoadTexture(t);
+	return t->textureId;
 }
-// Tomaz || TGA End

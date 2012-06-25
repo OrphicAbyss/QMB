@@ -74,11 +74,6 @@ CVar show_fps("show_fps", "1", true); // set for running times - muff
 
 int fps_count;
 
-// CSL - epca@powerup.com.au
-// Use bspextensions to determine changes in format to bsp files
-int bspextensions = 0;
-// CSL
-
 /*
 ================
 Host_EndGame

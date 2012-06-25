@@ -19,10 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 #include "quakedef.h"
+#include "Texture.h"
 #include <png.h>
-
-extern int image_width;
-extern int image_height;
 
 typedef struct png_s { // TPng = class(TGraphic)
 	char *tmpBuf;
@@ -54,7 +52,6 @@ unsigned char* pngbytes;
 
 void InitializeDemData() {
 	long* cvaluep; //ub
-	long y;
 
 	// Initialize Data and RowPtrs
 	if (my_png->Data) {
@@ -74,7 +71,7 @@ void InitializeDemData() {
 
 	if ((my_png->Data) && (my_png->FRowPtrs)) {
 		cvaluep = (long*) my_png->FRowPtrs;
-		for (y = 0; y < my_png->Height; y++) {
+		for (unsigned int y = 0; y < my_png->Height; y++) {
 			cvaluep[y] = (long) my_png->Data + (y * (long) my_png->FRowBytes); //DL Added 08/07/2000
 		}
 	}
@@ -116,13 +113,8 @@ void PNGAPI fReadData(png_structp png, png_bytep data, png_size_t length) { // c
 	for (i = 0; i < length; i++)
 		data[i] = my_png->tmpBuf[my_png->tmpi++]; // give pnglib a some more bytes
 }
-//_____________________________________________________________________________
 
-extern int filelength(FILE *f);
-
-//Tei png version, ripped and adapted from sul_png.c from Quake2max
-
-byte * LoadPNG(FILE *f, char * name, int filesize) {
+void LoadPNG(FILE *f, char *filename, Texture *tex) {
 	png_structp png;
 	png_infop pnginfo;
 	byte ioBuffer[8192];
@@ -130,28 +122,29 @@ byte * LoadPNG(FILE *f, char * name, int filesize) {
 	byte *raw;
 	byte *imagedata;
 
+	int filesize = Sys_FileLength(f);
 	raw = (byte *) malloc(filesize + 1);
 
 	fread(raw, 1, filesize, f);
 	fclose(f);
 
 	if (!raw) {
-		Con_Printf("Bad png file %s\n", name);
-		return 0;
+		Con_Printf("Bad png file %s\n", filename);
+		return;
 	}
 
 	if (png_sig_cmp(raw, 0, 4))
-		return 0;
+		return;
 
 	png = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
 	if (!png)
-		return 0;
+		return;
 
 	pnginfo = png_create_info_struct(png);
 
 	if (!pnginfo) {
 		png_destroy_read_struct(&png, &pnginfo, 0);
-		return 0;
+		return;
 	}
 	png_set_sig_bytes(png, 0/*sizeof( sig )*/);
 
@@ -203,27 +196,17 @@ byte * LoadPNG(FILE *f, char * name, int filesize) {
 
 	png_destroy_read_struct(&png, &pnginfo, 0);
 
-	//only load 32 bit by now...
-   //Fix code BorisU
-   //if (my_png->BitDepth == 8 &&  !(my_png->ColorType  & PNG_COLOR_MASK_ALPHA) )
-     // png_set_filler(png, 255, PNG_FILLER_AFTER);
-   //Fix code BorisU
-
 	if (my_png->BitDepth == 8) {
-		image_width = my_png->Width;
-		image_height = my_png->Height;
-		imagedata = (byte *) my_png->Data;
+		tex->width = my_png->Width;
+		tex->height = my_png->Height;
+		tex->data = (byte *) my_png->Data;
 	} else {
-		Con_Printf("Bad png color depth: %s\n", name);
-		//*pic = NULL;
-		imagedata = 0;
+		Con_Printf("Bad png color depth: %s\n", filename);
 		free(my_png->Data);
-		free(raw);
 	}
-
+	
+	free(raw);
 	mypng_struct_destroy(true);
 
-	return imagedata;
+	return;
 }
-//Tei png version, ripped and adapted from sul_png.c from Quake2max
-//_____________________________________________________________________________
