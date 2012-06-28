@@ -39,6 +39,8 @@ int		GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean f
 int		GL_LoadTexture (const char *identifier, int width, int height, byte *data, qboolean mipmap, qboolean fullbright, int bytesperpixel, qboolean grayscale);
 int		GL_LoadTexImage (char *filename, qboolean complain, qboolean mipmap, qboolean grayscale);
 
+extern	int glx, gly, glwidth, glheight;
+
 #define BACKFACE_EPSILON	0.01
 
 void R_TimeRefresh_f (void);
@@ -125,7 +127,6 @@ extern	CVar	sv_stepheight;
 extern	CVar	sv_jumpstep;
 
 extern	int		gl_lightmap_format;
-extern	int		gl_alpha_format;
 
 extern	const char *gl_vendor;
 extern	const char *gl_renderer;

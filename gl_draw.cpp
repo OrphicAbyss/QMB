@@ -25,10 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "mathlib.h"
 #include "Texture.h"
 
-#include <GL/glu.h>
-
-#define GL_COLOR_INDEX8_EXT     0x80E5
-
 //qmb :detail texture
 extern int detailtexture;
 extern int detailtexture2;
@@ -54,10 +50,6 @@ byte conback_buffer[sizeof (qpic_t) + sizeof (glpic_t)];
 qpic_t *conback = (qpic_t *) & conback_buffer;
 
 int gl_lightmap_format = GL_BGRA;
-int gl_alpha_format = GL_RGBA;
-
-int gl_filter_min = GL_LINEAR_MIPMAP_LINEAR;
-int gl_filter_max = GL_LINEAR;
 
 //=============================================================================
 
@@ -91,10 +83,10 @@ qpic_t *Draw_PicFromWadXY(const char *name, int height, int width) {
 	gl = (glpic_t *) p->data;
 
 	sprintf(texname, "textures/wad/%s", name);
-	texnum = GL_LoadTexImage(&texname[0], false, false, gl_sincity.getBool());
+	texnum = GL_LoadTexImage(&texname[0], false, true, gl_sincity.getBool());
 	if (!texnum) {
 		sprintf(texname, "gfx/%s", name);
-		texnum = GL_LoadTexImage(&texname[0], false, false, gl_sincity.getBool());
+		texnum = GL_LoadTexImage(&texname[0], false, true, gl_sincity.getBool());
 	}
 
 	if (texnum) {
@@ -102,7 +94,7 @@ qpic_t *Draw_PicFromWadXY(const char *name, int height, int width) {
 		p->width = width;
 		gl->texnum = texnum;
 	} else {
-		gl->texnum = GL_LoadTexture("", p->width, p->height, p->data, false, false, true, gl_sincity.getBool());
+		gl->texnum = GL_LoadTexture("", p->width, p->height, p->data, true, false, 1, gl_sincity.getBool());
 	}
 
 	gl->sl = 0;
@@ -160,59 +152,8 @@ qpic_t *Draw_CachePic(const char *path) {
 	return &pic->pic;
 }
 
-typedef struct {
-	char *name;
-	int minimize;
-	int maximize;
-} glmode_t;
-
-glmode_t modes[] = {
-	{"GL_NEAREST", GL_NEAREST, GL_NEAREST},
-	{"GL_LINEAR", GL_LINEAR, GL_LINEAR},
-	{"GL_NEAREST_MIPMAP_NEAREST", GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST},
-	{"GL_LINEAR_MIPMAP_NEAREST", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR},
-	{"GL_NEAREST_MIPMAP_LINEAR", GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST},
-	{"GL_LINEAR_MIPMAP_LINEAR", GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR}
-};
-
-/*
-===============
-Draw_TextureMode_f
-===============
- */
-void Draw_TextureMode_f(void) {
-	int i;
-
-	if (CmdArgs::getArgCount() == 1) {
-		for (i = 0; i < 6; i++)
-			if (gl_filter_min == modes[i].minimize) {
-				Con_Printf("%s\n", modes[i].name);
-				return;
-			}
-		Con_Printf("current filter is unknown???\n");
-		return;
-	}
-
-	for (i = 0; i < 6; i++) {
-		if (!Q_strcasecmp(modes[i].name, CmdArgs::getArg(1)))
-			break;
-	}
-	if (i == 6) {
-		Con_Printf("bad filter name\n");
-		return;
-	}
-
-	gl_filter_min = modes[i].minimize;
-	gl_filter_max = modes[i].maximize;
-
-	// change all the existing mipmap texture objects
-	TextureManager::resetTextureModes();
-}
-
-/*
-===============
-Draw_Init
-===============
+/**
+ * Initalise the draw/texture details
  */
 void Draw_Init(void) {
 	int i;
@@ -226,7 +167,7 @@ void Draw_Init(void) {
 	CVar::registerCVar(&gl_quick_texture_reload);
 	CVar::registerCVar(&gl_sincity);
 
-	Cmd::addCmd("gl_texturemode", &Draw_TextureMode_f);
+	Cmd::addCmd("gl_texturemode", &TextureManager::setTextureModeCMD);
 
 	char_texture = GL_LoadTexImage("gfx/charset", false, true, gl_sincity.getBool());
 	if (char_texture == 0) {
@@ -464,7 +405,7 @@ void Draw_TransPicTranslate(int x, int y, qpic_t *pic, byte *translation) {
 		}
 	}
 
-	glTexImage2D(GL_TEXTURE_2D, 0, gl_alpha_format, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, trans);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, trans);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -484,7 +425,6 @@ void Draw_TransPicTranslate(int x, int y, qpic_t *pic, byte *translation) {
 /*
 ================
 Draw_ConsoleBackground
-
 ================
  */
 void Draw_ConsoleBackground(int lines) {
@@ -715,663 +655,7 @@ void GL_Set2D(void) {
 
 //====================================================================
 
-void Image_Resample32LerpLine(const byte *in, byte *out, int inwidth, int outwidth) {
-	int j, xi, oldx = 0, f, fstep, endx, lerp;
-	fstep = (int) (inwidth * 65536.0f / outwidth);
-	endx = (inwidth - 1);
-	for (j = 0, f = 0; j < outwidth; j++, f += fstep) {
-		xi = f >> 16;
-		if (xi != oldx) {
-			in += (xi - oldx) * 4;
-			oldx = xi;
-		}
-		if (xi < endx) {
-			lerp = f & 0xFFFF;
-			*out++ = (byte) ((((in[4] - in[0]) * lerp) >> 16) + in[0]);
-			*out++ = (byte) ((((in[5] - in[1]) * lerp) >> 16) + in[1]);
-			*out++ = (byte) ((((in[6] - in[2]) * lerp) >> 16) + in[2]);
-			*out++ = (byte) ((((in[7] - in[3]) * lerp) >> 16) + in[3]);
-		} else // last pixel of the line has no pixel to lerp to
-		{
-			*out++ = in[0];
-			*out++ = in[1];
-			*out++ = in[2];
-			*out++ = in[3];
-		}
-	}
-}
-
-void Image_Resample24LerpLine(const byte *in, byte *out, int inwidth, int outwidth) {
-	int j, xi, oldx = 0, f, fstep, endx, lerp;
-	fstep = (int) (inwidth * 65536.0f / outwidth);
-	endx = (inwidth - 1);
-	for (j = 0, f = 0; j < outwidth; j++, f += fstep) {
-		xi = f >> 16;
-		if (xi != oldx) {
-			in += (xi - oldx) * 3;
-			oldx = xi;
-		}
-		if (xi < endx) {
-			lerp = f & 0xFFFF;
-			*out++ = (byte) ((((in[3] - in[0]) * lerp) >> 16) + in[0]);
-			*out++ = (byte) ((((in[4] - in[1]) * lerp) >> 16) + in[1]);
-			*out++ = (byte) ((((in[5] - in[2]) * lerp) >> 16) + in[2]);
-		} else // last pixel of the line has no pixel to lerp to
-		{
-			*out++ = in[0];
-			*out++ = in[1];
-			*out++ = in[2];
-		}
-	}
-}
-
-int resamplerowsize = 0;
-byte *resamplerow1 = NULL;
-byte *resamplerow2 = NULL;
-
-#define LERPBYTE(i) r = resamplerow1[i];out[i] = (byte) ((((resamplerow2[i] - r) * lerp) >> 16) + r)
-
-void Image_Resample32Lerp(const void *indata, int inwidth, int inheight, void *outdata, int outwidth, int outheight) {
-	int i, j, r, yi, oldy, f, fstep, lerp, endy = (inheight - 1), inwidth4 = inwidth * 4, outwidth4 = outwidth * 4;
-	byte *out;
-	const byte *inrow;
-	out = (byte *) outdata;
-	fstep = (int) (inheight * 65536.0f / outheight);
-
-	inrow = (const byte *) indata;
-	oldy = 0;
-	Image_Resample32LerpLine(inrow, resamplerow1, inwidth, outwidth);
-	Image_Resample32LerpLine(inrow + inwidth4, resamplerow2, inwidth, outwidth);
-	for (i = 0, f = 0; i < outheight; i++, f += fstep) {
-		yi = f >> 16;
-		if (yi < endy) {
-			lerp = f & 0xFFFF;
-			if (yi != oldy) {
-				inrow = (byte *) indata + inwidth4*yi;
-				if (yi == oldy + 1)
-					Q_memcpy(resamplerow1, resamplerow2, outwidth4);
-				else
-					Image_Resample32LerpLine(inrow, resamplerow1, inwidth, outwidth);
-				Image_Resample32LerpLine(inrow + inwidth4, resamplerow2, inwidth, outwidth);
-				oldy = yi;
-			}
-			j = outwidth - 4;
-			while (j >= 0) {
-				LERPBYTE(0);
-				LERPBYTE(1);
-				LERPBYTE(2);
-				LERPBYTE(3);
-				LERPBYTE(4);
-				LERPBYTE(5);
-				LERPBYTE(6);
-				LERPBYTE(7);
-				LERPBYTE(8);
-				LERPBYTE(9);
-				LERPBYTE(10);
-				LERPBYTE(11);
-				LERPBYTE(12);
-				LERPBYTE(13);
-				LERPBYTE(14);
-				LERPBYTE(15);
-				out += 16;
-				resamplerow1 += 16;
-				resamplerow2 += 16;
-				j -= 4;
-			}
-			if (j & 2) {
-				LERPBYTE(0);
-				LERPBYTE(1);
-				LERPBYTE(2);
-				LERPBYTE(3);
-				LERPBYTE(4);
-				LERPBYTE(5);
-				LERPBYTE(6);
-				LERPBYTE(7);
-				out += 8;
-				resamplerow1 += 8;
-				resamplerow2 += 8;
-			}
-			if (j & 1) {
-				LERPBYTE(0);
-				LERPBYTE(1);
-				LERPBYTE(2);
-				LERPBYTE(3);
-				out += 4;
-				resamplerow1 += 4;
-				resamplerow2 += 4;
-			}
-			resamplerow1 -= outwidth4;
-			resamplerow2 -= outwidth4;
-		} else {
-			if (yi != oldy) {
-				inrow = (byte *) indata + inwidth4*yi;
-				if (yi == oldy + 1)
-					Q_memcpy(resamplerow1, resamplerow2, outwidth4);
-				else
-					Image_Resample32LerpLine(inrow, resamplerow1, inwidth, outwidth);
-				oldy = yi;
-			}
-			Q_memcpy(out, resamplerow1, outwidth4);
-		}
-	}
-}
-
-void Image_Resample32Nearest(const void *indata, int inwidth, int inheight, void *outdata, int outwidth, int outheight) {
-	int i, j;
-	unsigned frac, fracstep;
-	// relies on int being 4 bytes
-	int *inrow, *out;
-	out = (int *) outdata;
-
-	fracstep = inwidth * 0x10000 / outwidth;
-	for (i = 0; i < outheight; i++) {
-		inrow = (int *) indata + inwidth * (i * inheight / outheight);
-		frac = fracstep >> 1;
-		j = outwidth - 4;
-		while (j >= 0) {
-			out[0] = inrow[frac >> 16];
-			frac += fracstep;
-			out[1] = inrow[frac >> 16];
-			frac += fracstep;
-			out[2] = inrow[frac >> 16];
-			frac += fracstep;
-			out[3] = inrow[frac >> 16];
-			frac += fracstep;
-			out += 4;
-			j -= 4;
-		}
-		if (j & 2) {
-			out[0] = inrow[frac >> 16];
-			frac += fracstep;
-			out[1] = inrow[frac >> 16];
-			frac += fracstep;
-			out += 2;
-		}
-		if (j & 1) {
-			out[0] = inrow[frac >> 16];
-			frac += fracstep;
-			out += 1;
-		}
-	}
-}
-
-void Image_Resample24Lerp(const void *indata, int inwidth, int inheight, void *outdata, int outwidth, int outheight) {
-	int i, j, r, yi, oldy, f, fstep, lerp, endy = (inheight - 1), inwidth3 = inwidth * 3, outwidth3 = outwidth * 3;
-	byte *out;
-	const byte *inrow;
-	out = (byte *) outdata;
-	fstep = (int) (inheight * 65536.0f / outheight);
-
-	inrow = (const byte *) indata;
-	oldy = 0;
-	Image_Resample24LerpLine(inrow, resamplerow1, inwidth, outwidth);
-	Image_Resample24LerpLine(inrow + inwidth3, resamplerow2, inwidth, outwidth);
-	for (i = 0, f = 0; i < outheight; i++, f += fstep) {
-		yi = f >> 16;
-		if (yi < endy) {
-			lerp = f & 0xFFFF;
-			if (yi != oldy) {
-				inrow = (byte *) indata + inwidth3*yi;
-				if (yi == oldy + 1)
-					Q_memcpy(resamplerow1, resamplerow2, outwidth3);
-				else
-					Image_Resample24LerpLine(inrow, resamplerow1, inwidth, outwidth);
-				Image_Resample24LerpLine(inrow + inwidth3, resamplerow2, inwidth, outwidth);
-				oldy = yi;
-			}
-			j = outwidth - 4;
-			while (j >= 0) {
-				LERPBYTE(0);
-				LERPBYTE(1);
-				LERPBYTE(2);
-				LERPBYTE(3);
-				LERPBYTE(4);
-				LERPBYTE(5);
-				LERPBYTE(6);
-				LERPBYTE(7);
-				LERPBYTE(8);
-				LERPBYTE(9);
-				LERPBYTE(10);
-				LERPBYTE(11);
-				out += 12;
-				resamplerow1 += 12;
-				resamplerow2 += 12;
-				j -= 4;
-			}
-			if (j & 2) {
-				LERPBYTE(0);
-				LERPBYTE(1);
-				LERPBYTE(2);
-				LERPBYTE(3);
-				LERPBYTE(4);
-				LERPBYTE(5);
-				out += 6;
-				resamplerow1 += 6;
-				resamplerow2 += 6;
-			}
-			if (j & 1) {
-				LERPBYTE(0);
-				LERPBYTE(1);
-				LERPBYTE(2);
-				out += 3;
-				resamplerow1 += 3;
-				resamplerow2 += 3;
-			}
-			resamplerow1 -= outwidth3;
-			resamplerow2 -= outwidth3;
-		} else {
-			if (yi != oldy) {
-				inrow = (byte *) indata + inwidth3*yi;
-				if (yi == oldy + 1)
-					Q_memcpy(resamplerow1, resamplerow2, outwidth3);
-				else
-					Image_Resample24LerpLine(inrow, resamplerow1, inwidth, outwidth);
-				oldy = yi;
-			}
-			Q_memcpy(out, resamplerow1, outwidth3);
-		}
-	}
-}
-
-void Image_Resample24Nolerp(const void *indata, int inwidth, int inheight, void *outdata, int outwidth, int outheight) {
-	int i, j, f, inwidth3 = inwidth * 3;
-	unsigned frac, fracstep;
-	byte *inrow, *out;
-	out = (byte *) outdata;
-
-	fracstep = inwidth * 0x10000 / outwidth;
-	for (i = 0; i < outheight; i++) {
-		inrow = (byte *) indata + inwidth3 * (i * inheight / outheight);
-		frac = fracstep >> 1;
-		j = outwidth - 4;
-		while (j >= 0) {
-			f = (frac >> 16)*3;
-			*out++ = inrow[f + 0];
-			*out++ = inrow[f + 1];
-			*out++ = inrow[f + 2];
-			frac += fracstep;
-			f = (frac >> 16)*3;
-			*out++ = inrow[f + 0];
-			*out++ = inrow[f + 1];
-			*out++ = inrow[f + 2];
-			frac += fracstep;
-			f = (frac >> 16)*3;
-			*out++ = inrow[f + 0];
-			*out++ = inrow[f + 1];
-			*out++ = inrow[f + 2];
-			frac += fracstep;
-			f = (frac >> 16)*3;
-			*out++ = inrow[f + 0];
-			*out++ = inrow[f + 1];
-			*out++ = inrow[f + 2];
-			frac += fracstep;
-			j -= 4;
-		}
-		if (j & 2) {
-			f = (frac >> 16)*3;
-			*out++ = inrow[f + 0];
-			*out++ = inrow[f + 1];
-			*out++ = inrow[f + 2];
-			frac += fracstep;
-			f = (frac >> 16)*3;
-			*out++ = inrow[f + 0];
-			*out++ = inrow[f + 1];
-			*out++ = inrow[f + 2];
-			frac += fracstep;
-			out += 2;
-		}
-		if (j & 1) {
-			f = (frac >> 16)*3;
-			*out++ = inrow[f + 0];
-			*out++ = inrow[f + 1];
-			*out++ = inrow[f + 2];
-			frac += fracstep;
-			out += 1;
-		}
-	}
-}
-
-/*
-================
-Image_Resample
-================
- */
-void Image_Resample(const void *indata, int inwidth, int inheight, int indepth, void *outdata, int outwidth, int outheight, int outdepth, int bytesperpixel, int quality) {
-	if (indepth != 1 || outdepth != 1)
-		Sys_Error("Image_Resample: 3D resampling not supported\n");
-	if (resamplerowsize < outwidth * 4) {
-		if (resamplerow1)
-			free(resamplerow1);
-		resamplerowsize = outwidth * 4;
-		resamplerow1 = (byte *) malloc(resamplerowsize * 2);
-		resamplerow2 = resamplerow1 + resamplerowsize;
-	}
-	if (bytesperpixel == 4) {
-		if (quality)
-			Image_Resample32Lerp(indata, inwidth, inheight, outdata, outwidth, outheight);
-		else
-			Image_Resample32Nearest(indata, inwidth, inheight, outdata, outwidth, outheight);
-	} else if (bytesperpixel == 3) {
-		if (quality)
-			Image_Resample24Lerp(indata, inwidth, inheight, outdata, outwidth, outheight);
-		else
-			Image_Resample24Nolerp(indata, inwidth, inheight, outdata, outwidth, outheight);
-	} else
-		Sys_Error("Image_Resample: unsupported bytesperpixel %i\n", bytesperpixel);
-}
-
-// in can be the same as out
-void Image_MipReduce(const byte *in, byte *out, int *width, int *height, int *depth, int destwidth, int destheight, int destdepth, int bytesperpixel) {
-	int x, y, nextrow;
-	if (*depth != 1 || destdepth != 1)
-		Sys_Error("Image_Resample: 3D resampling not supported\n");
-	nextrow = *width * bytesperpixel;
-	if (*width > destwidth) {
-		*width >>= 1;
-		if (*height > destheight) {
-			// reduce both
-			*height >>= 1;
-			if (bytesperpixel == 4) {
-				for (y = 0; y < *height; y++) {
-					for (x = 0; x < *width; x++) {
-						out[0] = (byte) ((in[0] + in[4] + in[nextrow ] + in[nextrow + 4]) >> 2);
-						out[1] = (byte) ((in[1] + in[5] + in[nextrow + 1] + in[nextrow + 5]) >> 2);
-						out[2] = (byte) ((in[2] + in[6] + in[nextrow + 2] + in[nextrow + 6]) >> 2);
-						out[3] = (byte) ((in[3] + in[7] + in[nextrow + 3] + in[nextrow + 7]) >> 2);
-						out += 4;
-						in += 8;
-					}
-					in += nextrow; // skip a line
-				}
-			} else if (bytesperpixel == 3) {
-				for (y = 0; y < *height; y++) {
-					for (x = 0; x < *width; x++) {
-						out[0] = (byte) ((in[0] + in[3] + in[nextrow ] + in[nextrow + 3]) >> 2);
-						out[1] = (byte) ((in[1] + in[4] + in[nextrow + 1] + in[nextrow + 4]) >> 2);
-						out[2] = (byte) ((in[2] + in[5] + in[nextrow + 2] + in[nextrow + 5]) >> 2);
-						out += 3;
-						in += 6;
-					}
-					in += nextrow; // skip a line
-				}
-			} else
-				Sys_Error("Image_MipReduce: unsupported bytesperpixel %i\n", bytesperpixel);
-		} else {
-			// reduce width
-			if (bytesperpixel == 4) {
-				for (y = 0; y < *height; y++) {
-					for (x = 0; x < *width; x++) {
-						out[0] = (byte) ((in[0] + in[4]) >> 1);
-						out[1] = (byte) ((in[1] + in[5]) >> 1);
-						out[2] = (byte) ((in[2] + in[6]) >> 1);
-						out[3] = (byte) ((in[3] + in[7]) >> 1);
-						out += 4;
-						in += 8;
-					}
-				}
-			} else if (bytesperpixel == 3) {
-				for (y = 0; y < *height; y++) {
-					for (x = 0; x < *width; x++) {
-						out[0] = (byte) ((in[0] + in[3]) >> 1);
-						out[1] = (byte) ((in[1] + in[4]) >> 1);
-						out[2] = (byte) ((in[2] + in[5]) >> 1);
-						out += 3;
-						in += 6;
-					}
-				}
-			} else
-				Sys_Error("Image_MipReduce: unsupported bytesperpixel %i\n", bytesperpixel);
-		}
-	} else {
-		if (*height > destheight) {
-			// reduce height
-			*height >>= 1;
-			if (bytesperpixel == 4) {
-				for (y = 0; y < *height; y++) {
-					for (x = 0; x < *width; x++) {
-						out[0] = (byte) ((in[0] + in[nextrow ]) >> 1);
-						out[1] = (byte) ((in[1] + in[nextrow + 1]) >> 1);
-						out[2] = (byte) ((in[2] + in[nextrow + 2]) >> 1);
-						out[3] = (byte) ((in[3] + in[nextrow + 3]) >> 1);
-						out += 4;
-						in += 4;
-					}
-					in += nextrow; // skip a line
-				}
-			} else if (bytesperpixel == 3) {
-				for (y = 0; y < *height; y++) {
-					for (x = 0; x < *width; x++) {
-						out[0] = (byte) ((in[0] + in[nextrow ]) >> 1);
-						out[1] = (byte) ((in[1] + in[nextrow + 1]) >> 1);
-						out[2] = (byte) ((in[2] + in[nextrow + 2]) >> 1);
-						out += 3;
-						in += 3;
-					}
-					in += nextrow; // skip a line
-				}
-			} else
-				Sys_Error("Image_MipReduce: unsupported bytesperpixel %i\n", bytesperpixel);
-		} else
-			Sys_Error("Image_MipReduce: desired size already achieved\n");
-	}
-}
-
-/*
-===============
-GL_Upload32
-
-first converts strange sized textures
-to ones in the form 2^n*2^m where n is the height and m is the width
-===============
- */
-static unsigned char tobig[] = {255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 255, 255};
-
-__inline unsigned RGBAtoGrayscale(unsigned rgba) {
-	unsigned char *rgb, value;
-	unsigned output;
-	double shift;
-
-	output = rgba;
-	rgb = ((unsigned char *) &output);
-
-	value = min(255, rgb[0] * 0.2125 + rgb[1] * 0.7154 + rgb[2] * 0.0721);
-	//shift = sqrt(max(0,(rgb[0])-(rgb[1]+rgb[2])/2))/16;
-	//value = min(255,rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114);
-
-#if 1
-	rgb[0] = value;
-	rgb[1] = value;
-	rgb[2] = value;
-#else
-	rgb[0] = rgb[0] + (value - rgb[0]) * shift;
-	rgb[1] = rgb[1] + (value - rgb[1]) * shift;
-	rgb[2] = rgb[2] + (value - rgb[2]) * shift;
-#endif
-
-	return output;
-}
-
-void GL_Upload32(unsigned int *data, int width, int height, qboolean mipmap, qboolean grayscale) {
-	static unsigned temp_buffer[512 * 512];
-	int samples;
-	unsigned *scaled;
-	int scaled_width, scaled_height;
-
-	if (gl_texture_non_power_of_two) {
-		scaled_width = width;
-		scaled_height = height;
-
-		//this seems buggered (will squash really large textures, but then again, not may huge textures around)
-		//if (scaled_width > gl_max_size.value) scaled_width = gl_max_size.value; //make sure its not bigger than the max size
-		//if (scaled_height > gl_max_size.value) scaled_height = gl_max_size.value;//make sure its not bigger than the max size
-	} else {
-		scaled_width = 1 << (int) ceil(log(width) / log(2.0));
-		scaled_height = 1 << (int) ceil(log(height) / log(2.0));
-
-		//this seems buggered (will squash really large textures, but then again, not may huge textures around)
-		scaled_width = min(scaled_width, gl_max_size.getInt()); //make sure its not bigger than the max size
-		scaled_height = min(scaled_height, gl_max_size.getInt()); //make sure its not bigger than the max size
-	}
-
-	samples = gl_alpha_format; //internal format
-
-	if (scaled_width * scaled_height < 512 * 512) //see if we can use our buffer
-		scaled = &temp_buffer[0];
-	else {
-		scaled = (unsigned *) malloc(sizeof (unsigned) *scaled_width * scaled_height);
-		Con_SafeDPrintf("&c500Upload32:&r Needed Dynamic Buffer for texture resize...\n");
-
-		if (scaled == NULL)
-			Sys_Error("GL_LoadTexture: texture is too big, cannot resample textures bigger than %i", scaled_width * scaled_height);
-	}
-
-
-	if (scaled_width == width && scaled_height == height) {
-		//not being scaled
-		if (grayscale && gl_sincity.getBool()) {
-			//go through data and convert
-			int size = width * height;
-			for (int i = 0; i < size; i++) {
-				data[i] = RGBAtoGrayscale(data[i]);
-			}
-		}
-		if (!mipmap) {
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		} else { //else build mipmaps for it
-			if (gl_sgis_mipmap) {
-				glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-				glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
-			} else {
-				gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, scaled_width, scaled_height, GL_RGBA, GL_UNSIGNED_BYTE, data);
-			}
-		}
-	} else { //if we need to scale
-		Con_SafeDPrintf("&c500Upload32:&r Textures too big or not a power of two in size: %ix%i...\n", width, height);
-
-		//fix size so its a power of 2
-		Image_Resample(data, width, height, 1, scaled, scaled_width, scaled_height, 1, 4, 1);
-
-		//was scaled
-		if (grayscale && gl_sincity.getBool()) {
-			//go through data and convert
-			int size = scaled_width * scaled_height;
-			for (int i = 0; i < size; i++) {
-				scaled[i] = RGBAtoGrayscale(scaled[i]);
-			}
-		}
-
-		if (gl_sgis_mipmap) {
-			glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-			glTexImage2D(GL_TEXTURE_2D, 0, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, scaled);
-			glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
-		} else {
-			gluBuild2DMipmaps(GL_TEXTURE_2D, samples, scaled_width, scaled_height, GL_RGBA, GL_UNSIGNED_BYTE, scaled);
-		}
-
-		if (scaled != &temp_buffer[0])
-			free(scaled);
-	}
-
-	if (mipmap) {
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, gl_anisotropic.getBool());
-	} else {
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_max);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, gl_anisotropic.getBool());
-	}
-}
-
-/*
-===============
-GL_Upload8
-===============
- */
-int GL_Upload8(byte *data, int width, int height, qboolean mipmap, qboolean fullbright) {
-	static unsigned temp_buffer[512 * 256];
-	unsigned *trans;
-	
-	int s = width*height;
-	if (s < 512 * 256) {
-		trans = &temp_buffer[0];
-		//Q_memset(trans, 0, 512 * 256 * sizeof (unsigned));
-	} else {
-		trans = (unsigned *) malloc(s * sizeof (unsigned));
-		Con_SafeDPrintf("&c500GL_Upload8:&r Needed Dynamic Buffer for 8bit to 24bit texture convert...\n");
-	}
-	// if there are no transparent pixels, make it a 3 component (ie: RGB not RGBA)
-	// texture even if it was specified as otherwise
-	if (fullbright) {
-		// this is a fullbright mask, so make all non-fullbright colors transparent
-		bool hasFullbright = false;
-		for (int i = 0; i < s; i++) {
-			int p = data[i];
-			if (p < 224) {
-				trans[i] = d_8to24table[255]; // transparent
-			} else {
-				trans[i] = d_8to24table[p]; // fullbright
-				hasFullbright = true;
-			}
-		}
-		if (!hasFullbright)
-			return false;
-	} else {
-		for (int i = 0; i < s; i += 4) {
-			if (gl_sincity.getBool()) {
-				trans[i] = RGBAtoGrayscale(d_8to24table[data[i]]);
-				trans[i + 1] = RGBAtoGrayscale(d_8to24table[data[i + 1]]);
-				trans[i + 2] = RGBAtoGrayscale(d_8to24table[data[i + 2]]);
-				trans[i + 3] = RGBAtoGrayscale(d_8to24table[data[i + 3]]);
-			} else {
-				trans[i] = d_8to24table[data[i]];
-				trans[i + 1] = d_8to24table[data[i + 1]];
-				trans[i + 2] = d_8to24table[data[i + 2]];
-				trans[i + 3] = d_8to24table[data[i + 3]];
-			}
-		}
-	}
-
-	GL_Upload32(trans, width, height, mipmap, false);
-
-	if (trans != &temp_buffer[0])
-		free(trans);
-
-	return true;
-}
-
-Texture *GL_LoadTexture(Texture *t) {
-	// See if the texture has already been loaded
-	t->calculateHash();
-	Texture *found = TextureManager::findTexture(t);
-	if (found != NULL) {
-		if (found->isMissMatch(t)) {
-			Con_DPrintf("GL_LoadTexture: cache mismatch\n");
-			TextureManager::removeTexture(found);
-			delete found;
-		} else {
-			delete t;
-			return found;
-		}
-	}
-	
-	t->textureId = texture_extension_number++;
-	
-	if (!isDedicated) {
-		glBindTexture(GL_TEXTURE_2D, t->textureId);
-		
-		t->upload();
-	}
-	
-	TextureManager::addTexture(t);
-	return t;
-}
-
 int GL_LoadTexture(const char *identifier, int width, int height, byte *data, qboolean mipmap, qboolean fullbright, int bytesperpixel, qboolean grayscale) {
-	if (fullbright)
-		return 0;
-
 	Texture *t = new Texture(identifier);
 	t->data = data;
 	t->height = height;
@@ -1379,8 +663,12 @@ int GL_LoadTexture(const char *identifier, int width, int height, byte *data, qb
 	t->bytesPerPixel = bytesperpixel;
 	t->mipmap = mipmap;
 	t->grayscale = grayscale;
+
+	if (fullbright)
+		if (!t->convert8To32Fullbright())
+			return 0;
 	
-	t = GL_LoadTexture(t);
+	t = TextureManager::LoadTexture(t);
 	
 	return t->textureId;
 }
@@ -1408,6 +696,6 @@ int GL_LoadTexImage(char* filename, qboolean complain, qboolean mipmap, qboolean
 	t->bytesPerPixel = 4;
 	t->grayscale = grayscale;
 	
-	t = GL_LoadTexture(t);
+	t = TextureManager::LoadTexture(t);
 	return t->textureId;
 }

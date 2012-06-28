@@ -375,7 +375,6 @@ void Mod_LoadQ3Model(model_t *mod, void *buffer)
 			mem_vert->vec[1] = (float)disk_vert->vec[1] / 64.0f;
 			mem_vert->vec[2] = (float)disk_vert->vec[2] / 64.0f;
 
-
 			//work out normals
 			lat = (disk_vert->normal + 255) * (2 * 3.141592654f) / 256.0f;
 			lng = ((disk_vert->normal >> 8) & 255) * (2 * 3.141592654f) / 256.0f;

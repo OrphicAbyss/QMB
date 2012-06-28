@@ -4,10 +4,11 @@
 #include "quakedef.h"
 
 class Texture {
-public:
+public:	
 	Texture(const char *ident);
 	virtual ~Texture();
 	void calculateHash();
+	bool convert8To32Fullbright();
 	void convertToGrayscale();
 	void convert8To32();
 	void convert24To32();
@@ -31,14 +32,26 @@ public:
 	bool grayscale;
 };
 
+typedef struct {
+	char *name;
+	GLuint minimize;
+	GLuint maximize;
+} glFilterMode;
+
 class TextureManager {
 public:
+	static GLuint glFilterMax;
+	static GLuint glFilterMin;
+	static glFilterMode glFilterModes[];
+	
+	static Texture *LoadTexture(Texture *texture);
 	static Texture *LoadFile(char *filename, bool complain);
 	static Texture *LoadFilePNG(FILE *f, char *name);
 	static Texture *LoadFileJPG(FILE *f, char *name);
 	static Texture *LoadFileTGA(FILE *f, char *name);
 	static Texture *LoadFilePCX(FILE *f, char *name);
 
+	static void setTextureModeCMD();
 	static void resetTextureModes();
 	static Texture *findTexture(const char *identifier);
 	static Texture *findTexture(Texture *find);

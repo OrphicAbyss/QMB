@@ -94,7 +94,7 @@ typedef struct
 
 //**** md3 memory format ****//
 
-//diffrent size
+//different size
 typedef struct
 {
     vec3_t	vec;

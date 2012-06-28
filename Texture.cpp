@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include "Image.h"
 
 #include <GL/glu.h>
 
@@ -49,8 +50,40 @@ void Texture::calculateHash() {
 	}
 }
 
+__inline unsigned RGBAtoGrayscale(unsigned rgba) {
+	unsigned char *rgb, value;
+	unsigned output;
+	double shift;
+
+	output = rgba;
+	rgb = ((unsigned char *) &output);
+
+	value = min(255, rgb[0] * 0.2125 + rgb[1] * 0.7154 + rgb[2] * 0.0721);
+	//shift = sqrt(max(0,(rgb[0])-(rgb[1]+rgb[2])/2))/16;
+	//value = min(255,rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114);
+
+#if 1
+	rgb[0] = value;
+	rgb[1] = value;
+	rgb[2] = value;
+#else
+	rgb[0] = rgb[0] + (value - rgb[0]) * shift;
+	rgb[1] = rgb[1] + (value - rgb[1]) * shift;
+	rgb[2] = rgb[2] + (value - rgb[2]) * shift;
+#endif
+
+	return output;
+}
+
+void PrintErrorMessage(const char *function, const char *message) {
+	Con_SafePrintf("&c500%s:&r %s\n");
+}
+
 void Texture::convertToGrayscale() {
-	extern unsigned RGBAtoGrayscale(unsigned rgba);
+	if (bytesPerPixel != 4) {
+		PrintErrorMessage("convertToGrayscale", "Requires 32bit image to convert...");
+		return;
+	}
 	
 	//go through data and convert
 	int size = width * height;
@@ -59,7 +92,38 @@ void Texture::convertToGrayscale() {
 	}
 }
 
+bool Texture::convert8To32Fullbright() {
+	if (bytesPerPixel != 1) {
+		PrintErrorMessage("convert8To32Fullbright", "Requires 8bit image to convert...");
+		return false;
+	}
+	
+	bool hasFullbright = false;
+	unsigned *newData = (unsigned *)malloc(width * height * 4);
+	
+	int size = width * height;
+	for (int i=0; i<size; i++) {
+		unsigned char p = data[i];
+		if (p < 224)
+			newData[i] = d_8to24table[255]; // transparent
+		else {
+			newData[i] = d_8to24table[p]; // fullbright
+			hasFullbright = true;
+		}
+	}
+	
+	free(this->data);
+	data = (unsigned char *)newData;
+	bytesPerPixel = 4;
+	return hasFullbright;
+}
+
 void Texture::convert8To32() {
+	if (bytesPerPixel != 1) {
+		PrintErrorMessage("convert8To32", "Requires 8bit image to convert...");
+		return;
+	}
+	
 	unsigned *newData = (unsigned *)malloc(width * height * 4);
 	
 	int size = width * height;
@@ -69,9 +133,15 @@ void Texture::convert8To32() {
 	
 	free(this->data);
 	this->data = (unsigned char *)newData;
+	bytesPerPixel = 4;
 }
 
 void Texture::convert24To32() {
+	if (bytesPerPixel != 3) {
+		PrintErrorMessage("convert8To32", "Requires 8bit image to convert...");
+		return;
+	}
+	
 	unsigned char *newData = (unsigned char *)malloc(width * height * 4);
 	
 	int size = width * height;
@@ -86,6 +156,7 @@ void Texture::convert24To32() {
 	
 	free(this->data);
 	this->data = newData;
+	bytesPerPixel = 4;
 }
 
 void Texture::fixSize() {
@@ -109,32 +180,30 @@ void Texture::fixSize() {
 	
 	if (scaled_width != width || scaled_height != height) {
 		resample(scaled_height, scaled_width);
+		width = scaled_width;
+		height = scaled_height;
 	}
 }
 
 void Texture::resample(const int scaledHeight, const int scaledWidth) {
-	extern void Image_Resample(const void *indata, int inwidth, int inheight, int indepth, void *outdata, int outwidth, int outheight, int outdepth, int bytesperpixel, int quality);
 	unsigned char *scaled = (unsigned char *)malloc(scaledHeight * scaledWidth * this->bytesPerPixel);
 	
-	Image_Resample(this->data, this->width, this->height, 1, scaled, scaledWidth, scaledHeight, 1, this->bytesPerPixel, 1);
+	Image::resample((void *)this->data, this->width, this->height, (void *)scaled, scaledWidth, scaledHeight, this->bytesPerPixel, 1);
 	
 	free(this->data);
 	this->data = scaled;
 }
 
-void Texture::upload() {
-	extern int gl_filter_min;
-	extern int gl_filter_max;
-	
+void Texture::upload() {	
 	// Ensure we have a 32bit image to upload
 	if (bytesPerPixel == 1)
-		this->convert8To32();
+		convert8To32();
 	else if (bytesPerPixel == 3)
-		this->convert24To32();
+		convert24To32();
 	
 	// If we are grayscaling things, do it now
 	if (grayscale && gl_sincity.getBool())
-		this->convertToGrayscale();
+		convertToGrayscale();
 	
 	// Resize the image if we need to (non-power of 2 or over max size)
 	fixSize();
@@ -152,10 +221,10 @@ void Texture::upload() {
 	}
 	
 	if (mipmap)
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TextureManager::glFilterMin);
 	else
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_max);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TextureManager::glFilterMax);
 	
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, TextureManager::glFilterMax);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, gl_anisotropic.getInt());
 }
