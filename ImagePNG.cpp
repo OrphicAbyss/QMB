@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "Texture.h"
+#include "Image.h"
 #include <png.h>
 
 typedef struct png_s { // TPng = class(TGraphic)
@@ -48,7 +49,6 @@ typedef struct png_s { // TPng = class(TGraphic)
 } png_t;
 png_t *my_png = 0;
 unsigned char* pngbytes;
-//_____________________________________________________________________________
 
 void InitializeDemData() {
 	long* cvaluep; //ub
@@ -76,7 +76,6 @@ void InitializeDemData() {
 		}
 	}
 }
-//_____________________________________________________________________________
 
 void mypng_struct_create() {
 	if (my_png) return;
@@ -91,7 +90,6 @@ void mypng_struct_create() {
 	my_png->Compression = PNG_COMPRESSION_TYPE_DEFAULT;
 	my_png->Filter = PNG_FILTER_TYPE_DEFAULT;
 }
-//_____________________________________________________________________________
 
 void mypng_struct_destroy(qboolean keepData) {
 	if (!my_png)
@@ -106,7 +104,6 @@ void mypng_struct_destroy(qboolean keepData) {
 	free(my_png);
 	my_png = 0;
 }
-//_____________________________________________________________________________
 
 void PNGAPI fReadData(png_structp png, png_bytep data, png_size_t length) { // called by pnglib
 	unsigned int i;
@@ -114,7 +111,7 @@ void PNGAPI fReadData(png_structp png, png_bytep data, png_size_t length) { // c
 		data[i] = my_png->tmpBuf[my_png->tmpi++]; // give pnglib a some more bytes
 }
 
-void LoadPNG(FILE *f, char *filename, Texture *tex) {
+void Image::LoadPNG(FILE *f, char *filename, Texture *tex) {
 	png_structp png;
 	png_infop pnginfo;
 	byte ioBuffer[8192];

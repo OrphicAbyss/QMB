@@ -20,12 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "Texture.h"
+#include "Image.h"
 
-/*
-===========
-PCX Loading
-===========
- */
 typedef struct {
 	char manufacturer;
 	char version;
@@ -42,10 +38,7 @@ typedef struct {
 	unsigned data; // unbounded
 } pcx_t;
 
-/**
- * Load PCX image
- */
-void LoadPCX(FILE *f, char *filename, Texture *tex) {
+void Image::LoadPCX(FILE *f, char *filename, Texture *tex) {
 	pcx_t *pcx, pcxbuf;
 	byte palette[768];
 	byte *pix, *image_rgba;

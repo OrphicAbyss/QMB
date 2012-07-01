@@ -20,12 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "Texture.h"
+#include "Image.h"
 
-/*
-=============
-TARGA LOADING
-=============
- */
 typedef struct _TargaHeader {
 	unsigned char id_length;
 	unsigned char colormap_type;
@@ -64,30 +60,27 @@ int fgetLittleLong(FILE *f) {
 	return b1 + (b2 << 8) + (b3 << 16) + (b4 << 24);
 }
 
-/**
- * Load TGA image file
- */
-void LoadTGA(FILE *f, char *filename, Texture *tex) {
+void Image::LoadTGA(FILE *file, char *filename, Texture *tex) {
 	int columns, rows, numPixels;
 	byte *pixbuf;
 	int row, column;
 	byte *image_rgba, *fin, *datafile;
 
-	int filesize = Sys_FileLength(f);
+	int filesize = Sys_FileLength(file);
 	
-	targa_header.id_length = fgetc(f);
-	targa_header.colormap_type = fgetc(f);
-	targa_header.image_type = fgetc(f);
+	targa_header.id_length = fgetc(file);
+	targa_header.colormap_type = fgetc(file);
+	targa_header.image_type = fgetc(file);
 
-	targa_header.colormap_index = fgetLittleShort(f);
-	targa_header.colormap_length = fgetLittleShort(f);
-	targa_header.colormap_size = fgetc(f);
-	targa_header.x_origin = fgetLittleShort(f);
-	targa_header.y_origin = fgetLittleShort(f);
-	targa_header.width = fgetLittleShort(f);
-	targa_header.height = fgetLittleShort(f);
-	targa_header.pixel_size = fgetc(f);
-	targa_header.attributes = fgetc(f);
+	targa_header.colormap_index = fgetLittleShort(file);
+	targa_header.colormap_length = fgetLittleShort(file);
+	targa_header.colormap_size = fgetc(file);
+	targa_header.x_origin = fgetLittleShort(file);
+	targa_header.y_origin = fgetLittleShort(file);
+	targa_header.width = fgetLittleShort(file);
+	targa_header.height = fgetLittleShort(file);
+	targa_header.pixel_size = fgetc(file);
+	targa_header.attributes = fgetc(file);
 
 	if (targa_header.image_type != 2 && targa_header.image_type != 10) {
 		Con_Printf("&c900LoadTGA:&r Only type 2 and 10 targa RGB images supported &c090[%s]&r\n", filename);
@@ -110,10 +103,10 @@ void LoadTGA(FILE *f, char *filename, Texture *tex) {
 	}
 
 	if (targa_header.id_length != 0)
-		fseek(f, targa_header.id_length, SEEK_CUR); // skip TARGA image comment
+		fseek(file, targa_header.id_length, SEEK_CUR); // skip TARGA image comment
 
 	//file to read = total size - current position
-	filesize = filesize - ftell(f);
+	filesize = filesize - ftell(file);
 
 	//read it whole image at once
 	datafile = (byte *) malloc(filesize);
@@ -122,7 +115,8 @@ void LoadTGA(FILE *f, char *filename, Texture *tex) {
 		return;
 	}
 
-	fread(datafile, 1, filesize, f);
+	fread(datafile, 1, filesize, file);
+	fclose(file);
 	fin = datafile;
 
 	if (targa_header.image_type == 2) { // Uncompressed, RGB images

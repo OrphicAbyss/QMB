@@ -17,8 +17,6 @@
 
 #define MD3IDHEADER		(('3'<<24)+('P'<<16)+('D'<<8)+'I')
 
-typedef float vec2_t[2];
-
 //**** md3 disk format ****//
 typedef struct
 {
@@ -91,7 +89,6 @@ typedef struct
 	int		eof_offs;		//not used atm
 } md3header_t;
 
-
 //**** md3 memory format ****//
 
 //different size
@@ -122,7 +119,7 @@ typedef struct
 	int		texnum;
 } md3shader_mem_t;
 
-//diffrent
+//different
 typedef struct md3surface_mem_s
 {
 	char	id[4];	//should be IDP3

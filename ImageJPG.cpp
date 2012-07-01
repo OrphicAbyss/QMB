@@ -20,10 +20,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "Texture.h"
+#include "Image.h"
 #include <jpeglib.h>
 #include <math.h>
 
-void LoadJPG(FILE *f, char *filename, Texture *tex) {
+void Image::LoadJPG(FILE *f, char *filename, Texture *tex) {
 	struct jpeg_decompress_struct cinfo;
 	JDIMENSION num_scanlines;
 	JSAMPARRAY in;

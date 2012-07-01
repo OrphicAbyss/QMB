@@ -1,9 +1,5 @@
 #include "Texture.h"
-
-extern void LoadPNG(FILE *f, char *filename, Texture *tex);
-extern void LoadJPG(FILE *f, char *filename, Texture *tex);
-extern void LoadPCX(FILE *f, char *filename, Texture *texv);
-extern void LoadTGA(FILE *f, char *filename, Texture *tex);
+#include "Image.h"
 
 Texture *TextureManager::LoadFile(char *filename, bool complain) {
 	FILE *f;
@@ -45,24 +41,24 @@ Texture *TextureManager::LoadFile(char *filename, bool complain) {
 
 Texture *TextureManager::LoadFilePNG(FILE *f, char *name) {
 	Texture *t = new Texture(name);
-	LoadPNG(f, name, t);
+	Image::LoadPNG(f, name, t);
 	return t;
 }
 
 Texture *TextureManager::LoadFileJPG(FILE *f, char *name) {
 	Texture *t = new Texture(name);
-	LoadJPG(f, name, t);
+	Image::LoadJPG(f, name, t);
 	return t;
 }
 
 Texture *TextureManager::LoadFilePCX(FILE *f, char *name){
 	Texture *t = new Texture(name);
-	LoadPCX(f, name, t);
+	Image::LoadPCX(f, name, t);
 	return t;
 }
 
 Texture *TextureManager::LoadFileTGA(FILE *f, char *name) {
 	Texture *t = new Texture(name);
-	LoadTGA(f, name, t);
+	Image::LoadTGA(f, name, t);
 	return t;
 }

@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 struct	mplane_s;
 
 typedef float vec_t;
+typedef vec_t vec2_t[2];
 typedef vec_t vec3_t[3];
 typedef vec_t vec5_t[5];
 

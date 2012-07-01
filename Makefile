@@ -54,11 +54,13 @@ OBJ  =	bot.o bot_misc.o bot_setup.o  \
 	cmd.o console.o cvar.o host.o host_cmd.o \
 	chase.o common.o crc.o mathlib.o menu.o sbar.o view.o wad.o world.o zone.o \
 	in_keys.o in_sdl.o \
-	gl_draw.o gl_hud.o gl_md3.o gl_mesh.o gl_model.o \
-	gl_jpg.o gl_pcx.o gl_png.o gl_tga.o \
+	gl_draw.o gl_hud.o \
+	gl_md3.o gl_mesh.o gl_model.o gl_sprite.o \
+	ModelAlias.o \
+	Image.o ImageJPG.o ImagePCX.o ImagePNG.o ImageTGA.o \
+	Texture.o TextureManager.o TextureFile.o \
 	gl_refrag.o gl_rlight.o gl_rmain.o gl_rmisc.o \
-	gl_rpart.o gl_rsurf.o gl_renderworld.o gl_screen.o gl_sprite.o gl_warp.o \
-	Texture.o TextureManager.o TextureFile.o Image.o \
+	gl_rpart.o gl_rsurf.o gl_renderworld.o gl_screen.o gl_warp.o \
 	net_loop.o net_main.o net_vcr.o net_none.o \
 	pr_cmds.o pr_edict.o pr_exec.o nn_main.o \
 	cd_sdl.o snd_dma.o snd_mem.o snd_mix.o snd_sdl.o \
