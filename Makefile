@@ -67,7 +67,6 @@ OBJ  =	bot.o bot_misc.o bot_setup.o  \
 	sv_main.o sv_move.o sv_phys.o sv_user.o \
 	CaptureAvi.o CaptureHelpers.o \
 	sys_sdl.o gl_vid_sdl.o
-#	gl_jpg.o
 #net_udp.o net_bsd.o net_dgrm.o
 
 LINKOBJ  = $(OBJ)
