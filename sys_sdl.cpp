@@ -98,12 +98,9 @@ void Sys_Error(const char *error, ...) {
 
 /*
 ===============================================================================
-
 FILE IO
-
 ===============================================================================
  */
-
 #define	MAX_HANDLES		10
 FILE *sys_handles[MAX_HANDLES];
 
@@ -117,9 +114,6 @@ int findhandle(void) {
 	return -1;
 }
 
-/**
- * Returns the length of a file
- */
 int Sys_FileLength(FILE *f) {
 	int pos;
 	int end;
@@ -133,12 +127,8 @@ int Sys_FileLength(FILE *f) {
 }
 
 int Sys_FileOpenRead(char *path, int *hndl) {
-	FILE *f;
-	int i;
-
-	i = findhandle();
-
-	f = fopen(path, "rb");
+	int i = findhandle();
+	FILE *f = fopen(path, "rb");
 	if (!f) {
 		*hndl = -1;
 		return -1;
@@ -150,12 +140,8 @@ int Sys_FileOpenRead(char *path, int *hndl) {
 }
 
 int Sys_FileOpenWrite(char *path) {
-	FILE *f;
-	int i;
-
-	i = findhandle();
-
-	f = fopen(path, "wb");
+	int i = findhandle();
+	FILE *f = fopen(path, "wb");
 	if (!f)
 		Sys_Error("Error opening %s: %s", path, strerror(errno));
 	sys_handles[i] = f;
@@ -171,30 +157,25 @@ void Sys_FileClose(int handle) {
 }
 
 void Sys_FileSeek(int handle, int position) {
-	if (handle >= 0) {
+	if (handle >= 0)
 		fseek(sys_handles[handle], position, SEEK_SET);
-	}
 }
 
 int Sys_FileRead(int handle, void *dst, int count) {
-	char *data;
-	int size, done;
-
-	size = 0;
+	int size = 0;
 	if (handle >= 0) {
-		data = (char *) dst;
+		char *data = (char *) dst;
 		while (count > 0) {
-			done = fread(data, 1, count, sys_handles[handle]);
-			if (done == 0) {
+			int done = fread(data, 1, count, sys_handles[handle]);
+			if (done == 0)
 				break;
-			}
+
 			data += done;
 			count -= done;
 			size += done;
 		}
 	}
 	return size;
-
 }
 
 int Sys_FileWrite(int handle, void *src, int count) {
@@ -202,9 +183,7 @@ int Sys_FileWrite(int handle, void *src, int count) {
 }
 
 int Sys_FileTime(char *path) {
-	FILE *f;
-
-	f = fopen(path, "rb");
+	FILE *f = fopen(path, "rb");
 	if (f) {
 		fclose(f);
 		return 1;
@@ -236,16 +215,13 @@ void Sys_DebugLog(char *file, char *fmt, ...) {
 
 double Sys_FloatTime(void) {
 #ifdef __WIN32__
-
 	static int starttime = 0;
 
 	if (!starttime)
 		starttime = clock();
 
 	return (clock() - starttime)*1.0 / 1024;
-
 #else
-
 	struct timeval tp;
 	struct timezone tzp;
 	static int secbase;
@@ -258,19 +234,13 @@ double Sys_FloatTime(void) {
 	}
 
 	return (tp.tv_sec - secbase) +tp.tv_usec / 1000000.0;
-
 #endif
 }
 
 #ifdef WIN32
 #include <windows.h>
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-	int rc;
-
-	rc = main(__argc, __argv);
-
-	return rc;
+	return main(__argc, __argv);
 }
 #endif
 
@@ -322,14 +292,8 @@ int main(int c, char **v) {
 
 		Host_Frame(time);
 	}
-
 }
 
-/*
-================
-Sys_ConsoleInput
-================
- */
 char *Sys_ConsoleInput(void) {
 	return 0;
 }

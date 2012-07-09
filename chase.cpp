@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-*/
+ */
 // chase.c -- chase camera code
 
 #include "quakedef.h"
@@ -26,73 +26,64 @@ CVar chase_up("chase_up", "16");
 CVar chase_right("chase_right", "0");
 CVar chase_active("chase_active", "0");
 
-vec3_t	chase_pos;
-vec3_t	chase_angles;
+vec3_t chase_pos;
+vec3_t chase_angles;
 
-vec3_t	chase_dest;
-vec3_t	chase_dest_angles;
+vec3_t chase_dest;
+vec3_t chase_dest_angles;
 
-
-void Chase_Init (void)
-{
+void Chase_Init(void) {
 	CVar::registerCVar(&chase_back);
 	CVar::registerCVar(&chase_up);
 	CVar::registerCVar(&chase_right);
 	CVar::registerCVar(&chase_active);
 }
 
-void Chase_Reset (void)
-{
+void Chase_Reset(void) {
 	// for respawning and teleporting
-//	start position 12 units behind head
+	//	start position 12 units behind head
 }
 
-void TraceLine (vec3_t start, vec3_t end, vec3_t impact)
-{
-	trace_t	trace;
+void TraceLine(vec3_t start, vec3_t end, vec3_t impact) {
+	trace_t trace;
 
-	Q_memset (&trace, 0, sizeof(trace));
-	SV_RecursiveHullCheck (cl.worldmodel->hulls, 0, 0, 1, start, end, &trace);
+	Q_memset(&trace, 0, sizeof (trace));
+	SV_RecursiveHullCheck(cl.worldmodel->hulls, 0, 0, 1, start, end, &trace);
 
-	VectorCopy (trace.endpos, impact);
+	VectorCopy(trace.endpos, impact);
 }
 
-void Chase_Update (void)
-{
-	int		i;
-	float	dist;
-	vec3_t	forward, up, right;
-	vec3_t	dest, stop;
-
+void Chase_Update(void) {
+	int i;
+	float dist;
+	vec3_t forward, up, right;
+	vec3_t dest, stop;
 
 	// if can't see player, reset
-	AngleVectors (cl.viewangles, forward, right, up);
+	AngleVectors(cl.viewangles, forward, right, up);
 
 	// calc exact destination
-	for (i=0 ; i<3 ; i++)
+	for (i = 0; i < 3; i++)
 		chase_dest[i] = r_refdef.vieworg[i]
-		- forward[i]*chase_back.getFloat()
-		- right[i]*chase_right.getFloat();
+			- forward[i] * chase_back.getFloat()
+		- right[i] * chase_right.getFloat();
 	chase_dest[2] = r_refdef.vieworg[2] + chase_up.getFloat();
 
 	// find the spot the player is looking at
-	VectorMA (r_refdef.vieworg, 4096, forward, dest);
-	TraceLine (r_refdef.vieworg, dest, stop);
+	VectorMA(r_refdef.vieworg, 4096, forward, dest);
+	TraceLine(r_refdef.vieworg, dest, stop);
 
 	// calculate pitch to look at the same spot from camera
-	VectorSubtract (stop, r_refdef.vieworg, stop);
-	dist = DotProduct (stop, forward);
+	VectorSubtract(stop, r_refdef.vieworg, stop);
+	dist = DotProduct(stop, forward);
 	if (dist < 1)
 		dist = 1;
 	r_refdef.viewangles[PITCH] = -atan(stop[2] / dist) / M_PI * 180;
 
 	// move towards destination
-	VectorCopy (chase_dest, r_refdef.vieworg);
-	//qmb :chase cam fix
+	VectorCopy(chase_dest, r_refdef.vieworg);
 
 	TraceLine(r_refdef.vieworg, chase_dest, stop);
 	if (Length(stop) != 0)
 		VectorCopy(stop, chase_dest);
-
 }
-

@@ -153,7 +153,6 @@ DWORD RequestProc (DWORD dwNichts)
 	return 0;
 }
 
-
 LPVOID GetMappedBuffer (HANDLE hfileBuffer)
 {
 	LPVOID pBuffer;
@@ -164,12 +163,10 @@ LPVOID GetMappedBuffer (HANDLE hfileBuffer)
 	return pBuffer;
 }
 
-
 void ReleaseMappedBuffer (LPVOID pBuffer)
 {
 	UnmapViewOfFile (pBuffer);
 }
-
 
 BOOL GetScreenBufferLines (int *piLines)
 {
@@ -184,13 +181,11 @@ BOOL GetScreenBufferLines (int *piLines)
 	return bRet;
 }
 
-
 BOOL SetScreenBufferLines (int iLines)
 {
 
 	return SetConsoleCXCY (hStdout, 80, iLines);
 }
-
 
 BOOL ReadText (LPTSTR pszText, int iBeginLine, int iEndLine)
 {

@@ -16,38 +16,29 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-*/
-
-/*
-	misc code to do with the bot is in here, basicly functions
-	that should be else were in the code but to retain portablity
-	to other engines i've kept them in here.
-	*/
+ */
 
 #include "quakedef.h"
 #include "bot.h"
 
 /*
-======
-Random
+	misc code to do with the bot is in here, basicly functions
+	that should be else were in the code but to retain portablity
+	to other engines i've kept them in here.
+ */
 
-This function only returns a random number in the range 0 - 1
-======
-*/
-float Random (void)
-{
-	return (rand ()&0x7fff) / ((float)0x7fff);
+
+/**
+ * This function only returns a random number in the range 0 - 1
+ */
+float Random(void) {
+	return (rand()&0x7fff) / ((float) 0x7fff);
 }
 
-/*
-===========
-RandomRange
-
-This function is pretty much the same as Random except
-that it returns a value in the range min - max
-===========
-*/
-float RandomRange (float min, float max) 
-{
-	return (Random() * (max - min)) + min;
+/**
+ * This function is pretty much the same as Random except
+ * that it returns a value in the range min - max
+ */
+float RandomRange(float min, float max) {
+	return (Random() * (max - min)) +min;
 }

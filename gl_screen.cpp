@@ -755,15 +755,12 @@ void SCR_UpdateScreen(void) {
 			Draw_Character(x, y, '+');
 		}
 
-		SCR_DrawRam();
 		SCR_DrawNet();
 		SCR_DrawTurtle();
 		SCR_DrawFPS();
 		Scr_ShowNumP();
-
 		SCR_DrawPause();
 		SCR_CheckDrawCenterString();
-		//Sbar_Draw ();
 		SCR_DrawConsole();
 		M_Draw();
 	}
@@ -773,7 +770,6 @@ void SCR_UpdateScreen(void) {
 
 	V_UpdatePalette();
 
-	// CAPTURE <anthony@planetquake.com>
 	CaptureHelper_OnUpdateScreen();
 
 	GL_EndRendering();

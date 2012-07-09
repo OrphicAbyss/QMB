@@ -21,8 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef GloBot
 #define GloBot
 
-typedef struct
-{
+typedef struct {
 	struct edict_s	*enemy;			// This holds what client the bot is currently in a fight with
 	struct edict_s	*chase;			// This holds what client the bot is following when he cant see anyone. Its used to get him to run around... bad hack i know
 	int				ClientNo;		// This holds the bots client number
@@ -31,17 +30,14 @@ typedef struct
 	qboolean		menudone;		// Used for Team Fortress to see if we have passed the class menu or not
 	qboolean		isbot;			// This keeps track if a client is a bot or a human
 	qboolean		Active;			// And this if client has joined the game or not
-
 //data for movement
 	vec3_t			prev_org;		// holds previous position to see if we are stuck
-
 //data for aiming
 	vec3_t			desired_angle;
 	float			prev_angle_delta;
 } bot_t;
 
-typedef struct
-{
+typedef struct {
 	struct edict_s	*world;			// This holds the world entity
 	byte			MaxClients;		// And this is the maximum allowed number of client's
 	qboolean		botactive[64];	// And this keeps track of what bots that has already joined
@@ -52,7 +48,6 @@ extern	globot_t		globot;		// This struct is used to store global stuff that aint
 //bot_misc.c
 float Random (void);
 float RandomRange (float min, float max) ;
-
 //bot_setup.c
 void NextFreeClient (void);
 

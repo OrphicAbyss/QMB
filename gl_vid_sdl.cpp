@@ -179,8 +179,6 @@ void VID_SetPalette(unsigned char *palette) {
 		colors[i].b = *palette++;
 	}
 	d_8to24table[255] &= 0xffffff; // 255 is transparent
-
-	//SDL_SetColors(screen, colors, 0, 256);
 }
 
 void VID_ShiftPalette(unsigned char *palette) {
