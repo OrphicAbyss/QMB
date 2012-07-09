@@ -54,12 +54,6 @@ dlight_t cl_dlights[MAX_DLIGHTS];
 int cl_numvisedicts;
 entity_t *cl_visedicts[MAX_VISEDICTS];
 
-/*
-=====================
-CL_ClearState
-
-=====================
- */
 void CL_ClearState(void) {
 	int i;
 
@@ -79,22 +73,16 @@ void CL_ClearState(void) {
 	Q_memset(cl_temp_entities, 0, sizeof (cl_temp_entities));
 	Q_memset(cl_beams, 0, sizeof (cl_beams));
 
-	//
 	// allocate the efrags and chain together into a free list
-	//
 	cl.free_efrags = cl_efrags;
 	for (i = 0; i < MAX_EFRAGS - 1; i++)
 		cl.free_efrags[i].entnext = &cl.free_efrags[i + 1];
 	cl.free_efrags[i].entnext = NULL;
 }
 
-/*
-=====================
-CL_Disconnect
-
-Sends a disconnect message to the server
-This is also called on Host_Error, so it shouldn't cause any errors
-=====================
+/**
+ * Sends a disconnect message to the server
+ * This is also called on Host_Error, so it shouldn't cause any errors
  */
 void CL_Disconnect(void) {
 	// stop sounds (especially looping!)
@@ -132,12 +120,8 @@ void CL_Disconnect_f(void) {
 		Host_ShutdownServer(false);
 }
 
-/*
-=====================
-CL_EstablishConnection
-
-Host should be either "local" or a net address to be passed on
-=====================
+/**
+ * Host should be either "local" or a net address to be passed on
  */
 void CL_EstablishConnection(char *host) {
 	if (cls.state == ca_dedicated)
@@ -158,12 +142,8 @@ void CL_EstablishConnection(char *host) {
 	cls.signon = 0; // need all the signon messages before playing
 }
 
-/*
-=====================
-CL_SignonReply
-
-An svc_signonnum has been received, perform a client side setup
-=====================
+/**
+ * An svc_signonnum has been received, perform a client side setup
  */
 void CL_SignonReply(void) {
 	char str[8192];
@@ -200,12 +180,8 @@ void CL_SignonReply(void) {
 	}
 }
 
-/*
-=====================
-CL_NextDemo
-
-Called to play the next demo in the demo loop
-=====================
+/**
+ * Called to play the next demo in the demo loop
  */
 void CL_NextDemo(void) {
 	char str[1024];
@@ -229,11 +205,6 @@ void CL_NextDemo(void) {
 	cls.demonum++;
 }
 
-/*
-==============
-CL_PrintEntities_f
-==============
- */
 void CL_PrintEntities_f(void) {
 	entity_t *ent;
 	int i;
@@ -249,12 +220,6 @@ void CL_PrintEntities_f(void) {
 	}
 }
 
-/*
-===============
-CL_AllocDlight
-
-===============
- */
 dlight_t *CL_AllocDlight(int key) {
 	int i;
 	dlight_t *dl;
@@ -315,12 +280,6 @@ dlightsetup:
 		dl->die = 0;
 }
 
-/*
-===============
-CL_DecayLights
-
-===============
- */
 void CL_DecayLights(void) {
 	int i;
 	dlight_t *dl;
@@ -339,13 +298,9 @@ void CL_DecayLights(void) {
 	}
 }
 
-/*
-===============
-CL_LerpPoint
-
-Determines the fraction between the last two messages that the objects
-should be put at.
-===============
+/**
+ * Determines the fraction between the last two messages that the objects
+ * should be put at.
  */
 float CL_LerpPoint(void) {
 	float f, frac;
@@ -380,11 +335,6 @@ float CL_LerpPoint(void) {
 	return frac;
 }
 
-/*
-===============
-CL_RelinkEntities
-===============
- */
 void CL_RelinkEntities(void) {
 	entity_t *ent;
 	int i, j;
@@ -399,9 +349,7 @@ void CL_RelinkEntities(void) {
 
 	cl_numvisedicts = 0;
 
-	//
 	// interpolate player info
-	//
 	for (i = 0; i < 3; i++)
 		cl.velocity[i] = cl.mvelocity[1][i] +
 			frac * (cl.mvelocity[0][i] - cl.mvelocity[1][i]);
@@ -452,15 +400,11 @@ void CL_RelinkEntities(void) {
 				delta[j] = ent->msg_origins[0][j] - ent->msg_origins[1][j];
 				if (delta[j] > 100 || delta[j] < -100)
 					f = 1; // assume a teleportation, not a motion
-				//qmb :interpolation
-				// fenix@io.com: model transform interpolation
-				// interpolation should be reset in the event of a large delta
 				if (f >= 1) {
 					ent->frame_start_time = 0;
 					ent->translate_start_time = 0;
 					ent->rotate_start_time = 0;
 				}
-				//qmb :end
 			}
 
 			// interpolate the origin and angles
@@ -474,7 +418,6 @@ void CL_RelinkEntities(void) {
 					d += 360;
 				ent->angles[j] = ent->msg_angles[1][j] + f*d;
 			}
-
 		}
 
 		// rotate binary objects locally
@@ -484,13 +427,9 @@ void CL_RelinkEntities(void) {
 			ent->origin[2] += ((sin(bobjrotate / 90 * M_PI) * 5) + 5);
 		}
 
-
 		if (ent->effects & EF_BRIGHTFIELD)
 			R_EntityParticles(ent);
-#ifdef QUAKE2
-		if (ent->effects & EF_DARKFIELD)
-			R_DarkFieldParticles(ent);
-#endif
+
 		if (ent->effects & EF_MUZZLEFLASH) {
 			vec3_t fv, rv, uv;
 
@@ -520,21 +459,6 @@ void CL_RelinkEntities(void) {
 			dl->radius = 200 + (rand()&31);
 			dl->die = cl.time + 0.001;
 		}
-#ifdef QUAKE2
-		if (ent->effects & EF_DARKLIGHT) {
-			dl = CL_AllocDlight(i);
-			VectorCopy(ent->origin, dl->origin);
-			dl->radius = 200.0 + (rand()&31);
-			dl->die = cl.time + 0.001;
-			dl->dark = true;
-		}
-		if (ent->effects & EF_LIGHT) {
-			dl = CL_AllocDlight(i);
-			VectorCopy(ent->origin, dl->origin);
-			dl->radius = 200;
-			dl->die = cl.time + 0.001;
-		}
-#endif
 
 		if (ent->model->flags & EF_GIB)
 			R_RocketTrail(oldorg, ent->origin, 2);
@@ -563,10 +487,6 @@ void CL_RelinkEntities(void) {
 		if (i == cl.viewentity && !chase_active.getBool())
 			continue;
 
-#ifdef QUAKE2
-		if (ent->effects & EF_NODRAW)
-			continue;
-#endif
 		if (cl_numvisedicts < MAX_VISEDICTS) {
 			cl_visedicts[cl_numvisedicts] = ent;
 			cl_numvisedicts++;
@@ -575,12 +495,8 @@ void CL_RelinkEntities(void) {
 
 }
 
-/*
-===============
-CL_ReadFromServer
-
-Read all incoming data from the server
-===============
+/**
+ * Read all incoming data from the server
  */
 int CL_ReadFromServer(void) {
 	int ret;
@@ -605,17 +521,10 @@ int CL_ReadFromServer(void) {
 	CL_RelinkEntities();
 	CL_UpdateTEnts();
 
-	//
 	// bring the links up to date
-	//
 	return 0;
 }
 
-/*
-=================
-CL_SendCmd
-=================
- */
 void CL_SendCmd(void) {
 	usercmd_t cmd;
 
@@ -625,10 +534,8 @@ void CL_SendCmd(void) {
 	if (cls.signon == SIGNONS) {
 		// get basic movement from keyboard
 		CL_BaseMove(&cmd);
-
 		// allow mice or other external controllers to add to the move
 		IN_Move(&cmd);
-
 		// send the unreliable message
 		CL_SendMove(&cmd);
 
@@ -654,20 +561,13 @@ void CL_SendCmd(void) {
 	SZ_Clear(&cls.message);
 }
 
-/*
-=================
-CL_Init
-=================
- */
 void CL_Init(void) {
 	SZ_Alloc(&cls.message, 1024);
 
 	CL_InitInput();
 	CL_InitTEnts();
 
-	//
 	// register our commands
-	//
 	CVar::registerCVar(&cl_name);
 	CVar::registerCVar(&cl_color);
 	CVar::registerCVar(&cl_upspeed);
@@ -696,4 +596,3 @@ void CL_Init(void) {
 	Cmd::addCmd("playdemo", CL_PlayDemo_f);
 	Cmd::addCmd("timedemo", CL_TimeDemo_f);
 }
-

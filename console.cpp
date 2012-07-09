@@ -55,10 +55,8 @@ qboolean con_initialized;
 int con_notifylines; // scan lines to clear for notify lines
 extern void M_Menu_Main_f(void);
 
-/*
-================
-Con_ToggleConsole_f
-================
+/**
+ * Called to toggle the console
  */
 void Con_ToggleConsole_f(void) {
 	if (key_dest == key_console) {
@@ -76,11 +74,17 @@ void Con_ToggleConsole_f(void) {
 	Q_memset(con_times, 0, sizeof (con_times));
 }
 
+/**
+ * Clear the console
+ */
 void Con_Clear_f(void) {
 	if (con_text)
 		Q_memset(con_text, ' ', CON_TEXTSIZE);
 }
 
+/**
+ * Clears any notify messages
+ */
 void Con_ClearNotify(void) {
 	int i;
 
@@ -156,7 +160,7 @@ void Con_OpenDebugLog(void);
 
 void Con_Init(void) {
 	char temp[MAXGAMEDIRLEN + 1];
-	char *t2 = "/qconsole.log";
+	const char *t2 = "/qconsole.log";
 
 	con_debuglog = COM_CheckParm("-condebug");
 
@@ -188,8 +192,7 @@ void Con_Init(void) {
 void Con_Linefeed(void) {
 	con_x = 0;
 	con_current++;
-	Q_memset(&con_text[(con_current % con_totallines) * con_linewidth]
-			, ' ', con_linewidth);
+	Q_memset(&con_text[(con_current % con_totallines) * con_linewidth], ' ', con_linewidth);
 }
 
 /**
@@ -269,79 +272,23 @@ void Con_OpenDebugLog(void) {
 	logfile = fopen(va("%s/QMB.log", com_gamedir), "w");
 }
 
-void Con_DebugLog(const char *fmt, ...) {
-	va_list args;
-
-	va_start(args, fmt);
-
-	vfprintf(logfile, fmt, args);
-
-	va_end(args);
+void Con_DebugLog(const char *msg) {
+	fprintf(logfile, msg);
 }
 
 void Con_CloseDebugLog(void) {
 	fclose(logfile);
 }
 
-/**
- * Handles cursor positioning, line wrapping, etc
- */
-#define	MAXPRINTMSG	4096
-void Con_Printf(const char *fmt, ...) {
-	va_list argptr;
-	char msg[MAXPRINTMSG];
+int Con_Print_Real(const char *msg) {
 	static qboolean inupdate;
-
-	va_start(argptr, fmt);
-	vsnprintf(msg, MAXPRINTMSG, fmt, argptr);
-	va_end(argptr);
-
+		
 	// also echo to debugging console
 	Sys_Printf("%s", msg); // also echo to debugging console
 
 	// log all messages to file
 	if (con_debuglog)
-		Con_DebugLog("%s", msg);
-
-	if (!con_initialized)
-		return;
-
-	if (cls.state == ca_dedicated)
-		return; // no graphics mode
-
-	// write it to the scrollable buffer
-	Con_Print(msg);
-
-	// update the screen if the console is displayed
-	if (cls.signon != SIGNONS && !scr_disabled_for_loading) {
-		// protect against infinite loop if something in SCR_UpdateScreen calls
-		// Con_Printd
-		if (!inupdate) {
-			inupdate = true;
-			SCR_UpdateScreen();
-			inupdate = false;
-		}
-	}
-}
-
-#ifdef JAVA
-#include <jni.h>
-
-jint JNICALL Con_fPrintf(FILE *empty, char *fmt, ...) {
-	va_list argptr;
-	char msg[MAXPRINTMSG];
-	static qboolean inupdate;
-
-	va_start(argptr, fmt);
-	vsnprintf(msg, MAXPRINTMSG, fmt, argptr);
-	va_end(argptr);
-
-	// also echo to debugging console
-	Sys_Printf("%s", msg); // also echo to debugging console
-
-	// log all messages to file
-	if (con_debuglog)
-		Con_DebugLog("%s", msg);
+		Con_DebugLog(msg);
 
 	if (!con_initialized)
 		return -1;
@@ -362,9 +309,37 @@ jint JNICALL Con_fPrintf(FILE *empty, char *fmt, ...) {
 			inupdate = false;
 		}
 	}
+	return 0;	
+}
 
-	Con_Printf("JavaMsg\n");
-	return 0;
+/**
+ * Handles cursor positioning, line wrapping, etc
+ */
+#define	MAXPRINTMSG	4096
+void Con_Printf(const char *fmt, ...) {
+	va_list argptr;
+	char msg[MAXPRINTMSG];
+
+	va_start(argptr, fmt);
+	vsnprintf(msg, MAXPRINTMSG, fmt, argptr);
+	va_end(argptr);
+
+	Con_Print_Real(msg);
+}
+
+#ifdef JAVA
+#include <jni.h>
+jint JNICALL Con_fPrintf(FILE *empty, char *fmt, ...) {
+	va_list argptr;
+	char msg[MAXPRINTMSG];
+	static qboolean inupdate;
+
+	va_start(argptr, fmt);
+	vsnprintf(msg, MAXPRINTMSG, fmt, argptr);
+	va_end(argptr);
+
+	Con_Print_Real(msg);
+	Con_Print_Real("JavaMsg\n");
 }
 #endif
 
@@ -382,7 +357,14 @@ void Con_DPrintf(const char *fmt, ...) {
 	vsnprintf(msg, MAXPRINTMSG, fmt, argptr);
 	va_end(argptr);
 
-	Con_Printf("%s", msg);
+	Con_Print_Real(msg);
+}
+
+void Con_SafePrint(const char *msg) {
+	int temp = scr_disabled_for_loading;
+	scr_disabled_for_loading = true;
+	Con_Print_Real(msg);
+	scr_disabled_for_loading = temp;
 }
 
 /**
@@ -391,16 +373,12 @@ void Con_DPrintf(const char *fmt, ...) {
 void Con_SafePrintf(const char *fmt, ...) {
 	va_list argptr;
 	char msg[MAXPRINTMSG];
-	int temp;
 	
 	va_start(argptr, fmt);
 	vsnprintf(msg, MAXPRINTMSG, fmt, argptr);
 	va_end(argptr);
 
-	temp = scr_disabled_for_loading;
-	scr_disabled_for_loading = true;
-	Con_Printf("%s", msg);
-	scr_disabled_for_loading = temp;
+	Con_SafePrint(msg);
 }
 
 /**
@@ -410,20 +388,15 @@ void Con_SafePrintf(const char *fmt, ...) {
 void Con_SafeDPrintf(const char *fmt, ...) {
 	va_list argptr;
 	char msg[MAXPRINTMSG];
-	int temp;
 
 	if (!developer.getBool())
 		return; // don't confuse non-developers with techie stuff...
 
-	Con_SafePrintf(fmt, ...);
-//	va_start(argptr, fmt);
-//	vsnprintf(msg, MAXPRINTMSG, fmt, argptr);
-//	va_end(argptr);
-//
-//	temp = scr_disabled_for_loading;
-//	scr_disabled_for_loading = true;
-//	Con_Printf("%s", msg);
-//	scr_disabled_for_loading = temp;
+	va_start(argptr, fmt);
+	vsnprintf(msg, MAXPRINTMSG, fmt, argptr);
+	va_end(argptr);
+	
+	Con_SafePrint(msg);
 }
 
 /*
