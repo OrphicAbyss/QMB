@@ -52,7 +52,7 @@ void R_InitOtherTextures(void) {
 	float cellFull[32][3];
 	float vertexFull[32][3];
 	int i, found;
-	char *crossfound[32];
+	char crosshairFname[32];
 
 	extern int crosshair_tex[32];
 
@@ -61,14 +61,9 @@ void R_InitOtherTextures(void) {
 	underwatertexture = GL_LoadTexImage("textures/water_caustic", false, true, false);
 	highlighttexture = GL_LoadTexImage("gfx/highlight", false, true, false);
 
-	found = COM_MultipleSearch("textures/crosshairs/*", crossfound, 32);
-
-	Con_Printf("\nFound %i crosshairs.\n", found);
-
-	for (i = 0; i < found && i < 32; i++) {
-		Con_DPrintf("%i. %s\n", i, crossfound[i]);
-		crosshair_tex[i] = GL_LoadTexImage(crossfound[i], false, false, false);
-		MemoryObj::ZFree(crossfound[i]);
+	for (i = 0; i < 32; i++) {
+		snprintf(&crosshairFname[0],32,"textures/crosshairs/crosshair%02i.tga",i);
+		crosshair_tex[i] = GL_LoadTexImage((char *)&crosshairFname[0], false, false, false);
 	}
 
 	for (i = 0; i < 32; i++)
