@@ -105,11 +105,6 @@ qpic_t *Draw_PicFromWadXY(const char *name, int height, int width) {
 	return p;
 }
 
-/*
-================
-Draw_CachePic
-================
- */
 qpic_t *Draw_CachePic(const char *path) {
 	cachepic_t *pic;
 	int i;
@@ -125,9 +120,7 @@ qpic_t *Draw_CachePic(const char *path) {
 	menu_numcachepics++;
 	Q_strcpy(pic->name, path);
 
-	//
 	// load the pic from disk
-	//
 	dat = (qpic_t *) COM_LoadTempFile(path);
 	if (!dat)
 		Sys_Error("Draw_CachePic: failed to load %s", path);
@@ -210,9 +203,7 @@ void Draw_Init(void) {
 	// save a texture slot for translated picture
 	translate_texture = texture_extension_number++;
 
-	//
 	// get the other pics we need
-	//
 	draw_disc = Draw_PicFromWadXY("disc", 48, 48);
 	draw_backtile = Draw_PicFromWad("backtile");
 	//qmb :detail texture
@@ -221,14 +212,10 @@ void Draw_Init(void) {
 	quadtexture = GL_LoadTexImage("textures/quad", false, true, false);
 }
 
-/*
-================
-Draw_Character
-
-Draws one 8*8 graphics character with 0 being transparent.
-It can be clipped to the top of the screen to allow the console to be
-smoothly scrolled off.
-================
+/**
+ * Draws one 8*8 graphics character with 0 being transparent.
+ * It can be clipped to the top of the screen to allow the console to be 
+ * smoothly scrolled off.
  */
 void Draw_Character(int x, int y, int num) {
 	int row, col;
@@ -264,11 +251,6 @@ void Draw_Character(int x, int y, int num) {
 	glEnd();
 }
 
-/*
-================
-Draw_String
-================
- */
 void Draw_String(int x, int y, const char *str) {
 	while (*str) {
 		Draw_Character(x, y, *str++);
@@ -276,23 +258,6 @@ void Draw_String(int x, int y, const char *str) {
 	}
 }
 
-/*
-================
-Draw_DebugChar
-
-Draws a single character directly to the upper right corner of the screen.
-This is for debugging lockups by drawing different chars in different parts
-of the code.
-================
- */
-void Draw_DebugChar(char num) {
-}
-
-/*
-=============
-Draw_AlphaColourPic
-=============
- */
 void Draw_AlphaColourPic(int x, int y, qpic_t *pic, vec3_t colour, float alpha) {
 	glpic_t *gl;
 
@@ -325,11 +290,6 @@ void Draw_AlphaColourPic(int x, int y, qpic_t *pic, vec3_t colour, float alpha) 
 	}
 }
 
-/*
-=============
-Draw_AlphaPic
-=============
- */
 void Draw_AlphaPic(int x, int y, qpic_t *pic, float alpha) {
 	glpic_t *gl;
 
@@ -362,11 +322,6 @@ void Draw_AlphaPic(int x, int y, qpic_t *pic, float alpha) {
 	}
 }
 
-/*
-=============
-Draw_TransPic
-=============
- */
 void Draw_TransPic(int x, int y, qpic_t *pic) {
 	if (x < 0 || (unsigned) (x + pic->width) > vid.conwidth || y < 0 ||
 			(unsigned) (y + pic->height) > vid.conheight) {
@@ -376,12 +331,8 @@ void Draw_TransPic(int x, int y, qpic_t *pic) {
 	Draw_AlphaPic(x, y, pic, 1);
 }
 
-/*
-=============
-Draw_TransPicTranslate
-
-Only used for the player color selection menu
-=============
+/**
+ * Only used for the player color selection menu
  */
 void Draw_TransPicTranslate(int x, int y, qpic_t *pic, byte *translation) {
 	int v, u, c;
@@ -422,11 +373,6 @@ void Draw_TransPicTranslate(int x, int y, qpic_t *pic, byte *translation) {
 	glEnd();
 }
 
-/*
-================
-Draw_ConsoleBackground
-================
- */
 void Draw_ConsoleBackground(int lines) {
 	int y = (vid.conheight * 3) >> 2;
 
@@ -436,13 +382,9 @@ void Draw_ConsoleBackground(int lines) {
 		Draw_AlphaPic(0, lines - vid.conheight, conback, (float) (gl_conalpha.getFloat() * lines) / y);
 }
 
-/*
-=============
-Draw_TileClear
-
-This repeats a 64*64 tile graphic to fill the screen around a sized down
-refresh window.
-=============
+/**
+ * This repeats a 64*64 tile graphic to fill the screen around a sized down 
+ * refresh window.
  */
 void Draw_TileClear(int x, int y, int w, int h) {
 	glColor4f(0, 0.5f, 0.5f, 0.5f);
@@ -463,12 +405,8 @@ void Draw_TileClear(int x, int y, int w, int h) {
 	glEnable(GL_TEXTURE_2D);
 }
 
-/*
-=============
-Draw_Fill
-
-Fills a box of pixels with a single color
-=============
+/**
+ * Fills a box of pixels with a single color
  */
 void Draw_Fill(int x, int y, int w, int h, int c) {
 	glDisable(GL_TEXTURE_2D);
@@ -488,12 +426,8 @@ void Draw_Fill(int x, int y, int w, int h, int c) {
 	glEnable(GL_TEXTURE_2D);
 }
 
-/*
-=============
-Draw_AlphaFill
-
-JHL: Fills a box of pixels with a single transparent color
-=============
+/**
+ * Fills a box of pixels with a single transparent color
  */
 void Draw_AlphaFill(int x, int y, int width, int height, vec3_t colour, float alpha) {
 	glEnable(GL_BLEND);
@@ -515,12 +449,8 @@ void Draw_AlphaFill(int x, int y, int width, int height, vec3_t colour, float al
 	glDisable(GL_BLEND);
 }
 
-/*
-=============
-Draw_AlphaFillFade
-
-JHL: Fills a box of pixels with a single transparent color
-=============
+/**
+ * Fills a box of pixels with a single transparent color
  */
 void Draw_AlphaFillFade(int x, int y, int width, int height, vec3_t colour, float alpha[2]) {
 	glEnable(GL_BLEND);
@@ -546,33 +476,23 @@ void Draw_AlphaFillFade(int x, int y, int width, int height, vec3_t colour, floa
 	glDisable(GL_BLEND);
 }
 
-/*
-===============
-Draw_Crosshair
-
-function that draws the crosshair to the center of the screen
-===============
+/**
+ * function that draws the crosshair to the center of the screen
  */
 void Draw_Crosshair(int texnum, vec3_t colour, float alpha) {
 	int x = 0;
 	int y = 0;
 	float xsize, ysize;
 
-	//
 	// Default for if it isn't set...
-	//
 	xsize = 32;
 	ysize = 32;
 
-	//
 	// Crosshair offset
-	//
 	x = (vid.conwidth / 2) - 16; // was 14
 	y = (vid.conheight / 2) - 8; // was 14
 
-	//
 	// Start drawing
-	//
 	glEnable(GL_BLEND);
 	glDisable(GL_ALPHA_TEST);
 	glColor4f(colour[0], colour[1], colour[2], alpha);
@@ -597,20 +517,11 @@ void Draw_Crosshair(int texnum, vec3_t colour, float alpha) {
 	glEnable(GL_ALPHA_TEST);
 	glDisable(GL_BLEND);
 }
-//=============================================================================
 
-/*
-================
-Draw_FadeScreen
-
-================
- */
 void Draw_FadeScreen(void) {
 	vec3_t colour;
 	float alpha[2];
-	//JHL; changed...
-	int start_x, start_y,
-			end_x, end_y;
+	int start_x, start_y, end_x, end_y;
 
 	start_x = (vid.conwidth - 320) / 2;
 	start_y = (vid.conheight - 240) / 2;
@@ -627,12 +538,8 @@ void Draw_FadeScreen(void) {
 
 //=============================================================================
 
-/*
-================
-GL_Set2D
-
-Setup as if the screen was 320*200
-================
+/**
+ * Setup as if the screen was 320*200 (or overridden hud res
  */
 void GL_Set2D(void) {
 	glViewport(glx, gly, glwidth, glheight);

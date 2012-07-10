@@ -40,16 +40,11 @@ m*_t structures are in-memory
 
 /*
 ==============================================================================
-
 BRUSH MODELS
-
 ==============================================================================
 */
 
-
-//
 // in memory representation
-//
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct
 {
@@ -59,7 +54,6 @@ typedef struct
 #define	SIDE_FRONT	0
 #define	SIDE_BACK	1
 #define	SIDE_ON		2
-
 
 // plane_t structure
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
@@ -87,7 +81,6 @@ typedef struct texture_s
 	unsigned	offsets[MIPLEVELS];		// four mip maps stored
 } texture_t;
 
-
 #define	SURF_PLANEBACK		2
 #define	SURF_DRAWSKY		4
 #define SURF_DRAWSPRITE		8
@@ -95,19 +88,15 @@ typedef struct texture_s
 #define SURF_DRAWTILED		32
 #define SURF_DRAWBACKGROUND	64
 #define SURF_UNDERWATER		128
-//qmb :reflections
 #define SURF_SHINY_GLASS	256 //JHL:ADD; New flag for glass effect
 #define SURF_SHINY_METAL	512 //JHL:ADD; New flag for chrome effect
 
-// !!! if this is changed, it must be changed in asm_draw.h too !!!
-typedef struct
-{
+typedef struct {
 	unsigned short	v[2];
 	unsigned int	cachededgeoffset;
 } medge_t;
 
-typedef struct
-{
+typedef struct {
 	float		vecs[2][4];
 	float		mipadjust;
 	texture_t	*texture;
@@ -116,8 +105,7 @@ typedef struct
 
 #define	VERTEXSIZE	12//old 7
 
-typedef struct glpoly_s
-{
+typedef struct glpoly_s {
 	struct	glpoly_s	*next;
 	struct	glpoly_s	*chain;
 	int		numverts;
@@ -130,8 +118,7 @@ typedef struct glpoly_s
 	//and rgb is the vertex light
 } glpoly_t;
 
-typedef struct msurface_s
-{
+typedef struct msurface_s {
 	int			visframe;		// should be drawn when node is crossed
 
 	mplane_t	*plane;
@@ -163,8 +150,7 @@ typedef struct msurface_s
 	byte		*samples;		// [numstyles*surfsize]
 } msurface_t;
 
-typedef struct mnode_s
-{
+typedef struct mnode_s {
 // common with leaf
 	int			contents;		// 0, to differentiate from leafs
 	int			visframe;		// node needs to be traversed if current
@@ -181,10 +167,7 @@ typedef struct mnode_s
 	unsigned short		numsurfaces;
 } mnode_t;
 
-
-
-typedef struct mleaf_s
-{
+typedef struct mleaf_s {
 // common with node
 	int			contents;		// wil be a negative contents number
 	int			visframe;		// node needs to be traversed if current
@@ -203,9 +186,7 @@ typedef struct mleaf_s
 	byte		ambient_sound_level[NUM_AMBIENTS];
 } mleaf_t;
 
-// !!! if this is changed, it must be changed in asm_i386.h too !!!
-typedef struct
-{
+typedef struct {
 	dclipnode_t	*clipnodes;
 	mplane_t	*planes;
 	int			firstclipnode;
@@ -216,37 +197,29 @@ typedef struct
 
 /*
 ==============================================================================
-
 SPRITE MODELS
-
 ==============================================================================
 */
-
-
 // FIXME: shorten these?
-typedef struct mspriteframe_s
-{
+typedef struct mspriteframe_s {
 	int		width;
 	int		height;
 	float	up, down, left, right;
 	int		gl_texturenum;
 } mspriteframe_t;
 
-typedef struct
-{
+typedef struct {
 	int				numframes;
 	float			*intervals;
 	mspriteframe_t	*frames[1];
 } mspritegroup_t;
 
-typedef struct
-{
+typedef struct {
 	spriteframetype_t	type;
 	mspriteframe_t		*frameptr;
 } mspriteframedesc_t;
 
-typedef struct
-{
+typedef struct {
 	int					type;
 	int					maxwidth;
 	int					maxheight;
@@ -256,18 +229,14 @@ typedef struct
 	mspriteframedesc_t	frames[1];
 } msprite_t;
 
-
 /*
 ==============================================================================
-
 ALIAS MODELS
-
 Alias models are position independent, so the cache manager can move them.
 ==============================================================================
 */
 
-typedef struct
-{
+typedef struct {
 	int					firstpose;
 	int					numposes;
 	float				interval;
@@ -277,27 +246,23 @@ typedef struct
 	char				name[16];
 } maliasframedesc_t;
 
-typedef struct
-{
+typedef struct {
 	trivertx_t			bboxmin;
 	trivertx_t			bboxmax;
 	int					frame;
 } maliasgroupframedesc_t;
 
-typedef struct
-{
+typedef struct {
 	int						numframes;
 	int						intervals;
 	maliasgroupframedesc_t	frames[1];
 } maliasgroup_t;
 
-// !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct mtriangle_s {
 	int					facesfront;
 	int					vertindex[3];
 	int					neighbours[3];
 } mtriangle_t;
-
 
 #define	MAX_SKINS	32
 typedef struct {
@@ -340,19 +305,14 @@ extern	stvert_t	stverts[MAXALIASVERTS];
 extern	mtriangle_t	triangles[MAXALIASTRIS];
 extern	trivertx_t	*poseverts[MAXALIASFRAMES];
 
-
-
 /*
 ========================================================================
-
 .MD2 triangle model file format
-
 ========================================================================
 */
 
 // LordHavoc: grabbed this from the Q2 utility source,
 // renamed a things to avoid conflicts
-
 #define MD2IDALIASHEADER		(('2'<<24)+('P'<<16)+('D'<<8)+'I')
 #define MD2ALIAS_VERSION	8
 
@@ -364,20 +324,17 @@ extern	trivertx_t	*poseverts[MAXALIASFRAMES];
 // sanity checking size
 #define MD2MAX_SIZE	(1024*4200)
 
-typedef struct
-{
+typedef struct {
 	short	s;
 	short	t;
 } md2stvert_t;
 
-typedef struct
-{
+typedef struct {
 	short	index_xyz[3];
 	short	index_st[3];
 } md2triangle_t;
 
-typedef struct
-{
+typedef struct {
 	byte	v[3];			// scaled byte to fit in frame mins/maxs
 	byte	lightnormalindex;
 } md2trivertx_t;
@@ -388,14 +345,12 @@ typedef struct
 #define MD2TRIVERTX_LNI  3
 #define MD2TRIVERTX_SIZE 4
 
-typedef struct
-{
+typedef struct {
 	float		scale[3];	// multiply byte verts by this
 	float		translate[3];	// then add this
 	char		name[16];	// frame name from grabbing
 	md2trivertx_t	verts[1];	// variable sized
 } md2frame_t;
-
 
 // the glcmd format:
 // a positive integer starts a tristrip command, followed by that many
@@ -405,9 +360,7 @@ typedef struct
 // a vertex consists of a floating point s, a floating point t,
 // and an integer vertex index.
 
-
-typedef struct
-{
+typedef struct {
 	int			ident;
 	int			version;
 
@@ -437,10 +390,7 @@ typedef struct
 #define ALIASTYPE_MD3 3
 
 //===================================================================
-
-//
 // Whole model
-//
 
 typedef enum {mod_brush, mod_sprite, mod_alias} modtype_t;
 
@@ -454,8 +404,7 @@ typedef enum {mod_brush, mod_sprite, mod_alias} modtype_t;
 #define	EF_TRACER3	128			// purple trail
 #define EF_MODELFLASH 256		// md3 replacement pickup models flash
 
-typedef struct model_s
-{
+typedef struct model_s {
 	char		name[MAX_QPATH];
 	qboolean	needload;		// bmodels and sprites don't cache normally
 
@@ -466,21 +415,15 @@ typedef struct model_s
 
 	int			flags;
 
-//
 // volume occupied by the model graphics
-//
 	vec3_t		mins, maxs;
 	float		radius;
 
-//
 // solid volume for clipping
-//
 	qboolean	clipbox;
 	vec3_t		clipmins, clipmaxs;
 
-//
 // brush model
-//
 	int			firstmodelsurface, nummodelsurfaces;
 
 	int			numsubmodels;
@@ -525,11 +468,8 @@ typedef struct model_s
 	byte		*lightdata;
 	char		*entities;
 
-//
 // additional model data
-//
 	MemoryObj	*cache;		// only access through Mod_Extradata
-
 } model_t;
 
 //============================================================================

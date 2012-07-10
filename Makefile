@@ -2,7 +2,6 @@
 # Makefile for QMB
 #===============================================================================
 
-
 ifdef WINDIR
 # Win32
     TARGET_PLATFORM = windows

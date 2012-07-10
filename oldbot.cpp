@@ -1,8 +1,8 @@
 #include "quakedef.h"
 #include "bot.h"
 
-void SearchForEnemyCoop (client_t *client)
-{ //its a coop game
+void SearchForEnemyCoop (client_t *client) {
+	//its a coop game
 	edict_t	*bot = client->edict;
 	edict_t	*nmy = bot->bot.enemy;
 	edict_t *bestent;
@@ -15,19 +15,17 @@ void SearchForEnemyCoop (client_t *client)
 
 	// try all possible entities
 	if (nmy != bot			&&	// If he has an enemy that aint himself
-		nmy->v.health > 0)		// and has some health
-	{
+		nmy->v.health > 0) {	// and has some health
 		VectorAdd (nmy->v.mins, nmy->v.maxs, eyes1);
 		VectorScale (eyes1, 0.5, eyes1);
 		VectorAdd (nmy->v.origin, eyes1, eyes1);
 
-		VectorAdd (bot->v.origin, bot->v.view_ofs, eyes2);	// We want the origin of the bots eyes
+		VectorAdd (bot->v.origin, bot->v.view_ofs, eyes2);		// We want the origin of the bots eyes
 
-		if (IsInView(eyes1, eyes2, bot, nmy, 80, test))		// If the bot can see his enemy
-		{
-				VectorCopy (test, bot->v.angles);			// Then turn towards the enemy
+		if (IsInView(eyes1, eyes2, bot, nmy, 80, test)) {		// If the bot can see his enemy
+				VectorCopy (test, bot->v.angles);				// Then turn towards the enemy
 				AttackMoveBot (client, true, true, false, nmy);	// and start shooting
-				return;										// We are done here now...
+				return;											// We are done here now...
 		}
 	}
 
@@ -36,10 +34,8 @@ void SearchForEnemyCoop (client_t *client)
 	bestent = NULL;
 
 	//save calculations
-
 	nmy = NEXT_EDICT(sv.edicts);
-	for (i=1 ; i<sv.num_edicts ; i++, nmy = NEXT_EDICT(nmy) )
-	{
+	for (i=1 ; i<sv.num_edicts ; i++, nmy = NEXT_EDICT(nmy)) {
 		if (nmy->v.takedamage != DAMAGE_AIM	||				//takes damage
 			nmy == bot						||				//isnt the bot
 			!(nmy->v.health > 0)			||				// and is alive
@@ -51,16 +47,14 @@ void SearchForEnemyCoop (client_t *client)
 		VectorScale (eyes1, 0.5, eyes1);
 		VectorAdd (nmy->v.origin, eyes1, eyes1);
 
-		if (IsInView(eyes1, eyes2, bot, nmy, bestdist, test))// If the bot can see his client
-		{
+		if (IsInView(eyes1, eyes2, bot, nmy, bestdist, test)) {// If the bot can see his client
 			test2 = test[1] - bot->v.angles[1];		// Another shortcut
 			bestdist = abs(test2);
 			bestent = nmy;
 		}
 	}
 
-	if (bestent)
-	{
+	if (bestent) {
 		nmy = bestent;
 		VectorSubtract (bestent->v.origin, bot->v.origin, origin);
 		CalcAngles (origin, test);		// And use it to see in what direction the client is
@@ -81,8 +75,7 @@ void SearchForEnemyCoop (client_t *client)
 	if (nmy					&&
 		nmy != bot			&&		// and is not the bot himself
 		nmy->v.health > 0	&&		// and is alive
-		!nmy->bot.isbot)			// and is not a bot
-	{
+		!nmy->bot.isbot) {			// and is not a bot
 		bot->bot.chase = nmy;									// Then start chasing him
 		VectorSubtract (nmy->v.origin, bot->v.origin, origin);	// Get a nice vector
 
@@ -97,17 +90,13 @@ void SearchForEnemyCoop (client_t *client)
 	bot->bot.enemy = bot;				// Set enemy to the bot himself again
 	nmy	= Nextent(globot.world);		// Prepare to loop through clients
 	num	= 0;
-	while (num < globot.MaxClients)		// Keep looping as long as there are clients
-	{
+	while (num < globot.MaxClients) {	// Keep looping as long as there are clients
 		if (nmy != bot			&&		// and is not the bot himself
 			nmy->v.health > 0	&&		// and is alive
-			!nmy->bot.isbot)			// and is not a bot
-
-		{
+			!nmy->bot.isbot) {			// and is not a bot
 			VectorAdd (nmy->v.origin, nmy->v.view_ofs, eyes1);	// We want the origin of the clients eyes
 
-			if (IsInView(eyes1, eyes2, bot, nmy, 1000, test))
-			{
+			if (IsInView(eyes1, eyes2, bot, nmy, 1000, test)) {
 				bot->bot.chase = nmy;						// start him chasing
 				bot->v.angles[0] = 0;						// This is reset so it doesnt look like hes running into the floor if the chase client is below him
 				bot->v.angles[1] = test[1];					// Then turn the bot that way
