@@ -201,7 +201,7 @@ void Draw_Init(void) {
 	conback->height = vid.conheight;
 
 	// save a texture slot for translated picture
-	translate_texture = texture_extension_number++;
+	translate_texture = TextureManager::getTextureId();
 
 	// get the other pics we need
 	draw_disc = Draw_PicFromWadXY("disc", 48, 48);

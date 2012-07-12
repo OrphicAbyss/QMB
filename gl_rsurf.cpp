@@ -20,14 +20,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // r_surf.c: surface-related refresh code
 
 #include "quakedef.h"
+#include "Texture.h"
 
-int lightmap_bytes; // 1, 2, or 4
-int lightmap_textures;
-
+#define	MAX_LIGHTMAPS	1024
 #define	BLOCK_WIDTH		128
 #define	BLOCK_HEIGHT	128
 
-#define	MAX_LIGHTMAPS	1024
+int lightmap_bytes; // 1, 2, or 4
+int lightmap_textures[MAX_LIGHTMAPS];
 int active_lightmaps;
 
 typedef struct glRect_s {
@@ -641,7 +641,7 @@ void GL_UploadLightmap(void) {
 		lightmap_rectchange[i].t = BLOCK_HEIGHT;
 		lightmap_rectchange[i].w = 0;
 		lightmap_rectchange[i].h = 0;
-		glBindTexture(GL_TEXTURE_2D, lightmap_textures + i);
+		glBindTexture(GL_TEXTURE_2D, lightmap_textures[i]);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -658,9 +658,9 @@ void GL_BuildLightmaps(void) {
 
 	r_framecount = 1; // no dlightcache
 
-	if (!lightmap_textures) {
-		lightmap_textures = texture_extension_number;
-		texture_extension_number += MAX_LIGHTMAPS;
+	if (!lightmap_textures[0]) {
+		for (int i=0; i<MAX_LIGHTMAPS; i++)
+			lightmap_textures[i] = TextureManager::getTextureId();
 	}
 
 	lightmap_bytes = 4;

@@ -17,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #include "quakedef.h"
+#include "Texture.h"
 #include "gl_md3.h"
 
 extern char loadname[32];
@@ -79,8 +80,6 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline) {
 
 	extern vec3_t lightcolor;
 	extern vec3_t shadevector;
-	extern unsigned int celtexture;
-	extern unsigned int vertextexture;
 
 	//md3 interpolation
 	float blend, iblend;
@@ -99,9 +98,9 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline) {
 		glDisable(GL_TEXTURE_2D);
 		glEnable(GL_TEXTURE_1D);
 		if (r_celshading.getBool())
-			glBindTexture(GL_TEXTURE_1D, celtexture);
+			glBindTexture(GL_TEXTURE_1D, TextureManager::celtexture);
 		else
-			glBindTexture(GL_TEXTURE_1D, vertextexture);
+			glBindTexture(GL_TEXTURE_1D, TextureManager::vertextexture);
 		glActiveTexture(GL_TEXTURE0_ARB);
 
 		usevertexarray = false;

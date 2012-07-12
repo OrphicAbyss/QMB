@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // screen.c -- master for refresh, status bar, console, chat, notify, etc
 
 #include "quakedef.h"
+#include "Texture.h"
 #include "CaptureHelpers.h"
 
 /*
@@ -681,7 +682,6 @@ void Draw_Crosshair(int texnum, vec3_t colour, float alpha);
  * needs almost the entire 256k of stack space!
  */
 void SCR_UpdateScreen(void) {
-	extern int crosshair_tex[32];
 	extern CVar hud_r, hud_g, hud_b, hud_a;
 	vec3_t colour;
 
@@ -746,8 +746,8 @@ void SCR_UpdateScreen(void) {
 		Sbar_FinaleOverlay();
 		SCR_CheckDrawCenterString();
 	} else {
-		if (crosshair.getInt() < 32 && crosshair_tex[(int) crosshair.getInt()] != 0)
-			Draw_Crosshair(crosshair_tex[(int) crosshair.getInt()], colour, 0.7f);
+		if (crosshair.getInt() < 32 && TextureManager::crosshair_tex[crosshair.getInt()] != 0)
+			Draw_Crosshair(TextureManager::crosshair_tex[crosshair.getInt()], colour, 0.7f);
 		else
 			if (crosshair.getBool()) {
 			float x = (vid.conwidth / 2) - 0;

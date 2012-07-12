@@ -27,8 +27,6 @@ int texture_mode = GL_NEAREST_MIPMAP_NEAREST;
 //int		texture_mode = GL_LINEAR_MIPMAP_NEAREST;
 //int		texture_mode = GL_LINEAR_MIPMAP_LINEAR;
 
-int texture_extension_number = 1;
-
 //qmb :extra stuff
 qboolean gl_combine = false;
 qboolean gl_point_sprite = false;
@@ -178,7 +176,7 @@ void VID_SetPalette(unsigned char *palette) {
 		colors[i].g = *palette++;
 		colors[i].b = *palette++;
 	}
-	d_8to24table[255] &= 0xffffff; // 255 is transparent
+	d_8to24table[255] &= 0x00000000; // 255 is transparent
 }
 
 void VID_ShiftPalette(unsigned char *palette) {

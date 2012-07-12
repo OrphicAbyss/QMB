@@ -26,6 +26,7 @@ public:
 	int bytesPerPixel;
 	int dataHash;
 	unsigned char *data;
+	GLuint textureType;
 	GLuint textureId;
 	GLuint fullbrightTextureId;
 	bool mipmap;
@@ -44,6 +45,14 @@ public:
 	static GLuint glFilterMin;
 	static glFilterMode glFilterModes[];
 	
+	static GLuint shinetex_glass;
+	static GLuint shinetex_chrome;
+	static GLuint underwatertexture;
+	static GLuint highlighttexture;
+	static GLuint celtexture;
+	static GLuint vertextexture;
+	static GLuint crosshair_tex[32];
+
 	static Texture *LoadTexture(Texture *texture);
 	static Texture *LoadFile(char *filename, bool complain);
 	static Texture *LoadFilePNG(FILE *f, char *name);
@@ -57,6 +66,12 @@ public:
 	static Texture *findTexture(Texture *find);
 	static void addTexture(Texture *add);
 	static void removeTexture(Texture *remove);
+
+	static void LoadMiscTextures();
+	
+	static GLuint getTextureId();
+	static void delTextureId(GLuint);
 };
+
 #endif	/* TEXTURE_H */
 

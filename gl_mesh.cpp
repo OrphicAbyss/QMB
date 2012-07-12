@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // gl_mesh.c: triangle model functions
 
 #include "quakedef.h"
+#include "Texture.h"
 #include "gl_md3.h"
 
 /*
@@ -304,8 +305,6 @@ void GL_DrawAliasFrame(aliashdr_t *paliashdr, int posenum, int shell, int cell) 
 
 	//cell shading
 	vec3_t lightVector;
-	extern unsigned int celtexture;
-	extern unsigned int vertextexture;
 
 	lightVector[0] = 0;
 	lightVector[1] = 0;
@@ -324,9 +323,9 @@ void GL_DrawAliasFrame(aliashdr_t *paliashdr, int posenum, int shell, int cell) 
 		glDisable(GL_TEXTURE_2D);
 		glEnable(GL_TEXTURE_1D);
 		if (r_celshading.getBool())
-			glBindTexture(GL_TEXTURE_1D, celtexture);
+			glBindTexture(GL_TEXTURE_1D, TextureManager::celtexture);
 		else
-			glBindTexture(GL_TEXTURE_1D, vertextexture);
+			glBindTexture(GL_TEXTURE_1D, TextureManager::vertextexture);
 
 	}
 
@@ -461,8 +460,6 @@ void GL_DrawAliasBlendedFrame(aliashdr_t *paliashdr, int pose1, int pose2, float
 
 	//cell shading
 	vec3_t lightVector;
-	extern unsigned int celtexture;
-	extern unsigned int vertextexture;
 
 	lightVector[0] = 0;
 	lightVector[1] = 0;
@@ -475,9 +472,9 @@ void GL_DrawAliasBlendedFrame(aliashdr_t *paliashdr, int pose1, int pose2, float
 		glDisable(GL_TEXTURE_2D);
 		glEnable(GL_TEXTURE_1D);
 		if (r_celshading.getBool())
-			glBindTexture(GL_TEXTURE_1D, celtexture);
+			glBindTexture(GL_TEXTURE_1D, TextureManager::celtexture);
 		else
-			glBindTexture(GL_TEXTURE_1D, vertextexture);
+			glBindTexture(GL_TEXTURE_1D, TextureManager::vertextexture);
 
 	}
 
@@ -935,7 +932,7 @@ void R_DrawAliasModel(entity_t *e) {
 			if (0 && gl_textureunits > 2) {
 				GL_EnableTMU(GL_TEXTURE1_ARB);
 
-				glBindTexture(GL_TEXTURE_2D, highlighttexture);
+				glBindTexture(GL_TEXTURE_2D, TextureManager::highlighttexture);
 
 				glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
 				glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);

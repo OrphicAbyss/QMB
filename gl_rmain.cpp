@@ -30,10 +30,6 @@ int r_framecount; // used for dlight push checking
 mplane_t frustum[4];
 
 int c_brush_polys, c_alias_polys;
-int shinetex_glass, shinetex_chrome, underwatertexture, highlighttexture;
-int crosshair_tex[32];
-
-int playertextures; // up to 16 color translated skins
 
 // Used by depth hack
 float gldepthmin, gldepthmax;
@@ -452,7 +448,7 @@ void R_SetupGL(void) {
 	glTranslatef(-r_refdef.vieworg[0], -r_refdef.vieworg[1], -r_refdef.vieworg[2]);
 
 	// set drawing parms
-	if (gl_cull.value)
+	if (gl_cull.getBool())
 		glEnable(GL_CULL_FACE);
 	else
 		glDisable(GL_CULL_FACE);

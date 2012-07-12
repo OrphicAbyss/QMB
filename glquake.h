@@ -30,7 +30,6 @@ void checkGLError(const char *text);
 void GL_BeginRendering (int *x, int *y, int *width, int *height);
 void GL_EndRendering (void);
 
-extern	int		texture_extension_number;
 extern	int		texture_mode;
 extern	int		gl_textureunits;	//qmb :multitexture stuff
 
@@ -71,10 +70,6 @@ extern	refdef_t	r_refdef;
 extern	mleaf_t		*r_viewleaf, *r_oldviewleaf;
 extern	texture_t	*r_notexture_mip;
 extern	int		d_lightstylevalue[256];	// 8.8 fraction of base light value
-
-extern	int shinetex_glass, shinetex_chrome, underwatertexture, highlighttexture;
-
-extern	int	playertextures;
 
 extern	CVar	r_drawentities;
 extern	CVar	r_drawworld;

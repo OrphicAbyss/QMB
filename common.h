@@ -27,13 +27,7 @@ typedef unsigned char 		byte;
 #define BYTE_DEFINED 1
 #endif
 
-//#ifdef cpp
 typedef bool qboolean;
-//#else
-//#undef true
-//#undef false
-//typedef enum {false, true}	qboolean;
-//#endif
 
 //============================================================================
 
@@ -71,10 +65,6 @@ void InsertLinkAfter (link_t *l, link_t *after);
 #define	STRUCT_FROM_LINK(l,t,m) ((t *)((byte *)l - (int)&(((t *)0)->m)))
 
 //============================================================================
-
-#ifndef NULL
-#define NULL ((void *)0)
-#endif
 
 #define Q_MAXCHAR ((char)0x7f)
 #define Q_MAXSHORT ((short)0x7fff)
@@ -181,7 +171,6 @@ byte *COM_LoadStackFile (const char *path, void *buffer, int bufsize);
 byte *COM_LoadTempFile (const char *path);
 byte *COM_LoadHunkFile (const char *path);
 void COM_LoadCacheFile (const char *path, struct cache_user_s *cu);
-int COM_MultipleSearch (char *searchstring, char **found, int max);
 
 extern	struct CVar registered;
 
@@ -193,5 +182,4 @@ extern qboolean		standard_quake, rogue, hipnotic;
 
 #define bound(a,b,c) ((a) >= (c) ? (a) : \
 					(b) < (a) ? (a) : (b) > (c) ? (c) : (b))
-
 #endif

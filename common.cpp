@@ -987,7 +987,6 @@ void COM_CheckRegistered(void) {
 	Con_Printf("Playing registered version.\n");
 }
 
-
 void COM_Path_f(void);
 
 /*
@@ -1530,111 +1529,9 @@ pack_t *COM_LoadPackFile(char *packfile) {
 	return pack;
 }
 
-#ifdef WIN32
-#include <io.h>
-#endif
-
-/*
-====================================
-COM_MultipleSearch
-takes a searchstring with wildcards (*) and searches for all files maching it.
-returns an array of strings that need to be cleared.
-====================================
- */
-int COM_MultipleSearch(char *searchstring, char **found, int max) {
-	int i;
-	searchpath_t *search = com_searchpaths;
-	char basestring[MAX_QPATH];
-	int baselen, numfound = 0;
-
-#ifdef FALSE_WIN32
-	baselen = (void *) COM_SkipPath(searchstring) - (void *) searchstring;
-	Q_strncpy(basestring, searchstring, baselen);
-	basestring[baselen] = '\0';
-	//Con_Printf("%i - %i - %s\n",(int)searchstring,(int)COM_SkipPath(searchstring),searchstring);
-
-	for (; search; search = search->next) {
-		if (search->pack) {
-			// look through all the pak file elements
-			pack_t *pak = search->pack;
-
-			for (i = 0; i < pak->numfiles && numfound < max; i++)
-				if (!Q_strcmp(basestring, pak->files[i].name)) { // found a matching mapname.. now to match wildcards.
-					char *substr = pak->files[i].name;
-					char *wildcardstring = COM_SkipPath(searchstring);
-					int n = 0; //postition in wildcardstring
-
-					while (1) {
-						char tmp[MAX_QPATH];
-						int s = 0;
-
-						switch (wildcardstring[n]) {
-							case '\0':
-								if (substr[0])
-									goto next;
-								else {//Found it!
-									found[numfound] = MemoryObj::ZAlloc(Q_strlen(pak->files[i].name) * sizeof (char));
-									Q_strcpy(found[numfound], pak->files[i].name);
-									numfound++;
-								}
-
-							case '*':
-								while (wildcardstring[n] != '\0' && wildcardstring[n] != '*' && wildcardstring[n] != '?')
-									tmp[s++] = substr[n++];
-								tmp[s] = '\0';
-								substr = strstr(tmp, substr);
-								if (!substr)
-									goto next;
-							default:
-								while (wildcardstring[n] != '\0' && wildcardstring[n] != '*' && wildcardstring[n] != '?')
-									tmp[s++] = substr[n++];
-								tmp[s] = '\0';
-								if (Q_strcmp(tmp, substr))
-									goto next;
-								substr += s - 1;
-						}
-						n++;
-						substr++;
-					}
-					found[numfound] = MemoryObj::ZAlloc(Q_strlen(pak->files[i].name) * sizeof (char));
-					Q_strcpy(found[numfound], pak->files[i].name);
-					numfound++;
-next:
-					;
-				}
-		} else {
-			char filestring[MAX_QPATH];
-			char dirstring [MAX_QPATH];
-			struct _finddata_t fileinfo;
-			int handle;
-
-			sprintf(dirstring, "%s/%s", search->filename, searchstring);
-			handle = _findfirst(dirstring, &fileinfo);
-			if (handle != -1)
-				do {
-					if (fileinfo.name[0] == '.')
-						continue;
-
-					sprintf(filestring, "%s%s", basestring, fileinfo.name);
-
-					found[numfound] = MemoryObj::ZAlloc(Q_strlen(filestring) * sizeof (char));
-					Q_strcpy(found[numfound], filestring);
-					numfound++;
-				} while (_findnext(handle, &fileinfo) != -1 && numfound < max);
-			_findclose(handle);
-		}
-	}
-#endif
-	return numfound;
-}
-
-/*
-================
-COM_AddGameDirectory
-
-Sets com_gamedir, adds the directory to the head of the path,
-then loads and adds pak1.pak pak2.pak ...
-================
+/**
+ * Sets com_gamedir, adds the directory to the head of the path,
+ * then loads and adds pak1.pak pak2.pak ...
  */
 void COM_AddGameDirectory(char *dir) {
 	int i;
@@ -1644,17 +1541,13 @@ void COM_AddGameDirectory(char *dir) {
 
 	Q_strcpy(com_gamedir, dir);
 
-	//
 	// add the directory to the search path
-	//
 	search = (searchpath_t *) Hunk_Alloc(sizeof (searchpath_t));
 	Q_strcpy(search->filename, dir);
 	search->next = com_searchpaths;
 	com_searchpaths = search;
 
-	//
 	// add any pak files in the format pak0.pak pak1.pak, ...
-	//
 	for (i = 0;; i++) {
 		sprintf(pakfile, "%s/pak%i.pak", dir, i);
 		pak = COM_LoadPackFile(pakfile);
@@ -1666,26 +1559,16 @@ void COM_AddGameDirectory(char *dir) {
 		com_searchpaths = search;
 	}
 
-	//
 	// add the contents of the parms.txt file to the end of the command line
-	//
-
 }
 
-/*
-================
-COM_InitFilesystem
-================
- */
 void COM_InitFilesystem(void) {
 	int i, j;
 	char basedir[MAX_OSPATH];
 	searchpath_t *search;
 
-	//
 	// -basedir <path>
 	// Overrides the system supplied base directory (under GAMENAME)
-	//
 	i = COM_CheckParm("-basedir");
 	if (i && i < com_argc - 1)
 		Q_strcpy(basedir, com_argv[i + 1]);
@@ -1718,13 +1601,9 @@ void COM_InitFilesystem(void) {
 	else */
 	com_cachedir[0] = 0;
 
-	//
 	// start up with GAMENAME by default (id1)
-	//
 	COM_AddGameDirectory(va("%s/"GAMENAME, basedir));
-
-	//QMB :mod
-	//JHL:HACK; Add QMB mod for default!
+	// add in the QMB mod
 	COM_AddGameDirectory(va("%s/qmb", basedir));
 
 	if (COM_CheckParm("-rogue"))
@@ -1732,20 +1611,16 @@ void COM_InitFilesystem(void) {
 	if (COM_CheckParm("-hipnotic"))
 		COM_AddGameDirectory(va("%s/hipnotic", basedir));
 
-	//
 	// -game <gamedir>
 	// Adds basedir/gamedir as an override game
-	//
 	i = COM_CheckParm("-game");
 	if (i && i < com_argc - 1) {
 		com_modified = true;
 		COM_AddGameDirectory(va("%s/%s", basedir, com_argv[i + 1]));
 	}
 
-	//
 	// -path <dir or packfile> [<dir or packfile>] ...
 	// Fully specifies the exact serach path, overriding the generated one
-	//
 	i = COM_CheckParm("-path");
 	if (i) {
 		com_modified = true;
@@ -1769,5 +1644,3 @@ void COM_InitFilesystem(void) {
 	if (COM_CheckParm("-nomod"))
 		nomod = true;
 }
-
-

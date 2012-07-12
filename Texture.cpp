@@ -6,6 +6,7 @@
 Texture::Texture(const char *ident) {
 	this->identifier = (char *)MemoryObj::ZAlloc(Q_strlen(ident));
 	Q_strcpy(this->identifier, ident);
+	this->textureType = GL_TEXTURE_2D;
 	this->data = NULL;
 	this->dataHash = 0;
 	this->width = 0;
@@ -17,10 +18,12 @@ Texture::Texture(const char *ident) {
 }
 
 Texture::~Texture() {
-	if (this->data)
-		free(this->data);
-	if (this->identifier)
-		MemoryObj::ZFree(this->identifier);
+	if (textureId != 0)
+		TextureManager::delTextureId(textureId);
+	if (data)
+		free(data);
+	if (identifier)
+		MemoryObj::ZFree(identifier);
 }
 
 bool Texture::operator ==(const Texture& other) const {
@@ -133,7 +136,7 @@ void Texture::convert8To32() {
 	
 	free(this->data);
 	this->data = (unsigned char *)newData;
-	bytesPerPixel = 4;
+	this->bytesPerPixel = 4;
 }
 
 void Texture::convert24To32() {
@@ -156,7 +159,7 @@ void Texture::convert24To32() {
 	
 	free(this->data);
 	this->data = newData;
-	bytesPerPixel = 4;
+	this->bytesPerPixel = 4;
 }
 
 void Texture::fixSize() {
@@ -207,24 +210,38 @@ void Texture::upload() {
 	
 	// Resize the image if we need to (non-power of 2 or over max size)
 	fixSize();
-	
-	if (!mipmap) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	} else { //else build mipmaps for it
-		if (gl_sgis_mipmap) {
-			glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+
+	if (this->textureType == GL_TEXTURE_2D) {
+		if (textureId == 0)
+			textureId = TextureManager::getTextureId();
+		
+		glBindTexture(GL_TEXTURE_2D, textureId);
+		if (!mipmap) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-			glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
-		} else {
-			gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		} else { //else build mipmaps for it
+			if (gl_sgis_mipmap) {
+				glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+				glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
+			} else {
+				gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			}
 		}
+
+		if (mipmap)
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TextureManager::glFilterMin);
+		else
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TextureManager::glFilterMax);
+
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, TextureManager::glFilterMax);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, gl_anisotropic.getInt());
+	} else if (this->textureType == GL_TEXTURE_1D) {
+		glBindTexture(GL_TEXTURE_1D, textureId);
+		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		// Upload
+		glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, width, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	} else {
+		Con_Printf("Unknown texture type for texture: %s", identifier);
 	}
-	
-	if (mipmap)
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TextureManager::glFilterMin);
-	else
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TextureManager::glFilterMax);
-	
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, TextureManager::glFilterMax);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, gl_anisotropic.getInt());
 }

@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 //world brush related drawing code
 #include "quakedef.h"
-#include <GL/GLee.h>
+#include "Texture.h"
 
 typedef struct glRect_s {
 	unsigned char l, t, w, h;
@@ -326,22 +326,22 @@ void Surf_DrawExtraChainsFour(msurface_t *extrachain) {
 	//the first water caustic
 	GL_DisableTMU(GL_TEXTURE0_ARB);
 	Surf_EnableCaustic();
-	glBindTexture(GL_TEXTURE_2D, underwatertexture);
+	glBindTexture(GL_TEXTURE_2D, TextureManager::underwatertexture);
 
 	//the second water caustic
 	glActiveTexture(GL_TEXTURE1_ARB);
 	Surf_EnableCaustic();
-	glBindTexture(GL_TEXTURE_2D, underwatertexture);
+	glBindTexture(GL_TEXTURE_2D, TextureManager::underwatertexture);
 
 	//the glass shiny texture
 	glActiveTexture(GL_TEXTURE2_ARB);
 	Surf_EnableShiny();
-	glBindTexture(GL_TEXTURE_2D, shinetex_glass);
+	glBindTexture(GL_TEXTURE_2D, TextureManager::shinetex_glass);
 
 	//the metal shiny texture
 	glActiveTexture(GL_TEXTURE3_ARB);
 	Surf_EnableShiny();
-	glBindTexture(GL_TEXTURE_2D, shinetex_chrome);
+	glBindTexture(GL_TEXTURE_2D, TextureManager::shinetex_chrome);
 
 	glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
 	glEnable(GL_BLEND);
@@ -645,12 +645,12 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain) {
 	//the first water caustic
 	GL_DisableTMU(GL_TEXTURE0_ARB);
 	Surf_EnableCaustic();
-	glBindTexture(GL_TEXTURE_2D, underwatertexture);
+	glBindTexture(GL_TEXTURE_2D, TextureManager::underwatertexture);
 
 	//the second water caustic
 	glActiveTexture(GL_TEXTURE1_ARB);
 	Surf_EnableCaustic();
-	glBindTexture(GL_TEXTURE_2D, underwatertexture);
+	glBindTexture(GL_TEXTURE_2D, TextureManager::underwatertexture);
 
 	glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
 	glEnable(GL_BLEND);
@@ -720,12 +720,12 @@ void Surf_DrawExtraChainsTwo(msurface_t *extrachain) {
 	//the glass shiny texture
 	glActiveTexture(GL_TEXTURE0_ARB);
 	Surf_EnableShiny();
-	glBindTexture(GL_TEXTURE_2D, shinetex_glass);
+	glBindTexture(GL_TEXTURE_2D, TextureManager::shinetex_glass);
 
 	//the metal shiny texture
 	glActiveTexture(GL_TEXTURE1_ARB);
 	Surf_EnableShiny();
-	glBindTexture(GL_TEXTURE_2D, shinetex_chrome);
+	glBindTexture(GL_TEXTURE_2D, TextureManager::shinetex_chrome);
 
 	for (surf = extrachain; surf;) {
 		if (!shiny_glass && surf->flags & SURF_SHINY_GLASS && gl_shiny.getBool()) {

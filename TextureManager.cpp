@@ -14,6 +14,14 @@ glFilterMode TextureManager::glFilterModes[] = {
 	{"GL_LINEAR_MIPMAP_LINEAR", GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR}	
 };
 
+GLuint TextureManager::shinetex_glass = 0;
+GLuint TextureManager::shinetex_chrome = 0;
+GLuint TextureManager::underwatertexture = 0;
+GLuint TextureManager::highlighttexture = 0;
+GLuint TextureManager::celtexture = 0;
+GLuint TextureManager::vertextexture = 0;
+GLuint TextureManager::crosshair_tex[32];
+
 void TextureManager::setTextureModeCMD() {
 		int i;
 		
@@ -77,12 +85,8 @@ Texture *TextureManager::LoadTexture(Texture *texture) {
 			return found;
 		}
 	}
-	
-	texture->textureId = texture_extension_number++;
-	
-	if (!isDedicated) {
-		glBindTexture(GL_TEXTURE_2D, texture->textureId);
 		
+	if (!isDedicated) {		
 		texture->upload();
 	}
 	
@@ -122,4 +126,18 @@ void TextureManager::addTexture(Texture *add) {
 
 void TextureManager::removeTexture(Texture *remove) {
 	Textures.remove(remove);
+}
+
+void TextureManager::delTextureId(GLuint textureId) {
+	glDeleteTextures(1, &textureId);
+}
+
+GLuint TextureManager::getTextureId() {
+	GLuint textureId = 0;
+	glGenTextures(1, &textureId);
+	return textureId;
+}
+
+void TextureManager::LoadMiscTextures() {
+	
 }
