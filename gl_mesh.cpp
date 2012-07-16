@@ -171,27 +171,22 @@ done:
  * Generate a list of trifans or strips for the model, which holds for all frames
  */
 void BuildTris(void) {
-	int i, j, k;
 	int startv;
-	float s, t;
 	int len, bestlen, besttype;
 	int bestverts[1024];
 	int besttris[1024];
-	int type;
 
 	// build tristrips
 	numorder = 0;
 	numcommands = 0;
 	Q_memset(used, 0, sizeof (used));
-	for (i = 0; i < pheader->numtris; i++) {
+	for (int i = 0; i < pheader->numtris; i++) {
 		// pick an unused triangle and start the trifan
 		if (used[i])
 			continue;
 
 		bestlen = 0;
-		for (type = 0; type < 2; type++)
-			//	type = 1;
-		{
+		for (int type = 0; type < 2; type++) { //	type = 1;
 			for (startv = 0; startv < 3; startv++) {
 				if (type == 1)
 					len = StripLength(i, startv);
@@ -200,16 +195,16 @@ void BuildTris(void) {
 				if (len > bestlen) {
 					besttype = type;
 					bestlen = len;
-					for (j = 0; j < bestlen + 2; j++)
+					for (int j = 0; j < bestlen + 2; j++)
 						bestverts[j] = stripverts[j];
-					for (j = 0; j < bestlen; j++)
+					for (int j = 0; j < bestlen; j++)
 						besttris[j] = striptris[j];
 				}
 			}
 		}
 
 		// mark the tris on the best strip as used
-		for (j = 0; j < bestlen; j++)
+		for (int j = 0; j < bestlen; j++)
 			used[besttris[j]] = 1;
 
 		if (besttype == 1)
@@ -217,21 +212,21 @@ void BuildTris(void) {
 		else
 			commands[numcommands++] = -(bestlen + 2);
 
-		for (j = 0; j < bestlen + 2; j++) {
+		for (int j = 0; j < bestlen + 2; j++) {
 			// emit a vertex into the reorder buffer
-			k = bestverts[j];
+			int k = bestverts[j];
 			vertexorder[numorder++] = k;
 
 			// emit s/t coords into the commands stream
-			s = stverts[k].s;
-			t = stverts[k].t;
+			float s = stverts[k].s;
+			float t = stverts[k].t;
 			if (!triangles[besttris[0]].facesfront && stverts[k].onseam)
 				s += pheader->skinwidth / 2; // on back side
 			s = (s + 0.5) / pheader->skinwidth;
 			t = (t + 0.5) / pheader->skinheight;
 
-			*(float *) &commands[numcommands++] = s;
-			*(float *) &commands[numcommands++] = t;
+			*(float *)&commands[numcommands++] = s;
+			*(float *)&commands[numcommands++] = t;
 		}
 	}
 
@@ -244,10 +239,6 @@ void BuildTris(void) {
 }
 
 void GL_MakeAliasModelDisplayLists(model_t *m, aliashdr_t *hdr) {
-	int i, j;
-	int *cmds;
-	trivertx_t *verts;
-
 	aliasmodel = m;
 	paliashdr = hdr; // (aliashdr_t *)Mod_Extradata (m);
 
@@ -257,15 +248,14 @@ void GL_MakeAliasModelDisplayLists(model_t *m, aliashdr_t *hdr) {
 	// save the data out
 	paliashdr->poseverts = numorder;
 
-	cmds = (int *) Hunk_Alloc(numcommands * 4);
+	int *cmds = (int *) Hunk_Alloc(numcommands * 4);
 	paliashdr->commands = (byte *) cmds - (byte *) paliashdr;
 	Q_memcpy(cmds, commands, numcommands * 4);
 
-	verts = (trivertx_t *) Hunk_Alloc(paliashdr->numposes * paliashdr->poseverts
-			* sizeof (trivertx_t));
+	trivertx_t *verts = (trivertx_t *) Hunk_Alloc(paliashdr->numposes * paliashdr->poseverts * sizeof (trivertx_t));
 	paliashdr->posedata = (byte *) verts - (byte *) paliashdr;
-	for (i = 0; i < paliashdr->numposes; i++)
-		for (j = 0; j < numorder; j++)
+	for (int i = 0; i < paliashdr->numposes; i++)
+		for (int j = 0; j < numorder; j++)
 			*verts++ = poseverts[i][vertexorder[j]];
 }
 
@@ -768,8 +758,6 @@ void R_DrawAliasModel(entity_t *e) {
 	model_t *clmodel;
 	vec3_t mins, maxs;
 	aliashdr_t *paliashdr;
-	//trivertx_t  *verts, *v;
-	//int         index;
 	float an; //s, t,
 	int anim;
 	md2_t *pheader; // LH / muff

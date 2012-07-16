@@ -1278,8 +1278,7 @@ void Mod_FloodFillSkin(byte *skin, int skinwidth, int skinheight) {
 		filledcolor = 0;
 		// attempt to find opaque black
 		for (i = 0; i < 256; ++i)
-			if (d_8to24table[i] == (255 << 0)) // alpha 1.0
-			{
+			if (d_8to24table[i] == (255 << 0)) { // alpha 1.0
 				filledcolor = i;
 				break;
 			}
@@ -1314,9 +1313,7 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 	daliasskingroup_t *pinskingroup;
 	int groupskins;
 	daliasskininterval_t *pinskinintervals;
-
-	char name[64], model[64], model2[64], model3[64]; //TGA
-	//qmb :model3 is for lordhavoc's replacement skin naming
+	char name[64], model[64], model2[64];
 
 	byte *skin = (byte *) (pskintype + 1);
 
@@ -1329,10 +1326,6 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 		if (pskintype->type == ALIAS_SKIN_SINGLE) {
 			Mod_FloodFillSkin(skin, pheader->skinwidth, pheader->skinheight);
 
-			sprintf(model3, "%s_%i", loadmodel->name, i); //qmb :loardhavoc's skin naming
-			COM_StripExtension(loadmodel->name, model);
-			sprintf(model2, "%s_%i", model, i);
-
 			// save 8 bit texels for the player model to remap
 			if (!Q_strcmp(loadmodel->name, "progs/player.mdl")) {
 				texels = (byte *) Hunk_AllocName(s, loadname);
@@ -1341,21 +1334,22 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 				GL_SkinSplitShirt(texels, pheader->skinwidth, pheader->skinheight, 0x0040, model);
 			}
 
-			//QMB :tomaz skin naming for blah.mdl skin 0
-			//the name is blah_0.tga
+			//Tomaz skin naming: blah_0.tga
+			COM_StripExtension(loadmodel->name, model);
+			sprintf(model2, "%s_%i", model, i);
 			pheader->gl_texturenum[i][0] =
 					pheader->gl_texturenum[i][1] =
 					pheader->gl_texturenum[i][2] =
 					pheader->gl_texturenum[i][3] =
 					TextureManager::LoadExternTexture(model2, false, true, gl_sincity.getBool());
 			if (pheader->gl_texturenum[i][0] == 0) {
-				//QMB :lordhavoc skin naming for blah.mdl skin 0
-				//the name is blah.mdl_0.tga
+				//Darkplaces skin naming: blah.mdl_0.tga
+				sprintf(model2, "%s_%i", loadmodel->name, i); //qmb :loardhavoc's skin naming
 				pheader->gl_texturenum[i][0] =
 						pheader->gl_texturenum[i][1] =
 						pheader->gl_texturenum[i][2] =
 						pheader->gl_texturenum[i][3] =
-						TextureManager::LoadExternTexture(model3, false, true, gl_sincity.getBool());
+						TextureManager::LoadExternTexture(model2, false, true, gl_sincity.getBool());
 
 				if (pheader->gl_texturenum[i][0] == 0)// did not find a matching TGA...
 				{
@@ -1402,30 +1396,22 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 //=========================================================================
 
 void Mod_LoadAliasModel(model_t *mod, void *buffer) {
-	int i, j;
-	mdl_t *pinmodel;
 	stvert_t *pinstverts;
 	dtriangle_t *pintriangles;
-	int version, numframes;
-	int size;
+	int numframes;
 	daliasframetype_t *pframetype;
 	daliasskintype_t *pskintype;
-	int start, end, total;
 
-	start = Hunk_LowMark();
+	int start = Hunk_LowMark();
 
-	pinmodel = (mdl_t *) buffer;
+	mdl_t *pinmodel = (mdl_t *) buffer;
 
-	version = LittleLong(pinmodel->version);
+	int version = LittleLong(pinmodel->version);
 	if (version != ALIAS_VERSION)
-		Sys_Error("%s has wrong version number (%i should be %i)",
-			mod->name, version, ALIAS_VERSION);
+		Sys_Error("%s has wrong version number (%i should be %i)", mod->name, version, ALIAS_VERSION);
 
-	// allocate space for a working header, plus all the data except the frames,
-	// skin and group info
-	size = sizeof (aliashdr_t)
-			+ (LittleLong(pinmodel->numframes) - 1) *
-			sizeof (pheader->frames[0]);
+	// allocate space for a working header, plus all the data except the frames, skin and group info
+	int size = sizeof (aliashdr_t) + (LittleLong(pinmodel->numframes) - 1) * sizeof (pheader->frames[0]);
 	pheader = (aliashdr_t *) Hunk_AllocName(size, loadname);
 
 	mod->flags = LittleLong(pinmodel->flags);
@@ -1458,7 +1444,7 @@ void Mod_LoadAliasModel(model_t *mod, void *buffer) {
 	mod->synctype = (synctype_t) LittleLong(pinmodel->synctype);
 	mod->numframes = pheader->numframes;
 
-	for (i = 0; i < 3; i++) {
+	for (int i = 0; i < 3; i++) {
 		pheader->scale[i] = LittleFloat(pinmodel->scale[i]);
 		pheader->scale_origin[i] = LittleFloat(pinmodel->scale_origin[i]);
 		pheader->eyeposition[i] = LittleFloat(pinmodel->eyeposition[i]);
@@ -1471,7 +1457,7 @@ void Mod_LoadAliasModel(model_t *mod, void *buffer) {
 	// load base s and t vertices
 	pinstverts = (stvert_t *) pskintype;
 
-	for (i = 0; i < pheader->numverts; i++) {
+	for (int i = 0; i < pheader->numverts; i++) {
 		stverts[i].onseam = LittleLong(pinstverts[i].onseam);
 		stverts[i].s = LittleLong(pinstverts[i].s);
 		stverts[i].t = LittleLong(pinstverts[i].t);
@@ -1481,12 +1467,11 @@ void Mod_LoadAliasModel(model_t *mod, void *buffer) {
 	pintriangles = (dtriangle_t *) & pinstverts[pheader->numverts];
 	pheader->indecies = (byte *) & pinstverts[pheader->numverts] - (byte *) pheader;
 
-	for (i = 0; i < pheader->numtris; i++) {
+	for (int i = 0; i < pheader->numtris; i++) {
 		triangles[i].facesfront = LittleLong(pintriangles[i].facesfront);
 
-		for (j = 0; j < 3; j++) {
-			triangles[i].vertindex[j] =
-					LittleLong(pintriangles[i].vertindex[j]);
+		for (int j = 0; j < 3; j++) {
+			triangles[i].vertindex[j] = LittleLong(pintriangles[i].vertindex[j]);
 		}
 	}
 
@@ -1497,27 +1482,24 @@ void Mod_LoadAliasModel(model_t *mod, void *buffer) {
 	aliasbboxmins[0] = aliasbboxmins[1] = aliasbboxmins[2] = 99999;
 	aliasbboxmaxs[0] = aliasbboxmaxs[1] = aliasbboxmaxs[2] = -99999;
 
-	for (i = 0; i < numframes; i++) {
+	for (int i = 0; i < numframes; i++) {
 		aliasframetype_t frametype;
 
 		frametype = (aliasframetype_t) LittleLong(pframetype->type);
 
 		if (frametype == ALIAS_SINGLE) {
-			pframetype = (daliasframetype_t *)
-					Mod_LoadAliasFrame(pframetype + 1, &pheader->frames[i]);
+			pframetype = (daliasframetype_t *)Mod_LoadAliasFrame(pframetype + 1, &pheader->frames[i]);
 		} else {
-			pframetype = (daliasframetype_t *)
-					Mod_LoadAliasGroup(pframetype + 1, &pheader->frames[i]);
+			pframetype = (daliasframetype_t *)Mod_LoadAliasGroup(pframetype + 1, &pheader->frames[i]);
 		}
 	}
 
 	pheader->numposes = posenum;
-
 	mod->type = mod_alias;
 
 	// FIXME: do this right :done right
 	//qmb :bounding box
-	for (i = 0; i < 3; i++) {
+	for (int i = 0; i < 3; i++) {
 		mod->mins[i] = min(-16, aliasbboxmins[i] * pheader->scale[i] + pheader->scale_origin[i]);
 		mod->maxs[i] = max(16, aliasbboxmaxs[i] * pheader->scale[i] + pheader->scale_origin[i]);
 	}
@@ -1526,8 +1508,8 @@ void Mod_LoadAliasModel(model_t *mod, void *buffer) {
 	GL_MakeAliasModelDisplayLists(mod, pheader);
 
 	// move the complete, relocatable alias model to the cache
-	end = Hunk_LowMark();
-	total = end - start;
+	int end = Hunk_LowMark();
+	int total = end - start;
 
 	mod->cache = MemoryObj::Alloc(MemoryObj::CACHE, loadname, total);
 	if (!mod->cache->getData())
