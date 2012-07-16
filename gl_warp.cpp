@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // gl_warp.c -- sky and water polygons
 
 #include "quakedef.h"
+#include "Texture.h"
 
 extern model_t *loadmodel;
 
@@ -404,19 +405,19 @@ int R_LoadSky(char *newname) {
 	//find where the sky is
 	//some are in /env others /gfx/ernv
 	//some have skyname?? others skyname_??
-	skytex[0] = GL_LoadTexImage(name, false, false, gl_sincity.getBool());
+	skytex[0] = TextureManager::LoadExternTexture(name, false, false, gl_sincity.getBool());
 	if (skytex[0] == 0) {
 		sprintf(dirname, "env/");
 		sprintf(name, "%s%s%s", dirname, skyname, suf[0]);
-		skytex[0] = GL_LoadTexImage(name, false, false, gl_sincity.getBool());
+		skytex[0] = TextureManager::LoadExternTexture(name, false, false, gl_sincity.getBool());
 		if (skytex[0] == 0) {
 			sprintf(skyname, "%s_", skyname);
 			sprintf(name, "%s%s%s", dirname, skyname, suf[0]);
-			skytex[0] = GL_LoadTexImage(name, false, false, gl_sincity.getBool());
+			skytex[0] = TextureManager::LoadExternTexture(name, false, false, gl_sincity.getBool());
 			if (skytex[0] == 0) {
 				sprintf(dirname, "gfx/env/");
 				sprintf(name, "%s%s%s", dirname, skyname, suf[0]);
-				skytex[0] = GL_LoadTexImage(name, false, false, gl_sincity.getBool());
+				skytex[0] = TextureManager::LoadExternTexture(name, false, false, gl_sincity.getBool());
 				if (skytex[0] == 0) {
 					oldsky = true;
 					return false;
@@ -428,7 +429,7 @@ int R_LoadSky(char *newname) {
 	for (i = 1; i < 6; i++) {
 		sprintf(name, "gfx/env/%s%s", skyname, suf[i]);
 
-		skytex[i] = GL_LoadTexImage(name, false, false, false);
+		skytex[i] = TextureManager::LoadExternTexture(name, false, false, false);
 		if (skytex[i] == 0) {
 			oldsky = true;
 			return false;
@@ -675,7 +676,7 @@ void R_InitSky(texture_t *mt) {
 	((byte *) & transpix)[3] = 0;
 	
 	sprintf(name, "%ssolid", mt->name);
-	mt->gl_texturenum = GL_LoadTexture(name, 128, 128, (byte *) & trans[0], false, false, 4, false);
+	mt->gl_texturenum = TextureManager::LoadInternTexture(name, 128, 128, (byte *) & trans[0], false, false, 4, false);
 
 	for (int i = 0; i < 128; i++)
 		for (int j = 0; j < 128; j++) {
@@ -687,5 +688,5 @@ void R_InitSky(texture_t *mt) {
 		}
 	
 	sprintf(name, "%salpha", mt->name);
-	mt->gl_skynum = GL_LoadTexture(name, 128, 128, (byte *) & trans[0], false, false, 4, false);
+	mt->gl_skynum = TextureManager::LoadInternTexture(name, 128, 128, (byte *) & trans[0], false, false, 4, false);
 }

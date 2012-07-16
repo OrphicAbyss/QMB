@@ -1,7 +1,7 @@
 #include "Texture.h"
 #include "Image.h"
 
-Texture *TextureManager::LoadFile(char *filename, bool complain) {
+Texture *TextureManager::LoadFile(const char *filename, bool complain) {
 	FILE *f;
 	char basename[128], name[128];
 	int filesize = 0;

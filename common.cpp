@@ -807,7 +807,7 @@ void COM_MakeFilenameValid(char *data) {
 COM_StripExtension
 ============
  */
-void COM_StripExtension(char *in, char *out) {
+void COM_StripExtension(const char *in, char *out) {
 	while (*in && *in != '.')
 		*out++ = *in++;
 	*out = 0;

@@ -338,15 +338,13 @@ void Mod_LoadTextures(lump_t *l) {
 			R_InitSky(tx);
 		} else {
 			sprintf(texname, "textures/%s", mt->name);
-			sprintf(texnamefb, "textures/%s_glow", mt->name);
-
 			if (gl_24bitmaptex.getBool()) {
-				tx->gl_texturenum = GL_LoadTexImage(texname, false, false, gl_sincity.getBool());
+				tx->gl_texturenum = TextureManager::LoadExternTexture(texname, false, false, gl_sincity.getBool());
 
 				//if there is a 24bit texture, check for a fullbright
 				if (tx->gl_texturenum != 0) {
 					sprintf(texnamefbluma, "textures/%s_luma", mt->name);
-					tx->gl_fullbright = GL_LoadTexImage(texnamefbluma, false, true, false);
+					tx->gl_fullbright = TextureManager::LoadExternTexture(texnamefbluma, false, true, false);
 
 					/*if (tx->gl_fullbright == 0){ //no texture _glow
 						sprintf (texnamefb, "textures/%s_glow", mt->name);
@@ -358,10 +356,10 @@ void Mod_LoadTextures(lump_t *l) {
 			}
 
 			if (tx->gl_texturenum == 0) { // No Matching Texture
-				tx->gl_texturenum = GL_LoadTexture(mt->name, tx->width, tx->height, (byte *) (tx + 1), true, false, 1, gl_sincity.getBool());
+				tx->gl_texturenum = TextureManager::LoadInternTexture(mt->name, tx->width, tx->height, (byte *) (tx + 1), true, false, 1, gl_sincity.getBool());
 
 				if (Img_HasFullbrights((byte *) (tx + 1), tx->width * tx->height)) {
-					tx->gl_fullbright = GL_LoadTexture(texnamefb, tx->width, tx->height, (byte *) (tx + 1), true, true, 1, false);
+					tx->gl_fullbright = TextureManager::LoadInternTexture(texnamefb, tx->width, tx->height, (byte *) (tx + 1), true, true, 1, false);
 				} else {
 					tx->gl_fullbright = 0;
 				}
@@ -1209,7 +1207,7 @@ int GL_SkinSplitShirt(byte *in, int width, int height, int bits, char *name) {
 	}
 
 	if (passed) {
-		texnum = GL_LoadTexture(name, width, height, out, true, false, 1, gl_sincity.getBool());
+		texnum = TextureManager::LoadInternTexture(name, width, height, out, true, false, 1, gl_sincity.getBool());
 		return texnum;
 	} else {
 		return 0;
@@ -1237,7 +1235,7 @@ int GL_SkinSplit(byte *in, int width, int height, int bits, char *name) {
 	}
 
 	if (passed) {
-		texnum = GL_LoadTexture(name, width, height, out, true, false, 1, gl_sincity.getBool());
+		texnum = TextureManager::LoadInternTexture(name, width, height, out, true, false, 1, gl_sincity.getBool());
 		return texnum;
 	} else {
 		return 0;
@@ -1312,9 +1310,6 @@ void Mod_FloodFillSkin(byte *skin, int skinwidth, int skinheight) {
 }
 
 void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
-	int i, j, k;
-	int s;
-	byte *skin;
 	byte *texels;
 	daliasskingroup_t *pinskingroup;
 	int groupskins;
@@ -1323,14 +1318,14 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 	char name[64], model[64], model2[64], model3[64]; //TGA
 	//qmb :model3 is for lordhavoc's replacement skin naming
 
-	skin = (byte *) (pskintype + 1);
+	byte *skin = (byte *) (pskintype + 1);
 
 	if (numskins < 1 || numskins > MAX_SKINS)
 		Sys_Error("Mod_LoadAliasModel: Invalid # of skins: %d\n", numskins);
 
-	s = pheader->skinwidth * pheader->skinheight;
+	int s = pheader->skinwidth * pheader->skinheight;
 
-	for (i = 0; i < numskins; i++) {
+	for (int i = 0; i < numskins; i++) {
 		if (pskintype->type == ALIAS_SKIN_SINGLE) {
 			Mod_FloodFillSkin(skin, pheader->skinwidth, pheader->skinheight);
 
@@ -1352,7 +1347,7 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 					pheader->gl_texturenum[i][1] =
 					pheader->gl_texturenum[i][2] =
 					pheader->gl_texturenum[i][3] =
-					GL_LoadTexImage(model2, false, true, gl_sincity.getBool());
+					TextureManager::LoadExternTexture(model2, false, true, gl_sincity.getBool());
 			if (pheader->gl_texturenum[i][0] == 0) {
 				//QMB :lordhavoc skin naming for blah.mdl skin 0
 				//the name is blah.mdl_0.tga
@@ -1360,7 +1355,7 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 						pheader->gl_texturenum[i][1] =
 						pheader->gl_texturenum[i][2] =
 						pheader->gl_texturenum[i][3] =
-						GL_LoadTexImage(model3, false, true, gl_sincity.getBool());
+						TextureManager::LoadExternTexture(model3, false, true, gl_sincity.getBool());
 
 				if (pheader->gl_texturenum[i][0] == 0)// did not find a matching TGA...
 				{
@@ -1369,7 +1364,7 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 							pheader->gl_texturenum[i][1] =
 							pheader->gl_texturenum[i][2] =
 							pheader->gl_texturenum[i][3] =
-							GL_LoadTexture(name, pheader->skinwidth, pheader->skinheight, (byte *) (pskintype + 1), true, false, 1, gl_sincity.getBool());
+							TextureManager::LoadInternTexture(name, pheader->skinwidth, pheader->skinheight, (byte *) (pskintype + 1), true, false, 1, gl_sincity.getBool());
 				}
 			}
 
@@ -1383,6 +1378,7 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 
 			pskintype = (daliasskintype_t *) (pinskinintervals + groupskins);
 
+			int j;
 			for (j = 0; j < groupskins; j++) {
 				Mod_FloodFillSkin(skin, pheader->skinwidth, pheader->skinheight);
 				if (j == 0) {
@@ -1391,13 +1387,12 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 					Q_memcpy(texels, (byte *) (pskintype), s);
 				}
 				sprintf(name, "%s_%i_%i", loadmodel->name, i, j);
-				pheader->gl_texturenum[i][j & 3] = GL_LoadTexture(name, pheader->skinwidth, pheader->skinheight, (byte *) (pskintype), true, false, 1, gl_sincity.getBool());
+				pheader->gl_texturenum[i][j & 3] = TextureManager::LoadInternTexture(name, pheader->skinwidth, pheader->skinheight, (byte *) (pskintype), true, false, 1, gl_sincity.getBool());
 				pskintype = (daliasskintype_t *) ((byte *) (pskintype) + s);
 			}
-			k = j;
+			int k = j;
 			for ( ; j < 4; j++)
-				pheader->gl_texturenum[i][j & 3] =
-					pheader->gl_texturenum[i][j - k];
+				pheader->gl_texturenum[i][j & 3] = pheader->gl_texturenum[i][j - k];
 		}
 	}
 
@@ -1549,7 +1544,7 @@ void Mod_LoadQ2AliasModel(model_t *mod, void *buffer) {
 	md2frame_t *pinframe, *poutframe;
 	char *pinskins;
 
-	char model[64], model2[64], model3[64]; //TGA
+	char model[64], modelFilename[64];
 
 	start = Hunk_LowMark();
 
@@ -1609,27 +1604,18 @@ void Mod_LoadQ2AliasModel(model_t *mod, void *buffer) {
 	if (pheader->num_skins) {
 		pinskins = (char *) ((byte *) pinmodel + LittleLong(pinmodel->ofs_skins));
 		for (i = 0; i < pheader->num_skins; i++) {
-
-			//TGA: begin
-			sprintf(model3, "%s_%i", mod->name, i); //qmb :loardhavoc's skin naming
 			COM_StripExtension(mod->name, model);
-			sprintf(model2, "%s_%i", model, i);
+			sprintf(modelFilename, "%s_%i", model, i);
+			// tomazquake external skin naming: blah_0.tga
+			pheader->gl_texturenum[i] = TextureManager::LoadExternTexture(modelFilename, false, true, gl_sincity.getBool());
+			if (pheader->gl_texturenum[i] == 0) {
+				// darkplaces external skin naming: blah.mdl_0.tga
+				sprintf(modelFilename, "%s_%i", mod->name, i);
+				pheader->gl_texturenum[i] = TextureManager::LoadExternTexture(modelFilename, false, true, gl_sincity.getBool());
 
-			//qmb :tomaz skin naming for blah.mdl skin 0
-			//the name is blah_0.tga
-			pheader->gl_texturenum[i] = GL_LoadTexImage(model2, false, true, gl_sincity.getBool());
-			if (pheader->gl_texturenum[i] == 0)// did not find a matching TGA...
-			{
-				//qmb :lordhavoc skin naming for blah.mdl skin 0
-				//the name is blah.mdl_0.tga
-				pheader->gl_texturenum[i] = GL_LoadTexImage(model3, false, true, gl_sincity.getBool());
-
-				if (pheader->gl_texturenum[i] == 0)// did not find a matching TGA...
-				{
-					pheader->gl_texturenum[i] = GL_LoadTexImage(pinskins, false, true, gl_sincity.getBool());
-				}
+				if (pheader->gl_texturenum[i] == 0)
+					pheader->gl_texturenum[i] = TextureManager::LoadExternTexture(pinskins, false, true, gl_sincity.getBool());
 			}
-			//TGA: end
 
 			pinskins += MD2MAX_SKINNAME;
 		}
@@ -1756,10 +1742,10 @@ void * Mod_LoadSpriteFrame(void * pin, mspriteframe_t **ppframe, int framenum) {
 	Mod_Sprite_StripExtension(loadmodel->name, sprite);
 	sprintf(sprite2, "%s_%i", sprite, framenum);
 
-	pspriteframe->gl_texturenum = GL_LoadTexImage(sprite2, false, true, gl_sincity.getBool());
+	pspriteframe->gl_texturenum = TextureManager::LoadExternTexture(sprite2, false, true, gl_sincity.getBool());
 	if (pspriteframe->gl_texturenum == 0) {
 		sprintf(name, "%s_%i", loadmodel->name, framenum);
-		pspriteframe->gl_texturenum = GL_LoadTexture(name, width, height, (byte *) (pinframe + 1), true, false, 1, gl_sincity.getBool());
+		pspriteframe->gl_texturenum = TextureManager::LoadInternTexture(name, width, height, (byte *) (pinframe + 1), true, false, 1, gl_sincity.getBool());
 	}
 
 	return (void *) ((byte *) pinframe + sizeof (dspriteframe_t) + size);

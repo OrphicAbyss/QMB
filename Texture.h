@@ -54,8 +54,10 @@ public:
 	static GLuint vertextexture;
 	static GLuint crosshair_tex[32];
 
+	static int LoadExternTexture(const char* filename, bool complain, bool mipmap, bool grayscale);
+	static int LoadInternTexture(const char *identifier, int width, int height, byte *data, bool mipmap, bool fullbright, int bytesperpixel, bool grayscale);
 	static Texture *LoadTexture(Texture *texture);
-	static Texture *LoadFile(char *filename, bool complain);
+	static Texture *LoadFile(const char *filename, bool complain);
 	static Texture *LoadFilePNG(FILE *f, char *name);
 	static Texture *LoadFileJPG(FILE *f, char *name);
 	static Texture *LoadFileTGA(FILE *f, char *name);

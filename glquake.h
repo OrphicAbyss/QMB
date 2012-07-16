@@ -32,13 +32,7 @@ void GL_EndRendering (void);
 
 extern	int		texture_mode;
 extern	int		gl_textureunits;	//qmb :multitexture stuff
-
-void	GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap, qboolean grayscale);
-int		GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean fullbright);
-int		GL_LoadTexture (const char *identifier, int width, int height, byte *data, qboolean mipmap, qboolean fullbright, int bytesperpixel, qboolean grayscale);
-int		GL_LoadTexImage (char *filename, qboolean complain, qboolean mipmap, qboolean grayscale);
-
-extern	int glx, gly, glwidth, glheight;
+extern	int		glx, gly, glwidth, glheight;
 
 #define BACKFACE_EPSILON	0.01
 
@@ -102,6 +96,7 @@ extern	CVar	gl_test;
 extern	CVar	gl_conalpha;
 extern	CVar	gl_checkleak;
 extern	CVar	gl_max_size;
+extern	CVar	gl_quick_texture_reload;
 extern	CVar	r_skydetail;
 extern	CVar	r_sky_x;
 extern	CVar	r_sky_y;

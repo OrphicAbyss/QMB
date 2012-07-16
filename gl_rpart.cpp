@@ -47,6 +47,7 @@ QMB: 2.10
 
 #include "quakedef.h"
 #include "gl_rpart.h"
+#include "Texture.h"
 
 #ifdef JAVA
 #include "java_vm.h"
@@ -1931,7 +1932,7 @@ particle_t *AddTrailColor(vec3_t start, vec3_t end, int type, float time, float 
 //Particle texture code
 //==================================================
 int LoadParticleTexture(char *texture) {
-	return GL_LoadTexImage(texture, false, true, gl_sincity.getBool());
+	return TextureManager::LoadExternTexture(texture, false, true, gl_sincity.getBool());
 }
 
 /** MakeParticleTexture
@@ -1962,7 +1963,7 @@ void MakeParticleTexure(void) {
 		}
 	}
 	//Load the texture into vid mem and save the number for later use
-	part_tex = GL_LoadTexture("particle", 128, 128, &data[0][0][0], true, false, 4, gl_sincity.getBool());
+	part_tex = TextureManager::LoadInternTexture("particle", 128, 128, &data[0][0][0], true, false, 4, gl_sincity.getBool());
 
 	//Clear the data
 	max = 64;
@@ -1989,7 +1990,7 @@ void MakeParticleTexure(void) {
 		}
 	}
 	
-	trail_tex = GL_LoadTexture("trail_part", 128, 128, &data[0][0][0], false, false, 4, gl_sincity.getBool());
+	trail_tex = TextureManager::LoadInternTexture("trail_part", 128, 128, &data[0][0][0], false, false, 4, gl_sincity.getBool());
 	blood_tex = LoadParticleTexture("textures/particles/blood");
 	bubble_tex = LoadParticleTexture("textures/particles/bubble");
 	smoke_tex = LoadParticleTexture("textures/particles/smoke");

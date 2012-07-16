@@ -413,7 +413,7 @@ void Mod_LoadQ3Model(model_t *mod, void *buffer) {
 				//try loading texture here
 				sprintf(&name[0], "progs/%s", shader[j].name);
 
-				shader[j].texnum = GL_LoadTexImage(&name[0], false, true, gl_sincity.getBool());
+				shader[j].texnum = TextureManager::LoadExternTexture(&name[0], false, true, gl_sincity.getBool());
 				if (shader[j].texnum == 0) {
 					Con_Printf("Model: %s  Texture missing: %s\n", mod->name, shader[j].name);
 				}

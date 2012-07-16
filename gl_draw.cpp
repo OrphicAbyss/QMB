@@ -81,10 +81,10 @@ qpic_t *Draw_PicFromWadXY(const char *name, int height, int width) {
 	gl = (glpic_t *) p->data;
 
 	sprintf(texname, "textures/wad/%s", name);
-	texnum = GL_LoadTexImage(&texname[0], false, true, gl_sincity.getBool());
+	texnum = TextureManager::LoadExternTexture(&texname[0], false, true, gl_sincity.getBool());
 	if (!texnum) {
 		sprintf(texname, "gfx/%s", name);
-		texnum = GL_LoadTexImage(&texname[0], false, true, gl_sincity.getBool());
+		texnum = TextureManager::LoadExternTexture(&texname[0], false, true, gl_sincity.getBool());
 	}
 
 	if (texnum) {
@@ -92,7 +92,7 @@ qpic_t *Draw_PicFromWadXY(const char *name, int height, int width) {
 		p->width = width;
 		gl->texnum = texnum;
 	} else {
-		gl->texnum = GL_LoadTexture("", p->width, p->height, p->data, true, false, 1, gl_sincity.getBool());
+		gl->texnum = TextureManager::LoadInternTexture("", p->width, p->height, p->data, true, false, 1, gl_sincity.getBool());
 	}
 
 	gl->sl = 0;
@@ -134,7 +134,7 @@ qpic_t *Draw_CachePic(const char *path) {
 	pic->pic.height = dat->height;
 
 	gl = (glpic_t *) pic->pic.data;
-	gl->texnum = GL_LoadTexture("", dat->width, dat->height, dat->data, false, false, 1, gl_sincity.getBool());
+	gl->texnum = TextureManager::LoadInternTexture("", dat->width, dat->height, dat->data, false, false, 1, gl_sincity.getBool());
 	gl->sl = 0;
 	gl->sh = 1;
 	gl->tl = 0;
@@ -160,7 +160,7 @@ void Draw_Init(void) {
 
 	Cmd::addCmd("gl_texturemode", &TextureManager::setTextureModeCMD);
 
-	char_texture = GL_LoadTexImage("gfx/charset", false, true, gl_sincity.getBool());
+	char_texture = TextureManager::LoadExternTexture("gfx/charset", false, true, gl_sincity.getBool());
 	if (char_texture == 0) {
 		byte *draw_chars = (byte *)W_GetLumpName("conchars");
 		for (i = 0; i < 256 * 64; i++)
@@ -168,11 +168,11 @@ void Draw_Init(void) {
 				draw_chars[i] = 255; // proper transparent color
 
 		// now turn them into textures
-		char_texture = GL_LoadTexture("charset", 128, 128, draw_chars, false, true, 1, false);
+		char_texture = TextureManager::LoadInternTexture("charset", 128, 128, draw_chars, false, true, 1, false);
 	}
 
 	gl = (glpic_t *) conback->data;
-	gl->texnum = GL_LoadTexImage("gfx/conback", false, true, gl_sincity.getBool());
+	gl->texnum = TextureManager::LoadExternTexture("gfx/conback", false, true, gl_sincity.getBool());
 	if (gl->texnum == 0) {
 		start = Hunk_LowMark();
 
@@ -185,7 +185,7 @@ void Draw_Init(void) {
 		conback->height = cb->height;
 		ncdata = cb->data;
 
-		gl->texnum = GL_LoadTexture("gfx/conback", conback->width, conback->height, ncdata, false, false, 1, false);
+		gl->texnum = TextureManager::LoadInternTexture("gfx/conback", conback->width, conback->height, ncdata, false, false, 1, false);
 
 		// free loaded console
 		Hunk_FreeToLowMark(start);
@@ -205,9 +205,9 @@ void Draw_Init(void) {
 	draw_disc = Draw_PicFromWadXY("disc", 48, 48);
 	draw_backtile = Draw_PicFromWad("backtile");
 	//qmb :detail texture
-	detailtexture = GL_LoadTexImage("textures/detail", false, true, gl_sincity.getBool());
-	detailtexture2 = GL_LoadTexImage("textures/detail2", false, true, gl_sincity.getBool());
-	quadtexture = GL_LoadTexImage("textures/quad", false, true, false);
+	detailtexture = TextureManager::LoadExternTexture("textures/detail", false, true, gl_sincity.getBool());
+	detailtexture2 = TextureManager::LoadExternTexture("textures/detail2", false, true, gl_sincity.getBool());
+	quadtexture = TextureManager::LoadExternTexture("textures/quad", false, true, false);
 }
 
 /**
@@ -556,51 +556,4 @@ void GL_Set2D(void) {
 	//	glDisable (GL_ALPHA_TEST);
 
 	glColor4f(1, 1, 1, 1);
-}
-
-//====================================================================
-
-int GL_LoadTexture(const char *identifier, int width, int height, byte *data, qboolean mipmap, qboolean fullbright, int bytesperpixel, qboolean grayscale) {
-	Texture *t = new Texture(identifier);
-	t->data = data;
-	t->height = height;
-	t->width = width;
-	t->bytesPerPixel = bytesperpixel;
-	t->mipmap = mipmap;
-	t->grayscale = grayscale;
-
-	if (fullbright)
-		if (!t->convert8To32Fullbright()) {
-			delete t;
-			return 0;
-		}
-	
-	t = TextureManager::LoadTexture(t);
-	
-	return t->textureId;
-}
-
-int GL_LoadTexImage(char* filename, qboolean complain, qboolean mipmap, qboolean grayscale) {
-	if (gl_quick_texture_reload.getBool()) {
-		Texture *t = TextureManager::findTexture(filename);
-		if (t != NULL)
-			return t->textureId;
-	}
-
-	Texture *t = TextureManager::LoadFile(filename, complain);
-	
-	if (!t)
-		return 0;
-	
-	if (!t->data) {
-		delete t;
-		return 0;
-	}
-	
-	t->mipmap = mipmap;
-	t->bytesPerPixel = 4;
-	t->grayscale = grayscale;
-	
-	t = TextureManager::LoadTexture(t);
-	return t->textureId;
 }

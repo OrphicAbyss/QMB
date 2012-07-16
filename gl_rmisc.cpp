@@ -73,9 +73,6 @@ void R_Init(void) {
 	CVar::registerCVar(&gl_24bitmaptex);
 
 	R_InitParticles();
-	//R_InitParticleTexture();
-
-	TextureManager::Init();
 }
 
 /**

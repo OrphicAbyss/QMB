@@ -72,6 +72,50 @@ void TextureManager::resetTextureModes() {
 	}
 }
 
+int TextureManager::LoadExternTexture(const char* filename, bool complain, bool mipmap, bool grayscale) {
+	if (gl_quick_texture_reload.getBool()) {
+		Texture *t = findTexture(filename);
+		if (t != NULL)
+			return t->textureId;
+	}
+
+	Texture *t = LoadFile(filename, complain);
+	if (!t)
+		return 0;
+	
+	if (!t->data) {
+		delete t;
+		return 0;
+	}
+	
+	t->mipmap = mipmap;
+	t->bytesPerPixel = 4;
+	t->grayscale = grayscale;
+	
+	t = LoadTexture(t);
+	return t->textureId;
+}
+
+int TextureManager::LoadInternTexture(const char *identifier, int width, int height, byte *data, bool mipmap, bool fullbright, int bytesperpixel, bool grayscale) {
+	Texture *t = new Texture(identifier);
+	t->data = data;
+	t->height = height;
+	t->width = width;
+	t->bytesPerPixel = bytesperpixel;
+	t->mipmap = mipmap;
+	t->grayscale = grayscale;
+
+	if (fullbright)
+		if (!t->convert8To32Fullbright()) {
+			delete t;
+			return 0;
+		}
+	
+	t = LoadTexture(t);
+	
+	return t->textureId;
+}
+
 Texture *TextureManager::LoadTexture(Texture *texture) {
 	// See if the texture has already been loaded
 	texture->calculateHash();
@@ -181,10 +225,10 @@ void TextureManager::LoadDefaultTexture() {
 }
 
 void TextureManager::LoadMiscTextures() {
-	shinetex_glass = GL_LoadTexImage("textures/shine_glass", false, true, false);
-	shinetex_chrome = GL_LoadTexImage("textures/shine_chrome", false, true, false);
-	underwatertexture = GL_LoadTexImage("textures/water_caustic", false, true, false);
-	highlighttexture = GL_LoadTexImage("gfx/highlight", false, true, false);
+	shinetex_glass = LoadExternTexture("textures/shine_glass", false, true, false);
+	shinetex_chrome = LoadExternTexture("textures/shine_chrome", false, true, false);
+	underwatertexture = LoadExternTexture("textures/water_caustic", false, true, false);
+	highlighttexture = LoadExternTexture("gfx/highlight", false, true, false);
 }
 
 void TextureManager::LoadCrosshairTextures() {
@@ -192,7 +236,7 @@ void TextureManager::LoadCrosshairTextures() {
 	
 	for (int i = 0; i < 32; i++) {
 		snprintf(&crosshairFname[0],32,"textures/crosshairs/crosshair%02i.tga",i);
-		crosshair_tex[i] = GL_LoadTexImage((char *)&crosshairFname[0], false, false, false);
+		crosshair_tex[i] = LoadExternTexture((char *)&crosshairFname[0], false, false, false);
 	}
 }
 

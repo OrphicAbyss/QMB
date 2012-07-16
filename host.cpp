@@ -768,10 +768,10 @@ void Host_Init(quakeparms_t *parms) {
 
 		IN_Init();
 		VID_Init(host_basepal);
-//		TextureManager::Init();
 		Draw_Init();
 		SCR_Init();
 		R_Init();
+		TextureManager::Init();
 		S_Init();
 		CDAudio_Init();
 		Sbar_Init();
