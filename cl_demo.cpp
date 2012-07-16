@@ -222,7 +222,7 @@ void CL_Record_f(void) {
 void CL_PlayDemo_f(void) {
 	char name[256];
 	int c;
-	qboolean neg = false;
+	bool neg = false;
 
 	if (CmdArgs::getSource() != CmdArgs::COMMAND)
 		return;

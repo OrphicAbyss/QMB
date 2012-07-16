@@ -65,7 +65,7 @@ edict_t *Nextent(edict_t *edict) {
  * possible, no move is done, false is returned, and
  * pr_global_struct->trace_normal is set to the normal of the blocking wall
  */
-qboolean bot_movestep(edict_t *ent, vec3_t move) {
+bool bot_movestep(edict_t *ent, vec3_t move) {
 	//	float		dz;
 	vec3_t oldorg, neworg, end;
 	trace_t trace;
@@ -144,7 +144,7 @@ qboolean bot_movestep(edict_t *ent, vec3_t move) {
  * float(float yaw, float dist) walkmove
  * returns true if it can move
  */
-qboolean bot_walkmove(edict_t *ent, float yaw, float dist) {
+bool bot_walkmove(edict_t *ent, float yaw, float dist) {
 	vec3_t move;
 
 	if (!((int) ent->v.flags & (FL_ONGROUND | FL_FLY | FL_SWIM)))
@@ -163,7 +163,7 @@ qboolean bot_walkmove(edict_t *ent, float yaw, float dist) {
  * This function is used to decide if a bot can see his enemy or not
  * (this is just a recoded PF_traceline)
  */
-qboolean Traceline(vec3_t start, vec3_t end, edict_t *self, edict_t *enemy) {
+bool Traceline(vec3_t start, vec3_t end, edict_t *self, edict_t *enemy) {
 	trace_t trace = SV_Move(start, vec3_origin, vec3_origin, end, MOVE_NOMONSTERS, self);
 
 	if (trace.fraction >= 0.999f) // If there were no walls
@@ -222,7 +222,7 @@ void CalcAngles(vec3_t oldvector, vec3_t newvector) {
  * This function is used to calcualte if an entity can be seen.
  * Returns the angle in test and true if the entity can be seen, else it returns false
  */
-qboolean IsInView(vec3_t eyes1, vec3_t eyes2, edict_t *bot, edict_t *nmy, int fov, vec3_t test) {
+bool IsInView(vec3_t eyes1, vec3_t eyes2, edict_t *bot, edict_t *nmy, int fov, vec3_t test) {
 	vec3_t origin;
 	float test2;
 
@@ -333,7 +333,7 @@ float onLedge(vec3_t org, vec3_t angle, edict_t *bot) {
  * move and shoot and kill and destroy and wreak havoc and
  * slaughter and... oh sorry
  */
-void AttackMoveBot(client_t *client, qboolean fire, qboolean move, qboolean strafe, edict_t *enemy) {
+void AttackMoveBot(client_t *client, bool fire, bool move, bool strafe, edict_t *enemy) {
 	if (fire) { // If he has an enemy
 		vec3_t origin;
 

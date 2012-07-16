@@ -40,7 +40,7 @@ float *angles;
 float *origin;
 float *velocity;
 
-qboolean onground;
+bool onground;
 
 usercmd_t alias;
 
@@ -370,7 +370,7 @@ void SV_ReadClientMove(usercmd_t *move) {
 /**
  * Returns false if the client should be killed
  */
-qboolean SV_ReadClientMessage(void) {
+bool SV_ReadClientMessage(void) {
 	int ret;
 	int cmd;
 	char *s;

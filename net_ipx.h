@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int  IPX_Init (void);
 void IPX_Shutdown (void);
-void IPX_Listen (qboolean state);
+void IPX_Listen (bool state);
 int  IPX_OpenSocket (int port);
 int  IPX_CloseSocket (int socket);
 int  IPX_Connect (int socket, struct qsockaddr *addr);

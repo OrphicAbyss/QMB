@@ -240,7 +240,7 @@ bool Alias::consoleCommand() {
 	return false;
 }
 
-qboolean cmd_wait;
+bool cmd_wait;
 
 //=============================================================================
 

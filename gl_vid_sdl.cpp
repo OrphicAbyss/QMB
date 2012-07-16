@@ -28,14 +28,14 @@ int texture_mode = GL_NEAREST_MIPMAP_NEAREST;
 //int		texture_mode = GL_LINEAR_MIPMAP_LINEAR;
 
 //qmb :extra stuff
-qboolean gl_combine = false;
-qboolean gl_point_sprite = false;
-qboolean gl_sgis_mipmap = false;
-qboolean gl_texture_non_power_of_two = false;
-qboolean gl_n_patches = false;
-qboolean gl_stencil = true;
-qboolean gl_shader = false;
-qboolean gl_filtering_anisotropic = false;
+bool gl_combine = false;
+bool gl_point_sprite = false;
+bool gl_sgis_mipmap = false;
+bool gl_texture_non_power_of_two = false;
+bool gl_n_patches = false;
+bool gl_stencil = true;
+bool gl_shader = false;
+bool gl_filtering_anisotropic = false;
 float gl_maximumAnisotropy;
 //====================================
 

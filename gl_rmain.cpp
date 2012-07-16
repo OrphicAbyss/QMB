@@ -134,7 +134,7 @@ void DoGamma() {
 /**
  * Returns true if the box is completely outside the frustum
  */
-qboolean R_CullBox(vec3_t mins, vec3_t maxs) {
+bool R_CullBox(vec3_t mins, vec3_t maxs) {
 	int i;
 
 	for (i = 0; i < 4; i++)

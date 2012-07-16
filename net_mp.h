@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int  MPATH_Init (void);
 void MPATH_Shutdown (void);
-void MPATH_Listen (qboolean state);
+void MPATH_Listen (bool state);
 int  MPATH_OpenSocket (int port);
 int  MPATH_CloseSocket (int socket);
 int  MPATH_Connect (int socket, struct qsockaddr *addr);

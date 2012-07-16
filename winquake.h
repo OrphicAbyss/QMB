@@ -30,19 +30,19 @@ typedef enum {MS_WINDOWED, MS_FULLSCREEN, MS_FULLDIB, MS_UNINIT} modestate_t;
 extern modestate_t	modestate;
 
 extern HWND			mainwindow;
-extern qboolean		ActiveApp, Minimized;
+extern bool		ActiveApp, Minimized;
 
 extern HANDLE	hinput, houtput;
 
 extern cvar_t		_windowed_mouse;
-extern qboolean	mouseinitialized;
+extern bool	mouseinitialized;
 
 extern int		window_center_x, window_center_y;
 extern RECT		window_rect;
 
 void CenterWindow(HWND hWndCenter, int width, int height, BOOL lefttopjustify);
 
-extern qboolean	winsock_lib_initialized;
+extern bool	winsock_lib_initialized;
 int		(PASCAL FAR *pWSAStartup)		(WORD wVersionRequired, LPWSADATA lpWSAData);
 int		(PASCAL FAR *pWSACleanup)		(void);
 int		(PASCAL FAR *pWSAGetLastError)	(void);

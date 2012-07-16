@@ -32,7 +32,7 @@ static int net_acceptsocket = -1;		// socket for fielding new connections
 static int net_controlsocket;
 static struct qsockaddr broadcastaddr;
 
-extern qboolean winsock_initialized;
+extern bool winsock_initialized;
 extern WSADATA		winsockdata;
 
 #define IPXSOCKETS 18
@@ -134,7 +134,7 @@ void WIPX_Shutdown (void)
 
 //=============================================================================
 
-void WIPX_Listen (qboolean state)
+void WIPX_Listen (bool state)
 {
 	// enable listening
 	if (state)

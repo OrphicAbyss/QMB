@@ -88,7 +88,7 @@ CVar gl_triplebuffer("gl_triplebuffer", "1", true);
 
 extern CVar crosshair;
 
-qboolean scr_initialized; // ready to draw
+bool scr_initialized; // ready to draw
 
 qpic_t *scr_ram;
 qpic_t *scr_net;
@@ -101,8 +101,8 @@ int clearnotify;
 
 vrect_t scr_vrect;
 
-qboolean scr_disabled_for_loading;
-qboolean scr_drawloading;
+bool scr_disabled_for_loading;
+bool scr_drawloading;
 float scr_disabled_time;
 
 void SCR_ScreenShot_f(void);
@@ -225,7 +225,7 @@ float CalcFov(float fov_x, float width, float height) {
 static void SCR_CalcRefdef(void) {
 	float size, fov;
 	int h;
-	qboolean full = false;
+	bool full = false;
 
 	scr_fullupdate = 0; // force a background redraw
 	vid.recalc_refdef = 0;
@@ -571,7 +571,7 @@ void SCR_EndLoadingPlaque(void) {
 //=============================================================================
 
 const char *scr_notifystring;
-qboolean scr_drawdialog;
+bool scr_drawdialog;
 
 void SCR_DrawNotifyString(void) {
 	const char *start;

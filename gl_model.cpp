@@ -34,7 +34,7 @@ void Mod_LoadSpriteModel(model_t *mod, void *buffer);
 void Mod_LoadBrushModel(model_t *mod, void *buffer);
 void Mod_LoadAliasModel(model_t *mod, void *buffer);
 void Mod_LoadQ2AliasModel(model_t *mod, void *buffer);
-model_t *Mod_LoadModel(model_t *mod, qboolean crash);
+model_t *Mod_LoadModel(model_t *mod, bool crash);
 
 byte mod_novis[MAX_MAP_LEAFS / 8];
 
@@ -183,7 +183,7 @@ void Mod_TouchModel(char *name) {
 /**
  * Loads a model into the cache
  */
-model_t *Mod_LoadModel(model_t *mod, qboolean crash) {
+model_t *Mod_LoadModel(model_t *mod, bool crash) {
 	void *d;
 	unsigned *buf;
 	byte stackbuf[1024]; // avoid dirtying the cache heap
@@ -265,7 +265,7 @@ model_t *Mod_LoadModel(model_t *mod, qboolean crash) {
 /**
  * Loads in a model for the given name
  */
-model_t *Mod_ForName(const char *name, qboolean crash) {
+model_t *Mod_ForName(const char *name, bool crash) {
 	model_t *mod;
 
 	mod = Mod_FindName(name);
@@ -281,7 +281,7 @@ model_t *Mod_ForName(const char *name, qboolean crash) {
 
 byte *mod_base;
 
-qboolean Img_HasFullbrights(byte *pixels, int size) {
+bool Img_HasFullbrights(byte *pixels, int size) {
 	for (int i = 0; i < size; i++)
 		if (pixels[i] >= 224)
 			return true;

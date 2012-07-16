@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 extern CVar host_framerate;
 extern float scr_con_current;
-extern qboolean scr_drawloading;
+extern bool scr_drawloading;
 extern short* snd_out;
 extern int snd_linear_count;
 extern int soundtime;
@@ -40,7 +40,7 @@ int frames;
 // "0" indicates no compression codec.
 CVar capture_codec("capture_codec","0",true);
 
-qboolean CaptureHelper_IsActive(void)
+bool CaptureHelper_IsActive(void)
 {
     // don't output whilst console is down or 'loading' is displayed
     if (scr_con_current > 0) return false;
@@ -188,7 +188,7 @@ void CaptureHelper_OnTransferStereo16(void)
     }
 }
 
-qboolean CaptureHelper_GetSoundtime(void)
+bool CaptureHelper_GetSoundtime(void)
 {
     if (CaptureHelper_IsActive()) {
         soundtime += (int)(0.5 + host_framerate.getFloat() * shm->speed);

@@ -311,7 +311,7 @@ void IPX_Shutdown(void)
 
 //=============================================================================
 
-void IPX_Listen (qboolean state)
+void IPX_Listen (bool state)
 {
 	// enable listening
 	if (state)

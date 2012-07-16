@@ -49,7 +49,7 @@ char *PF_VarString (int	first)
 char *ENGINE_EXTENSIONS = "\
 ";
 
-qboolean checkextension(char *name)
+bool checkextension(char *name)
 {
 	int len;
 	char *e, *start;
@@ -169,7 +169,7 @@ void PF_setorigin (void)
 }
 
 
-void SetMinMaxSize (edict_t *e, float *min, float *max, qboolean rotate)
+void SetMinMaxSize (edict_t *e, float *min, float *max, bool rotate)
 {
 	float	*angles;
 	vec3_t	rmin, rmax;

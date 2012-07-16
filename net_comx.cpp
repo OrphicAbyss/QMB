@@ -54,7 +54,7 @@ extern cvar_t	config_modem_hangup;
 
 extern int m_return_state;
 extern int m_state;
-extern qboolean m_return_onerror;
+extern bool m_return_onerror;
 extern char m_return_reason[32];
 
 // 8250, 16550 definitions
@@ -140,12 +140,12 @@ typedef struct ComPort_s
 	byte					modemStatusIgnore;
 	byte					lineStatus;
 	byte					bufferUsed;
-	qboolean				enabled;
-	volatile qboolean		statusUpdated;
-	qboolean				useModem;
-	qboolean				modemInitialized;
-	qboolean				modemRang;
-	qboolean				modemConnected;
+	bool				enabled;
+	volatile bool		statusUpdated;
+	bool				useModem;
+	bool				modemInitialized;
+	bool				modemRang;
+	bool				modemConnected;
 	queue					inputQueue;
 	queue					outputQueue;
 	char					clear[16];
@@ -179,10 +179,10 @@ int TTY_WriteByte(int handle, byte data);
 void TTY_Flush(int handle);
 int TTY_Connect(int handle, char *host);
 void TTY_Disconnect(int handle);
-qboolean TTY_CheckForConnection(int handle);
-qboolean TTY_IsEnabled(int serialPortNumber);
-qboolean TTY_IsModem(int serialPortNumber);
-qboolean TTY_OutputQueueIsEmpty(int handle);
+bool TTY_CheckForConnection(int handle);
+bool TTY_IsEnabled(int serialPortNumber);
+bool TTY_IsModem(int serialPortNumber);
+bool TTY_OutputQueueIsEmpty(int handle);
 
 static void ISR_8250 (ComPort *p)
 {
@@ -317,7 +317,7 @@ static void COM2_ISR_16550 (void)
 }
 
 
-void TTY_GetComPortConfig (int portNumber, int *port, int *irq, int *baud, qboolean *useModem)
+void TTY_GetComPortConfig (int portNumber, int *port, int *irq, int *baud, bool *useModem)
 {
 	ComPort	*p;
 
@@ -328,7 +328,7 @@ void TTY_GetComPortConfig (int portNumber, int *port, int *irq, int *baud, qbool
 	*useModem = p->useModem;
 }
 
-void TTY_SetComPortConfig (int portNumber, int port, int irq, int baud, qboolean useModem)
+void TTY_SetComPortConfig (int portNumber, int port, int irq, int baud, bool useModem)
 {
 	ComPort	*p;
 	float	temp;
@@ -872,7 +872,7 @@ void TTY_Disconnect(int handle)
 }
 
 
-qboolean TTY_CheckForConnection(int handle)
+bool TTY_CheckForConnection(int handle)
 {
 	ComPort	*p;
 
@@ -928,19 +928,19 @@ qboolean TTY_CheckForConnection(int handle)
 }
 
 
-qboolean TTY_IsEnabled(int serialPortNumber)
+bool TTY_IsEnabled(int serialPortNumber)
 {
 	return handleToPort[serialPortNumber]->enabled;
 }
 
 
-qboolean TTY_IsModem(int serialPortNumber)
+bool TTY_IsModem(int serialPortNumber)
 {
 	return handleToPort[serialPortNumber]->useModem;
 }
 
 
-qboolean TTY_OutputQueueIsEmpty(int handle)
+bool TTY_OutputQueueIsEmpty(int handle)
 {
 	return EMPTY(handleToPort[handle]->outputQueue);
 }

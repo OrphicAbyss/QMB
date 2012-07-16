@@ -36,7 +36,7 @@ typedef struct efrag_s
 
 typedef struct entity_s
 {
-	qboolean				forcelink;		// model changed
+	bool				forcelink;		// model changed
 
 	int						update_type;
 

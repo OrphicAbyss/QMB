@@ -230,7 +230,7 @@ void BuildGammaTable(float g) {
 	}
 }
 
-qboolean V_CheckGamma(void) {
+bool V_CheckGamma(void) {
 	static float oldgammavalue;
 
 	if (v_gamma.getFloat() == oldgammavalue)
@@ -423,12 +423,12 @@ void V_CalcBlend(void) {
 
 void V_UpdatePalette(void) {
 	int i, j;
-	qboolean changed;
+	bool changed;
 	byte *basepal, *newpal;
 	byte pal[768];
 	float r, g, b, a;
 	int ir, ig, ib;
-	qboolean force;
+	bool force;
 
 	V_CalcPowerupCshift();
 

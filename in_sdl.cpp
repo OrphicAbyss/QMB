@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "input.h"
 
-static qboolean mouse_avail;
+static bool mouse_avail;
 static float mouse_x, mouse_y;
 static int mouse_oldbuttonstate = 0;
 

@@ -75,7 +75,7 @@ void S_Update (vec3_t origin, vec3_t v_forward, vec3_t v_right, vec3_t v_up)
 {
 }
 
-void S_StopAllSounds (qboolean clear)
+void S_StopAllSounds (bool clear)
 {
 }
 

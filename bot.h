@@ -27,9 +27,9 @@ typedef struct {
 	int				ClientNo;		// This holds the bots client number
 	float			connecttime;	// The server time when he connected
 	float			delaytime;		// Respawn delay timer (time of death) //qmb :bot
-	qboolean		menudone;		// Used for Team Fortress to see if we have passed the class menu or not
-	qboolean		isbot;			// This keeps track if a client is a bot or a human
-	qboolean		Active;			// And this if client has joined the game or not
+	bool		menudone;		// Used for Team Fortress to see if we have passed the class menu or not
+	bool		isbot;			// This keeps track if a client is a bot or a human
+	bool		Active;			// And this if client has joined the game or not
 //data for movement
 	vec3_t			prev_org;		// holds previous position to see if we are stuck
 //data for aiming
@@ -40,7 +40,7 @@ typedef struct {
 typedef struct {
 	struct edict_s	*world;			// This holds the world entity
 	byte			MaxClients;		// And this is the maximum allowed number of client's
-	qboolean		botactive[64];	// And this keeps track of what bots that has already joined
+	bool		botactive[64];	// And this keeps track of what bots that has already joined
 } globot_t;
 
 extern	globot_t		globot;		// This struct is used to store global stuff that aint client specific

@@ -38,7 +38,7 @@ int hunk_size;
 int hunk_low_used;
 int hunk_high_used;
 
-qboolean hunk_tempactive;
+bool hunk_tempactive;
 int hunk_tempmark;
 
 /*
@@ -68,7 +68,7 @@ If "all" is specified, every single allocation is printed.
 Otherwise, allocations with the same name will be totaled up before printing.
 ==============
  */
-void Hunk_Print(qboolean all) {
+void Hunk_Print(bool all) {
 	hunk_t *h, *next, *endlow, *starthigh, *endhigh;
 	int count, sum;
 	int totalblocks;

@@ -35,7 +35,7 @@ extern cvar_t hostname;
 static int net_acceptsocket = -1;		// socket for fielding new connections
 static int net_controlsocket;
 static int net_broadcastsocket = 0;
-//static qboolean ifbcastinit = false;
+//static bool ifbcastinit = false;
 static struct qsockaddr broadcastaddr;
 
 static unsigned long myAddr;
@@ -125,7 +125,7 @@ void MPATH_Shutdown (void)
 
 //=============================================================================
 
-void MPATH_Listen (qboolean state)
+void MPATH_Listen (bool state)
 {
 	// enable listening
 	if (state)

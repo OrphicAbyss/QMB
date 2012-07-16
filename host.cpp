@@ -36,7 +36,7 @@ Memory is cleared / released when a server or client begins, not when they end.
 
 quakeparms_t host_parms;
 
-qboolean host_initialized; // true if into command execution
+bool host_initialized; // true if into command execution
 
 double host_frametime;
 double host_time;
@@ -113,7 +113,7 @@ This shuts down both the client and server
 void Host_Error(const char *error, ...) {
 	va_list argptr;
 	char string[1024];
-	static qboolean inerror = false;
+	static bool inerror = false;
 
 	if (inerror)
 		Sys_Error("Host_Error: recursively entered");
@@ -314,7 +314,7 @@ Called when the player is getting totally kicked off the host
 if (crash = true), don't bother sending signofs
 =====================
  */
-void SV_DropClient(qboolean crash) {
+void SV_DropClient(bool crash) {
 	int saveSelf;
 	int i;
 	client_t *client;
@@ -371,7 +371,7 @@ Host_ShutdownServer
 This only happens at the end of a game, not between levels
 ==================
  */
-void Host_ShutdownServer(qboolean crash) {
+void Host_ShutdownServer(bool crash) {
 	int i;
 	int count;
 	sizebuf_t buf;
@@ -455,7 +455,7 @@ Host_FilterTime
 Returns false if the time is too short to run a frame
 ===================
  */
-qboolean Host_FilterTime(float time) {
+bool Host_FilterTime(float time) {
 	realtime += time;
 
 	if (max_fps.getInt() > 0) {
@@ -792,10 +792,10 @@ void Host_Init(quakeparms_t *parms) {
  * FIXME: this is a callback from Sys_Quit and Sys_Error.  It would be better
  * to run quit through here before the final hand off to the sys code.
  */
-extern qboolean con_debuglog;
+extern bool con_debuglog;
 void Con_CloseDebugLog(void);
 void Host_Shutdown(void) {
-	static qboolean isdown = false;
+	static bool isdown = false;
 
 	if (isdown) {
 		printf("recursive shutdown\n");

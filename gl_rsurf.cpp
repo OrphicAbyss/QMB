@@ -35,7 +35,7 @@ int lightmap_textures[MAX_LIGHTMAPS];
 int active_lightmaps;
 unsigned blocklights[BLOCK_WIDTH*BLOCK_HEIGHT * 3];
 glpoly_t *lightmap_polys[MAX_LIGHTMAPS];
-qboolean lightmap_modified[MAX_LIGHTMAPS];
+bool lightmap_modified[MAX_LIGHTMAPS];
 glRect_t lightmap_rectchange[MAX_LIGHTMAPS];
 int allocated[MAX_LIGHTMAPS][BLOCK_WIDTH];
 // the lightmap texture data needs to be kept in
@@ -234,7 +234,7 @@ void R_DrawBrushModel(entity_t *e) {
 	int k;
 	vec3_t mins, maxs;
 	model_t *clmodel;
-	qboolean rotated;
+	bool rotated;
 	int i;
 	extern vec3_t lightcolor;
 	int lnum;

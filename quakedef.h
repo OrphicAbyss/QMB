@@ -243,7 +243,7 @@ typedef struct
 
 //=============================================================================
 
-extern qboolean noclip_anglehack;
+extern bool noclip_anglehack;
 
 
 //
@@ -255,7 +255,7 @@ extern	CVar		sys_ticrate;
 extern	CVar		sys_nostdout;
 extern	CVar		developer;
 
-extern	qboolean	host_initialized;		// true if into command execution
+extern	bool	host_initialized;		// true if into command execution
 extern	double		host_frametime;
 extern	byte		*host_basepal;
 extern	byte		*host_colormap;
@@ -272,12 +272,12 @@ void Host_EndGame		(const char *message, ...);
 void Host_Frame		(float time);
 void Host_Quit_f		(void);
 void Host_ClientCommands(const char *fmt, ...);
-void Host_ShutdownServer(qboolean crash);
+void Host_ShutdownServer(bool crash);
 
 extern int			current_skill;		// skill level for currently loaded level (in case
 										//  the user changes the cvar while the level is
 										//  running, this reflects the level actually in use)
-extern qboolean		isDedicated;
+extern bool		isDedicated;
 extern int			minimum_memory;
 
 //

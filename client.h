@@ -78,7 +78,7 @@ typedef struct
 	float	minlight;			// don't add when contributing less
 	int		key;
 #ifdef QUAKE2
-	qboolean	dark;			// subtracts light instead of adding
+	bool	dark;			// subtracts light instead of adding
 #endif
 	// CDL - epca@powerup.com.au
 	// Add a colour to the dynamic lights
@@ -127,9 +127,9 @@ typedef struct
 
 // demo recording info must be here, because record is started before
 // entering a map (and clearing client_state_t)
-	qboolean	demorecording;
-	qboolean	demoplayback;
-	qboolean	timedemo;
+	bool	demorecording;
+	bool	demoplayback;
+	bool	timedemo;
 	int			forcetrack;			// -1 = use normal cd track
 	FILE		*demofile;
 	int			td_lastframe;		// to meter out one message a frame
@@ -143,7 +143,7 @@ typedef struct
 	sizebuf_t	message;		// writing buffer to send to server
 
 	// CAPTURE <anthony@planetquake.com>
-	qboolean    capturedemo;
+	bool    capturedemo;
 } client_static_t;
 
 extern client_static_t	cls;
@@ -186,16 +186,16 @@ typedef struct
 // pitch drifting vars
 	float		idealpitch;
 	float		pitchvel;
-	qboolean	nodrift;
+	bool	nodrift;
 	float		driftmove;
 	double		laststop;
 
 	float		viewheight;
 	float		crouch;			// local amount for smoothing stepups
 
-	qboolean	paused;			// send over by server
-	qboolean	onground;
-	qboolean	inwater;
+	bool	paused;			// send over by server
+	bool	onground;
+	bool	inwater;
 
 	int			intermission;	// don't change view angle, full screen, etc
 	int			completed_time;	// latched at intermission start

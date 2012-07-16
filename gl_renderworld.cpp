@@ -38,7 +38,7 @@ extern msurface_t *outlinechain;
 
 #define	MAX_LIGHTMAPS	1024
 
-extern qboolean lightmap_modified[MAX_LIGHTMAPS];
+extern bool lightmap_modified[MAX_LIGHTMAPS];
 extern glRect_t lightmap_rectchange[MAX_LIGHTMAPS];
 extern byte lightmaps[4 * MAX_LIGHTMAPS*BLOCK_WIDTH*BLOCK_HEIGHT];
 

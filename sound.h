@@ -51,9 +51,9 @@ typedef struct
 
 typedef struct
 {
-	qboolean		gamealive;
-	qboolean		soundalive;
-	qboolean		splitbuffer;
+	bool		gamealive;
+	bool		soundalive;
+	bool		splitbuffer;
 	int				channels;
 	int				samples;				// mono samples in buffer
 	int				submission_chunk;		// don't mix less than this #
@@ -95,7 +95,7 @@ void S_Shutdown			(void);
 void S_StartSound			(int entnum, int entchannel, sfx_t *sfx, vec3_t origin, float fvol,  float attenuation);
 void S_StaticSound			(sfx_t *sfx, vec3_t origin, float vol, float attenuation);
 void S_StopSound			(int entnum, int entchannel);
-void S_StopAllSounds		(qboolean clear);
+void S_StopAllSounds		(bool clear);
 void S_ClearBuffer			(void);
 void S_Update				(vec3_t origin, vec3_t v_forward, vec3_t v_right, vec3_t v_up);
 void S_ExtraUpdate			(void);
@@ -121,7 +121,7 @@ void SND_Spatialize		(channel_t *ch);
 
 wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength);
 
-qboolean SNDDMA_Init(void);	// initializes cycling through a DMA buffer and returns information on it
+bool SNDDMA_Init(void);	// initializes cycling through a DMA buffer and returns information on it
 int SNDDMA_GetDMAPos(void);	// gets the current DMA position
 void SNDDMA_Shutdown(void);	// shutdown the DMA xfer.
 void SNDDMA_Submit	(void);
@@ -145,7 +145,7 @@ extern	int			total_channels;
 // isolating performance in the renderer.  The fakedma_updates is
 // number of times S_Update() is called per second.
 //
-extern qboolean 	fakedma;
+extern bool 	fakedma;
 extern int 			fakedma_updates;
 extern int			paintedtime;
 extern vec3_t		listener_origin;
@@ -160,7 +160,7 @@ extern	CVar loadas8bit;
 extern	CVar bgmvolume;
 extern	CVar volume;
 
-extern qboolean	snd_initialized;
+extern bool	snd_initialized;
 
 extern int		snd_blocked;
 

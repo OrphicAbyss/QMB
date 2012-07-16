@@ -362,7 +362,7 @@ void BW_Shutdown(void)
 
 //=============================================================================
 
-void BW_Listen (qboolean state)
+void BW_Listen (bool state)
 {
 	// enable listening
 	if (state)

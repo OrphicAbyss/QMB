@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int  BW_Init (void);
 void BW_Shutdown (void);
-void BW_Listen (qboolean state);
+void BW_Listen (bool state);
 int  BW_OpenSocket (int port);
 int  BW_CloseSocket (int socket);
 int  BW_Connect (int socket, struct qsockaddr *addr);

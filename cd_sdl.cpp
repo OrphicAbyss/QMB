@@ -9,10 +9,10 @@
 
 #include "quakedef.h"
 
-static qboolean cdValid = false;
-static qboolean initialized = false;
-static qboolean enabled = true;
-static qboolean playLooping = false;
+static bool cdValid = false;
+static bool initialized = false;
+static bool enabled = true;
+static bool playLooping = false;
 static SDL_CD *cd_id;
 static float cdvolume = 1.0;
 
@@ -26,7 +26,7 @@ static void CDAudio_Eject()
 		Con_DPrintf("Unable to eject CD-ROM tray.\n");
 }
 
-void CDAudio_Play(byte track, qboolean looping)
+void CDAudio_Play(byte track, bool looping)
 {
 	CDstatus cd_stat;
 	if(!cd_id || !enabled) return;

@@ -122,13 +122,13 @@ extern	const char *gl_extensions;
 
 void R_TranslatePlayerSkin (int playernum);
 
-extern qboolean gl_combine;
-extern qboolean gl_stencil;
-extern qboolean gl_shader;
-extern qboolean gl_sgis_mipmap;
-extern qboolean gl_texture_non_power_of_two;
-extern qboolean gl_point_sprite;
-extern qboolean gl_n_patches;
+extern bool gl_combine;
+extern bool gl_stencil;
+extern bool gl_shader;
+extern bool gl_sgis_mipmap;
+extern bool gl_texture_non_power_of_two;
+extern bool gl_point_sprite;
+extern bool gl_n_patches;
 
 extern void GL_EnableTMU(int tmu);
 extern void GL_DisableTMU(int tmu);

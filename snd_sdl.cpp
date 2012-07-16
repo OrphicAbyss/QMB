@@ -20,7 +20,7 @@ static void paint_audio(void *unused, Uint8 *stream, int len)
 	}
 }
 
-qboolean SNDDMA_Init(void)
+bool SNDDMA_Init(void)
 {
 	SDL_AudioSpec desired, obtained;
 

@@ -91,7 +91,7 @@ void mypng_struct_create() {
 	my_png->Filter = PNG_FILTER_TYPE_DEFAULT;
 }
 
-void mypng_struct_destroy(qboolean keepData) {
+void mypng_struct_destroy(bool keepData) {
 	if (!my_png)
 		return;
 	if (my_png->Data && !keepData)

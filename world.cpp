@@ -284,7 +284,7 @@ void SV_FindTouchedLeafs(edict_t *ent, mnode_t *node) {
 		SV_FindTouchedLeafs(ent, node->children[1]);
 }
 
-void SV_LinkEdict(edict_t *ent, qboolean touch_triggers) {
+void SV_LinkEdict(edict_t *ent, bool touch_triggers) {
 	areanode_t *node;
 
 	if (ent->area.prev)
@@ -418,7 +418,7 @@ LINE TESTING IN HULLS
 // 1/32 epsilon to keep floating point happy
 #define	DIST_EPSILON	(0.03125)
 
-qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, vec3_t p1, vec3_t p2, trace_t *trace) {
+bool SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, vec3_t p1, vec3_t p2, trace_t *trace) {
 	dclipnode_t *node;
 	mplane_t *plane;
 	float t1, t2;

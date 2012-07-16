@@ -43,8 +43,8 @@ void ExampleId1Function(void)
 }
  */
 
-// Avoid having to pull in common.h just to get qboolean:
-typedef int qboolean_not_yet_declared;
+// Avoid having to pull in common.h just to get bool:
+typedef int bool_not_yet_declared;
 
 
 // Hook to initialise console vars and commands
@@ -126,7 +126,7 @@ void S_TransferStereo16 (int endtime)
  */
 
 // Use an alternative calculation for GetSoundtime
-qboolean CaptureHelper_GetSoundtime(void);
+bool CaptureHelper_GetSoundtime(void);
 /* in snd_dma.c:
 void GetSoundtime(void)
 {
@@ -146,7 +146,7 @@ void GetSoundtime(void)
  */
 
 // Check if we are capturing this frame
-qboolean CaptureHelper_IsActive(void);
+bool CaptureHelper_IsActive(void);
 /* in snd_dma.c:
 void S_ExtraUpdate (void)
 {
@@ -166,7 +166,7 @@ void S_ExtraUpdate (void)
 // To ensure good audio sync at _all_ framerates, you can also ensure
 // we do not drop very short frames:
 /* in host.c:
-qboolean Host_FilterTime (float time)
+bool Host_FilterTime (float time)
 {
 	realtime += time;
 
@@ -191,7 +191,7 @@ typedef struct
 	sizebuf_t	message;		// writing buffer to send to server
 
     // CAPTURE <mailto:anthony@planetquake.com>
-    qboolean    capturedemo;
+    bool    capturedemo;
 
 } client_static_t;
  */

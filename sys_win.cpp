@@ -34,15 +34,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define NOT_FOCUS_SLEEP	20				// sleep time when not focus
 
 int			starttime;
-qboolean	ActiveApp, Minimized;
-qboolean	WinNT;
+bool	ActiveApp, Minimized;
+bool	WinNT;
 
 static double		pfreq;
 static double		curtime = 0.0;
 static double		lastcurtime = 0.0;
 static int			lowshift;
-qboolean			isDedicated;
-static qboolean		sc_return_on_enter = false;
+bool			isDedicated;
+static bool		sc_return_on_enter = false;
 HANDLE				hinput, houtput;
 
 static char			*tracking_tag = "Clams & Mooses";

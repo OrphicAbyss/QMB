@@ -32,7 +32,7 @@ ALIAS MODEL DISPLAY LIST GENERATION
 model_t *aliasmodel;
 aliashdr_t *paliashdr;
 
-qboolean used[8192];
+bool used[8192];
 
 // the command list holds counts and s/t values that are valid for
 // every frame
@@ -403,9 +403,7 @@ void GL_DrawAliasFrameNew(aliashdr_t *paliashdr, int posenum, int shell, int cel
 
 	/*
 	glBegin (GL_TRIANGLES);
-	do
-	{
-
+	do {
 		// normals and vertexes come from the frame list
 		//qmb :alias coloured lighting
 		l = shadedots[verts->lightnormalindex];
@@ -586,8 +584,6 @@ void R_SetupQ3AliasFrame(int frame, aliashdr_t *paliashdr, int shell) {
 }
 
 void R_SetupAliasBlendedFrame(int frame, aliashdr_t *paliashdr, entity_t* e, int shell, int cell) {
-	int pose;
-	int numposes;
 	float blend;
 
 	if ((frame >= paliashdr->numframes) || (frame < 0)) {
@@ -595,8 +591,8 @@ void R_SetupAliasBlendedFrame(int frame, aliashdr_t *paliashdr, entity_t* e, int
 		frame = 0;
 	}
 
-	pose = paliashdr->frames[frame].firstpose;
-	numposes = paliashdr->frames[frame].numposes;
+	int pose = paliashdr->frames[frame].firstpose;
+	int numposes = paliashdr->frames[frame].numposes;
 
 	if (numposes > 1) {
 		e->frame_interval = paliashdr->frames[frame].interval;

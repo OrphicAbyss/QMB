@@ -146,7 +146,7 @@ typedef struct msurface_s {
 	int			lightmaptexturenum;
 	byte		styles[MAXLIGHTMAPS];
 	int			cached_light[MAXLIGHTMAPS];	// values currently used in lightmap
-	qboolean	cached_dlight;				// true if dynamic light in cache
+	bool	cached_dlight;				// true if dynamic light in cache
 	byte		*samples;		// [numstyles*surfsize]
 } msurface_t;
 
@@ -406,7 +406,7 @@ typedef enum {mod_brush, mod_sprite, mod_alias} modtype_t;
 
 typedef struct model_s {
 	char		name[MAX_QPATH];
-	qboolean	needload;		// bmodels and sprites don't cache normally
+	bool	needload;		// bmodels and sprites don't cache normally
 
 	modtype_t	type;
 	int			aliastype; // LordHavoc: Q2 model support
@@ -420,7 +420,7 @@ typedef struct model_s {
 	float		radius;
 
 // solid volume for clipping
-	qboolean	clipbox;
+	bool	clipbox;
 	vec3_t		clipmins, clipmaxs;
 
 // brush model
@@ -476,7 +476,7 @@ typedef struct model_s {
 
 void	Mod_Init (void);
 void	Mod_ClearAll (void);
-model_t *Mod_ForName (const char *name, qboolean crash);
+model_t *Mod_ForName (const char *name, bool crash);
 void	*Mod_Extradata (model_t *mod);	// handles caching
 void	Mod_TouchModel (char *name);
 
