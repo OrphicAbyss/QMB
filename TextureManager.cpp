@@ -14,6 +14,7 @@ glFilterMode TextureManager::glFilterModes[] = {
 	{"GL_LINEAR_MIPMAP_LINEAR", GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR}	
 };
 
+GLuint TextureManager::defaultTexture = 0;
 GLuint TextureManager::shinetex_glass = 0;
 GLuint TextureManager::shinetex_chrome = 0;
 GLuint TextureManager::underwatertexture = 0;
@@ -90,6 +91,8 @@ Texture *TextureManager::LoadTexture(Texture *texture) {
 		texture->upload();
 	}
 	
+	checkGLError("Loading texture");
+	
 	addTexture(texture);
 	return texture;
 }
@@ -138,6 +141,97 @@ GLuint TextureManager::getTextureId() {
 	return textureId;
 }
 
-void TextureManager::LoadMiscTextures() {
+void TextureManager::LoadDefaultTexture() {
+	int width = 32;
+	int height = 32;
+	unsigned char *data = (unsigned char *)malloc(sizeof(unsigned char) * width * height * 4);
+	unsigned cur = 0;
 	
+	for (int i=0; i<32; i++) {
+		for (int j=0; j<32; j++) {
+			bool x = i < 16;
+			bool y = j < 16;
+			
+			if ((x && y) || (!x && !y)) {
+				data[cur++] = 255;
+				data[cur++] = 255;
+				data[cur++] = 255;
+				data[cur++] = 255;
+			} else {
+				data[cur++] = 0;
+				data[cur++] = 0;
+				data[cur++] = 0;
+				data[cur++] = 255;
+			}
+		}
+	}
+	
+	//default texture
+	Texture *defTex = new Texture("defaultTexture");
+	defTex->data = data;
+	defTex->height = height;
+	defTex->width = width;
+	defTex->bytesPerPixel = 4;
+	LoadTexture(defTex);
+	defaultTexture = defTex->textureId;
+
+	// hook into map default texture
+	extern texture_t *r_notexture_mip;
+	r_notexture_mip->gl_texturenum = defaultTexture;
+}
+
+void TextureManager::LoadMiscTextures() {
+	shinetex_glass = GL_LoadTexImage("textures/shine_glass", false, true, false);
+	shinetex_chrome = GL_LoadTexImage("textures/shine_chrome", false, true, false);
+	underwatertexture = GL_LoadTexImage("textures/water_caustic", false, true, false);
+	highlighttexture = GL_LoadTexImage("gfx/highlight", false, true, false);
+}
+
+void TextureManager::LoadCrosshairTextures() {
+	char crosshairFname[32];
+	
+	for (int i = 0; i < 32; i++) {
+		snprintf(&crosshairFname[0],32,"textures/crosshairs/crosshair%02i.tga",i);
+		crosshair_tex[i] = GL_LoadTexImage((char *)&crosshairFname[0], false, false, false);
+	}
+}
+
+void TextureManager::LoadModelShadingTextures() {
+	unsigned char cellData[32] = {55, 55, 55, 55, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
+	unsigned char *cellFull = (unsigned char *)malloc(sizeof(unsigned char) * 32 * 3);
+	unsigned char *vertexFull = (unsigned char *)malloc(sizeof(unsigned char) * 32 * 3);
+
+	for (int i = 0; i < 32; i++) {
+		cellFull[i * 3 + 0] = cellFull[i * 3 + 1] = cellFull[i * 3 + 2] = cellData[i];
+		vertexFull[i * 3 + 0] = vertexFull[i * 3 + 1] = vertexFull[i * 3 + 2] = (unsigned char)((i / 32.0f) * 255);
+	}	
+
+	//cell shading stuff...
+	Texture *cell = new Texture("celTexture");
+	cell->data = cellFull;
+	cell->height = 1;
+	cell->width = 32;
+	cell->bytesPerPixel = 3;
+	cell->mipmap = false;
+	cell->textureType = GL_TEXTURE_1D;
+	LoadTexture(cell);
+	celtexture = cell->textureId;
+
+	//vertex shading stuff...
+	Texture *vertex = new Texture("vertexTexture");
+	vertex->data = vertexFull;
+	vertex->height = 1;
+	vertex->width = 32;
+	vertex->bytesPerPixel = 3;
+	vertex->mipmap = false;
+	vertex->textureType = GL_TEXTURE_1D;
+	LoadTexture(vertex);
+	vertextexture = vertex->textureId;
+}
+
+void TextureManager::Init() {
+	LoadDefaultTexture();
+	LoadMiscTextures();
+	LoadCrosshairTextures();
+	LoadModelShadingTextures();
 }

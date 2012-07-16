@@ -392,19 +392,13 @@ void V_CalcPowerupCshift(void) {
 }
 
 void V_CalcBlend(void) {
-	float r, g, b, a, a2;
-	int j;
+	float r = 0, g = 0, b = 0, a = 0;
 
-	r = 0;
-	g = 0;
-	b = 0;
-	a = 0;
-
-	for (j = 0; j < NUM_CSHIFTS; j++) {
+	for (int j = 0; j < NUM_CSHIFTS; j++) {
 		if (!gl_cshiftpercent.getFloat())
 			continue;
 
-		a2 = ((cl.cshifts[j].percent * gl_cshiftpercent.getFloat()) / 100.0) / 255.0;
+		float a2 = ((cl.cshifts[j].percent * gl_cshiftpercent.getFloat()) / 100.0) / 255.0;
 
 		//		a2 = cl.cshifts[j].percent/255.0;
 		if (!a2)
@@ -453,12 +447,13 @@ void V_UpdatePalette(void) {
 	}
 
 	// drop the damage value
-	cl.cshifts[CSHIFT_DAMAGE].percent -= host_frametime * 150;
+	double time = cl.time - cl.oldtime;
+	cl.cshifts[CSHIFT_DAMAGE].percent -= time * 150;
 	if (cl.cshifts[CSHIFT_DAMAGE].percent <= 0)
 		cl.cshifts[CSHIFT_DAMAGE].percent = 0;
 
 	// drop the bonus value
-	cl.cshifts[CSHIFT_BONUS].percent -= host_frametime * 100;
+	cl.cshifts[CSHIFT_BONUS].percent -= time * 100;
 	if (cl.cshifts[CSHIFT_BONUS].percent <= 0)
 		cl.cshifts[CSHIFT_BONUS].percent = 0;
 

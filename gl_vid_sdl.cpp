@@ -51,9 +51,6 @@ void CheckMultiTextureExtensions(void) {
 			gl_textureunits = 2;
 		Con_Printf("&c840Multitexture extensions found&r.\n");
 		Con_Printf("&c840Found %i texture unit support&r.\n", gl_textureunits);
-		qglPointParameterfvEXT = glPointParameterfvEXT; //(void *)wglGetProcAddress("glPointParameterfvEXT");
-		qglPointParameterfEXT = glPointParameterfEXT; //(void *)wglGetProcAddress("glPointParameterfEXT");
-		glPNTrianglesiATI = glPNTrianglesiATI; //(void *)wglGetProcAddress("glPNTrianglesiATI");
 	}
 }
 
@@ -157,24 +154,18 @@ void GL_EndRendering(void) {
 }
 
 void VID_SetPalette(unsigned char *palette) {
-	int i;
-	SDL_Color colors[256];
 	unsigned r, g, b;
 	unsigned *table;
 
 	// Save palette table for lookups
 	table = d_8to24table;
 
-	for (i = 0; i < 256; ++i) {
-		r = palette[0];
-		g = palette[1];
-		b = palette[2];
+	for (int i = 0; i < 256; ++i) {
+		r = *palette++;
+		g = *palette++;
+		b = *palette++;
 
 		*table++ = (255 << 24) + (r << 0) + (g << 8) + (b << 16);
-
-		colors[i].r = *palette++;
-		colors[i].g = *palette++;
-		colors[i].b = *palette++;
 	}
 	d_8to24table[255] &= 0x00000000; // 255 is transparent
 }

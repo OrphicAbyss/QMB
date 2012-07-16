@@ -26,30 +26,26 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	BLOCK_WIDTH		128
 #define	BLOCK_HEIGHT	128
 
-int lightmap_bytes; // 1, 2, or 4
-int lightmap_textures[MAX_LIGHTMAPS];
-int active_lightmaps;
-
 typedef struct glRect_s {
 	unsigned char l, t, w, h;
 } glRect_t;
 
+int lightmap_bytes; // 1, 2, or 4
+int lightmap_textures[MAX_LIGHTMAPS];
+int active_lightmaps;
 unsigned blocklights[BLOCK_WIDTH*BLOCK_HEIGHT * 3];
 glpoly_t *lightmap_polys[MAX_LIGHTMAPS];
 qboolean lightmap_modified[MAX_LIGHTMAPS];
 glRect_t lightmap_rectchange[MAX_LIGHTMAPS];
 int allocated[MAX_LIGHTMAPS][BLOCK_WIDTH];
-
 // the lightmap texture data needs to be kept in
 // main memory so texsubimage can update properly
 byte lightmaps[4 * MAX_LIGHTMAPS*BLOCK_WIDTH*BLOCK_HEIGHT];
-
 //world texture chains
 msurface_t *skychain = NULL;
 msurface_t *waterchain = NULL;
 msurface_t *extrachain = NULL;
 msurface_t *outlinechain = NULL;
-
 //qmb :detail texture
 int detailtexture;
 int detailtexture2;
@@ -61,9 +57,6 @@ void R_BuildLightMap(msurface_t *surf, byte *dest, int stride);
  * Returns the proper texture for a given time and base texture
  */
 texture_t *R_TextureAnimation(texture_t *base) {
-	int reletive;
-	int count;
-
 	//	if (currententity && currententity->frame)
 	//	{
 	if (base->alternate_anims)
@@ -73,9 +66,9 @@ texture_t *R_TextureAnimation(texture_t *base) {
 	if (!base->anim_total)
 		return base;
 
-	reletive = (int) (cl.time * 10) % base->anim_total;
+	int reletive = (int) (cl.time * 10) % base->anim_total;
 
-	count = 0;
+	int count = 0;
 	while (base->anim_min > reletive || base->anim_max <= reletive) {
 		base = base->anim_next;
 		if (!base)
@@ -621,7 +614,7 @@ void UpdateLightmap(int texNum) {
 	if (lightmap_modified[texNum]) {
 		lightmap_modified[texNum] = false;
 		glRect_t *theRect = &lightmap_rectchange[texNum];
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t, BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_INT_8_8_8_8_REV, lightmaps + (texNum * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * lightmap_bytes);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t, BLOCK_WIDTH, theRect->h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, lightmaps + (texNum * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * lightmap_bytes);
 		theRect->l = BLOCK_WIDTH;
 		theRect->t = BLOCK_HEIGHT;
 		theRect->h = 0;
@@ -636,6 +629,7 @@ void GL_UploadLightmap(void) {
 	for (int i = 0; i < MAX_LIGHTMAPS; i++) {
 		if (!allocated[i][0])
 			break; // no more used
+//		UpdateLightmap(i);
 		lightmap_modified[i] = false;
 		lightmap_rectchange[i].l = BLOCK_WIDTH;
 		lightmap_rectchange[i].t = BLOCK_HEIGHT;
@@ -645,7 +639,7 @@ void GL_UploadLightmap(void) {
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, lightmap_bytes, BLOCK_WIDTH, BLOCK_HEIGHT, 0, gl_lightmap_format, GL_UNSIGNED_INT_8_8_8_8_REV, lightmaps + i * BLOCK_WIDTH * BLOCK_HEIGHT * lightmap_bytes);
+		glTexImage2D(GL_TEXTURE_2D, 0, lightmap_bytes, BLOCK_WIDTH, BLOCK_HEIGHT, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, lightmaps + i * BLOCK_WIDTH * BLOCK_HEIGHT * lightmap_bytes);
 	}
 	glActiveTexture(GL_TEXTURE0_ARB);
 }
@@ -813,7 +807,7 @@ void R_BuildLightMap(msurface_t *surf, byte *dest, int stride) {
 				*bl++ += *lightmap++ * scale; //g
 				*bl++ += *lightmap++ * scale; //b
 
-				RGBtoGrayscale(rgb);
+				//RGBtoGrayscale(rgb);
 			}
 		}
 

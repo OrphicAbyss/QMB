@@ -68,17 +68,17 @@ typedef struct mplane_s
 
 typedef struct texture_s
 {
-	char		name[16];
-	unsigned	width, height;
-	int			gl_texturenum;
-	int			gl_fullbright;
-	int			gl_skynum;
+	char			name[16];
+	unsigned		width, height;
+	unsigned int	gl_texturenum;
+	unsigned int	gl_fullbright;
+	unsigned int	gl_skynum;
 	struct msurface_s	*texturechain;	// for texture sorted drawing
-	int			anim_total;				// total tenths in sequence ( 0 = no)
-	int			anim_min, anim_max;		// time for this frame min <=time< max
+	int				anim_total;				// total tenths in sequence ( 0 = no)
+	int				anim_min, anim_max;		// time for this frame min <=time< max
 	struct texture_s *anim_next;		// in the animation sequence
 	struct texture_s *alternate_anims;	// bmodels in frmae 1 use these
-	unsigned	offsets[MIPLEVELS];		// four mip maps stored
+	unsigned		offsets[MIPLEVELS];		// four mip maps stored
 } texture_t;
 
 #define	SURF_PLANEBACK		2

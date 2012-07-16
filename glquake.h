@@ -68,7 +68,6 @@ extern	vec3_t	r_origin;
 //
 extern	refdef_t	r_refdef;
 extern	mleaf_t		*r_viewleaf, *r_oldviewleaf;
-extern	texture_t	*r_notexture_mip;
 extern	int		d_lightstylevalue[256];	// 8.8 fraction of base light value
 
 extern	CVar	r_drawentities;
@@ -121,104 +120,12 @@ extern	CVar	hostname;
 extern	CVar	sv_stepheight;
 extern	CVar	sv_jumpstep;
 
-extern	int		gl_lightmap_format;
-
 extern	const char *gl_vendor;
 extern	const char *gl_renderer;
 extern	const char *gl_version;
 extern	const char *gl_extensions;
 
 void R_TranslatePlayerSkin (int playernum);
-
-// Multitexture
-#define GL_MAX_TEXTURE_UNITS_ARB			0x84E2
-
-#define GL_TEXTURE_MAX_ANISOTROPY_EXT		0x84FE
-#define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT	0x84FF
-
-//QMB :overbright stuff
-#define GL_COMBINE_EXT						0x8570
-#define GL_COMBINE_RGB_EXT					0x8571
-#define GL_RGB_SCALE_EXT					0x8573
-#define GL_ADD_SIGNED						0x8574
-#define GL_SUBTRACT							0x84E7
-//QMB :end
-
-//QMB :texture shaders
-#define GL_DSDT8_NV							0x8709
-#define GL_DSDT_NV							0x86F5
-#define GL_TEXTURE_SHADER_NV				0x86DE
-#define GL_SHADER_OPERATION_NV				0x86DF
-#define GL_OFFSET_TEXTURE_2D_NV				0x86E8
-#define GL_PREVIOUS_TEXTURE_INPUT_NV		0x86E4
-#define GL_OFFSET_TEXTURE_MATRIX_NV			0x86E1
-//QMB :end
-
-//QMB :texture compression
-#ifndef GL_ARB_texture_compression
-#define GL_COMPRESSED_ALPHA_ARB				0x84E9
-#define GL_COMPRESSED_LUMINANCE_ARB			0x84EA
-#define GL_COMPRESSED_LUMINANCE_ALPHA_ARB	0x84EB
-#define GL_COMPRESSED_INTENSITY_ARB			0x84EC
-#define GL_COMPRESSED_RGB_ARB				0x84ED
-#define GL_COMPRESSED_RGBA_ARB				0x84EE
-#define GL_TEXTURE_COMPRESSION_HINT_ARB		0x84EF
-#define GL_TEXTURE_IMAGE_SIZE_ARB			0x86A0
-#define GL_TEXTURE_COMPRESSED_ARB			0x86A1
-#define GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB	0x86A2
-#define GL_COMPRESSED_TEXTURE_FORMATS_ARB	0x86A3
-#endif
-//QMB :end
-
-//QMB :SGIS_generate_mipmap
-#define GL_GENERATE_MIPMAP_SGIS				0x8191
-//QMB :end
-
-//QMB :NV_point_sprite
-#define GL_POINT_SPRITE_NV					0x8861
-#define GL_COORD_REPLACE_NV					0x8862
-#define GL_POINT_SPRITE_R_MODE_NV			0x8863
-//QMB :end
-
-//QMB :points
-#ifndef GL_SGIS_point_parameters
-#define GL_POINT_SIZE_MIN_EXT				0x8126
-#define GL_POINT_SIZE_MIN_SGIS				0x8126
-#define GL_POINT_SIZE_MAX_EXT				0x8127
-#define GL_POINT_SIZE_MAX_SGIS				0x8127
-#define GL_POINT_FADE_THRESHOLD_SIZE_EXT	0x8128
-#define GL_POINT_FADE_THRESHOLD_SIZE_SGIS	0x8128
-#define GL_DISTANCE_ATTENUATION_EXT			0x8129
-#define GL_DISTANCE_ATTENUATION_SGIS		0x8129
-#endif
-//QMB :end
-
-//QMB :npatches
-#ifndef GL_ATI_pn_triangles
-#define GL_ATI_pn_triangles 1
-
-#define GL_PN_TRIANGLES_ATI							0x87F0
-#define GL_MAX_PN_TRIANGLES_TESSELATION_LEVEL_ATI	0x87F1
-#define GL_PN_TRIANGLES_POINT_MODE_ATI				0x87F2
-#define GL_PN_TRIANGLES_NORMAL_MODE_ATI				0x87F3
-#define GL_PN_TRIANGLES_TESSELATION_LEVEL_ATI		0x87F4
-#define GL_PN_TRIANGLES_POINT_MODE_LINEAR_ATI		0x87F5
-#define GL_PN_TRIANGLES_POINT_MODE_CUBIC_ATI		0x87F6
-#define GL_PN_TRIANGLES_NORMAL_MODE_LINEAR_ATI		0x87F7
-#define GL_PN_TRIANGLES_NORMAL_MODE_QUADRATIC_ATI   0x87F8
-#endif
-//QMB :end
-
-//QMB :NV_point_sprite
-typedef void (APIENTRY *pointPramFUNCv) (GLenum pname, const GLfloat *params);
-typedef void (APIENTRY *pointPramFUNC) (GLenum pname, const GLfloat params);
-//QMB :npatches
-typedef void (APIENTRY *pnTrianglesIatiPROC)(GLenum pname, GLint param);
-typedef void (APIENTRY *pnTrianglesFaitPROC)(GLenum pname, GLfloat param);
-
-extern pointPramFUNCv qglPointParameterfvEXT;
-extern pointPramFUNC qglPointParameterfEXT;
-extern pnTrianglesIatiPROC glPNTrianglesiATI;
 
 extern qboolean gl_combine;
 extern qboolean gl_stencil;

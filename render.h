@@ -129,9 +129,7 @@ typedef struct
 //
 extern	refdef_t	r_refdef;
 extern vec3_t	r_origin, vpn, vright, vup;
-
-extern	struct texture_s	*r_notexture_mip;
-
+extern int	R_Skybox;
 
 void R_Init (void);
 void R_InitTextures (void);
@@ -141,26 +139,16 @@ void R_RenderView (void);		// must set r_refdef first
 void R_InitSky (struct texture_s *mt);	// called at level load
 int R_LoadSky (char *newname);
 void R_CurrentCoord_f (void);
-extern int	R_Skybox;
-
 void R_AddEfrags (entity_t *ent);
 void R_RemoveEfrags (entity_t *ent);
-
 void R_NewMap (void);
-
-
 void R_ParseParticleEffect (void);
 void R_RunParticleEffect (vec3_t org, vec3_t dir, int color, int count);
 void R_RocketTrail (vec3_t start, vec3_t end, int type);
-
-#ifdef QUAKE2
-void R_DarkFieldParticles (entity_t *ent);
-#endif
 void R_EntityParticles (entity_t *ent);
 void R_BlobExplosion (vec3_t org);
 void R_ParticleExplosion (vec3_t org);
 void R_ParticleExplosion2 (vec3_t org, int colorStart, int colorLength);
 void R_LavaSplash (vec3_t org);
 void R_TeleportSplash (vec3_t org);
-
 void R_PushDlights (void);

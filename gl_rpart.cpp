@@ -88,11 +88,6 @@ float grav;
 CVar gl_clipparticles("gl_clipparticles", "0", true);
 CVar gl_smoketrail("gl_smoketrail", "0", true);
 
-//used for nv_pointsprits
-//pointsprits dont work right anyway (prob some crazy quake matrix stuff)
-pointPramFUNCv qglPointParameterfvEXT;
-pointPramFUNC qglPointParameterfEXT;
-
 //internal functions
 void TraceLineN(vec3_t start, vec3_t end, vec3_t impact, vec3_t normal, int accurate); //Physics, checks to see if a particle hit the world
 void R_UpdateAll(void); //used to run the particle update (do accelration and kill of old particles)
@@ -792,9 +787,9 @@ void DrawParticles(void) {
 	static GLfloat quadratic[3] = {0.25f, 0.0f, -1.0f};
 
 	if (gl_point_sprite) {
-		qglPointParameterfvEXT(GL_DISTANCE_ATTENUATION_EXT, constant);
-		//qglPointParameterfEXT( GL_POINT_SIZE_MAX_EXT, 260.0f);
-		//qglPointParameterfEXT( GL_POINT_SIZE_MIN_EXT, 1.0f);
+		glPointParameterfvEXT(GL_DISTANCE_ATTENUATION_EXT, constant);
+		//glPointParameterfEXT( GL_POINT_SIZE_MAX_EXT, 260.0f);
+		//glPointParameterfEXT( GL_POINT_SIZE_MIN_EXT, 1.0f);
 	}
 
 	VectorAdd(vup, vright, coord[2]);

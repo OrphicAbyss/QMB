@@ -42,7 +42,7 @@ extern qboolean lightmap_modified[MAX_LIGHTMAPS];
 extern glRect_t lightmap_rectchange[MAX_LIGHTMAPS];
 extern byte lightmaps[4 * MAX_LIGHTMAPS*BLOCK_WIDTH*BLOCK_HEIGHT];
 
-extern int lightmap_textures;
+extern int lightmap_textures[];
 extern int lightmap_bytes;
 
 void R_RenderDynamicLightmaps(msurface_t *fa);
@@ -191,7 +191,7 @@ void PreUpdateLightmaps(model_t *model) {
 			// Update lightmap now
 			R_RenderDynamicLightmaps(s);
 
-			glBindTexture(GL_TEXTURE_2D, lightmap_textures + s->lightmaptexturenum);
+			glBindTexture(GL_TEXTURE_2D, lightmap_textures[s->lightmaptexturenum]);
 			// Upload changes
 			UpdateLightmap(s->lightmaptexturenum);
 		}
@@ -210,13 +210,17 @@ void Surf_DrawTextureChainsFour(model_t *model) {
 	skychain = NULL;
 
 	//always a normal texture, so enable tmu
-	GL_EnableTMU(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
+	glEnable(GL_TEXTURE_2D);
 	Surf_EnableNormal();
 
-	//always a lightmap, so enable tmu
-	GL_EnableTMU(GL_TEXTURE1_ARB);
-	Surf_EnableLightmap();
-
+	//if (!r_fullbright.getBool()) {
+		//always a lightmap, so enable tmu
+		glActiveTexture(GL_TEXTURE1_ARB);
+		glEnable(GL_TEXTURE_2D);
+		Surf_EnableLightmap();
+	//}
+	
 	//could be a fullbright, just setup for them
 	glActiveTexture(GL_TEXTURE2_ARB);
 	Surf_EnableFullbright();
@@ -247,14 +251,15 @@ void Surf_DrawTextureChainsFour(model_t *model) {
 
 		if (t->gl_fullbright != 0) {
 			//if there is a fullbright texture then bind it to TMU2
-			GL_EnableTMU(GL_TEXTURE2_ARB);
+			glActiveTexture(GL_TEXTURE2_ARB);
+			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, t->gl_fullbright);
 		}
 
 		glActiveTexture(GL_TEXTURE1_ARB);
 		for (msurface_t *s = model->textures[i]->texturechain; s;) {
 			// Select the right lightmap
-			glBindTexture(GL_TEXTURE_2D, lightmap_textures + s->lightmaptexturenum);
+			glBindTexture(GL_TEXTURE_2D, lightmap_textures[s->lightmaptexturenum]);
 
 			// Draw the polys
 			glBegin(GL_POLYGON);
@@ -504,7 +509,7 @@ void Surf_DrawTextureChainsTwo(model_t *model) {
 
 		for (msurface_t *s = model->textures[i]->texturechain; s;) {
 			// Select the right lightmap
-			glBindTexture(GL_TEXTURE_2D, lightmap_textures + s->lightmaptexturenum);
+			glBindTexture(GL_TEXTURE_2D, lightmap_textures[s->lightmaptexturenum]);
 
 			// Draw the polys
 			glBegin(GL_POLYGON);

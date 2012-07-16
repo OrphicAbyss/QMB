@@ -43,7 +43,6 @@ vec3_t r_origin;
 // screen size info
 refdef_t r_refdef;
 mleaf_t *r_viewleaf, *r_oldviewleaf;
-texture_t *r_notexture_mip;
 
 int d_lightstylevalue[256]; // 8.8 fraction of base light value
 
@@ -361,7 +360,6 @@ void R_SetFrustum(void) {
 }
 
 void R_SetupFrame(void) {
-
 	// don't allow cheats in multiplayer
 	if (cl.maxclients > 1)
 		r_fullbright.set(false);

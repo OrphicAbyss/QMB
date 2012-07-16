@@ -107,9 +107,9 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline) {
 	}
 
 	if (gl_ammoflash.getBool() && (model->flags & EF_MODELFLASH)) {
-		lightcolor[0] += sin(2 * cl.time * M_PI) / 4;
-		lightcolor[1] += sin(2 * cl.time * M_PI) / 4;
-		lightcolor[2] += sin(2 * cl.time * M_PI) / 4;
+		lightcolor[0] += sin(2 * cl.time * M_PI) / 8;
+		lightcolor[1] += sin(2 * cl.time * M_PI) / 8;
+		lightcolor[2] += sin(2 * cl.time * M_PI) / 8;
 		//Con_Printf("Model flags: %x\n", model->flags);
 	}
 

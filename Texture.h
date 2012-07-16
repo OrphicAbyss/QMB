@@ -45,6 +45,7 @@ public:
 	static GLuint glFilterMin;
 	static glFilterMode glFilterModes[];
 	
+	static GLuint defaultTexture;
 	static GLuint shinetex_glass;
 	static GLuint shinetex_chrome;
 	static GLuint underwatertexture;
@@ -67,11 +68,15 @@ public:
 	static void addTexture(Texture *add);
 	static void removeTexture(Texture *remove);
 
+	static void LoadDefaultTexture();
 	static void LoadMiscTextures();
+	static void LoadCrosshairTextures();
+	static void LoadModelShadingTextures();
+	
+	static void Init();
 	
 	static GLuint getTextureId();
 	static void delTextureId(GLuint);
 };
 
 #endif	/* TEXTURE_H */
-

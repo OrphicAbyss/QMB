@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "gl_md3.h"
 #include "mathlib.h"
+#include "Texture.h"
 
 model_t *loadmodel;
 char loadname[32]; // for hunk tags
@@ -42,10 +43,18 @@ model_t mod_known[MAX_MOD_KNOWN];
 int mod_numknown;
 
 CVar gl_subdivide_size("gl_subdivide_size", "128", true);
+texture_t *r_notexture_mip;
 
 void Mod_Init(void) {
 	CVar::registerCVar(&gl_subdivide_size);
 	Q_memset(mod_novis, 0xff, sizeof (mod_novis));
+	
+	// create a simple checkerboard texture for the default
+	r_notexture_mip = (texture_t *) Hunk_AllocName(sizeof (texture_t), "notexture");
+	r_notexture_mip->width = r_notexture_mip->height = 0;
+	for (int i=0; i<MIPLEVELS; i++)
+		r_notexture_mip->offsets[i] = 0;
+	r_notexture_mip->gl_texturenum = TextureManager::defaultTexture;
 }
 
 /**
@@ -86,8 +95,6 @@ mleaf_t *Mod_PointInLeaf(vec3_t p, model_t *model) {
 		else
 			node = node->children[1];
 	}
-
-	return NULL; // never reached
 }
 
 byte *Mod_DecompressVis(byte *in, model_t *model) {
@@ -275,9 +282,7 @@ model_t *Mod_ForName(const char *name, qboolean crash) {
 byte *mod_base;
 
 qboolean Img_HasFullbrights(byte *pixels, int size) {
-	int i;
-
-	for (i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 		if (pixels[i] >= 224)
 			return true;
 
@@ -286,16 +291,13 @@ qboolean Img_HasFullbrights(byte *pixels, int size) {
 
 void Mod_LoadTextures(lump_t *l) {
 	extern CVar gl_24bitmaptex;
-	int i, j, pixels, num, max, altmax;
+	int pixels, num, max, altmax;
 	miptex_t *mt;
 	texture_t *tx, *tx2;
 	texture_t * anims[10];
 	texture_t * altanims[10];
 	dmiptexlump_t *m;
-
-	// Tomaz || TGA Begin
 	char texname[64], texnamefb[64], texnamefbluma[64];
-	// Tomaz || TGA End
 
 	if (!l->filelen) {
 		loadmodel->textures = NULL;
@@ -308,14 +310,14 @@ void Mod_LoadTextures(lump_t *l) {
 	loadmodel->numtextures = m->nummiptex;
 	loadmodel->textures = (texture_t **) Hunk_AllocName(m->nummiptex * sizeof (*loadmodel->textures), loadname);
 
-	for (i = 0; i < m->nummiptex; i++) {
+	for (int i = 0; i < m->nummiptex; i++) {
 		m->dataofs[i] = LittleLong(m->dataofs[i]);
 		if (m->dataofs[i] == -1)
 			continue;
 		mt = (miptex_t *) ((byte *) m + m->dataofs[i]);
 		mt->width = LittleLong(mt->width);
 		mt->height = LittleLong(mt->height);
-		for (j = 0; j < MIPLEVELS; j++)
+		for (int j = 0; j < MIPLEVELS; j++)
 			mt->offsets[j] = LittleLong(mt->offsets[j]);
 
 		if ((mt->width & 15) || (mt->height & 15))
@@ -327,22 +329,19 @@ void Mod_LoadTextures(lump_t *l) {
 		Q_memcpy(tx->name, mt->name, sizeof (tx->name));
 		tx->width = mt->width;
 		tx->height = mt->height;
-		for (j = 0; j < MIPLEVELS; j++)
+		for (int j = 0; j < MIPLEVELS; j++)
 			tx->offsets[j] = mt->offsets[j] + sizeof (texture_t) - sizeof (miptex_t);
 		// the pixels immediately follow the structures
 		Q_memcpy(tx + 1, mt + 1, pixels);
 
-
 		if (!Q_strncmp(mt->name, "sky", 3)) {
 			R_InitSky(tx);
-		} else { // Fixed :)
-			texture_mode = GL_LINEAR_MIPMAP_LINEAR;
-
+		} else {
 			sprintf(texname, "textures/%s", mt->name);
 			sprintf(texnamefb, "textures/%s_glow", mt->name);
 
 			if (gl_24bitmaptex.getBool()) {
-				tx->gl_texturenum = GL_LoadTexImage(texname, false, true, gl_sincity.getBool());
+				tx->gl_texturenum = GL_LoadTexImage(texname, false, false, gl_sincity.getBool());
 
 				//if there is a 24bit texture, check for a fullbright
 				if (tx->gl_texturenum != 0) {
@@ -367,13 +366,11 @@ void Mod_LoadTextures(lump_t *l) {
 					tx->gl_fullbright = 0;
 				}
 			}
-
-			texture_mode = GL_LINEAR;
 		}
 	}
 
 	// sequence the animations
-	for (i = 0; i < m->nummiptex; i++) {
+	for (int i = 0; i < m->nummiptex; i++) {
 		tx = loadmodel->textures[i];
 		if (!tx || tx->name[0] != '+')
 			continue;
@@ -401,7 +398,7 @@ void Mod_LoadTextures(lump_t *l) {
 		} else
 			Sys_Error("Bad animating texture %s", tx->name);
 
-		for (j = i + 1; j < m->nummiptex; j++) {
+		for (int j = i + 1; j < m->nummiptex; j++) {
 			tx2 = loadmodel->textures[j];
 			if (!tx2 || tx2->name[0] != '+')
 				continue;
@@ -427,7 +424,7 @@ void Mod_LoadTextures(lump_t *l) {
 
 #define	ANIM_CYCLE	2
 		// link them all together
-		for (j = 0; j < max; j++) {
+		for (int j = 0; j < max; j++) {
 			tx2 = anims[j];
 			if (!tx2)
 				Sys_Error("Missing frame %i of %s", j, tx->name);
@@ -438,7 +435,7 @@ void Mod_LoadTextures(lump_t *l) {
 			if (altmax)
 				tx2->alternate_anims = altanims[0];
 		}
-		for (j = 0; j < altmax; j++) {
+		for (int j = 0; j < altmax; j++) {
 			tx2 = altanims[j];
 			if (!tx2)
 				Sys_Error("Missing frame %i of %s", j, tx->name);
@@ -1028,23 +1025,20 @@ float RadiusFromBounds(vec3_t mins, vec3_t maxs) {
 }
 
 void Mod_LoadBrushModel(model_t *mod, void *buffer) {
-	int i, j;
 	dheader_t *header;
 	dmodel_t *bm;
 
 	loadmodel->type = mod_brush;
 
 	header = (dheader_t *) buffer;
-
-	i = LittleLong(header->version);
-
-	if (i != BSPVERSION)
-		Sys_Error("Mod_LoadBrushModel: %s has wrong version number (%i should be %i)", mod->name, i, BSPVERSION);
+	int version = LittleLong(header->version);
+	if (version != BSPVERSION)
+		Sys_Error("Mod_LoadBrushModel: %s has wrong version number (%i should be %i)", mod->name, version, BSPVERSION);
 
 	// swap all the lumps
 	mod_base = (byte *) header;
 
-	for (i = 0; i<sizeof (dheader_t) / 4; i++)
+	for (unsigned i = 0; i<sizeof (dheader_t) / 4; i++)
 		((int *) header)[i] = LittleLong(((int *) header)[i]);
 
 	// load into heap
@@ -1069,11 +1063,11 @@ void Mod_LoadBrushModel(model_t *mod, void *buffer) {
 	mod->numframes = 2; // regular and alternate animation
 
 	// set up the submodels (FIXME: this is confusing)
-	for (i = 0; i < mod->numsubmodels; i++) {
+	for (int i = 0; i < mod->numsubmodels; i++) {
 		bm = &mod->submodels[i];
 
 		mod->hulls[0].firstclipnode = bm->headnode[0];
-		for (j = 1; j < MAX_MAP_HULLS; j++) {
+		for (int j = 1; j < MAX_MAP_HULLS; j++) {
 			mod->hulls[j].firstclipnode = bm->headnode[j];
 			mod->hulls[j].lastclipnode = mod->numclipnodes - 1;
 		}
@@ -1340,7 +1334,6 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 		if (pskintype->type == ALIAS_SKIN_SINGLE) {
 			Mod_FloodFillSkin(skin, pheader->skinwidth, pheader->skinheight);
 
-			//TGA: begin
 			sprintf(model3, "%s_%i", loadmodel->name, i); //qmb :loardhavoc's skin naming
 			COM_StripExtension(loadmodel->name, model);
 			sprintf(model2, "%s_%i", model, i);
@@ -1379,7 +1372,6 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 							GL_LoadTexture(name, pheader->skinwidth, pheader->skinheight, (byte *) (pskintype + 1), true, false, 1, gl_sincity.getBool());
 				}
 			}
-			//TGA: end
 
 			pskintype = (daliasskintype_t *) ((byte *) (pskintype + 1) + s);
 		} else {

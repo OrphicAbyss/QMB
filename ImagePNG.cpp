@@ -115,9 +115,7 @@ void Image::LoadPNG(FILE *f, char *filename, Texture *tex) {
 	png_structp png;
 	png_infop pnginfo;
 	byte ioBuffer[8192];
-	int len;
 	byte *raw;
-	byte *imagedata;
 
 	int filesize = Sys_FileLength(f);
 	raw = (byte *) malloc(filesize + 1);

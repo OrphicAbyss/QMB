@@ -210,11 +210,11 @@ void Texture::upload() {
 	
 	// Resize the image if we need to (non-power of 2 or over max size)
 	fixSize();
+	
+	if (textureId == 0)
+		textureId = TextureManager::getTextureId();
 
-	if (this->textureType == GL_TEXTURE_2D) {
-		if (textureId == 0)
-			textureId = TextureManager::getTextureId();
-		
+	if (this->textureType == GL_TEXTURE_2D) {		
 		glBindTexture(GL_TEXTURE_2D, textureId);
 		if (!mipmap) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);

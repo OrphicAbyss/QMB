@@ -49,8 +49,6 @@ typedef struct {
 byte conback_buffer[sizeof (qpic_t) + sizeof (glpic_t)];
 qpic_t *conback = (qpic_t *) & conback_buffer;
 
-int gl_lightmap_format = GL_BGRA;
-
 //=============================================================================
 
 /* Support Routines */
@@ -572,8 +570,10 @@ int GL_LoadTexture(const char *identifier, int width, int height, byte *data, qb
 	t->grayscale = grayscale;
 
 	if (fullbright)
-		if (!t->convert8To32Fullbright())
+		if (!t->convert8To32Fullbright()) {
+			delete t;
 			return 0;
+		}
 	
 	t = TextureManager::LoadTexture(t);
 	
@@ -581,15 +581,13 @@ int GL_LoadTexture(const char *identifier, int width, int height, byte *data, qb
 }
 
 int GL_LoadTexImage(char* filename, qboolean complain, qboolean mipmap, qboolean grayscale) {
-	Texture *t;
-
 	if (gl_quick_texture_reload.getBool()) {
-		t = TextureManager::findTexture(filename);
+		Texture *t = TextureManager::findTexture(filename);
 		if (t != NULL)
 			return t->textureId;
 	}
 
-	t = TextureManager::LoadFile(filename, complain);
+	Texture *t = TextureManager::LoadFile(filename, complain);
 	
 	if (!t)
 		return 0;

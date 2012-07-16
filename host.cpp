@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "input.h"
 #include "NeuralNets.h"
+#include "Texture.h"
 
 /*
 A server can allways be started, even if the system started out as a client
@@ -757,8 +758,6 @@ void Host_Init(quakeparms_t *parms) {
 	Con_Printf("Exe: "__TIME__" "__DATE__"\n");
 	Con_Printf("%4.1f megabyte heap\n", parms->memsize / (1024 * 1024.0));
 
-	R_InitTextures(); // needed even for dedicated servers
-
 	if (cls.state != ca_dedicated) {
 		host_basepal = (byte *) COM_LoadHunkFile("gfx/palette.lmp");
 		if (!host_basepal)
@@ -769,6 +768,7 @@ void Host_Init(quakeparms_t *parms) {
 
 		IN_Init();
 		VID_Init(host_basepal);
+//		TextureManager::Init();
 		Draw_Init();
 		SCR_Init();
 		R_Init();
@@ -788,18 +788,12 @@ void Host_Init(quakeparms_t *parms) {
 	Sys_Printf("========Quake Initialized=========\n");
 }
 
-
-/*
-===============
-Host_Shutdown
-
-FIXME: this is a callback from Sys_Quit and Sys_Error.  It would be better
-to run quit through here before the final handoff to the sys code.
-===============
+/**
+ * FIXME: this is a callback from Sys_Quit and Sys_Error.  It would be better
+ * to run quit through here before the final hand off to the sys code.
  */
 extern qboolean con_debuglog;
 void Con_CloseDebugLog(void);
-
 void Host_Shutdown(void) {
 	static qboolean isdown = false;
 

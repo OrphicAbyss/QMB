@@ -20,71 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "Texture.h"
 
-void R_InitTextures(void) {
-	// create a simple checkerboard texture for the default
-	r_notexture_mip = (texture_t *) Hunk_AllocName(sizeof (texture_t) + 16 * 16/*+8*8+4*4+2*2*/, "notexture");
-	r_notexture_mip->width = r_notexture_mip->height = 16;
-	r_notexture_mip->offsets[0] = sizeof (texture_t);
-	r_notexture_mip->offsets[1] = r_notexture_mip->offsets[0] + 16 * 16;
-	r_notexture_mip->offsets[2] = r_notexture_mip->offsets[1] + 8 * 8;
-	r_notexture_mip->offsets[3] = r_notexture_mip->offsets[2] + 4 * 4;
-
-	for (int m = 0; m < 4; m++) {
-		byte *dest = (byte *) r_notexture_mip + r_notexture_mip->offsets[m];
-		for (int y = 0; y < (16 >> m); y++)
-			for (int x = 0; x < (16 >> m); x++) {
-				if ((y < (8 >> m)) ^ (x < (8 >> m)))
-					*dest++ = 0;
-				else
-					*dest++ = 0xff;
-			}
-	}
-}
-
-void R_InitOtherTextures(void) {
-	unsigned char cellData[32] = {55, 55, 55, 55, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
-	unsigned char *cellFull = (unsigned char *)malloc(sizeof(unsigned char) * 32 * 3);
-	unsigned char *vertexFull = (unsigned char *)malloc(sizeof(unsigned char) * 32 * 3);
-	char crosshairFname[32];
-	
-	TextureManager::shinetex_glass = GL_LoadTexImage("textures/shine_glass", false, true, false);
-	TextureManager::shinetex_chrome = GL_LoadTexImage("textures/shine_chrome", false, true, false);
-	TextureManager::underwatertexture = GL_LoadTexImage("textures/water_caustic", false, true, false);
-	TextureManager::highlighttexture = GL_LoadTexImage("gfx/highlight", false, true, false);
-
-	for (int i = 0; i < 32; i++) {
-		snprintf(&crosshairFname[0],32,"textures/crosshairs/crosshair%02i.tga",i);
-		TextureManager::crosshair_tex[i] = GL_LoadTexImage((char *)&crosshairFname[0], false, false, false);
-	}
-
-	for (int i = 0; i < 32; i++) {
-		cellFull[i * 3 + 0] = cellFull[i * 3 + 1] = cellFull[i * 3 + 2] = cellData[i];
-		vertexFull[i * 3 + 0] = vertexFull[i * 3 + 1] = vertexFull[i * 3 + 2] = (unsigned char)((i / 32.0f) * 255);
-	}	
-
-	//cell shading stuff...
-	Texture *cell = new Texture("celTexture");
-	cell->data = cellFull;
-	cell->height = 1;
-	cell->width = 32;
-	cell->bytesPerPixel = 3;
-	cell->mipmap = false;
-	cell->textureType = GL_TEXTURE_1D;
-	TextureManager::LoadTexture(cell);
-	TextureManager::celtexture = cell->textureId;
-
-	//vertex shading stuff...
-	Texture *vertex = new Texture("vertexTexture");
-	vertex->data = vertexFull;
-	vertex->height = 1;
-	vertex->width = 32;
-	vertex->bytesPerPixel = 3;
-	vertex->mipmap = false;
-	vertex->textureType = GL_TEXTURE_1D;
-	TextureManager::LoadTexture(vertex);
-	TextureManager::vertextexture = vertex->textureId;
-}
-
 void R_Init(void) {
 	extern CVar gl_finish;
 
@@ -139,8 +74,8 @@ void R_Init(void) {
 
 	R_InitParticles();
 	//R_InitParticleTexture();
-	R_InitTextures();
-	R_InitOtherTextures();
+
+	TextureManager::Init();
 }
 
 /**
@@ -175,9 +110,7 @@ void R_TranslatePlayerSkin(int playernum) {
 }
 
 void R_NewMap(void) {
-	int i;
-
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 		d_lightstylevalue[i] = 264; // normal light value
 
 	Q_memset(&r_worldentity, 0, sizeof (r_worldentity));
@@ -185,7 +118,7 @@ void R_NewMap(void) {
 
 	// clear out efrags in case the level hasn't been reloaded
 	// FIXME: is this one short?
-	for (i = 0; i < cl.worldmodel->numleafs; i++)
+	for (int i = 0; i < cl.worldmodel->numleafs; i++)
 		cl.worldmodel->leafs[i].efrags = NULL;
 
 	r_viewleaf = NULL;
@@ -194,8 +127,6 @@ void R_NewMap(void) {
 	R_ClearBeams();
 
 	GL_BuildLightmaps();
-
-	//R_LoadSky ("sky");
 }
 
 /**
