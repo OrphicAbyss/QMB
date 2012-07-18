@@ -29,7 +29,6 @@ bool isDedicated;
 int noconinput = 0;
 
 char *basedir = ".";
-char *cachedir = "/tmp";
 
 CVar sys_nostdout("sys_nostdout", "0");
 
@@ -261,7 +260,6 @@ int main(int c, char **v) {
 
 	parms.membase = malloc(parms.memsize);
 	parms.basedir = basedir;
-	parms.cachedir = cachedir;
 
 	COM_InitArgv(c, v);
 	parms.argc = com_argc;

@@ -1101,7 +1101,6 @@ typedef struct {
 
 #define MAX_FILES_IN_PACK       2048
 
-char com_cachedir[MAX_OSPATH];
 char com_gamedir[MAX_OSPATH];
 
 void COM_Path_f(void) {
@@ -1310,25 +1309,6 @@ void COM_InitFilesystem(void) {
 		if ((basedir[j - 1] == '\\') || (basedir[j - 1] == '/'))
 			basedir[j - 1] = 0;
 	}
-
-	//
-	// -cachedir <path>
-	// Overrides the system supplied cache directory (NULL or /qcache)
-	// -cachedir - will disable caching.
-	//
-	/*
-	i = COM_CheckParm ("-cachedir");
-	if (i && i < com_argc-1)
-	{
-		if (com_argv[i+1][0] == '-')
-			com_cachedir[0] = 0;
-		else
-			Q_strcpy (com_cachedir, com_argv[i+1]);
-	}
-	else if (host_parms.cachedir)
-		Q_strcpy (com_cachedir, host_parms.cachedir);
-	else */
-	com_cachedir[0] = 0;
 
 	// start up with GAMENAME by default (id1)
 	COM_AddGameDirectory(va("%s/"GAMENAME, basedir));
