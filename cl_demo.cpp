@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "CaptureHelpers.h"
+#include "FileManager.h"
 
 void CL_FinishTimeDemo(void);
 
@@ -240,7 +241,7 @@ void CL_PlayDemo_f(void) {
 	COM_DefaultExtension(name, ".dem");
 
 	Con_Printf("Playing demo from %s.\n", name);
-	COM_FOpenFile(name, &cls.demofile);
+	FileManager::FOpenFile(name, &cls.demofile);
 	if (!cls.demofile) {
 		Con_Printf("ERROR: couldn't open.\n");
 		cls.demonum = -1; // stop demo loop

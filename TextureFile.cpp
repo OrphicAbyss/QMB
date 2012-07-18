@@ -1,35 +1,35 @@
 #include "Texture.h"
 #include "Image.h"
+#include "FileManager.h"
 
 Texture *TextureManager::LoadFile(const char *filename, bool complain) {
 	FILE *f;
 	char basename[128], name[128];
-	int filesize = 0;
 
 	COM_StripExtension(filename, basename);
 	COM_MakeFilenameValid(basename);
 	
 	//png loading
 	sprintf(name, "%s.png", basename);
-	filesize = COM_FOpenFile(name, &f);
+	int filesize = FileManager::FOpenFile(name, &f);
 	if (f)
 		return LoadFilePNG(f, basename);
 		
 	//tga loading
 	sprintf(name, "%s.tga", basename);
-	filesize = COM_FOpenFile(name, &f);
+	filesize = FileManager::FOpenFile(name, &f);
 	if (f)
 		return LoadFileTGA(f, basename);
 
 	//jpg loading
 	sprintf(name, "%s.jpg", basename);
-	filesize = COM_FOpenFile(name, &f);
+	filesize = FileManager::FOpenFile(name, &f);
 	if (f)
 		return LoadFileJPG(f, basename);
 
 	//pcx loading
 	sprintf(name, "%s.pcx", basename);
-	filesize = COM_FOpenFile(name, &f);
+	filesize = FileManager::FOpenFile(name, &f);
 	if (f)
 		return LoadFilePCX(f, basename);
 

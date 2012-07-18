@@ -434,7 +434,7 @@ void Mod_LoadQ3MultiModel(model_t *mod) {
 	mod->type = mod_null;
 
 	sprintf(path, "%sanimation.cfg", mod->name);
-	COM_OpenFile(path, &handle);
+	FileManager::OpenFile(path, &handle);
 
 	if (handle) //Q3Player
 	{
@@ -481,9 +481,8 @@ void Mod_LoadQ3MultiModel(model_t *mod) {
 	path[Q_strlen(path) - 1] = '\0';
 	Q_strcat(path, "_hand.md3");
 	Sys_Error("Trying to find weaponmodel %s", path);
-	COM_OpenFile(path, &handle);
-	if (handle) //W_Weapon
-	{
+	FileManager::OpenFile(path, &handle);
+	if (handle) { //W_Weapon
 		COM_CloseFile(handle);
 	}
 }

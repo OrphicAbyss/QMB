@@ -29,8 +29,7 @@ typedef unsigned char 		byte;
 
 //============================================================================
 
-typedef struct sizebuf_s
-{
+typedef struct sizebuf_s {
 	bool	allowoverflow;	// if false, do a Sys_Error
 	bool	overflowed;		// set to true if the buffer size failed
 	byte	*data;
@@ -81,8 +80,8 @@ extern	bool		bigendien;
 
 extern	short	(*BigShort) (short l);
 extern	short	(*LittleShort) (short l);
-extern	int	(*BigLong) (int l);
-extern	int	(*LittleLong) (int l);
+extern	int		(*BigLong) (int l);
+extern	int		(*LittleLong) (int l);
 extern	float	(*BigFloat) (float l);
 extern	float	(*LittleFloat) (float l);
 
@@ -131,7 +130,7 @@ float Q_atof (const char *str);
 
 //============================================================================
 
-extern	char		com_token[1024];
+extern	char	com_token[1024];
 extern	bool	com_eof;
 
 char *COM_Parse(char *data);
@@ -149,7 +148,7 @@ void COM_StripExtension(const char *in, char *out);
 void COM_FileBase(const char *in, char *out);
 void COM_DefaultExtension(char *path, const char *extension);
 
-char	*va(const char *format, ...);
+char *va(const char *format, ...);
 // does a varargs printf into a temp buffer
 
 //============================================================================
@@ -158,11 +157,6 @@ extern int com_filesize;
 struct cache_user_s;
 
 extern	char	com_gamedir[MAX_OSPATH];
-
-void COM_WriteFile (const char *filename, void *data, int len);
-int COM_OpenFile (const char *filename, int *hndl);
-int COM_FOpenFile (const char *filename, FILE **file);
-void COM_CloseFile (int h);
 
 byte *COM_LoadStackFile (const char *path, void *buffer, int bufsize);
 byte *COM_LoadTempFile (const char *path);

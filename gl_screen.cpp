@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "Texture.h"
+#include "FileManager.h"
 #include "CaptureHelpers.h"
 
 /*
@@ -531,7 +532,7 @@ void SCR_ScreenShot_f(void) {
 
 	glReadPixels(glx, gly, glwidth, glheight, GL_BGR, GL_UNSIGNED_BYTE, buffer + 18);
 
-	COM_WriteFile(pcxname, buffer, glwidth * glheight * 3 + 18);
+	FileManager::WriteFile(pcxname, buffer, glwidth * glheight * 3 + 18);
 
 	free(buffer);
 	Con_Printf("Wrote %s\n", pcxname);
