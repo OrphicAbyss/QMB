@@ -6,8 +6,8 @@ Texture *TextureManager::LoadFile(const char *filename, bool complain) {
 	FILE *f;
 	char basename[128], name[128];
 
-	COM_StripExtension(filename, basename);
-	COM_MakeFilenameValid(basename);
+	FileManager::StripExtension(filename, basename);
+	FileManager::MakeFilenameValid(basename);
 	
 	//png loading
 	sprintf(name, "%s.png", basename);

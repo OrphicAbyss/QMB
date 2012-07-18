@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "ICapture.h"
 #include "CaptureHelpers.h"
+#include "FileManager.h"
 
 extern CVar host_framerate;
 extern float scr_con_current;
@@ -71,7 +72,7 @@ void CaptureHelper_Start_f (void)
     fps = 1/host_framerate.getFloat();
 
     Q_strcpy(filename, CmdArgs::getArg(1));
-	COM_DefaultExtension (filename, Capture_DOTEXTENSION); // currently we capture AVI
+	FileManager::DefaultExtension (filename, Capture_DOTEXTENSION); // currently we capture AVI
 
 	if (shm){
 		Capture_Open(

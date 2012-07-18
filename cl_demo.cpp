@@ -202,7 +202,7 @@ void CL_Record_f(void) {
 		CmdArgs::executeString(va("map %s", CmdArgs::getArg(2)), CmdArgs::COMMAND);
 
 	// open the demo file
-	COM_DefaultExtension(name, ".dem");
+	FileManager::DefaultExtension(name, ".dem");
 
 	Con_Printf("recording to %s.\n", name);
 	cls.demofile = fopen(name, "wb");
@@ -238,7 +238,7 @@ void CL_PlayDemo_f(void) {
 
 	// open the demo file
 	Q_strcpy(name, CmdArgs::getArg(1));
-	COM_DefaultExtension(name, ".dem");
+	FileManager::DefaultExtension(name, ".dem");
 
 	Con_Printf("Playing demo from %s.\n", name);
 	FileManager::FOpenFile(name, &cls.demofile);

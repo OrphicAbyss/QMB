@@ -142,10 +142,6 @@ int COM_CheckParm (const char *parm);
 void COM_Init (char *path);
 void COM_InitArgv (int argc, char **argv);
 
-char *COM_SkipPath(char *pathname);
-void COM_MakeFilenameValid(char *data);
-void COM_StripExtension(const char *in, char *out);
-void COM_FileBase(const char *in, char *out);
 void COM_DefaultExtension(char *path, const char *extension);
 
 char *va(const char *format, ...);
@@ -154,14 +150,12 @@ char *va(const char *format, ...);
 //============================================================================
 
 extern int com_filesize;
-struct cache_user_s;
 
 extern	char	com_gamedir[MAX_OSPATH];
 
 byte *COM_LoadStackFile (const char *path, void *buffer, int bufsize);
 byte *COM_LoadTempFile (const char *path);
 byte *COM_LoadHunkFile (const char *path);
-void COM_LoadCacheFile (const char *path, struct cache_user_s *cu);
 
 extern	struct CVar registered;
 

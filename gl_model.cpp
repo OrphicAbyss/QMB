@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "gl_md3.h"
 #include "mathlib.h"
 #include "Texture.h"
+#include "FileManager.h"
 
 model_t *loadmodel;
 char loadname[32]; // for hunk tags
@@ -210,7 +211,7 @@ model_t *Mod_LoadModel(model_t *mod, bool crash) {
 #endif
 
 	// load the file
-	COM_StripExtension(mod->name, &strip[0]);
+	FileManager::StripExtension(mod->name, &strip[0]);
 	sprintf(&md2name[0], "%s.md2", &strip[0]);
 	sprintf(&md3name[0], "%s.md3", &strip[0]);
 
@@ -228,15 +229,12 @@ model_t *Mod_LoadModel(model_t *mod, bool crash) {
 	}
 
 	// allocate a new model
-	COM_FileBase(mod->name, loadname);
-
+	FileManager::FileBase(mod->name, loadname);
 	loadmodel = mod;
 
 	// fill it in
-
-	// call the apropriate loader
+	// call the appropriate loader
 	mod->needload = false;
-
 	switch (LittleLong(*(unsigned *) buf)) {
 		case MD3IDHEADER:
 			Mod_LoadQ3Model(mod, buf);
@@ -456,7 +454,7 @@ void Mod_LoadLighting(lump_t *l) {
 	loadmodel->lightdata = NULL;
 	// LordHavoc: check for a .lit file
 	Q_strcpy(litfilename, loadmodel->name);
-	COM_StripExtension(litfilename, litfilename);
+	FileManager::StripExtension(litfilename, litfilename);
 	Q_strcat(litfilename, ".lit");
 
 	data = (byte*) COM_LoadHunkFile(litfilename); //, false);
@@ -506,7 +504,7 @@ void Mod_LoadEntities(lump_t *l) {
 	loadmodel->entities = NULL;
 
 	Q_strcpy(entfilename, loadmodel->name);
-	COM_StripExtension(entfilename, entfilename);
+	FileManager::StripExtension(entfilename, entfilename);
 	Q_strcat(entfilename, ".ent");
 
 	data = (byte*) COM_LoadHunkFile(entfilename); //, false);
@@ -1335,7 +1333,7 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 			}
 
 			//Tomaz skin naming: blah_0.tga
-			COM_StripExtension(loadmodel->name, model);
+			FileManager::StripExtension(loadmodel->name, model);
 			sprintf(model2, "%s_%i", model, i);
 			pheader->gl_texturenum[i][0] =
 					pheader->gl_texturenum[i][1] =
@@ -1586,7 +1584,7 @@ void Mod_LoadQ2AliasModel(model_t *mod, void *buffer) {
 	if (pheader->num_skins) {
 		pinskins = (char *) ((byte *) pinmodel + LittleLong(pinmodel->ofs_skins));
 		for (i = 0; i < pheader->num_skins; i++) {
-			COM_StripExtension(mod->name, model);
+			FileManager::StripExtension(mod->name, model);
 			sprintf(modelFilename, "%s_%i", model, i);
 			// tomazquake external skin naming: blah_0.tga
 			pheader->gl_texturenum[i] = TextureManager::LoadExternTexture(modelFilename, false, true, gl_sincity.getBool());

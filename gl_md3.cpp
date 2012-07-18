@@ -436,8 +436,7 @@ void Mod_LoadQ3MultiModel(model_t *mod) {
 	sprintf(path, "%sanimation.cfg", mod->name);
 	FileManager::OpenFile(path, &handle);
 
-	if (handle) //Q3Player
-	{
+	if (handle) { //Q3Player
 		COM_CloseFile(handle);
 		//Load player
 		lower = Mod_AddMultiModel(NULL, mod); //Allocate a mmodel

@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "common.h"
+#include "FileManager.h"
 
 extern CVar	pausable;
 
@@ -511,7 +512,7 @@ void Host_Savegame_f (void)
 	}
 
 	sprintf (name, "%s/%s", com_gamedir, CmdArgs::getArg(1));
-	COM_DefaultExtension (name, ".sav");
+	FileManager::DefaultExtension (name, ".sav");
 
 	Con_Printf ("Saving game to %s...\n", name);
 	f = fopen (name, "w");
@@ -582,7 +583,7 @@ void Host_Loadgame_f (void)
 	cls.demonum = -1;		// stop demo loop in case this fails
 
 	sprintf (name, "%s/%s", com_gamedir, CmdArgs::getArg(1));
-	COM_DefaultExtension (name, ".sav");
+	FileManager::DefaultExtension (name, ".sav");
 
 // we can't call SCR_BeginLoadingPlaque, because too much stack space has
 // been used.  The menu calls it before stuffing loadgame command

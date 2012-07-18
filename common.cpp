@@ -121,336 +121,67 @@ void InsertLinkAfter(link_t *l, link_t *after) {
 					LIBRARY REPLACEMENT FUNCTIONS
 ============================================================================
  */
-#define uselib
-#ifdef uselib
 #include <string.h>
-#endif
 
 void Q_memset(void *dest, int fill, int count) {
-#ifdef uselib
 	memset(dest, fill, count);
-#else
-	int i;
-
-	if ((((long) dest | count) & 3) == 0) {
-		count >>= 2;
-		fill = fill | (fill << 8) | (fill << 16) | (fill << 24);
-		for (i = 0; i < count; i++)
-			((int *) dest)[i] = fill;
-	} else
-		for (i = 0; i < count; i++)
-			((byte *) dest)[i] = fill;
-#endif
 }
 
 void Q_memcpy(void *dest, const void *src, int count) {
-#ifdef uselib
 	memcpy(dest, src, count);
-#else
-	int i;
-
-	if ((((long) dest | (long) src | count) & 3) == 0) {
-		count >>= 2;
-		for (i = 0; i < count; i++)
-			((int *) dest)[i] = ((int *) src)[i];
-	} else
-		for (i = 0; i < count; i++)
-			((byte *) dest)[i] = ((byte *) src)[i];
-#endif
 }
 
 int Q_memcmp(void *m1, void *m2, int count) {
-#ifdef uselib
 	return memcmp(m1, m2, count);
-#else
-	while (count) {
-		count--;
-		if (((byte *) m1)[count] != ((byte *) m2)[count])
-			return -1;
-	}
-	return 0;
-#endif
 }
 
 void Q_strcpy(char *dest, const char *src) {
-#ifdef uselib
 	strcpy(dest, src);
-#else
-	while (*src) {
-		*dest++ = *src++;
-	}
-	*dest++ = 0;
-#endif
 }
 
 void Q_strncpy(char *dest, const char *src, int count) {
-#ifdef uselib
 	strncpy(dest, src, count);
-#else
-	while (*src && count--) {
-		*dest++ = *src++;
-	}
-	if (!count)
-		*dest++ = 0;
-#endif
 }
 
 int Q_strlen(const char *str) {
-#ifdef uselib
 	return strlen(str);
-#else
-	int count;
-
-	count = 0;
-	while (str[count])
-		count++;
-
-	return count;
-#endif
 }
 
 char *Q_strrchr(char *s, char c) {
-#ifdef uselib
 	return strrchr(s, c);
-#else
-	int len = Q_strlen(s);
-	s += len;
-	while (len--)
-		if (*--s == c) return s;
-	return 0;
-#endif
 }
 
 void Q_strcat(char *dest, const char *src) {
-#ifdef uselib
 	strcat(dest, src);
-#else
-	dest += Q_strlen(dest);
-	Q_strcpy(dest, src);
-#endif
 }
 
 int Q_strcmp(const char *s1, const char *s2) {
-#ifdef uselib
 	return strcmp(s1, s2);
-#else
-	while (1) {
-		if (*s1 != *s2)
-			return -1; // strings not equal
-		if (!*s1)
-			return 0; // strings are equal
-		s1++;
-		s2++;
-	}
-
-	return -1;
-#endif
 }
 
 int Q_strncmp(const char *s1, const char *s2, int count) {
-#ifdef uselib
 	return strncmp(s1, s2, count);
-#else
-	while (1) {
-		if (!count--)
-			return 0;
-		if (*s1 != *s2)
-			return -1; // strings not equal
-		if (!*s1)
-			return 0; // strings are equal
-		s1++;
-		s2++;
-	}
-
-	return -1;
-#endif
 }
 
 int Q_strncasecmp(const char *s1, const char *s2, int n) {
-#ifdef uselib
 	return strncasecmp(s1, s2, n);
-#else
-	int c1, c2;
-
-	while (1) {
-		c1 = *s1++;
-		c2 = *s2++;
-
-		if (!n--)
-			return 0; // strings are equal until end point
-
-		if (c1 != c2) {
-			if (c1 >= 'a' && c1 <= 'z')
-				c1 -= ('a' - 'A');
-			if (c2 >= 'a' && c2 <= 'z')
-				c2 -= ('a' - 'A');
-			if (c1 != c2)
-				return -1; // strings not equal
-		}
-		if (!c1)
-			return 0; // strings are equal
-	}
-
-	return -1;
-#endif
 }
 
 int Q_strcasecmp(const char *s1, const char *s2) {
-#ifdef uselib
 	return strcasecmp(s1, s2);
-#else
-	int c1, c2;
-
-	while (1) {
-		c1 = *s1++;
-		c2 = *s2++;
-
-		if (c1 != c2) {
-			if (c1 >= 'a' && c1 <= 'z')
-				c1 -= ('a' - 'A');
-			if (c2 >= 'a' && c2 <= 'z')
-				c2 -= ('a' - 'A');
-			if (c1 != c2)
-				return -1; // strings not equal
-		}
-		if (!c1)
-			return 0; // strings are equal
-	}
-
-	return -1;
-#endif
 }
 
 int Q_atoi(const char *str) {
-#ifdef uselib
 	return atoi(str);
-#else
-	int val;
-	int sign;
-	int c;
-
-	if (*str == '-') {
-		sign = -1;
-		str++;
-	} else
-		sign = 1;
-
-	val = 0;
-
-	//
-	// check for hex
-	//
-	if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X')) {
-		str += 2;
-		while (1) {
-			c = *str++;
-			if (c >= '0' && c <= '9')
-				val = (val << 4) + c - '0';
-			else if (c >= 'a' && c <= 'f')
-				val = (val << 4) + c - 'a' + 10;
-			else if (c >= 'A' && c <= 'F')
-				val = (val << 4) + c - 'A' + 10;
-			else
-				return val*sign;
-		}
-	}
-
-	//
-	// check for character
-	//
-	if (str[0] == '\'') {
-		return sign * str[1];
-	}
-
-	//
-	// assume decimal
-	//
-	while (1) {
-		c = *str++;
-		if (c < '0' || c > '9')
-			return val * sign;
-		val = val * 10 + c - '0';
-	}
-
-	return 0;
-#endif
 }
 
 float Q_atof(const char *str) {
-#ifdef uselib
 	return atof(str);
-#else
-	double val;
-	int sign;
-	int c;
-	int decimal, total;
-
-	if (*str == '-') {
-		sign = -1;
-		str++;
-	} else
-		sign = 1;
-
-	val = 0;
-
-	//
-	// check for hex
-	//
-	if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X')) {
-		str += 2;
-		while (1) {
-			c = *str++;
-			if (c >= '0' && c <= '9')
-				val = (val * 16) + c - '0';
-			else if (c >= 'a' && c <= 'f')
-				val = (val * 16) + c - 'a' + 10;
-			else if (c >= 'A' && c <= 'F')
-				val = (val * 16) + c - 'A' + 10;
-			else
-				return val*sign;
-		}
-	}
-
-	//
-	// check for character
-	//
-	if (str[0] == '\'') {
-		return sign * str[1];
-	}
-
-	//
-	// assume decimal
-	//
-	decimal = -1;
-	total = 0;
-	while (1) {
-		c = *str++;
-		if (c == '.') {
-			decimal = total;
-			continue;
-		}
-		if (c < '0' || c > '9')
-			break;
-		val = val * 10 + c - '0';
-		total++;
-	}
-
-	if (decimal == -1)
-		return val * sign;
-	while (total > decimal) {
-		val /= 10;
-		total--;
-	}
-
-	return val*sign;
-#endif
 }
 
 /*
 ============================================================================
-
 					BYTE ORDER FUNCTIONS
-
 ============================================================================
  */
 
@@ -513,16 +244,12 @@ float FloatNoSwap(float f) {
 
 /*
 ==============================================================================
-
 			MESSAGE IO FUNCTIONS
-
 Handles byte ordering and avoids alignment errors
 ==============================================================================
  */
 
-//
 // writing functions
-//
 #define MSG_ReadVector(v) {(v)[0] = MSG_ReadCoord();(v)[1] = MSG_ReadCoord();(v)[2] = MSG_ReadCoord();}
 
 void MSG_WriteChar(sizebuf_t *sb, int c) {
@@ -610,9 +337,7 @@ void MSG_WriteAngle(sizebuf_t *sb, float f) {
 	MSG_WriteByte(sb, ((int) f * 256 / 360) & 255);
 }
 
-//
 // reading functions
-//
 int msg_readcount;
 bool msg_badread;
 
@@ -622,7 +347,6 @@ void MSG_BeginReading(void) {
 }
 
 // returns -1 and sets msg_badread if no more characters are available
-
 int MSG_ReadChar(void) {
 	int c;
 
@@ -731,8 +455,6 @@ float MSG_ReadAngle(void) {
 	return MSG_ReadChar() * (360.0 / 256);
 }
 
-
-
 //===========================================================================
 
 void SZ_Alloc(sizebuf_t *buf, int startsize) {
@@ -784,93 +506,7 @@ void SZ_Print(sizebuf_t *buf, const char *data) {
 		Q_memcpy((byte *) SZ_GetSpace(buf, len - 1) - 1, data, len); // write over trailing 0
 }
 
-
 //============================================================================
-
-/*
-============
-COM_SkipPath
-============
- */
-char *COM_SkipPath(char *pathname) {
-	char *last;
-
-	last = pathname;
-	while (*pathname) {
-		if (*pathname == '/')
-			last = pathname + 1;
-		pathname++;
-	}
-	return last;
-}
-
-/**
- * Converts any illegal file characeters into legal ones.
- * 
- * @param data to check and fix
- */
-void COM_MakeFilenameValid(char *data) {
-	for (char *c = data; *c; c++)
-		if (*c == '*')
-			*c = '#';
-}
-
-/*
-============
-COM_StripExtension
-============
- */
-void COM_StripExtension(const char *in, char *out) {
-	while (*in && *in != '.')
-		*out++ = *in++;
-	*out = 0;
-}
-
-/*
-============
-COM_FileBase
-============
- */
-void COM_FileBase(const char *in, char *out) {
-	const char *s;
-	const char *s2;
-
-	s = in + Q_strlen(in) - 1;
-
-	while (s != in && *s != '.')
-		s--;
-
-	for (s2 = s; *s2 && *s2 != '/'; s2--)
-		;
-
-	if (s - s2 < 2)
-		Q_strcpy(out, "?model?");
-	else {
-		s--;
-		Q_strncpy(out, s2 + 1, s - s2);
-		out[s - s2] = 0;
-	}
-}
-
-/*
-==================
-COM_DefaultExtension
-==================
- */
-void COM_DefaultExtension(char *path, const char *extension) {
-	char *src;
-	// if path doesn't have a .EXT, append extension
-	// (extension should include the .)
-	src = path + Q_strlen(path) - 1;
-
-	while (*src != '/' && src != path) {
-		if (*src == '.')
-			return; // it has an extension
-		src--;
-	}
-
-	Q_strcat(path, extension);
-}
 
 /**
  * Parse a token out of a string
@@ -1132,7 +768,7 @@ byte *COM_LoadFile(const char *path, int usehunk) {
 		return NULL;
 
 	// extract the filename base name for hunk tag
-	COM_FileBase(path, base);
+	FileManager::FileBase(path, base);
 
 	if (usehunk == 1)
 		buf = Hunk_AllocName(len + 1, base);
@@ -1141,10 +777,7 @@ byte *COM_LoadFile(const char *path, int usehunk) {
 	else if (usehunk == 0)
 		buf = MemoryObj::ZAlloc(len + 1);
 	else if (usehunk == 3) {
-		// TODO: Shouldn't pass back the buffer, should only pass around CacheObj
-		// TODO: Require memory object base
-		loadcache = MemoryObj::Alloc(MemoryObj::CACHE, base, len + 1);
-		buf = loadcache->getData();
+		Sys_Error("Trying to load file to cache: %s\n", path);
 	} else if (usehunk == 4) {
 		if (len + 1 > loadsize)
 			buf = Hunk_TempAlloc(len + 1);
@@ -1172,11 +805,6 @@ byte *COM_LoadTempFile(const char *path) {
 	return COM_LoadFile(path, 2);
 }
 
-void COM_LoadCacheFile(const char *path, MemoryObj cu) {
-	loadcache = &cu;
-	COM_LoadFile(path, 3);
-}
-
 // uses temp hunk if larger than bufsize
 
 byte *COM_LoadStackFile(const char *path, void *buffer, int bufsize) {
@@ -1189,15 +817,11 @@ byte *COM_LoadStackFile(const char *path, void *buffer, int bufsize) {
 	return buf;
 }
 
-/*
-=================
-COM_LoadPackFile
-
-Takes an explicit (not game tree related) path to a pak file.
-
-Loads the header and directory, adding the files at the beginning
-of the list so they override previous pack files.
-=================
+/**
+ * Takes an explicit (not game tree related) path to a pak file.
+ * 
+ * Loads the header and directory, adding the files at the beginning of the list
+ * so they override previous pack files.
  */
 pack_t *COM_LoadPackFile(char *packfile) {
 	dpackheader_t header;
@@ -1262,7 +886,6 @@ pack_t *COM_LoadPackFile(char *packfile) {
  * then loads and adds pak1.pak pak2.pak ...
  */
 void COM_AddGameDirectory(char *dir) {
-	int i;
 	searchpath_t *search;
 	pack_t *pak;
 	char pakfile[MAX_OSPATH];
@@ -1276,7 +899,7 @@ void COM_AddGameDirectory(char *dir) {
 	FileManager::searchpaths = search;
 
 	// add any pak files in the format pak0.pak pak1.pak, ...
-	for (i = 0;; i++) {
+	for (int i = 0;; i++) {
 		sprintf(pakfile, "%s/pak%i.pak", dir, i);
 		pak = COM_LoadPackFile(pakfile);
 		if (!pak)
@@ -1286,24 +909,21 @@ void COM_AddGameDirectory(char *dir) {
 		search->next = FileManager::searchpaths;
 		FileManager::searchpaths = search;
 	}
-
 	// add the contents of the parms.txt file to the end of the command line
 }
 
 void COM_InitFilesystem(void) {
-	int i, j;
 	char basedir[MAX_OSPATH];
-	searchpath_t *search;
 
 	// -basedir <path>
 	// Overrides the system supplied base directory (under GAMENAME)
-	i = COM_CheckParm("-basedir");
+	int i = COM_CheckParm("-basedir");
 	if (i && i < com_argc - 1)
 		Q_strcpy(basedir, com_argv[i + 1]);
 	else
 		Q_strcpy(basedir, host_parms.basedir);
 
-	j = Q_strlen(basedir);
+	int j = Q_strlen(basedir);
 
 	if (j > 0) {
 		if ((basedir[j - 1] == '\\') || (basedir[j - 1] == '/'))
@@ -1338,7 +958,7 @@ void COM_InitFilesystem(void) {
 			if (!com_argv[i] || com_argv[i][0] == '+' || com_argv[i][0] == '-')
 				break;
 
-			search = (searchpath_t *) Hunk_Alloc(sizeof (searchpath_t));
+			searchpath_t *search = (searchpath_t *) Hunk_Alloc(sizeof (searchpath_t));
 			if (!Q_strcmp(FileManager::FileExtension(com_argv[i]), "pak")) {
 				search->pack = COM_LoadPackFile(com_argv[i]);
 				if (!search->pack)
