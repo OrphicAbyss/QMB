@@ -826,7 +826,6 @@ pack_t *COM_LoadPackFile(char *packfile) {
 	pack_t *pack;
 	int packhandle;
 	dpackfile_t info[MAX_FILES_IN_PACK];
-	unsigned short crc;
 
 	if (Sys_FileOpenRead(packfile, &packhandle) == -1) {
 		//              Con_Printf ("Couldn't open %s\n", packfile);
@@ -853,11 +852,12 @@ pack_t *COM_LoadPackFile(char *packfile) {
 	Sys_FileRead(packhandle, (void *) info, header.dirlen);
 
 	// crc the directory to check for modifications
-	CRC_Init(&crc);
-	for (int i = 0; i < header.dirlen; i++)
-		CRC_ProcessByte(&crc, ((byte *) info)[i]);
-	if (crc != PAK0_CRC)
+	CRC crc;
+	crc.process((byte *)info, header.dirlen);	
+	if (crc.getResult() != PAK0_CRC) {
+		Con_SafePrintf("PAK0 modified...");
 		com_modified = true;
+	}
 
 	// parse the directory
 	for (int i = 0; i < numpackfiles; i++) {

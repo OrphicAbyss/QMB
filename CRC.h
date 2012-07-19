@@ -17,8 +17,20 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-/* crc.h */
 
-void CRC_Init(unsigned short *crcvalue);
-void CRC_ProcessByte(unsigned short *crcvalue, byte data);
-unsigned short CRC_Value(unsigned short crcvalue);
+#ifndef CRC_H
+#define	CRC_H
+
+class CRC {
+public:
+	CRC();
+	void process(unsigned char *data, unsigned int size);
+	unsigned short getResult();
+private:
+	static const unsigned short CRC_INIT_VALUE = 0xffff;
+	static const unsigned short CRC_XOR_VALUE = 0x0000;
+	static unsigned short CRC_TABLE[];
+	unsigned short value;
+};
+
+#endif	/* CRC_H */
