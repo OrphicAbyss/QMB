@@ -142,8 +142,6 @@ int COM_CheckParm (const char *parm);
 void COM_Init (char *path);
 void COM_InitArgv (int argc, char **argv);
 
-void COM_DefaultExtension(char *path, const char *extension);
-
 char *va(const char *format, ...);
 // does a varargs printf into a temp buffer
 

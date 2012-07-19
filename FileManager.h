@@ -7,6 +7,7 @@
 #define	MAX_OSPATH		128			// max length of a filesystem pathname
 
 // in memory
+
 typedef struct {
 	char name[MAX_QPATH];
 	int filepos, filelen;
@@ -28,19 +29,33 @@ typedef struct searchpath_s {
 class FileManager {
 public:
 	static searchpath_t *searchpaths;
-	
+
 	static int OpenFile(const char *filename, int *hndl);
 	static int FOpenFile(const char *filename, FILE **file);
 	static int FindFile(const char *filename, int *handle, FILE **file);
 	static void WriteFile(const char *filename, void *data, int len);
 	static void CloseFile(int h);
-	
+	/**
+	 * Converts any illegal file characeters into legal ones.
+	 * 
+	 * @param data to check and fix
+	 */
 	static void MakeFilenameValid(char *data);
+	/**
+	 * Copy string without extension.
+     */
 	static void StripExtension(const char *in, char *out);
-	static void FileBase(const char *in, char *out);
-	static void DefaultExtension(char *path, const char *extension);
-	
+	/**
+	 * Return a pointer to the start of the file extension.
+     */
 	static char *FileExtension(char *in);
+	/**
+	 * If the path doesn't contain an extension .EXT then add the provided
+	 * default. 
+	 */
+	static void DefaultExtension(char *path, const char *extension);
+
+	static void FileBase(const char *in, char *out);
 private:
 
 };

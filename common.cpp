@@ -760,10 +760,9 @@ byte *COM_LoadFile(const char *path, int usehunk) {
 	int h;
 	void *buf = NULL;
 	char base[32];
-	int len;
 
 	// look for it in the filesystem or pack files
-	len = FileManager::OpenFile(path, &h);
+	int len = FileManager::OpenFile(path, &h);
 	if (h == -1)
 		return NULL;
 
@@ -806,7 +805,6 @@ byte *COM_LoadTempFile(const char *path) {
 }
 
 // uses temp hunk if larger than bufsize
-
 byte *COM_LoadStackFile(const char *path, void *buffer, int bufsize) {
 	byte *buf;
 
@@ -825,9 +823,6 @@ byte *COM_LoadStackFile(const char *path, void *buffer, int bufsize) {
  */
 pack_t *COM_LoadPackFile(char *packfile) {
 	dpackheader_t header;
-	int i;
-	packfile_t *newfiles;
-	int numpackfiles;
 	pack_t *pack;
 	int packhandle;
 	dpackfile_t info[MAX_FILES_IN_PACK];
@@ -844,7 +839,7 @@ pack_t *COM_LoadPackFile(char *packfile) {
 	header.dirofs = LittleLong(header.dirofs);
 	header.dirlen = LittleLong(header.dirlen);
 
-	numpackfiles = header.dirlen / sizeof (dpackfile_t);
+	int numpackfiles = header.dirlen / sizeof (dpackfile_t);
 
 	if (numpackfiles > MAX_FILES_IN_PACK)
 		Sys_Error("%s has %i files", packfile, numpackfiles);
@@ -852,20 +847,20 @@ pack_t *COM_LoadPackFile(char *packfile) {
 	if (numpackfiles != PAK0_COUNT)
 		com_modified = true; // not the original file
 
-	newfiles = (packfile_t *) Hunk_AllocName(numpackfiles * sizeof (packfile_t), "packfile");
+	packfile_t *newfiles = (packfile_t *) Hunk_AllocName(numpackfiles * sizeof (packfile_t), "packfile");
 
 	Sys_FileSeek(packhandle, header.dirofs);
 	Sys_FileRead(packhandle, (void *) info, header.dirlen);
 
 	// crc the directory to check for modifications
 	CRC_Init(&crc);
-	for (i = 0; i < header.dirlen; i++)
+	for (int i = 0; i < header.dirlen; i++)
 		CRC_ProcessByte(&crc, ((byte *) info)[i]);
 	if (crc != PAK0_CRC)
 		com_modified = true;
 
 	// parse the directory
-	for (i = 0; i < numpackfiles; i++) {
+	for (int i = 0; i < numpackfiles; i++) {
 		Q_strcpy(newfiles[i].name, info[i].name);
 		newfiles[i].filepos = LittleLong(info[i].filepos);
 		newfiles[i].filelen = LittleLong(info[i].filelen);
@@ -914,7 +909,7 @@ void COM_AddGameDirectory(char *dir) {
 
 void COM_InitFilesystem(void) {
 	char basedir[MAX_OSPATH];
-
+	
 	// -basedir <path>
 	// Overrides the system supplied base directory (under GAMENAME)
 	int i = COM_CheckParm("-basedir");

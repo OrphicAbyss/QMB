@@ -117,23 +117,6 @@ void FileManager::CloseFile(int h) {
 	Sys_FileClose(h);
 }
 
-char *FileManager::FileExtension(char *in) {
-	char *extension = strstr(in, ".");
-	
-	if (extension) {
-		extension++;
-	} else {
-		int length = strlen(in);
-		extension = in + length;
-	}
-	return extension;
-}
-
-/**
- * Converts any illegal file characeters into legal ones.
- * 
- * @param data to check and fix
- */
 void FileManager::MakeFilenameValid(char *data) {
 	for (char *c = data; *c; c++)
 		if (*c == '*')
@@ -146,17 +129,26 @@ void FileManager::StripExtension(const char *in, char *out) {
 	*out = 0;
 }
 
+char *FileManager::FileExtension(char *in) {
+	char *extension = strstr(in, ".");
+	
+	if (extension) {
+		extension++;
+	} else {
+		int length = strlen(in);
+		extension = in + length;
+	}
+	return extension;
+}
+
 void FileManager::FileBase(const char *in, char *out) {
-	const char *s;
-	const char *s2;
-
-	s = in + Q_strlen(in) - 1;
-
+	const char *s = in + Q_strlen(in) - 1;
 	while (s != in && *s != '.')
 		s--;
 
-	for (s2 = s; *s2 && *s2 != '/'; s2--)
-		;
+	const char *s2 = s;
+	while (s2 != in && *s2 != '/')
+		s2--;
 
 	if (s - s2 < 2)
 		Q_strcpy(out, "?model?");
@@ -168,10 +160,7 @@ void FileManager::FileBase(const char *in, char *out) {
 }
 
 void FileManager::DefaultExtension(char *path, const char *extension) {
-	char *src;
-	// if path doesn't have a .EXT, append extension
-	// (extension should include the .)
-	src = path + Q_strlen(path) - 1;
+	char *src = path + Q_strlen(path) - 1;
 
 	while (*src != '/' && src != path) {
 		if (*src == '.')
