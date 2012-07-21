@@ -145,7 +145,7 @@ static void IPX_GetLocalAddress(IPXaddr *addr)
 	regs.x.es = lowmem_bufseg;
 	regs.x.si = lowmem_bufoff;
 	__dpmi_simulate_real_mode_procedure_retf((__dpmi_regs *)&regs);
-	Q_memcpy(addr, lowmem_buffer, 10);
+	memcpy(addr, lowmem_buffer, 10);
 }
 
 //=============================================================================
@@ -158,11 +158,11 @@ static int IPX_GetLocalTarget(IPXaddr *addr, byte *localTarget)
 	regs.x.es = lowmem_bufseg;
 	regs.x.si = lowmem_bufoff;
 	regs.x.di = lowmem_bufoff + sizeof(IPXaddr);
-	Q_memcpy(lowmem_buffer, addr, sizeof(IPXaddr));
+	memcpy(lowmem_buffer, addr, sizeof(IPXaddr));
 	__dpmi_simulate_real_mode_procedure_retf((__dpmi_regs *)&regs);
 	if (regs.h.al)
 		return -1;
-	Q_memcpy(localTarget, lowmem_buffer + sizeof(IPXaddr), 6);
+	memcpy(localTarget, lowmem_buffer + sizeof(IPXaddr), 6);
 	return 0;
 }
 
@@ -417,7 +417,7 @@ int IPX_Connect (int handle, struct qsockaddr *addr)
 {
 	IPXaddr ipxaddr;
 
-	Q_memcpy(&ipxaddr, &((struct sockaddr_ipx *)addr)->sipx_addr, sizeof(IPXaddr));
+	memcpy(&ipxaddr, &((struct sockaddr_ipx *)addr)->sipx_addr, sizeof(IPXaddr));
 	if (IPX_GetLocalTarget(&ipxaddr, lma->socketbuffer[handle][0].ecb.immediateAddress) != 0)
 	{
 		Con_Printf("Get Local Target failed\n");
@@ -471,19 +471,19 @@ tryagain:
 	copylen = ntohs(rcvbuf->header.length) - (sizeof(int) + sizeof(IPXheader));
 	if (len < copylen)
 		Sys_Error("IPX_Read: buffer too small (%d vs %d)\n", len, copylen);
-	Q_memcpy(buf, rcvbuf->data, copylen);
+	memcpy(buf, rcvbuf->data, copylen);
 
 	// fill in the addr if they want it
 	if (addr)
 	{
 		((struct sockaddr_ipx *)addr)->sipx_family = AF_NETWARE;
-		Q_memcpy(&((struct sockaddr_ipx *)addr)->sipx_addr, rcvbuf->header.source.network, sizeof(IPXaddr));
+		memcpy(&((struct sockaddr_ipx *)addr)->sipx_addr, rcvbuf->header.source.network, sizeof(IPXaddr));
 		((struct sockaddr_ipx *)addr)->sipx_zero[0] = 0;
 		((struct sockaddr_ipx *)addr)->sipx_zero[1] = 0;
 	}
 
 	// update the send ecb's immediate address
-	Q_memcpy(lma->socketbuffer[handle][0].ecb.immediateAddress, rcvbuf->ecb.immediateAddress, 6);
+	memcpy(lma->socketbuffer[handle][0].ecb.immediateAddress, rcvbuf->ecb.immediateAddress, 6);
 
 	// get this ecb listening again
 	rcvbuf->ecb.fragSize = sizeof(IPXheader) + sizeof(int) + NET_DATAGRAMSIZE;
@@ -498,10 +498,10 @@ int IPX_Broadcast (int handle, byte *buf, int len)
 	struct sockaddr_ipx addr;
 	int ret;
 
-	Q_memset(addr.sipx_addr.network, 0x00, 4);
-	Q_memset(addr.sipx_addr.node, 0xff, 6);
+	memset(addr.sipx_addr.network, 0x00, 4);
+	memset(addr.sipx_addr.node, 0xff, 6);
 	addr.sipx_port = htons(net_hostport);
-	Q_memset(lma->socketbuffer[handle][0].ecb.immediateAddress, 0xff, 6);
+	memset(lma->socketbuffer[handle][0].ecb.immediateAddress, 0xff, 6);
 	ret = IPX_Write (handle, buf, len, (struct qsockaddr *)&addr);
 	return ret;
 }
@@ -552,14 +552,14 @@ int IPX_Write (int handle, byte *buf, int len, struct qsockaddr *addr)
 	lma->socketbuffer[handle][0].header.type = PTYPE_IPX;
 
 	// ipx header : destination
-	Q_memcpy(&lma->socketbuffer[handle][0].header.destination, &((struct sockaddr_ipx *)addr)->sipx_addr, sizeof(IPXaddr));
+	memcpy(&lma->socketbuffer[handle][0].header.destination, &((struct sockaddr_ipx *)addr)->sipx_addr, sizeof(IPXaddr));
 
 	// sequence number
 	lma->socketbuffer[handle][0].sequence = sequence[handle];
 	sequence[handle]++;
 
 	// copy down the data
-	Q_memcpy(lma->socketbuffer[handle][0].data, buf, len);
+	memcpy(lma->socketbuffer[handle][0].data, buf, len);
 
 	regs.x.cs = ipx_cs;
 	regs.x.ip = ipx_ip;
@@ -601,7 +601,7 @@ int IPX_StringToAddr (char *string, struct qsockaddr *addr)
 	char buf[3];
 
 	buf[2] = 0;
-	Q_memset(addr, 0, sizeof(struct qsockaddr));
+	memset(addr, 0, sizeof(struct qsockaddr));
 	addr->sa_family = AF_NETWARE;
 
 #define DO(src,dest)	\
@@ -633,7 +633,7 @@ int IPX_StringToAddr (char *string, struct qsockaddr *addr)
 
 int IPX_GetSocketAddr (int handle, struct qsockaddr *addr)
 {
-	Q_memset(addr, 0, sizeof(struct qsockaddr));
+	memset(addr, 0, sizeof(struct qsockaddr));
 	addr->sa_family = AF_NETWARE;
 	IPX_GetLocalAddress(&((struct sockaddr_ipx *)addr)->sipx_addr);
 	((struct sockaddr_ipx *)addr)->sipx_port = ipxsocket[handle];
@@ -680,7 +680,7 @@ int IPX_AddrCompare (struct qsockaddr *addr1, struct qsockaddr *addr2)
 	if (addr1->sa_family != addr2->sa_family)
 		return -1;
 
-	if(Q_memcmp(&((struct sockaddr_ipx *)addr1)->sipx_addr, &((struct sockaddr_ipx *)addr2)->sipx_addr, 10))
+	if(memcmp(&((struct sockaddr_ipx *)addr1)->sipx_addr, &((struct sockaddr_ipx *)addr2)->sipx_addr, 10))
 		return -1;
 
 	if (((struct sockaddr_ipx *)addr1)->sipx_port != ((struct sockaddr_ipx *)addr2)->sipx_port)

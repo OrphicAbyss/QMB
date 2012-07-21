@@ -51,7 +51,7 @@ void ResampleLerp(const void *indata, int inwidth, int inheight, void *outdata, 
 			if (yi != oldy) {
 				inrow = (byte *) indata + inwidth4*yi;
 				if (yi == oldy + 1)
-					Q_memcpy(resamplerow1, resamplerow2, outwidth4);
+					memcpy(resamplerow1, resamplerow2, outwidth4);
 				else
 					ResampleLerpLine(inrow, resamplerow1, inwidth, outwidth);
 				ResampleLerpLine(inrow + inwidth4, resamplerow2, inwidth, outwidth);
@@ -108,12 +108,12 @@ void ResampleLerp(const void *indata, int inwidth, int inheight, void *outdata, 
 			if (yi != oldy) {
 				inrow = (byte *) indata + inwidth4*yi;
 				if (yi == oldy + 1)
-					Q_memcpy(resamplerow1, resamplerow2, outwidth4);
+					memcpy(resamplerow1, resamplerow2, outwidth4);
 				else
 					ResampleLerpLine(inrow, resamplerow1, inwidth, outwidth);
 				oldy = yi;
 			}
-			Q_memcpy(out, resamplerow1, outwidth4);
+			memcpy(out, resamplerow1, outwidth4);
 		}
 	}
 }

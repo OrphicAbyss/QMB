@@ -837,7 +837,7 @@ int PF_newcheckclient (int check)
 	VectorAdd (ent->v.origin, ent->v.view_ofs, org);
 	leaf = Mod_PointInLeaf (org, sv.worldmodel);
 	pvs = Mod_LeafPVS (leaf, sv.worldmodel);
-	Q_memcpy (checkpvs, pvs, (sv.worldmodel->numleafs+7)>>3 );
+	memcpy (checkpvs, pvs, (sv.worldmodel->numleafs+7)>>3 );
 
 	return i;
 }
@@ -1965,7 +1965,7 @@ void PF_copyentity (void)
 	edict_t *in, *out;
 	in = G_EDICT(OFS_PARM0);
 	out = G_EDICT(OFS_PARM1);
-	Q_memcpy(&out->v, &in->v, progs->entityfields * 4);
+	memcpy(&out->v, &in->v, progs->entityfields * 4);
 }
 
 /*
@@ -2688,7 +2688,7 @@ void PF_fgets (void)
 	int test;
 	char *p;
 
-	Q_memset(pr_string_temp, 0, 127);
+	memset(pr_string_temp, 0, 127);
 	p = pr_string_temp;
 	Sys_FileRead(h, p, 1);
 	while (p && p[0] != '\n')
@@ -2761,7 +2761,7 @@ void PF_substring(void)
 {
 	char *s1, *s2;
 
-	Q_memset(pr_strcat_buf, 0, 127);
+	memset(pr_strcat_buf, 0, 127);
 	s1 = G_STRING(OFS_PARM0);
 	s2 = PF_VarString(1);
 	Q_strcpy(pr_strcat_buf, s1);

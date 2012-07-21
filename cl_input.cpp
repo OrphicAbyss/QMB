@@ -343,7 +343,7 @@ void CL_BaseMove(usercmd_t *cmd) {
 
 	CL_AdjustAngles();
 
-	Q_memset(cmd, 0, sizeof (*cmd));
+	memset(cmd, 0, sizeof (*cmd));
 
 	if (in_strafe.state & 1) {
 		cmd->sidemove += cl_sidespeed.getFloat() * CL_KeyState(&in_right);

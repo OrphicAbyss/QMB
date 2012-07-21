@@ -38,14 +38,14 @@ AliasModel::AliasModel() {
 //	for (int i=0; i < header->num_frames; i++) {
 //		md3frame_t *frameDisk = (md3frame_t *)((byte *)header + header->frame_offs);
 //		AliasFrame *frameMem = &loading->data->frames[i];
-//		Q_memcpy(frameMem, frameDisk, sizeof(md3frame_t));
+//		memcpy(frameMem, frameDisk, sizeof(md3frame_t));
 //	}
 //	
 //	loading->data->tags = new AliasTag[header->num_tags];
 //	for (int i=0; i < header->num_tags; i++) {
 //		md3tag_t *tagDisk = (md3tag_t *)((byte *)header + header->tag_offs);
 //		AliasTag *tagMem = &loading->data->tags[i];
-//		Q_memcpy(tagMem, tagDisk, sizeof(md3tag_t));
+//		memcpy(tagMem, tagDisk, sizeof(md3tag_t));
 //	}
 //
 //	loading->data->surfaces = new AliasSurface[header->num_surfaces];
@@ -107,21 +107,21 @@ AliasModel::AliasModel() {
 //	posn = 0; //posn in new buffer
 //
 //	//copy header
-//	Q_memcpy(mem_head, header, sizeof (md3header_t));
+//	memcpy(mem_head, header, sizeof (md3header_t));
 //	posn += sizeof (md3header_mem_t);
 //
 //	//posn of frames
 //	mem_head->offs_frames = posn;
 //
 //	//copy frames
-//	Q_memcpy((byte *) mem_head + mem_head->offs_frames, (byte *) header + header->frame_offs, sizeof (md3frame_t) * header->num_frames);
+//	memcpy((byte *) mem_head + mem_head->offs_frames, (byte *) header + header->frame_offs, sizeof (md3frame_t) * header->num_frames);
 //	posn += sizeof (md3frame_mem_t) * header->num_frames;
 //
 //	//posn of tags
 //	mem_head->offs_tags = posn;
 //
 //	//copy tags
-//	Q_memcpy((byte *) mem_head + mem_head->offs_tags, (byte *) header + header->tag_offs, sizeof (md3tag_t) * header->num_tags);
+//	memcpy((byte *) mem_head + mem_head->offs_tags, (byte *) header + header->tag_offs, sizeof (md3tag_t) * header->num_tags);
 //	posn += sizeof (md3tag_mem_t) * header->num_tags;
 //
 //	//posn of surfaces
@@ -136,7 +136,7 @@ AliasModel::AliasModel() {
 //
 //	for (int i = 0; i < header->num_surfaces; i++) {
 //		//copy size of surface
-//		Q_memcpy((byte *) mem_head + posn, (byte *) header + header->surface_offs, sizeof (md3surface_t));
+//		memcpy((byte *) mem_head + posn, (byte *) header + header->surface_offs, sizeof (md3surface_t));
 //		posn += sizeof (md3surface_mem_t);
 //
 //		//posn of shaders for this surface
@@ -144,21 +144,21 @@ AliasModel::AliasModel() {
 //
 //		for (int j = 0; j < surf->num_surf_shaders; j++) {
 //			//copy jth shader accross
-//			Q_memcpy((byte *) mem_head + posn, (byte *) surf + surf->shader_offs + j * sizeof (md3shader_t), sizeof (md3shader_t));
+//			memcpy((byte *) mem_head + posn, (byte *) surf + surf->shader_offs + j * sizeof (md3shader_t), sizeof (md3shader_t));
 //			posn += sizeof (md3shader_mem_t); //copyed non-mem into mem one
 //		}
 //		//posn of tris for this surface
 //		currentsurf->offs_tris = posn - surfstartposn;
 //
 //		//copy tri
-//		Q_memcpy((byte *) mem_head + posn, (byte *) surf + surf->tris_offs, sizeof (md3tri_t) * surf->num_surf_tris);
+//		memcpy((byte *) mem_head + posn, (byte *) surf + surf->tris_offs, sizeof (md3tri_t) * surf->num_surf_tris);
 //		posn += sizeof (md3tri_mem_t) * surf->num_surf_tris;
 //
 //		//posn of tex coords in this surface
 //		currentsurf->offs_tc = posn - surfstartposn;
 //
 //		//copy st
-//		Q_memcpy((byte *) mem_head + posn, (byte *) surf + surf->tc_offs, sizeof (md3st_t) * surf->num_surf_verts);
+//		memcpy((byte *) mem_head + posn, (byte *) surf + surf->tc_offs, sizeof (md3st_t) * surf->num_surf_verts);
 //		posn += sizeof (md3st_t) * surf->num_surf_verts;
 //
 //		//posn points to surface->verts

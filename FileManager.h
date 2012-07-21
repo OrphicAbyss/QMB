@@ -56,6 +56,26 @@ public:
 	static void DefaultExtension(char *path, const char *extension);
 
 	static void FileBase(const char *in, char *out);
+	/**
+	 * Console command to print out the search paths
+     */
+	static void PathCmd(void);
+	/**
+	 * Sets com_gamedir, adds the directory to the head of the path,
+     * then loads and adds pak1.pak pak2.pak ...
+     */
+    static void AddGameDirectory(char *dir);
+	/**
+	 * Add a pak to our list of places to search for files
+     */
+	static void AddPackToPath(char *pak);
+	/**
+     * Takes an explicit (not game tree related) path to a pak file.
+     * 
+     * Loads the header and directory, adding the files at the beginning of the list
+     * so they override previous pack files.
+     */
+    static pack_t *LoadPackFile(char *packfile);
 private:
 
 };

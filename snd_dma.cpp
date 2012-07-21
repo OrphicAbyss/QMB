@@ -464,7 +464,7 @@ void S_StartSound(int entnum, int entchannel, sfx_t *sfx, vec3_t origin, float f
 		return;
 
 // spatialize
-	Q_memset (target_chan, 0, sizeof(*target_chan));
+	memset (target_chan, 0, sizeof(*target_chan));
 	VectorCopy(origin, target_chan->origin);
 	target_chan->dist_mult = attenuation / sound_nominal_clip_dist;
 	target_chan->master_vol = vol;
@@ -536,7 +536,7 @@ void S_StopAllSounds(bool clear)
 		if (channels[i].sfx)
 			channels[i].sfx = NULL;
 
-	Q_memset(channels, 0, MAX_CHANNELS * sizeof(channel_t));
+	memset(channels, 0, MAX_CHANNELS * sizeof(channel_t));
 
 	if (clear)
 		S_ClearBuffer ();
@@ -559,7 +559,7 @@ void S_ClearBuffer (void)
 	else
 		clear = 0;
 
-	Q_memset(shm->buffer, clear, shm->samples * shm->samplebits/8);
+	memset(shm->buffer, clear, shm->samples * shm->samplebits/8);
 }
 
 

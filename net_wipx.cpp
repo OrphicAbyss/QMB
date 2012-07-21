@@ -106,8 +106,8 @@ int WIPX_Init (void)
 	}
 
 	((struct sockaddr_ipx *)&broadcastaddr)->sa_family = AF_IPX;
-	Q_memset(((struct sockaddr_ipx *)&broadcastaddr)->sa_netnum, 0, 4);
-	Q_memset(((struct sockaddr_ipx *)&broadcastaddr)->sa_nodenum, 0xff, 6);
+	memset(((struct sockaddr_ipx *)&broadcastaddr)->sa_netnum, 0, 4);
+	memset(((struct sockaddr_ipx *)&broadcastaddr)->sa_nodenum, 0xff, 6);
 	((struct sockaddr_ipx *)&broadcastaddr)->sa_socket = htons((unsigned short)net_hostport);
 
 	WIPX_GetSocketAddr (net_controlsocket, &addr);
@@ -178,8 +178,8 @@ int WIPX_OpenSocket (int port)
 		goto ErrorReturn;
 
 	address.sa_family = AF_IPX;
-	Q_memset(address.sa_netnum, 0, 4);
-	Q_memset(address.sa_nodenum, 0, 6);;
+	memset(address.sa_netnum, 0, 4);
+	memset(address.sa_nodenum, 0, 6);;
 	address.sa_socket = htons((unsigned short)port);
 	if( bind (newsocket, (void *)&address, sizeof(address)) == 0)
 	{
@@ -255,7 +255,7 @@ int WIPX_Read (int handle, byte *buf, int len, struct qsockaddr *addr)
 
 	// remove sequence number, it's only needed for DOS IPX
 	ret -= 4;
-	Q_memcpy(buf, packetBuffer+4, ret);
+	memcpy(buf, packetBuffer+4, ret);
 
 	return ret;
 }
@@ -277,7 +277,7 @@ int WIPX_Write (int handle, byte *buf, int len, struct qsockaddr *addr)
 	// build packet with sequence number
 	*(int *)(&packetBuffer[0]) = sequence[handle];
 	sequence[handle]++;
-	Q_memcpy(&packetBuffer[4], buf, len);
+	memcpy(&packetBuffer[4], buf, len);
 	len += 4;
 
 	ret = psendto (socket, packetBuffer, len, 0, (struct sockaddr *)addr, sizeof(struct qsockaddr));
@@ -318,7 +318,7 @@ int WIPX_StringToAddr (char *string, struct qsockaddr *addr)
 	char buf[3];
 
 	buf[2] = 0;
-	Q_memset(addr, 0, sizeof(struct qsockaddr));
+	memset(addr, 0, sizeof(struct qsockaddr));
 	addr->sa_family = AF_IPX;
 
 #define DO(src,dest)	\
@@ -354,7 +354,7 @@ int WIPX_GetSocketAddr (int handle, struct qsockaddr *addr)
 	int addrlen = sizeof(struct qsockaddr);
 	unsigned int a;
 
-	Q_memset(addr, 0, sizeof(struct qsockaddr));
+	memset(addr, 0, sizeof(struct qsockaddr));
 	if(pgetsockname(socket, (struct sockaddr *)addr, &addrlen) != 0)
 	{
 		int errno = pWSAGetLastError();
@@ -404,9 +404,9 @@ int WIPX_AddrCompare (struct qsockaddr *addr1, struct qsockaddr *addr2)
 		return -1;
 
 	if (*((struct sockaddr_ipx *)addr1)->sa_netnum && *((struct sockaddr_ipx *)addr2)->sa_netnum)
-		if (Q_memcmp(((struct sockaddr_ipx *)addr1)->sa_netnum, ((struct sockaddr_ipx *)addr2)->sa_netnum, 4) != 0)
+		if (memcmp(((struct sockaddr_ipx *)addr1)->sa_netnum, ((struct sockaddr_ipx *)addr2)->sa_netnum, 4) != 0)
 			return -1;
-	if (Q_memcmp(((struct sockaddr_ipx *)addr1)->sa_nodenum, ((struct sockaddr_ipx *)addr2)->sa_nodenum, 6) != 0)
+	if (memcmp(((struct sockaddr_ipx *)addr1)->sa_nodenum, ((struct sockaddr_ipx *)addr2)->sa_nodenum, 6) != 0)
 		return -1;
 
 	if (((struct sockaddr_ipx *)addr1)->sa_socket != ((struct sockaddr_ipx *)addr2)->sa_socket)

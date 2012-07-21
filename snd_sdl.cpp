@@ -76,7 +76,7 @@ bool SNDDMA_Init(void)
 							SDL_GetError());
 				return 0;
 			}
-			Q_memcpy(&obtained, &desired, sizeof(desired));
+			memcpy(&obtained, &desired, sizeof(desired));
 			break;
 	}
 	SDL_PauseAudio(0);

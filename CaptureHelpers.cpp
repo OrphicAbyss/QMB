@@ -175,7 +175,7 @@ void CaptureHelper_OnTransferStereo16(void)
     if (!CaptureHelper_IsActive()) return;
 
     // Copy last audio chunk written into our temporary buffer
-    Q_memcpy(capture_audio_samples + 2 * captured_audio_samples, snd_out, snd_linear_count * shm->channels);
+    memcpy(capture_audio_samples + 2 * captured_audio_samples, snd_out, snd_linear_count * shm->channels);
     captured_audio_samples += snd_linear_count / 2;
 
     if (captured_audio_samples >= (int)(0.5 + host_framerate.getFloat() * shm->speed)) {

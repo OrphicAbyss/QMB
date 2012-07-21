@@ -179,7 +179,7 @@ void BuildTris(void) {
 	// build tristrips
 	numorder = 0;
 	numcommands = 0;
-	Q_memset(used, 0, sizeof (used));
+	memset(used, 0, sizeof (used));
 	for (int i = 0; i < pheader->numtris; i++) {
 		// pick an unused triangle and start the trifan
 		if (used[i])
@@ -250,7 +250,7 @@ void GL_MakeAliasModelDisplayLists(model_t *m, aliashdr_t *hdr) {
 
 	int *cmds = (int *) Hunk_Alloc(numcommands * 4);
 	paliashdr->commands = (byte *) cmds - (byte *) paliashdr;
-	Q_memcpy(cmds, commands, numcommands * 4);
+	memcpy(cmds, commands, numcommands * 4);
 
 	trivertx_t *verts = (trivertx_t *) Hunk_Alloc(paliashdr->numposes * paliashdr->poseverts * sizeof (trivertx_t));
 	paliashdr->posedata = (byte *) verts - (byte *) paliashdr;

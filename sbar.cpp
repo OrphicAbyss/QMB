@@ -370,7 +370,7 @@ void Sbar_UpdateScoreboard(void) {
 	Sbar_SortFrags();
 
 	// draw the text
-	Q_memset(scoreboardtext, 0, sizeof (scoreboardtext));
+	memset(scoreboardtext, 0, sizeof (scoreboardtext));
 
 	for (i = 0; i < scoreboardlines; i++) {
 		k = fragsort[i];

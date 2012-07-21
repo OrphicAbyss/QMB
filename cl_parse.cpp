@@ -142,7 +142,7 @@ void CL_KeepaliveMessage(void) {
 
 	// read messages from server, should just be nops
 	old = net_message;
-	Q_memcpy(olddata, net_message.data, net_message.cursize);
+	memcpy(olddata, net_message.data, net_message.cursize);
 
 	do {
 		ret = CL_GetMessage();
@@ -162,7 +162,7 @@ void CL_KeepaliveMessage(void) {
 	} while (ret);
 
 	net_message = old;
-	Q_memcpy(net_message.data, olddata, net_message.cursize);
+	memcpy(net_message.data, olddata, net_message.cursize);
 
 	// check time
 	time = Sys_FloatTime();
@@ -220,7 +220,7 @@ void CL_ParseServerInfo(void) {
 	// needlessly purge it
 
 	// precache models
-	Q_memset(cl.model_precache, 0, sizeof (cl.model_precache));
+	memset(cl.model_precache, 0, sizeof (cl.model_precache));
 	for (nummodels = 1;; nummodels++) {
 		str = MSG_ReadString();
 		if (!str[0])
@@ -234,7 +234,7 @@ void CL_ParseServerInfo(void) {
 	}
 
 	// precache sounds
-	Q_memset(cl.sound_precache, 0, sizeof (cl.sound_precache));
+	memset(cl.sound_precache, 0, sizeof (cl.sound_precache));
 	for (numsounds = 1;; numsounds++) {
 		str = MSG_ReadString();
 		if (!str[0])
@@ -525,20 +525,20 @@ void CL_NewTranslation(int slot) {
 		Sys_Error("CL_NewTranslation: slot > cl.maxclients");
 	dest = cl.scores[slot].translations;
 	source = vid.colormap;
-	Q_memcpy(dest, vid.colormap, sizeof (cl.scores[slot].translations));
+	memcpy(dest, vid.colormap, sizeof (cl.scores[slot].translations));
 	top = cl.scores[slot].colors & 0xf0;
 	bottom = (cl.scores[slot].colors & 15) << 4;
 	R_TranslatePlayerSkin(slot);
 
 	for (i = 0; i < VID_GRADES; i++, dest += 256, source += 256) {
 		if (top < 128) // the artists made some backwards ranges.  sigh.
-			Q_memcpy(dest + TOP_RANGE, source + top, 16);
+			memcpy(dest + TOP_RANGE, source + top, 16);
 		else
 			for (j = 0; j < 16; j++)
 				dest[TOP_RANGE + j] = source[top + 15 - j];
 
 		if (bottom < 128)
-			Q_memcpy(dest + BOTTOM_RANGE, source + bottom, 16);
+			memcpy(dest + BOTTOM_RANGE, source + bottom, 16);
 		else
 			for (j = 0; j < 16; j++)
 				dest[BOTTOM_RANGE + j] = source[bottom + 15 - j];

@@ -120,7 +120,7 @@ void Hunk_Print(bool all) {
 		//
 		// print the single block
 		//
-		Q_memcpy(name, h->name, 8);
+		memcpy(name, h->name, 8);
 		if (all)
 			Con_Printf("%8p :%8i %8s\n", h, h->size, name);
 
@@ -166,7 +166,7 @@ void *Hunk_AllocName(int size, const char *name) {
 	h = (hunk_t *) (hunk_base + hunk_low_used);
 	hunk_low_used += size;
 
-	Q_memset(h, 0, size);
+	memset(h, 0, size);
 
 	h->size = size;
 	h->sentinal = HUNK_SENTINAL;
@@ -191,7 +191,7 @@ int Hunk_LowMark(void) {
 void Hunk_FreeToLowMark(int mark) {
 	if (mark < 0 || mark > hunk_low_used)
 		Sys_Error("Hunk_FreeToLowMark: bad mark %i", mark);
-	Q_memset(hunk_base + mark, 0, hunk_low_used - mark);
+	memset(hunk_base + mark, 0, hunk_low_used - mark);
 	hunk_low_used = mark;
 }
 
@@ -211,7 +211,7 @@ void Hunk_FreeToHighMark(int mark) {
 	}
 	if (mark < 0 || mark > hunk_high_used)
 		Sys_Error("Hunk_FreeToHighMark: bad mark %i", mark);
-	Q_memset(hunk_base + hunk_size - hunk_high_used, 0, hunk_high_used - mark);
+	memset(hunk_base + hunk_size - hunk_high_used, 0, hunk_high_used - mark);
 	hunk_high_used = mark;
 }
 
@@ -246,7 +246,7 @@ void *Hunk_HighAllocName(int size, const char *name) {
 
 	h = (hunk_t *) (hunk_base + hunk_size - hunk_high_used);
 
-	Q_memset(h, 0, size);
+	memset(h, 0, size);
 	h->size = size;
 	h->sentinal = HUNK_SENTINAL;
 	Q_strncpy(h->name, name, 8);
@@ -287,7 +287,7 @@ CACHE & ZONE MEMORY
  */
 
 MemoryObj::MemoryObj(MemType type, char *name, int size) {
-	Q_memset(this->name, 0, maxNameLength);
+	memset(this->name, 0, maxNameLength);
 	Q_strncpy(this->name, name, maxNameLength);
 	this->type = type;
 	this->data = malloc(size);

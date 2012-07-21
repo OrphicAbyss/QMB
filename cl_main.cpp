@@ -61,17 +61,17 @@ void CL_ClearState(void) {
 		Host_ClearMemory();
 
 	// wipe the entire cl structure
-	Q_memset(&cl, 0, sizeof (cl));
+	memset(&cl, 0, sizeof (cl));
 
 	SZ_Clear(&cls.message);
 
 	// clear other arrays
-	Q_memset(cl_efrags, 0, sizeof (cl_efrags));
-	Q_memset(cl_entities, 0, sizeof (cl_entities));
-	Q_memset(cl_dlights, 0, sizeof (cl_dlights));
-	Q_memset(cl_lightstyle, 0, sizeof (cl_lightstyle));
-	Q_memset(cl_temp_entities, 0, sizeof (cl_temp_entities));
-	Q_memset(cl_beams, 0, sizeof (cl_beams));
+	memset(cl_efrags, 0, sizeof (cl_efrags));
+	memset(cl_entities, 0, sizeof (cl_entities));
+	memset(cl_dlights, 0, sizeof (cl_dlights));
+	memset(cl_lightstyle, 0, sizeof (cl_lightstyle));
+	memset(cl_temp_entities, 0, sizeof (cl_temp_entities));
+	memset(cl_beams, 0, sizeof (cl_beams));
 
 	// allocate the efrags and chain together into a free list
 	cl.free_efrags = cl_efrags;
@@ -229,7 +229,7 @@ dlight_t *CL_AllocDlight(int key) {
 		dl = cl_dlights;
 		for (i = 0; i < MAX_DLIGHTS; i++, dl++) {
 			if (dl->key == key) {
-				Q_memset(dl, 0, sizeof (*dl));
+				memset(dl, 0, sizeof (*dl));
 				dl->key = key;
 				return dl;
 			}
@@ -240,14 +240,14 @@ dlight_t *CL_AllocDlight(int key) {
 	dl = cl_dlights;
 	for (i = 0; i < MAX_DLIGHTS; i++, dl++) {
 		if (dl->die < cl.time) {
-			Q_memset(dl, 0, sizeof (*dl));
+			memset(dl, 0, sizeof (*dl));
 			dl->key = key;
 			return dl;
 		}
 	}
 
 	dl = &cl_dlights[0];
-	Q_memset(dl, 0, sizeof (*dl));
+	memset(dl, 0, sizeof (*dl));
 	dl->key = key;
 	return dl;
 }
@@ -266,7 +266,7 @@ void CL_AllocDlightDP(vec3_t org, float radius, float red, float green, float bl
 	return;
 
 dlightsetup:
-	Q_memset(dl, 0, sizeof (*dl));
+	memset(dl, 0, sizeof (*dl));
 	//dl->ent = ent;
 	VectorCopy(org, dl->origin);
 	dl->radius = radius;

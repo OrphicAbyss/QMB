@@ -422,8 +422,8 @@ void Host_ShutdownServer(bool crash) {
 	//
 	// clear structures
 	//
-	Q_memset(&sv, 0, sizeof (sv));
-	Q_memset(svs.clients, 0, svs.maxclientslimit * sizeof (client_t));
+	memset(&sv, 0, sizeof (sv));
+	memset(svs.clients, 0, svs.maxclientslimit * sizeof (client_t));
 }
 
 /*
@@ -441,8 +441,8 @@ void Host_ClearMemory(void) {
 		Hunk_FreeToLowMark(host_hunklevel);
 
 	cls.signon = 0;
-	Q_memset(&sv, 0, sizeof (sv));
-	Q_memset(&cl, 0, sizeof (cl));
+	memset(&sv, 0, sizeof (sv));
+	memset(&cl, 0, sizeof (cl));
 }
 
 

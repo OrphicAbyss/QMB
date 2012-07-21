@@ -783,7 +783,7 @@ int PF_newcheckclient (int check)
 	VectorAdd (ent->v.origin, ent->v.view_ofs, org);
 	leaf = Mod_PointInLeaf (org, sv.worldmodel);
 	pvs = Mod_LeafPVS (leaf, sv.worldmodel);
-	Q_memcpy (checkpvs, pvs, (sv.worldmodel->numleafs+7)>>3 );
+	memcpy (checkpvs, pvs, (sv.worldmodel->numleafs+7)>>3 );
 
 	return i;
 }

@@ -31,14 +31,7 @@ static char *safeargvs[NUM_SAFE_ARGVS] = {"-nolan", "-nosound", "-nocdaudio", "-
 CVar registered("registered", "0");
 CVar cmdline("cmdline", "0", false, true);
 
-bool com_modified; // set true if using non-id files
-bool nomod;
-
 void COM_InitFilesystem(void);
-
-// if a packfile directory differs from this, it is assumed to be hacked
-#define PAK0_COUNT              339
-#define PAK0_CRC                32981
 
 char com_token[1024];
 int com_argc;
@@ -122,18 +115,6 @@ void InsertLinkAfter(link_t *l, link_t *after) {
 ============================================================================
  */
 #include <string.h>
-
-void Q_memset(void *dest, int fill, int count) {
-	memset(dest, fill, count);
-}
-
-void Q_memcpy(void *dest, const void *src, int count) {
-	memcpy(dest, src, count);
-}
-
-int Q_memcmp(void *m1, void *m2, int count) {
-	return memcmp(m1, m2, count);
-}
 
 void Q_strcpy(char *dest, const char *src) {
 	strcpy(dest, src);
@@ -491,7 +472,7 @@ void *SZ_GetSpace(sizebuf_t *buf, int length) {
 }
 
 void SZ_Write(sizebuf_t *buf, const void *data, int length) {
-	Q_memcpy(SZ_GetSpace(buf, length), data, length);
+	memcpy(SZ_GetSpace(buf, length), data, length);
 }
 
 void SZ_Print(sizebuf_t *buf, const char *data) {
@@ -501,9 +482,9 @@ void SZ_Print(sizebuf_t *buf, const char *data) {
 
 	// byte * cast to keep VC++ happy
 	if (buf->data[buf->cursize - 1])
-		Q_memcpy((byte *) SZ_GetSpace(buf, len), data, len); // no trailing 0
+		memcpy((byte *) SZ_GetSpace(buf, len), data, len); // no trailing 0
 	else
-		Q_memcpy((byte *) SZ_GetSpace(buf, len - 1) - 1, data, len); // write over trailing 0
+		memcpy((byte *) SZ_GetSpace(buf, len - 1) - 1, data, len); // write over trailing 0
 }
 
 //============================================================================
@@ -599,8 +580,6 @@ void COM_CheckRegistered(void) {
 	Con_Printf("Playing registered version.\n");
 }
 
-void COM_Path_f(void);
-
 /*
 ================
 COM_InitArgv
@@ -680,7 +659,7 @@ void COM_Init(char *basedir) {
 
 	CVar::registerCVar(&registered);
 	CVar::registerCVar(&cmdline);
-	Cmd::addCmd("path", COM_Path_f);
+	Cmd::addCmd("path", FileManager::PathCmd);
 
 	COM_InitFilesystem();
 	COM_CheckRegistered();
@@ -723,31 +702,7 @@ QUAKE FILESYSTEM
 
 int com_filesize;
 
-// on disk
-typedef struct {
-	char name[56];
-	int filepos, filelen;
-} dpackfile_t;
-
-typedef struct {
-	char id[4];
-	int dirofs;
-	int dirlen;
-} dpackheader_t;
-
-#define MAX_FILES_IN_PACK       2048
-
 char com_gamedir[MAX_OSPATH];
-
-void COM_Path_f(void) {
-	Con_Printf("Current search path:\n");
-	for (searchpath_t *s = FileManager::searchpaths; s; s = s->next) {
-		if (s->pack) {
-			Con_Printf("%s (%i files)\n", s->pack->filename, s->pack->numfiles);
-		} else
-			Con_Printf("%s\n", s->filename);
-	}
-}
 
 /**
  * Filename are reletive to the quake directory. Always appends a 0 byte.
@@ -788,7 +743,7 @@ byte *COM_LoadFile(const char *path, int usehunk) {
 	if (!buf)
 		Sys_Error("COM_LoadFile: not enough space for %s", path);
 
-	Q_memset(buf, 0, len + 1);
+	memset(buf, 0, len + 1);
 
 	Sys_FileRead(h, buf, len);
 	FileManager::CloseFile(h);
@@ -815,98 +770,6 @@ byte *COM_LoadStackFile(const char *path, void *buffer, int bufsize) {
 	return buf;
 }
 
-/**
- * Takes an explicit (not game tree related) path to a pak file.
- * 
- * Loads the header and directory, adding the files at the beginning of the list
- * so they override previous pack files.
- */
-pack_t *COM_LoadPackFile(char *packfile) {
-	dpackheader_t header;
-	pack_t *pack;
-	int packhandle;
-	dpackfile_t info[MAX_FILES_IN_PACK];
-
-	if (Sys_FileOpenRead(packfile, &packhandle) == -1) {
-		//              Con_Printf ("Couldn't open %s\n", packfile);
-		return NULL;
-	}
-	Sys_FileRead(packhandle, (void *) &header, sizeof (header));
-	if (header.id[0] != 'P' || header.id[1] != 'A'
-			|| header.id[2] != 'C' || header.id[3] != 'K')
-		Sys_Error("%s is not a packfile", packfile);
-	header.dirofs = LittleLong(header.dirofs);
-	header.dirlen = LittleLong(header.dirlen);
-
-	int numpackfiles = header.dirlen / sizeof (dpackfile_t);
-
-	if (numpackfiles > MAX_FILES_IN_PACK)
-		Sys_Error("%s has %i files", packfile, numpackfiles);
-
-	if (numpackfiles != PAK0_COUNT)
-		com_modified = true; // not the original file
-
-	packfile_t *newfiles = (packfile_t *) Hunk_AllocName(numpackfiles * sizeof (packfile_t), "packfile");
-
-	Sys_FileSeek(packhandle, header.dirofs);
-	Sys_FileRead(packhandle, (void *) info, header.dirlen);
-
-	// crc the directory to check for modifications
-	CRC crc;
-	crc.process((byte *)info, header.dirlen);	
-	if (crc.getResult() != PAK0_CRC) {
-		Con_SafePrintf("PAK0 modified...");
-		com_modified = true;
-	}
-
-	// parse the directory
-	for (int i = 0; i < numpackfiles; i++) {
-		Q_strcpy(newfiles[i].name, info[i].name);
-		newfiles[i].filepos = LittleLong(info[i].filepos);
-		newfiles[i].filelen = LittleLong(info[i].filelen);
-	}
-
-	pack = (pack_t *) Hunk_Alloc(sizeof (pack_t));
-	Q_strcpy(pack->filename, packfile);
-	pack->handle = packhandle;
-	pack->numfiles = numpackfiles;
-	pack->files = newfiles;
-
-	Con_Printf("Added packfile %s (%i files)\n", packfile, numpackfiles);
-	return pack;
-}
-
-/**
- * Sets com_gamedir, adds the directory to the head of the path,
- * then loads and adds pak1.pak pak2.pak ...
- */
-void COM_AddGameDirectory(char *dir) {
-	searchpath_t *search;
-	pack_t *pak;
-	char pakfile[MAX_OSPATH];
-
-	Q_strcpy(com_gamedir, dir);
-
-	// add the directory to the search path
-	search = (searchpath_t *) Hunk_Alloc(sizeof (searchpath_t));
-	Q_strcpy(search->filename, dir);
-	search->next = FileManager::searchpaths;
-	FileManager::searchpaths = search;
-
-	// add any pak files in the format pak0.pak pak1.pak, ...
-	for (int i = 0;; i++) {
-		sprintf(pakfile, "%s/pak%i.pak", dir, i);
-		pak = COM_LoadPackFile(pakfile);
-		if (!pak)
-			break;
-		search = (searchpath_t *) Hunk_Alloc(sizeof (searchpath_t));
-		search->pack = pak;
-		search->next = FileManager::searchpaths;
-		FileManager::searchpaths = search;
-	}
-	// add the contents of the parms.txt file to the end of the command line
-}
-
 void COM_InitFilesystem(void) {
 	char basedir[MAX_OSPATH];
 	
@@ -926,45 +789,32 @@ void COM_InitFilesystem(void) {
 	}
 
 	// start up with GAMENAME by default (id1)
-	COM_AddGameDirectory(va("%s/"GAMENAME, basedir));
+	FileManager::AddGameDirectory(va("%s/"GAMENAME, basedir));
 	// add in the QMB mod
-	COM_AddGameDirectory(va("%s/qmb", basedir));
+	FileManager::AddGameDirectory(va("%s/qmb", basedir));
 
 	if (COM_CheckParm("-rogue"))
-		COM_AddGameDirectory(va("%s/rogue", basedir));
+		FileManager::AddGameDirectory(va("%s/rogue", basedir));
 	if (COM_CheckParm("-hipnotic"))
-		COM_AddGameDirectory(va("%s/hipnotic", basedir));
+		FileManager::AddGameDirectory(va("%s/hipnotic", basedir));
 
 	// -game <gamedir>
 	// Adds basedir/gamedir as an override game
 	i = COM_CheckParm("-game");
 	if (i && i < com_argc - 1) {
-		com_modified = true;
-		COM_AddGameDirectory(va("%s/%s", basedir, com_argv[i + 1]));
+		FileManager::AddGameDirectory(va("%s/%s", basedir, com_argv[i + 1]));
 	}
 
 	// -path <dir or packfile> [<dir or packfile>] ...
 	// Fully specifies the exact serach path, overriding the generated one
 	i = COM_CheckParm("-path");
 	if (i) {
-		com_modified = true;
 		FileManager::searchpaths = NULL;
 		while (++i < com_argc) {
 			if (!com_argv[i] || com_argv[i][0] == '+' || com_argv[i][0] == '-')
 				break;
 
-			searchpath_t *search = (searchpath_t *) Hunk_Alloc(sizeof (searchpath_t));
-			if (!Q_strcmp(FileManager::FileExtension(com_argv[i]), "pak")) {
-				search->pack = COM_LoadPackFile(com_argv[i]);
-				if (!search->pack)
-					Sys_Error("Couldn't load packfile: %s", com_argv[i]);
-			} else
-				Q_strcpy(search->filename, com_argv[i]);
-			search->next = FileManager::searchpaths;
-			FileManager::searchpaths = search;
+			FileManager::AddPackToPath(com_argv[i]);
 		}
 	}
-
-	if (COM_CheckParm("-nomod"))
-		nomod = true;
 }

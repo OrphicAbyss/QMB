@@ -145,7 +145,7 @@ BOOL CaptureAviWriter::WriteVideo(int width, int height, unsigned char* pixel_bu
         m_video_frame_size = width * height * 3;
 
         BITMAPINFOHEADER bitmap_info_header;
-        Q_memset(&bitmap_info_header, 0, sizeof(BITMAPINFOHEADER));
+        memset(&bitmap_info_header, 0, sizeof(BITMAPINFOHEADER));
         bitmap_info_header.biSize = 40;
         bitmap_info_header.biWidth = width;
         bitmap_info_header.biHeight = height;
@@ -155,7 +155,7 @@ BOOL CaptureAviWriter::WriteVideo(int width, int height, unsigned char* pixel_bu
         bitmap_info_header.biSizeImage = m_video_frame_size * 3;
 
         AVISTREAMINFO stream_header;
-        Q_memset(&stream_header, 0, sizeof(stream_header));
+        memset(&stream_header, 0, sizeof(stream_header));
         stream_header.fccType = streamtypeVIDEO;
         stream_header.fccHandler = m_codec_fourcc;
         stream_header.dwScale = 100;
@@ -167,7 +167,7 @@ BOOL CaptureAviWriter::WriteVideo(int width, int height, unsigned char* pixel_bu
 
         if (m_codec_fourcc) {
             AVICOMPRESSOPTIONS opts;
-            Q_memset(&opts, 0, sizeof(opts));
+            memset(&opts, 0, sizeof(opts));
             AVICOMPRESSOPTIONS* aopts[1] = { &opts };
             opts.fccType = stream_header.fccType;
             opts.fccHandler = m_codec_fourcc;
@@ -202,7 +202,7 @@ BOOL CaptureAviWriter::WriteAudio(int samples, unsigned char* sample_buffer)
 
     if (!m_audio_frame_counter) {
         // write header etc based on first_frame
-        Q_memset(&m_wave_format, 0, sizeof(WAVEFORMATEX));
+        memset(&m_wave_format, 0, sizeof(WAVEFORMATEX));
         m_wave_format.wFormatTag = WAVE_FORMAT_PCM;
         m_wave_format.nChannels = 2; // always stereo in Quake sound engine
         m_wave_format.nSamplesPerSec = m_audio_hz;
@@ -212,7 +212,7 @@ BOOL CaptureAviWriter::WriteAudio(int samples, unsigned char* sample_buffer)
         m_wave_format.cbSize = 0;
 
         AVISTREAMINFO stream_header;
-        Q_memset(&stream_header, 0, sizeof(stream_header));
+        memset(&stream_header, 0, sizeof(stream_header));
         stream_header.fccType = streamtypeAUDIO;
         stream_header.dwScale = m_wave_format.nBlockAlign;
         stream_header.dwRate = stream_header.dwScale * (unsigned long)m_wave_format.nSamplesPerSec;

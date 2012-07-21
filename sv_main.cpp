@@ -230,8 +230,8 @@ void SV_ConnectClient(int clientnum) {
 	netconnection = client->netconnection;
 
 	if (sv.loadgame)
-		Q_memcpy(spawn_parms, client->spawn_parms, sizeof (spawn_parms));
-	Q_memset(client, 0, sizeof (*client));
+		memcpy(spawn_parms, client->spawn_parms, sizeof (spawn_parms));
+	memset(client, 0, sizeof (*client));
 	client->netconnection = netconnection;
 
 	Q_strcpy(client->name, "unconnected");
@@ -244,7 +244,7 @@ void SV_ConnectClient(int clientnum) {
 	client->privileged = false;
 
 	if (sv.loadgame)
-		Q_memcpy(client->spawn_parms, spawn_parms, sizeof (spawn_parms));
+		memcpy(client->spawn_parms, spawn_parms, sizeof (spawn_parms));
 	else {
 		// call the progs to get default spawn parms for the new client
 		PR_ExecuteProgram(pr_global_struct->SetNewParms);
@@ -337,7 +337,7 @@ void SV_AddToFatPVS(vec3_t org, mnode_t *node) {
  */
 byte *SV_FatPVS(vec3_t org) {
 	fatbytes = (sv.worldmodel->numleafs + 31) >> 3;
-	Q_memset(fatpvs, 0, fatbytes);
+	memset(fatpvs, 0, fatbytes);
 	SV_AddToFatPVS(org, sv.worldmodel->nodes);
 	return fatpvs;
 }
@@ -851,7 +851,7 @@ void SV_SpawnServer(char *server) {
 	// set up the new server
 	Host_ClearMemory();
 
-	Q_memset(&sv, 0, sizeof (sv));
+	memset(&sv, 0, sizeof (sv));
 	Q_strcpy(sv.name, server);
 
 	// load progs to get entity field count
@@ -910,7 +910,7 @@ void SV_SpawnServer(char *server) {
 
 	// load the rest of the entities
 	ent = EDICT_NUM(0);
-	Q_memset(&ent->v, 0, progs->entityfields * 4);
+	memset(&ent->v, 0, progs->entityfields * 4);
 	ent->free = false;
 	ent->v.model = sv.worldmodel->name - pr_strings;
 	ent->v.modelindex = 1; // world model

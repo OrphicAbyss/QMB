@@ -71,7 +71,7 @@ void Con_ToggleConsole_f(void) {
 		key_dest = key_console;
 
 	SCR_EndLoadingPlaque();
-	Q_memset(con_times, 0, sizeof (con_times));
+	memset(con_times, 0, sizeof (con_times));
 }
 
 /**
@@ -79,7 +79,7 @@ void Con_ToggleConsole_f(void) {
  */
 void Con_Clear_f(void) {
 	if (con_text)
-		Q_memset(con_text, ' ', CON_TEXTSIZE);
+		memset(con_text, ' ', CON_TEXTSIZE);
 }
 
 /**
@@ -121,7 +121,7 @@ void Con_CheckResize(void) {
 		width = 80;
 		con_linewidth = width;
 		con_totallines = CON_TEXTSIZE / con_linewidth;
-		Q_memset(con_text, ' ', CON_TEXTSIZE);
+		memset(con_text, ' ', CON_TEXTSIZE);
 	} else {
 		oldwidth = con_linewidth;
 		con_linewidth = width;
@@ -137,8 +137,8 @@ void Con_CheckResize(void) {
 		if (con_linewidth < numchars)
 			numchars = con_linewidth;
 
-		Q_memcpy(tbuf, con_text, CON_TEXTSIZE);
-		Q_memset(con_text, ' ', CON_TEXTSIZE);
+		memcpy(tbuf, con_text, CON_TEXTSIZE);
+		memset(con_text, ' ', CON_TEXTSIZE);
 
 		for (i = 0; i < numlines; i++) {
 			for (j = 0; j < numchars; j++) {
@@ -173,7 +173,7 @@ void Con_Init(void) {
 	}
 
 	con_text = (char *) Hunk_AllocName(CON_TEXTSIZE, "context");
-	Q_memset(con_text, ' ', CON_TEXTSIZE);
+	memset(con_text, ' ', CON_TEXTSIZE);
 	con_linewidth = -1;
 	Con_CheckResize();
 
@@ -192,7 +192,7 @@ void Con_Init(void) {
 void Con_Linefeed(void) {
 	con_x = 0;
 	con_current++;
-	Q_memset(&con_text[(con_current % con_totallines) * con_linewidth], ' ', con_linewidth);
+	memset(&con_text[(con_current % con_totallines) * con_linewidth], ' ', con_linewidth);
 }
 
 /**

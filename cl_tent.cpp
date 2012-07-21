@@ -407,7 +407,7 @@ entity_t *CL_NewTempEntity(void) {
 	if (num_temp_entities == MAX_TEMP_ENTITIES)
 		return NULL;
 	ent = &cl_temp_entities[num_temp_entities];
-	Q_memset(ent, 0, sizeof (*ent));
+	memset(ent, 0, sizeof (*ent));
 	num_temp_entities++;
 	cl_visedicts[cl_numvisedicts] = ent;
 	cl_numvisedicts++;

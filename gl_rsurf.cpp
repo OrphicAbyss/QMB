@@ -285,7 +285,7 @@ void R_DrawBrushModel(entity_t *e) {
 		glColor3fv(lightcolor);
 	} else {
 		glColor3f(1.0, 1.0, 1.0);
-		Q_memset(lightmap_polys, 0, sizeof (lightmap_polys));
+		memset(lightmap_polys, 0, sizeof (lightmap_polys));
 	}
 
 	VectorSubtract(r_refdef.vieworg, e->origin, modelorg);
@@ -396,13 +396,13 @@ void R_DrawWorld(void) {
 	entity_t ent;
 	float modelorg[3];
 
-	Q_memset(&ent, 0, sizeof (ent));
+	memset(&ent, 0, sizeof (ent));
 	ent.model = cl.worldmodel;
 
 	VectorCopy(r_refdef.vieworg, modelorg);
 
 	glColor3f(1, 1, 1);
-	Q_memset(lightmap_polys, 0, sizeof (lightmap_polys));
+	memset(lightmap_polys, 0, sizeof (lightmap_polys));
 
 	//draw the display list
 	R_RecursiveWorldNode(cl.worldmodel->nodes, &modelorg[0]);
@@ -429,7 +429,7 @@ void R_MarkLeaves(void) {
 
 	if (r_novis.getBool()) {
 		vis = solid;
-		Q_memset(solid, 0xff, (cl.worldmodel->numleafs + 7) >> 3);
+		memset(solid, 0xff, (cl.worldmodel->numleafs + 7) >> 3);
 	} else
 		vis = Mod_LeafPVS(r_viewleaf, cl.worldmodel);
 
@@ -648,7 +648,7 @@ void GL_UploadLightmap(void) {
  * Builds the lightmap texture with all the surfaces from all brush models
  */
 void GL_BuildLightmaps(void) {
-	Q_memset(allocated, 0, sizeof (allocated));
+	memset(allocated, 0, sizeof (allocated));
 
 	r_framecount = 1; // no dlightcache
 

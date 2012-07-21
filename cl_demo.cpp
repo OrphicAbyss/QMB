@@ -165,14 +165,13 @@ void CL_Stop_f(void) {
  * record <demoname> <map> [cd track]
  */
 void CL_Record_f(void) {
-	int c;
 	char name[MAX_OSPATH];
 	int track;
 
 	if (CmdArgs::getSource() != CmdArgs::COMMAND)
 		return;
 
-	c = CmdArgs::getArgCount();
+	int c = CmdArgs::getArgCount();
 	if (c != 2 && c != 3 && c != 4) {
 		Con_Printf("record <demoname> [<map> [cd track]]\n");
 		return;

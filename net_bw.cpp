@@ -241,7 +241,7 @@ static int net_controlsocket = 0;
 
 static int BW_ioctl(int s, char *msg, int msglen)
 {
-	Q_memcpy(lowmem_buffer, msg, msglen);
+	memcpy(lowmem_buffer, msg, msglen);
 
 	regs.x.ax = 0x4403;
 	regs.x.bx = s;
@@ -298,7 +298,7 @@ static int GetEthdevinfo(void)
 	regs.x.bx = fd;
 	if (dos_int86(0x21))
 		return -1;
-	Q_memcpy(&ethdevinfo, lowmem_buffer, regs.x.ax);
+	memcpy(&ethdevinfo, lowmem_buffer, regs.x.ax);
 
 	regs.h.ah = 0x3e;
 	regs.x.bx = fd;
@@ -537,7 +537,7 @@ int BW_Read(int s, byte *buf, int len, struct qsockaddr *from)
 		Con_Printf("BW UDP read packet too large: %u\n", len);
 		return -1;
 	}
-	Q_memcpy(buf, info2->data, len);
+	memcpy(buf, info2->data, len);
 
 	return len;
 }
@@ -562,7 +562,7 @@ int BW_Broadcast(int s, byte *msg, int len)
 	writeInfo->dataLen = len;
 	if (len > NET_DATAGRAMSIZE)
 		Sys_Error("BW UDP write packet too large: %u\n", len);
-	Q_memcpy(writeInfo->data, msg, len);
+	memcpy(writeInfo->data, msg, len);
 	writeInfo->data[len] = 0;
 	regs.h.ah = 0x40;
 	regs.x.bx = s;
@@ -598,7 +598,7 @@ int BW_Write(int s, byte *msg, int len, struct qsockaddr *to)
 	writeInfo->dataLen = len;
 	if (len > NET_DATAGRAMSIZE)
 		Sys_Error("BW UDP write packet too large: %u\n", len);
-	Q_memcpy(writeInfo->data, msg, len);
+	memcpy(writeInfo->data, msg, len);
 	writeInfo->data[len] = 0;
 	regs.h.ah = 0x40;
 	regs.x.bx = s;

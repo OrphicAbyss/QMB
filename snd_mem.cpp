@@ -234,7 +234,7 @@ void DumpChunks(void)
 	data_p=iff_data;
 	do
 	{
-		Q_memcpy (str, data_p, 4);
+		memcpy (str, data_p, 4);
 		data_p += 4;
 		iff_chunk_len = GetLittleLong();
 		Con_Printf ("0x%x : %s (%d)\n", (long)(data_p - 4), str, iff_chunk_len);
@@ -254,7 +254,7 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 	int     format;
 	int		samples;
 
-	Q_memset (&info, 0, sizeof(info));
+	memset (&info, 0, sizeof(info));
 
 	if (!wav)
 		return info;

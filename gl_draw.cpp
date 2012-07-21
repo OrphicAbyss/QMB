@@ -128,7 +128,7 @@ qpic_t *Draw_CachePic(const char *path) {
 	// the translatable player picture just for the menu
 	// configuration dialog
 	if (!Q_strcmp(path, "gfx/menuplyr.lmp"))
-		Q_memcpy(menuplyr_pixels, dat->data, dat->width * dat->height);
+		memcpy(menuplyr_pixels, dat->data, dat->width * dat->height);
 
 	pic->pic.width = dat->width;
 	pic->pic.height = dat->height;

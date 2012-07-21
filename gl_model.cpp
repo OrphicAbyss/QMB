@@ -48,7 +48,7 @@ texture_t *r_notexture_mip;
 
 void Mod_Init(void) {
 	CVar::registerCVar(&gl_subdivide_size);
-	Q_memset(mod_novis, 0xff, sizeof (mod_novis));
+	memset(mod_novis, 0xff, sizeof (mod_novis));
 	
 	// create a simple checkerboard texture for the default
 	r_notexture_mip = (texture_t *) Hunk_AllocName(sizeof (texture_t), "notexture");
@@ -324,13 +324,13 @@ void Mod_LoadTextures(lump_t *l) {
 		tx = (texture_t *) Hunk_AllocName(sizeof (texture_t) + pixels, loadname);
 		loadmodel->textures[i] = tx;
 
-		Q_memcpy(tx->name, mt->name, sizeof (tx->name));
+		memcpy(tx->name, mt->name, sizeof (tx->name));
 		tx->width = mt->width;
 		tx->height = mt->height;
 		for (int j = 0; j < MIPLEVELS; j++)
 			tx->offsets[j] = mt->offsets[j] + sizeof (texture_t) - sizeof (miptex_t);
 		// the pixels immediately follow the structures
-		Q_memcpy(tx + 1, mt + 1, pixels);
+		memcpy(tx + 1, mt + 1, pixels);
 
 		if (!Q_strncmp(mt->name, "sky", 3)) {
 			R_InitSky(tx);
@@ -374,8 +374,8 @@ void Mod_LoadTextures(lump_t *l) {
 			continue; // allready sequenced
 
 		// find the number of frames in the animation
-		Q_memset(anims, 0, sizeof (anims));
-		Q_memset(altanims, 0, sizeof (altanims));
+		memset(anims, 0, sizeof (anims));
+		memset(altanims, 0, sizeof (altanims));
 
 		max = tx->name[1];
 		altmax = 0;
@@ -479,7 +479,7 @@ void Mod_LoadLighting(lump_t *l) {
 	loadmodel->lightdata = (byte *) Hunk_AllocName(l->filelen * 3, litfilename);
 	in = loadmodel->lightdata + l->filelen * 2; // place the file at the end, so it will not be overwritten until the very last write
 	out = loadmodel->lightdata;
-	Q_memcpy(in, mod_base + l->fileofs, l->filelen);
+	memcpy(in, mod_base + l->fileofs, l->filelen);
 	for (i = 0; i < l->filelen; i++) {
 		d = *in++;
 		*out++ = d;
@@ -494,7 +494,7 @@ void Mod_LoadVisibility(lump_t *l) {
 		return;
 	}
 	loadmodel->visdata = (byte *) Hunk_AllocName(l->filelen, loadname);
-	Q_memcpy(loadmodel->visdata, mod_base + l->fileofs, l->filelen);
+	memcpy(loadmodel->visdata, mod_base + l->fileofs, l->filelen);
 }
 
 void Mod_LoadEntities(lump_t *l) {
@@ -520,7 +520,7 @@ void Mod_LoadEntities(lump_t *l) {
 	}
 
 	loadmodel->entities = (char *) Hunk_AllocName(l->filelen, loadname);
-	Q_memcpy(loadmodel->entities, mod_base + l->fileofs, l->filelen);
+	memcpy(loadmodel->entities, mod_base + l->fileofs, l->filelen);
 }
 
 void Mod_LoadVertexes(lump_t *l) {
@@ -1328,7 +1328,7 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 			if (!Q_strcmp(loadmodel->name, "progs/player.mdl")) {
 				texels = (byte *) Hunk_AllocName(s, loadname);
 				pheader->texels[i] = texels - (byte *) pheader;
-				Q_memcpy(texels, (byte *) (pskintype + 1), s);
+				memcpy(texels, (byte *) (pskintype + 1), s);
 				GL_SkinSplitShirt(texels, pheader->skinwidth, pheader->skinheight, 0x0040, model);
 			}
 
@@ -1376,7 +1376,7 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 				if (j == 0) {
 					texels = (byte *) Hunk_AllocName(s, loadname);
 					pheader->texels[i] = texels - (byte *) pheader;
-					Q_memcpy(texels, (byte *) (pskintype), s);
+					memcpy(texels, (byte *) (pskintype), s);
 				}
 				sprintf(name, "%s_%i_%i", loadmodel->name, i, j);
 				pheader->gl_texturenum[i][j & 3] = TextureManager::LoadInternTexture(name, pheader->skinwidth, pheader->skinheight, (byte *) (pskintype), true, false, 1, gl_sincity.getBool());
@@ -1512,7 +1512,7 @@ void Mod_LoadAliasModel(model_t *mod, void *buffer) {
 	mod->cache = MemoryObj::Alloc(MemoryObj::CACHE, loadname, total);
 	if (!mod->cache->getData())
 		return;
-	Q_memcpy(mod->cache->getData(), pheader, total);
+	memcpy(mod->cache->getData(), pheader, total);
 
 	Hunk_FreeToLowMark(start);
 }
@@ -1660,7 +1660,7 @@ void Mod_LoadQ2AliasModel(model_t *mod, void *buffer) {
 	mod->cache = MemoryObj::Alloc(MemoryObj::CACHE, loadname, total);
 	if (!mod->cache->getData())
 		return;
-	Q_memcpy(mod->cache->getData(), pheader, total);
+	memcpy(mod->cache->getData(), pheader, total);
 
 	Hunk_FreeToLowMark(start);
 }
@@ -1704,7 +1704,7 @@ void * Mod_LoadSpriteFrame(void * pin, mspriteframe_t **ppframe, int framenum) {
 
 	pspriteframe = (mspriteframe_t *) Hunk_AllocName(sizeof (mspriteframe_t), loadname);
 
-	Q_memset(pspriteframe, 0, sizeof (mspriteframe_t));
+	memset(pspriteframe, 0, sizeof (mspriteframe_t));
 
 	*ppframe = pspriteframe;
 

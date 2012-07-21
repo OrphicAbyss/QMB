@@ -192,7 +192,7 @@ areanode_t *SV_CreateAreaNode(int depth, vec3_t mins, vec3_t maxs) {
 void SV_ClearWorld(void) {
 	SV_InitBoxHull();
 
-	Q_memset(sv_areanodes, 0, sizeof (sv_areanodes));
+	memset(sv_areanodes, 0, sizeof (sv_areanodes));
 	sv_numareanodes = 0;
 	SV_CreateAreaNode(0, sv.worldmodel->mins, sv.worldmodel->maxs);
 }
@@ -550,7 +550,7 @@ trace_t SV_ClipMoveToEntity(edict_t *ent, vec3_t start, vec3_t mins, vec3_t maxs
 	hull_t *hull;
 
 	// fill in a default trace
-	Q_memset(&trace, 0, sizeof (trace_t));
+	memset(&trace, 0, sizeof (trace_t));
 	trace.fraction = 1;
 	trace.allsolid = true;
 	VectorCopy(end, trace.endpos);
@@ -661,7 +661,7 @@ void SV_MoveBounds(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, vec3_t bo
 trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int type, edict_t *passedict) {
 	moveclip_t clip;
 
-	Q_memset(&clip, 0, sizeof ( moveclip_t));
+	memset(&clip, 0, sizeof ( moveclip_t));
 
 	// clip to world
 	clip.trace = SV_ClipMoveToEntity(sv.edicts, start, mins, maxs, end);

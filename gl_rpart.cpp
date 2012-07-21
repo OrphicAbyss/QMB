@@ -1273,7 +1273,7 @@ void TraceLineN(vec3_t start, vec3_t end, vec3_t impact, vec3_t normal, int accu
 	trace_t trace;
 	vec3_t temp;
 
-	Q_memset(&trace, 0, sizeof (trace));
+	memset(&trace, 0, sizeof (trace));
 
 	SV_RecursiveHullCheck(cl.worldmodel->hulls, 0, 0, 1, start, end, &trace);
 

@@ -294,7 +294,7 @@ void Cbuf_InsertText(const char *text) {
 	templen = cmd_text.cursize;
 	if (templen) {
 		temp = (char *) MemoryObj::ZAlloc(templen);
-		Q_memcpy(temp, cmd_text.data, templen);
+		memcpy(temp, cmd_text.data, templen);
 		SZ_Clear(&cmd_text);
 	} else
 		temp = NULL; // shut up compiler
@@ -330,7 +330,7 @@ void Cbuf_Execute(void) {
 		}
 
 
-		Q_memcpy(line, text, i);
+		memcpy(line, text, i);
 		line[i] = 0;
 
 		// delete the text from the command buffer and move remaining commands down
@@ -342,7 +342,7 @@ void Cbuf_Execute(void) {
 		else {
 			i++;
 			cmd_text.cursize -= i;
-			Q_memcpy(text, text + i, cmd_text.cursize);
+			memcpy(text, text + i, cmd_text.cursize);
 		}
 
 		// execute the command line
@@ -465,7 +465,7 @@ void Cmd_Alias_f(void) {
 	int i, maxArgs;
 	const char *aliasName;
 
-	Q_memset(cmd, 0, 1024);
+	memset(cmd, 0, 1024);
 
 	if (CmdArgs::CmdArgs::getArgCount() == 1) {
 		Alias::printAliases();
