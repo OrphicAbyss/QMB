@@ -29,7 +29,7 @@ void NN_init(){
 	//check the command line to see if a number of neural networks was given
 	i = COM_CheckParm ("-neuralnets");
 	if (i){
-		neural_nets = (int)(Q_atoi(com_argv[i+1]));
+		neural_nets = (int)(atoi(com_argv[i+1]));
 	} else {
 		neural_nets = MAX_NEURAL_NETWORKS / 4;					//defualt to set 'max'
 	}

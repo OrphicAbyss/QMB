@@ -301,10 +301,10 @@ void V_ParseDamage(void) {
 }
 
 void V_cshift_f(void) {
-	cshift_empty.destcolor[0] = Q_atoi(CmdArgs::getArg(1));
-	cshift_empty.destcolor[1] = Q_atoi(CmdArgs::getArg(2));
-	cshift_empty.destcolor[2] = Q_atoi(CmdArgs::getArg(3));
-	cshift_empty.percent = Q_atoi(CmdArgs::getArg(4));
+	cshift_empty.destcolor[0] = atoi(CmdArgs::getArg(1));
+	cshift_empty.destcolor[1] = atoi(CmdArgs::getArg(2));
+	cshift_empty.destcolor[2] = atoi(CmdArgs::getArg(3));
+	cshift_empty.percent = atoi(CmdArgs::getArg(4));
 }
 
 /**

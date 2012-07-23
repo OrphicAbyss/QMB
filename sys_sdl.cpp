@@ -208,7 +208,7 @@ void Sys_DebugLog(char *file, char *fmt, ...) {
 	vsprintf(data, fmt, argptr);
 	va_end(argptr);
 	fp = fopen(file, "a");
-	fwrite(data, Q_strlen(data), 1, fp);
+	fwrite(data, strlen(data), 1, fp);
 	fclose(fp);
 }
 
@@ -254,7 +254,7 @@ int main(int c, char **v) {
 
 	value = COM_CheckParm("-mem");
 	if (value)
-		parms.memsize = (int) (Q_atof(com_argv[value + 1]) * 1024 * 1024);
+		parms.memsize = (int) (atof(com_argv[value + 1]) * 1024 * 1024);
 	else
 		parms.memsize = 16 * 1024 * 1024;
 

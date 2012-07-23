@@ -110,13 +110,13 @@ qpic_t *Draw_CachePic(const char *path) {
 	glpic_t *gl;
 
 	for (pic = menu_cachepics, i = 0; i < menu_numcachepics; pic++, i++)
-		if (!Q_strcmp(path, pic->name))
+		if (!strcmp(path, pic->name))
 			return &pic->pic;
 
 	if (menu_numcachepics == MAX_CACHED_PICS)
 		Sys_Error("menu_numcachepics == MAX_CACHED_PICS");
 	menu_numcachepics++;
-	Q_strcpy(pic->name, path);
+	strcpy(pic->name, path);
 
 	// load the pic from disk
 	dat = (qpic_t *) COM_LoadTempFile(path);
@@ -127,7 +127,7 @@ qpic_t *Draw_CachePic(const char *path) {
 	// HACK HACK HACK --- we need to keep the bytes for
 	// the translatable player picture just for the menu
 	// configuration dialog
-	if (!Q_strcmp(path, "gfx/menuplyr.lmp"))
+	if (!strcmp(path, "gfx/menuplyr.lmp"))
 		memcpy(menuplyr_pixels, dat->data, dat->width * dat->height);
 
 	pic->pic.width = dat->width;

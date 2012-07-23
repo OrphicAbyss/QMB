@@ -144,10 +144,10 @@ static void CD_f() {
 	if (CmdArgs::getArgCount() < 2) return;
 
 	char *command = CmdArgs::getArg(1);
-	if (!Q_strcasecmp(command, "on")) {
+	if (!strcasecmp(command, "on")) {
 		enabled = true;
 	}
-	if (!Q_strcasecmp(command, "off")) {
+	if (!strcasecmp(command, "off")) {
 		if (!cd_id) return;
 		int cdstate = SDL_CDStatus(cd_id);
 		if ((cdstate == CD_PLAYING) || (cdstate == CD_PAUSED))
@@ -156,31 +156,31 @@ static void CD_f() {
 		return;
 	}
 	
-	if (!Q_strcasecmp(command, "play")) {
-		CDAudio_Play(Q_atoi(CmdArgs::getArg(2)), false);
+	if (!strcasecmp(command, "play")) {
+		CDAudio_Play(atoi(CmdArgs::getArg(2)), false);
 		return;
 	}
-	if (!Q_strcasecmp(command, "loop")) {
-		CDAudio_Play(Q_atoi(CmdArgs::getArg(2)), true);
+	if (!strcasecmp(command, "loop")) {
+		CDAudio_Play(atoi(CmdArgs::getArg(2)), true);
 		return;
 	}
-	if (!Q_strcasecmp(command, "stop")) {
+	if (!strcasecmp(command, "stop")) {
 		CDAudio_Stop();
 		return;
 	}
-	if (!Q_strcasecmp(command, "pause")) {
+	if (!strcasecmp(command, "pause")) {
 		CDAudio_Pause();
 		return;
 	}
-	if (!Q_strcasecmp(command, "resume")) {
+	if (!strcasecmp(command, "resume")) {
 		CDAudio_Resume();
 		return;
 	}
-	if (!Q_strcasecmp(command, "eject")) {
+	if (!strcasecmp(command, "eject")) {
 		CDAudio_Eject();
 		return;
 	}
-	if (!Q_strcasecmp(command, "info")) {
+	if (!strcasecmp(command, "info")) {
 		if (!cd_id) return;
 		int cdstate = SDL_CDStatus(cd_id);
 		Con_Printf("%d tracks\n", cd_id->numtracks);

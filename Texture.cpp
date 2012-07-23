@@ -4,8 +4,8 @@
 #include <GL/glu.h>
 
 Texture::Texture(const char *ident) {
-	this->identifier = (char *)MemoryObj::ZAlloc(Q_strlen(ident));
-	Q_strcpy(this->identifier, ident);
+	this->identifier = (char *)MemoryObj::ZAlloc(strlen(ident));
+	strcpy(this->identifier, ident);
 	this->textureType = GL_TEXTURE_2D;
 	this->data = NULL;
 	this->dataHash = 0;
@@ -27,7 +27,7 @@ Texture::~Texture() {
 }
 
 bool Texture::operator ==(const Texture& other) const {
-	return Q_strcmp(this->identifier, other.identifier) == 0;
+	return strcmp(this->identifier, other.identifier) == 0;
 }
 
 bool Texture::operator !=(const Texture& other) const {

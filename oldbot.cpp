@@ -39,7 +39,7 @@ void SearchForEnemyCoop (client_t *client) {
 		if (nmy->v.takedamage != DAMAGE_AIM	||				//takes damage
 			nmy == bot						||				//isnt the bot
 			!(nmy->v.health > 0)			||				// and is alive
-			!Q_strcmp(pr_strings + nmy->v.classname, "player"))	//not a player
+			!strcmp(pr_strings + nmy->v.classname, "player"))	//not a player
 			continue;
 
 		//work out position of other object

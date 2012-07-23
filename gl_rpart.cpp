@@ -255,7 +255,7 @@ void R_InitParticles(void) {
 	//check the command line to see if a number of particles was given particle
 	i = COM_CheckParm("-particles");
 	if (i) {
-		r_numparticles = (int) (Q_atoi(com_argv[i + 1]));
+		r_numparticles = (int) (atoi(com_argv[i + 1]));
 		if (r_numparticles < ABSOLUTE_MIN_PARTICLES)
 			r_numparticles = ABSOLUTE_MIN_PARTICLES; //cant have less than set min
 	} else {

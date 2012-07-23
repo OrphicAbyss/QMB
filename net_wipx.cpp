@@ -78,7 +78,7 @@ int WIPX_Init (void)
 	if (pgethostname(buff, MAXHOSTNAMELEN) == 0)
 	{
 		// if the quake hostname isn't set, set it to the machine name
-		if (Q_strcmp(hostname.string, "UNNAMED") == 0)
+		if (strcmp(hostname.string, "UNNAMED") == 0)
 		{
 			// see if it's a text IP address (well, close enough)
 			for (p = buff; *p; p++)
@@ -111,8 +111,8 @@ int WIPX_Init (void)
 	((struct sockaddr_ipx *)&broadcastaddr)->sa_socket = htons((unsigned short)net_hostport);
 
 	WIPX_GetSocketAddr (net_controlsocket, &addr);
-	Q_strcpy(my_ipx_address,  WIPX_AddrToString (&addr));
-	p = Q_strrchr (my_ipx_address, ':');
+	strcpy(my_ipx_address,  WIPX_AddrToString (&addr));
+	p = strrchr (my_ipx_address, ':');
 	if (p)
 		*p = 0;
 
@@ -367,7 +367,7 @@ int WIPX_GetSocketAddr (int handle, struct qsockaddr *addr)
 
 int WIPX_GetNameFromAddr (struct qsockaddr *addr, char *name)
 {
-	Q_strcpy(name, WIPX_AddrToString(addr));
+	strcpy(name, WIPX_AddrToString(addr));
 	return 0;
 }
 
@@ -378,7 +378,7 @@ int WIPX_GetAddrFromName(char *name, struct qsockaddr *addr)
 	int n;
 	char buf[32];
 
-	n = Q_strlen(name);
+	n = strlen(name);
 
 	if (n == 12)
 	{

@@ -290,8 +290,8 @@ int IPX_Init(void)
 	SchedulePollProcedure(&pollProcedure, 0.01);
 
 	IPX_GetSocketAddr (net_controlsocket, &addr);
-	Q_strcpy(my_ipx_address,  IPX_AddrToString (&addr));
-	colon = Q_strrchr (my_ipx_address, ':');
+	strcpy(my_ipx_address,  IPX_AddrToString (&addr));
+	colon = strrchr (my_ipx_address, ':');
 	if (colon)
 		*colon = 0;
 
@@ -644,7 +644,7 @@ int IPX_GetSocketAddr (int handle, struct qsockaddr *addr)
 
 int IPX_GetNameFromAddr (struct qsockaddr *addr, char *name)
 {
-	Q_strcpy(name, IPX_AddrToString(addr));
+	strcpy(name, IPX_AddrToString(addr));
 	return 0;
 }
 
@@ -655,7 +655,7 @@ int IPX_GetAddrFromName (char *name, struct qsockaddr *addr)
 	int n;
 	char buf[32];
 
-	n = Q_strlen(name);
+	n = strlen(name);
 
 	if (n == 12)
 	{

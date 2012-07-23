@@ -114,51 +114,51 @@ void InsertLinkAfter(link_t *l, link_t *after) {
 					LIBRARY REPLACEMENT FUNCTIONS
 ============================================================================
  */
-#include <string.h>
 
-void Q_strcpy(char *dest, const char *src) {
-	strcpy(dest, src);
-}
 
-void Q_strncpy(char *dest, const char *src, int count) {
-	strncpy(dest, src, count);
-}
-
-int Q_strlen(const char *str) {
-	return strlen(str);
-}
-
-char *Q_strrchr(char *s, char c) {
-	return strrchr(s, c);
-}
-
-void Q_strcat(char *dest, const char *src) {
-	strcat(dest, src);
-}
-
-int Q_strcmp(const char *s1, const char *s2) {
-	return strcmp(s1, s2);
-}
-
-int Q_strncmp(const char *s1, const char *s2, int count) {
-	return strncmp(s1, s2, count);
-}
-
-int Q_strncasecmp(const char *s1, const char *s2, int n) {
-	return strncasecmp(s1, s2, n);
-}
-
-int Q_strcasecmp(const char *s1, const char *s2) {
-	return strcasecmp(s1, s2);
-}
-
-int Q_atoi(const char *str) {
-	return atoi(str);
-}
-
-float Q_atof(const char *str) {
-	return atof(str);
-}
+//void strcpy(char *dest, const char *src) {
+//	strcpy(dest, src);
+//}
+//
+//void strncpy(char *dest, const char *src, int count) {
+//	strncpy(dest, src, count);
+//}
+//
+//int strlen(const char *str) {
+//	return strlen(str);
+//}
+//
+//char *strrchr(char *s, char c) {
+//	return strrchr(s, c);
+//}
+//
+//void strcat(char *dest, const char *src) {
+//	strcat(dest, src);
+//}
+//
+//int strcmp(const char *s1, const char *s2) {
+//	return strcmp(s1, s2);
+//}
+//
+//int strncmp(const char *s1, const char *s2, int count) {
+//	return strncmp(s1, s2, count);
+//}
+//
+//int strncasecmp(const char *s1, const char *s2, int n) {
+//	return strncasecmp(s1, s2, n);
+//}
+//
+//int strcasecmp(const char *s1, const char *s2) {
+//	return strcasecmp(s1, s2);
+//}
+//
+//int atoi(const char *str) {
+//	return atoi(str);
+//}
+//
+//float atof(const char *str) {
+//	return atof(str);
+//}
 
 /*
 ============================================================================
@@ -298,7 +298,7 @@ void MSG_WriteString(sizebuf_t *sb, const char *s) {
 	if (!s)
 		SZ_Write(sb, "", 1);
 	else
-		SZ_Write(sb, s, Q_strlen(s) + 1);
+		SZ_Write(sb, s, strlen(s) + 1);
 }
 
 void MSG_WriteCoord(sizebuf_t *sb, float f) {
@@ -478,7 +478,7 @@ void SZ_Write(sizebuf_t *buf, const void *data, int length) {
 void SZ_Print(sizebuf_t *buf, const char *data) {
 	int len;
 
-	len = Q_strlen(data) + 1;
+	len = strlen(data) + 1;
 
 	// byte * cast to keep VC++ happy
 	if (buf->data[buf->cursize - 1])
@@ -493,10 +493,7 @@ void SZ_Print(sizebuf_t *buf, const char *data) {
  * Parse a token out of a string
  */
 char *COM_Parse(char *data) {
-	int c;
-	int len;
-
-	len = 0;
+	int len = 0;
 	com_token[0] = 0;
 
 	if (!data)
@@ -504,6 +501,7 @@ char *COM_Parse(char *data) {
 
 	// skip whitespace
 skipwhite:
+	int c = 0;
 	while ((c = *data) <= ' ') {
 		if (c == 0)
 			return NULL; // end of file;
@@ -562,7 +560,7 @@ int COM_CheckParm(const char *parm) {
 	for (int i = 1; i < com_argc; i++) {
 		if (!com_argv[i])
 			continue; // NEXTSTEP sometimes clears appkit vars.
-		if (!Q_strcmp(parm, com_argv[i]))
+		if (!strcmp(parm, com_argv[i]))
 			return i;
 	}
 	return 0;
@@ -608,7 +606,7 @@ void COM_InitArgv(int argc, char **argv) {
 	for (com_argc = 0; (com_argc < MAX_NUM_ARGVS) && (com_argc < argc);
 			com_argc++) {
 		largv[com_argc] = argv[com_argc];
-		if (!Q_strcmp("-safe", argv[com_argc]))
+		if (!strcmp("-safe", argv[com_argc]))
 			safe = true;
 	}
 
@@ -777,11 +775,11 @@ void COM_InitFilesystem(void) {
 	// Overrides the system supplied base directory (under GAMENAME)
 	int i = COM_CheckParm("-basedir");
 	if (i && i < com_argc - 1)
-		Q_strcpy(basedir, com_argv[i + 1]);
+		strcpy(basedir, com_argv[i + 1]);
 	else
-		Q_strcpy(basedir, host_parms.basedir);
+		strcpy(basedir, host_parms.basedir);
 
-	int j = Q_strlen(basedir);
+	int j = strlen(basedir);
 
 	if (j > 0) {
 		if ((basedir[j - 1] == '\\') || (basedir[j - 1] == '/'))

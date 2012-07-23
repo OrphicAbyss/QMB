@@ -156,7 +156,7 @@ void CL_DecodeHudPrint(void) {
 	len = MSG_ReadByte();
 
 	text = (char *) malloc(len);
-	Q_strcpy(text, MSG_ReadString());
+	strcpy(text, MSG_ReadString());
 
 	//code to position text
 	//0000 - 0 - left top
@@ -199,7 +199,7 @@ void CL_DecodeHudPic(void) {
 	y = MSG_ReadFloat();
 	id = MSG_ReadByte();
 	text = (char *) malloc(len);
-	Q_strcpy(text, MSG_ReadString());
+	strcpy(text, MSG_ReadString());
 
 	//code to position text
 	//0000 - 0 - left top

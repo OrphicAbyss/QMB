@@ -120,7 +120,7 @@ void SV_StartSound(edict_t *entity, int channel, const char *sample, int volume,
 	// find precache number for sound
 	for (sound_num = 1; sound_num < MAX_SOUNDS
 			&& sv.sound_precache[sound_num]; sound_num++)
-		if (!Q_strcmp(sample, sv.sound_precache[sound_num]))
+		if (!strcmp(sample, sv.sound_precache[sound_num]))
 			break;
 
 	if (sound_num == MAX_SOUNDS || !sv.sound_precache[sound_num]) {
@@ -234,7 +234,7 @@ void SV_ConnectClient(int clientnum) {
 	memset(client, 0, sizeof (*client));
 	client->netconnection = netconnection;
 
-	Q_strcpy(client->name, "unconnected");
+	strcpy(client->name, "unconnected");
 	client->active = true;
 	client->spawned = false;
 	client->edict = ent;
@@ -723,7 +723,7 @@ int SV_ModelIndex(char *name) {
 		return 0;
 
 	for (i = 0; i < MAX_MODELS && sv.model_precache[i]; i++)
-		if (!Q_strcmp(sv.model_precache[i], name))
+		if (!strcmp(sv.model_precache[i], name))
 			return i;
 	if (i == MAX_MODELS || !sv.model_precache[i])
 		Sys_Error("SV_ModelIndex: model %s not precached", name);
@@ -852,7 +852,7 @@ void SV_SpawnServer(char *server) {
 	Host_ClearMemory();
 
 	memset(&sv, 0, sizeof (sv));
-	Q_strcpy(sv.name, server);
+	strcpy(sv.name, server);
 
 	// load progs to get entity field count
 	PR_LoadProgs();
@@ -886,7 +886,7 @@ void SV_SpawnServer(char *server) {
 
 	sv.time = 1.0;
 
-	Q_strcpy(sv.name, server);
+	strcpy(sv.name, server);
 	sprintf(sv.modelname, "maps/%s.bsp", server);
 	sv.worldmodel = Mod_ForName(sv.modelname, false);
 	if (!sv.worldmodel) {

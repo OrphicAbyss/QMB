@@ -189,16 +189,16 @@ void VID_Init(unsigned char *palette) {
 	if ((pnum = COM_CheckParm("-winsize"))) {
 		if (pnum >= com_argc - 2)
 			Sys_Error("VID: -winsize <width> <height>\n");
-		vid.width = Q_atoi(com_argv[pnum + 1]);
-		vid.height = Q_atoi(com_argv[pnum + 2]);
+		vid.width = atoi(com_argv[pnum + 1]);
+		vid.height = atoi(com_argv[pnum + 2]);
 		if (!vid.width || !vid.height)
 			Sys_Error("VID: Bad window width/height\n");
 	}
 
 	if ((pnum = COM_CheckParm("-width")) != 0)
-		vid.width = Q_atoi(com_argv[pnum + 1]);
+		vid.width = atoi(com_argv[pnum + 1]);
 	if ((pnum = COM_CheckParm("-height")) != 0)
-		vid.height = Q_atoi(com_argv[pnum + 1]);
+		vid.height = atoi(com_argv[pnum + 1]);
 
 	// Set video width, height and flags
 	flags = (SDL_OPENGL);

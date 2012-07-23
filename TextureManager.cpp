@@ -37,7 +37,7 @@ void TextureManager::setTextureModeCMD() {
 	} else {
 		int i=0;
 		for ( ; i < 6; i++) {
-			if (!Q_strcasecmp(glFilterModes[i].name, CmdArgs::getArg(1)))
+			if (!strcasecmp(glFilterModes[i].name, CmdArgs::getArg(1)))
 				break;
 		}
 		
@@ -147,7 +147,7 @@ Texture *TextureManager::findTexture(const char *identifier) {
 	for (i = Textures.begin(); i != Textures.end(); i++) {
 		Texture *tex = *i;
 		
-		if (0 == Q_strcmp(tex->identifier, identifier))
+		if (0 == strcmp(tex->identifier, identifier))
 			return tex;
 	}
 	

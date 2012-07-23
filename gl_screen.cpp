@@ -128,7 +128,7 @@ int scr_erase_center;
  * for a few moments
  */
 void SCR_CenterPrint(const char *str) {
-	Q_strncpy(scr_centerstring, str, sizeof (scr_centerstring) - 1);
+	strncpy(scr_centerstring, str, sizeof (scr_centerstring) - 1);
 	scr_centertime_off = scr_centertime.getFloat();
 	scr_centertime_start = cl.time;
 
@@ -389,12 +389,12 @@ void SCR_DrawFPS(void) {
 
 	sprintf(st, "%3d FPS", lastfps);
 
-	x = vid.conwidth - Q_strlen(st) * 8 - 16;
+	x = vid.conwidth - strlen(st) * 8 - 16;
 	y = 0;
 	Draw_String(x, y, st);
 
 	sprintf(st, "%3d Last second", lastsecond);
-	x = vid.conwidth - Q_strlen(st) * 8 - 16;
+	x = vid.conwidth - strlen(st) * 8 - 16;
 	y = 8;
 	Draw_String(x, y, st);
 }
@@ -410,9 +410,9 @@ void Scr_ShowNumP(void) {
 
 	sprintf(st, "%i Particles in world", numParticles);
 
-	x = vid.conwidth - Q_strlen(st) * 8 - 16;
+	x = vid.conwidth - strlen(st) * 8 - 16;
 	y = 16; //vid.conheight - (sb_lines * (vid.conheight/240) )- 16;
-	//Draw_TileClear(x, y, Q_strlen(st)*16, 16);
+	//Draw_TileClear(x, y, strlen(st)*16, 16);
 	Draw_String(x, y, st);
 }
 
@@ -506,7 +506,7 @@ void SCR_ScreenShot_f(void) {
 	//
 	// find a file name to save it to
 	//
-	Q_strcpy(pcxname, "quake000.tga");
+	strcpy(pcxname, "quake000.tga");
 
 	for (i = 0; i <= 999; i++) {
 		pcxname[5] = '0' + i / 100;

@@ -783,10 +783,10 @@ void R_DrawAliasModel(entity_t *e) {
 	//needs to be linked when the model is created and distroyed when
 	//the entity is distroyed
 	//check if its a fire and add the particle effect
-	if (!Q_strcmp(clmodel->name, "progs/flame.mdl"))
+	if (!strcmp(clmodel->name, "progs/flame.mdl"))
 		AddFire(e->origin, 4);
 
-	if (!Q_strcmp(clmodel->name, "progs/flame2.mdl")) {
+	if (!strcmp(clmodel->name, "progs/flame2.mdl")) {
 		AddFire(e->origin, 10);
 		return; //do not draw the big fire model, its just a place holder for the particles
 	}

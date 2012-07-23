@@ -95,9 +95,9 @@ bool SNDDMA_Init(void)
 // set sample bits & speed
 
     s = getenv("QUAKE_SOUND_SAMPLEBITS");
-    if (s) shm->samplebits = Q_atoi(s);
+    if (s) shm->samplebits = atoi(s);
 	else if ((i = COM_CheckParm("-sndbits")) != 0)
-		shm->samplebits = Q_atoi(com_argv[i+1]);
+		shm->samplebits = atoi(com_argv[i+1]);
 	if (shm->samplebits != 16 && shm->samplebits != 8)
     {
         ioctl(audio_fd, SNDCTL_DSP_GETFMTS, &fmt);
@@ -106,9 +106,9 @@ bool SNDDMA_Init(void)
     }
 
     s = getenv("QUAKE_SOUND_SPEED");
-    if (s) shm->speed = Q_atoi(s);
+    if (s) shm->speed = atoi(s);
 	else if ((i = COM_CheckParm("-sndspeed")) != 0)
-		shm->speed = Q_atoi(com_argv[i+1]);
+		shm->speed = atoi(com_argv[i+1]);
     else
     {
         for (i=0 ; i<sizeof(tryrates)/4 ; i++)
@@ -117,7 +117,7 @@ bool SNDDMA_Init(void)
     }
 
     s = getenv("QUAKE_SOUND_CHANNELS");
-    if (s) shm->channels = Q_atoi(s);
+    if (s) shm->channels = atoi(s);
 	else if ((i = COM_CheckParm("-sndmono")) != 0)
 		shm->channels = 1;
 	else if ((i = COM_CheckParm("-sndstereo")) != 0)

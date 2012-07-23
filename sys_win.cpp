@@ -374,11 +374,11 @@ void Sys_Error (char *error, ...)
 		va_end (argptr);
 
 		sprintf (text2, "ERROR: %s\n", text);
-		WriteFile (houtput, text5, Q_strlen (text5), &dummy, NULL);
-		WriteFile (houtput, text4, Q_strlen (text4), &dummy, NULL);
-		WriteFile (houtput, text2, Q_strlen (text2), &dummy, NULL);
-		WriteFile (houtput, text3, Q_strlen (text3), &dummy, NULL);
-		WriteFile (houtput, text4, Q_strlen (text4), &dummy, NULL);
+		WriteFile (houtput, text5, strlen (text5), &dummy, NULL);
+		WriteFile (houtput, text4, strlen (text4), &dummy, NULL);
+		WriteFile (houtput, text2, strlen (text2), &dummy, NULL);
+		WriteFile (houtput, text3, strlen (text3), &dummy, NULL);
+		WriteFile (houtput, text4, strlen (text4), &dummy, NULL);
 
 
 		starttime = Sys_FloatTime ();
@@ -435,7 +435,7 @@ void Sys_Printf (char *fmt, ...)
 		vsprintf (text, fmt, argptr);
 		va_end (argptr);
 
-		WriteFile(houtput, text, Q_strlen (text), &dummy, NULL);
+		WriteFile(houtput, text, strlen (text), &dummy, NULL);
 	}
 }
 
@@ -541,7 +541,7 @@ void Sys_InitFloatTime (void)
 
 	if (j)
 	{
-		curtime = (double) (Q_atof(com_argv[j+1]));
+		curtime = (double) (atof(com_argv[j+1]));
 	}
 	else
 	{
@@ -712,8 +712,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	if (!GetCurrentDirectory (sizeof(cwd), cwd))
 		Sys_Error ("Couldn't determine current directory");
 
-	if (cwd[Q_strlen(cwd)-1] == '/')
-		cwd[Q_strlen(cwd)-1] = 0;
+	if (cwd[strlen(cwd)-1] == '/')
+		cwd[strlen(cwd)-1] = 0;
 
 	parms.basedir = cwd;
 
@@ -793,7 +793,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		t = COM_CheckParm("-heapsize") + 1;
 
 		if (t < com_argc)
-			parms.memsize = Q_atoi (com_argv[t]) * 1024;
+			parms.memsize = atoi (com_argv[t]) * 1024;
 	}
 
 	parms.membase = malloc (parms.memsize);
@@ -822,19 +822,19 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		if ((t = COM_CheckParm ("-HFILE")) > 0)
 		{
 			if (t < com_argc)
-				hFile = (HANDLE)Q_atoi (com_argv[t+1]);
+				hFile = (HANDLE)atoi (com_argv[t+1]);
 		}
 
 		if ((t = COM_CheckParm ("-HPARENT")) > 0)
 		{
 			if (t < com_argc)
-				heventParent = (HANDLE)Q_atoi (com_argv[t+1]);
+				heventParent = (HANDLE)atoi (com_argv[t+1]);
 		}
 
 		if ((t = COM_CheckParm ("-HCHILD")) > 0)
 		{
 			if (t < com_argc)
-				heventChild = (HANDLE)Q_atoi (com_argv[t+1]);
+				heventChild = (HANDLE)atoi (com_argv[t+1]);
 		}
 
 		InitConProc (hFile, heventParent, heventChild);

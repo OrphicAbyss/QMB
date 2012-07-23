@@ -165,7 +165,7 @@ void Con_Init(void) {
 	con_debuglog = COM_CheckParm("-condebug");
 
 	if (con_debuglog) {
-		if (Q_strlen(com_gamedir) < (MAXGAMEDIRLEN - Q_strlen(t2))) {
+		if (strlen(com_gamedir) < (MAXGAMEDIRLEN - strlen(t2))) {
 			sprintf(temp, "%s%s", com_gamedir, t2);
 			unlink(temp);
 		}

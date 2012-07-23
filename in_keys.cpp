@@ -202,8 +202,8 @@ void Key_Console (int key)
 		if (!cmd)
 			cmd = CVar::completeVariable(key_lines[edit_line]+1);
 		if (cmd){
-			Q_strcpy (key_lines[edit_line]+1, cmd);
-			key_linepos = Q_strlen(cmd)+1;
+			strcpy (key_lines[edit_line]+1, cmd);
+			key_linepos = strlen(cmd)+1;
 			key_lines[edit_line][key_linepos] = ' ';
 			key_linepos++;
 			key_lines[edit_line][key_linepos] = 0;
@@ -227,8 +227,8 @@ void Key_Console (int key)
 				&& !key_lines[history_line][1]);
 		if (history_line == edit_line)
 			history_line = (edit_line+1)&31;
-		Q_strcpy(key_lines[edit_line], key_lines[history_line]);
-		key_linepos = Q_strlen(key_lines[edit_line]);
+		strcpy(key_lines[edit_line], key_lines[history_line]);
+		key_linepos = strlen(key_lines[edit_line]);
 		return;
 	}
 
@@ -248,8 +248,8 @@ void Key_Console (int key)
 		}
 		else
 		{
-			Q_strcpy(key_lines[edit_line], key_lines[history_line]);
-			key_linepos = Q_strlen(key_lines[edit_line]);
+			strcpy(key_lines[edit_line], key_lines[history_line]);
+			key_linepos = strlen(key_lines[edit_line]);
 		}
 		return;
 	}
@@ -291,14 +291,14 @@ void Key_Console (int key)
 				clipText = GlobalLock(th);
 				if (clipText) {
 					textCopied = malloc(GlobalSize(th)+1);
-					Q_strcpy(textCopied, clipText);
+					strcpy(textCopied, clipText);
 	/* Substitutes a NULL for every token */strtok(textCopied, "\n\r\b");
-					i = Q_strlen(textCopied);
+					i = strlen(textCopied);
 					if (i+key_linepos>=MAXCMDLINE)
 						i=MAXCMDLINE-key_linepos;
 					if (i>0) {
 						textCopied[i]=0;
-						Q_strcat(key_lines[edit_line], textCopied);
+						strcat(key_lines[edit_line], textCopied);
 						key_linepos+=i;;
 					}
 					free(textCopied);
@@ -399,7 +399,7 @@ int Key_StringToKeynum (char *str)
 
 	for (kn=keynames ; kn->name ; kn++)
 	{
-		if (!Q_strcasecmp(str,kn->name))
+		if (!strcasecmp(str,kn->name))
 			return kn->keynum;
 	}
 	return -1;
@@ -457,9 +457,9 @@ void Key_SetBinding (int keynum, const char *binding)
 	}
 
 // allocate memory for new binding
-	l = Q_strlen (binding);
+	l = strlen (binding);
 	newKeyBinding = (char *)MemoryObj::ZAlloc (l+1);
-	Q_strcpy (newKeyBinding, binding);
+	strcpy (newKeyBinding, binding);
 	keybindings[keynum] = newKeyBinding;
 }
 
@@ -536,8 +536,8 @@ void Key_Bind_f (void)
 	for (i=2 ; i< c ; i++)
 	{
 		if (i > 2)
-			Q_strcat (cmd, " ");
-		Q_strcat (cmd, CmdArgs::getArg(i));
+			strcat (cmd, " ");
+		strcat (cmd, CmdArgs::getArg(i));
 	}
 
 	Key_SetBinding (b, cmd);

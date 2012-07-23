@@ -16,7 +16,7 @@ CVar *CVar::findCVar (const char *name){
 	for (i = CVars.begin(); i != CVars.end(); i++){
 		CVar *cvar = *i;
 
-		if (0 == Q_strcmp(cvar->getName(),name)){
+		if (0 == strcmp(cvar->getName(),name)){
 			return cvar;
 		}
 	}
@@ -33,7 +33,7 @@ CVar *CVar::findNextServerCVar (const char *name){
 		for (i = CVars.begin(); i != CVars.end(); i++){
 			CVar *cvar = *i;
 
-			if (0 == Q_strcmp(cvar->getName(),name)){
+			if (0 == strcmp(cvar->getName(),name)){
 				found = true;
 			}
 		}
@@ -102,13 +102,13 @@ const char *CVar::getStringValue(char *name){
 const char *CVar::completeVariable(char *partial){
 	list<CVar *>::iterator i;
 	CVar *match = NULL;
-	int sizeOfStr = Q_strlen(partial);
+	int sizeOfStr = strlen(partial);
 	bool multiple = false;
 
 	for (i = CVars.begin(); i != CVars.end() && !multiple; i++){
 		CVar *cvar = *i;
 
-		if (0 == Q_strncmp(cvar->getName(),partial,sizeOfStr)){
+		if (0 == strncmp(cvar->getName(),partial,sizeOfStr)){
 			if (match != NULL){
 				multiple = true;
 			} else {
@@ -123,7 +123,7 @@ const char *CVar::completeVariable(char *partial){
 		for (i = CVars.begin(); i != CVars.end(); i++){
 			CVar *cvar = *i;
 
-			if (0 == Q_strncmp(cvar->getName(),partial,sizeOfStr)){
+			if (0 == strncmp(cvar->getName(),partial,sizeOfStr)){
 				if (first){
 					first = false;
 					Con_Printf(cvar->getName());
@@ -203,8 +203,8 @@ void CVar::reg(){
 	if (!this->registered){
 		registered = true;
 		const char *value = this->originalValue;
-		this->sValue = (char *)MemoryObj::ZAlloc (Q_strlen(value)+1);
-		Q_strcpy (this->sValue, value);
+		this->sValue = (char *)MemoryObj::ZAlloc (strlen(value)+1);
+		strcpy (this->sValue, value);
 		this->originalValue = NULL;
 
 		parseValue();
@@ -215,8 +215,8 @@ void CVar::reg(){
  * Parse the string value into the float and integer value fields
  */
 void CVar::parseValue(){
-	this->fValue = Q_atof(this->sValue);
-	this->iValue = Q_atoi(this->sValue);
+	this->fValue = atof(this->sValue);
+	this->iValue = atoi(this->sValue);
 	this->bValue = this->iValue != 0;
 }
 
@@ -226,17 +226,17 @@ void CVar::parseValue(){
  * @param value The new string value
  */
 void CVar::set(const char *value){
-	bool changed = Q_strcmp(this->sValue, value);
+	bool changed = strcmp(this->sValue, value);
 	// If it's a new value
 	if (changed != 0) {
 		// Overwrite if it's the same length
-		if (Q_strlen(this->sValue) == Q_strlen(value)){
-			Q_strcpy(this->sValue, value);
+		if (strlen(this->sValue) == strlen(value)){
+			strcpy(this->sValue, value);
 		} else {
 			// Allocate new space for the string
 			MemoryObj::ZFree(this->sValue);
-			this->sValue = (char *)MemoryObj::ZAlloc(Q_strlen(value)+1);
-			Q_strcpy(this->sValue, value);
+			this->sValue = (char *)MemoryObj::ZAlloc(strlen(value)+1);
+			strcpy(this->sValue, value);
 		}
 		// Convert the value to a float
 		this->parseValue();

@@ -38,7 +38,7 @@ char *PF_VarString (int	first)
 	out[0] = 0;
 	for (i=first ; i<pr_argc ; i++)
 	{
-		Q_strcat (out, G_STRING((OFS_PARM0+i*3)));
+		strcat (out, G_STRING((OFS_PARM0+i*3)));
 	}
 	return out;
 }
@@ -107,7 +107,7 @@ bool checkextension(char *name)
 {
 	int len;
 	char *e, *start;
-	len = Q_strlen(name);
+	len = strlen(name);
 	for (e = ENGINE_EXTENSIONS;*e;e++)
 	{
 		while (*e == ' ')
@@ -118,7 +118,7 @@ bool checkextension(char *name)
 		while (*e && *e != ' ')
 			e++;
 		if (e - start == len)
-			if (!Q_strncasecmp(start, name, len))
+			if (!strncasecmp(start, name, len))
 				return true;
 	}
 	return false;
@@ -337,7 +337,7 @@ void PF_setmodel (void)
 
 // check to see if model was properly precached
 	for (i=0, check = sv.model_precache ; *check ; i++, check++)
-		if (!Q_strcmp(*check, m))
+		if (!strcmp(*check, m))
 			break;
 
 	if (!*check)
@@ -627,7 +627,7 @@ void PF_ambientsound (void)
 
 // check to see if samp was properly precached
 	for (soundnum=0, check = sv.sound_precache ; *check ; check++, soundnum++)
-		if (!Q_strcmp(*check,samp))
+		if (!strcmp(*check,samp))
 			break;
 
 	if (!*check)
@@ -1114,7 +1114,7 @@ void PF_Find (void)
 		t = E_STRING(ed,f);
 		if (!t)
 			continue;
-		if (!Q_strcmp(t,s))
+		if (!strcmp(t,s))
 		{
 			if (first == (edict_t *)sv.edicts)
 				first = ed;
@@ -1158,7 +1158,7 @@ void PF_Find (void)
 		t = E_STRING(ed,f);
 		if (!t)
 			continue;
-		if (!Q_strcmp(t,s))
+		if (!strcmp(t,s))
 		{
 			RETURN_EDICT(ed);
 			return;
@@ -1199,7 +1199,7 @@ void PF_precache_sound (void)
 			sv.sound_precache[i] = s;
 			return;
 		}
-		if (!Q_strcmp(sv.sound_precache[i], s))
+		if (!strcmp(sv.sound_precache[i], s))
 			return;
 	}
 	PR_RunError ("PF_precache_sound: overflow");
@@ -1225,7 +1225,7 @@ void PF_precache_model (void)
 			sv.models[i] = Mod_ForName (s, true);
 			return;
 		}
-		if (!Q_strcmp(sv.model_precache[i], s))
+		if (!strcmp(sv.model_precache[i], s))
 			return;
 	}
 	PR_RunError ("PF_precache_model: overflow");
@@ -2027,7 +2027,7 @@ void PF_findchain (void)
 		t = E_STRING(ent,f);
 		if (!t)
 			continue;
-		if (Q_strcmp(t,s))
+		if (strcmp(t,s))
 			continue;
 
 		ent->v.chain = EDICT_TO_PROG(chain);
@@ -2701,7 +2701,7 @@ void PF_fgets (void)
 			break;
 	};
 	p[0] = 0;
-	if (Q_strlen(pr_string_temp) == 0)
+	if (strlen(pr_string_temp) == 0)
 		G_INT(OFS_RETURN) = OFS_NULL;
 	else
 		G_INT(OFS_RETURN) = pr_string_temp - pr_strings;
@@ -2713,7 +2713,7 @@ void PF_fputs(void)
 	// writes to file, like bprint
 	float handle = G_FLOAT(OFS_PARM0);
 	char *str = PF_VarString(1);
-	Sys_FileWrite (handle, str, Q_strlen(str));
+	Sys_FileWrite (handle, str, strlen(str));
 
 }
 
@@ -2723,7 +2723,7 @@ void PF_strlen(void)
 	char *s;
 	s = G_STRING(OFS_PARM0);
 	if (s)
-		G_FLOAT(OFS_RETURN) = Q_strlen(s);
+		G_FLOAT(OFS_RETURN) = strlen(s);
 	else
 		G_FLOAT(OFS_RETURN) = 0;
 }
@@ -2741,8 +2741,8 @@ void PF_strcat(void)
 	p = G_STRING(OFS_PARM0);
 	start = (int)G_FLOAT(OFS_PARM1); // for some reason, Quake doesn't like G_INT
 	ltwo = (int)G_FLOAT(OFS_PARM2);
-	if (start > Q_strlen(p))
-		start = Q_strlen(p) - 1;
+	if (start > strlen(p))
+		start = strlen(p) - 1;
 
 	// cap values
 	if (start < 0)
@@ -2751,7 +2751,7 @@ void PF_strcat(void)
 		ltwo = 0;
 
 	p += start;
-	Q_strncpy(d, p, ltwo);
+	strncpy(d, p, ltwo);
 	G_INT(OFS_RETURN) = pr_string_temp - pr_strings;
 
 }
@@ -2764,8 +2764,8 @@ void PF_substring(void)
 	memset(pr_strcat_buf, 0, 127);
 	s1 = G_STRING(OFS_PARM0);
 	s2 = PF_VarString(1);
-	Q_strcpy(pr_strcat_buf, s1);
-	Q_strcat(pr_strcat_buf, s2);
+	strcpy(pr_strcat_buf, s1);
+	strcat(pr_strcat_buf, s2);
 	G_INT(OFS_RETURN) = pr_strcat_buf - pr_strings;
 }
 
@@ -2794,8 +2794,8 @@ void PF_strzone(void)
 {
 	char *m, *p;
 	m = G_STRING(OFS_PARM0);
-	p = (char *)MemoryObj::ZAlloc(Q_strlen(m) + 1);
-	Q_strcpy(p, m);
+	p = (char *)MemoryObj::ZAlloc(strlen(m) + 1);
+	strcpy(p, m);
 
 	G_INT(OFS_RETURN) = p - pr_strings;
 }

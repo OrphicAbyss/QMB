@@ -113,17 +113,19 @@ float MSG_ReadAngle (void);
 
 //============================================================================
 
-void Q_strcpy (char *dest, const char *src);
-void Q_strncpy (char *dest, const char *src, int count);
-int Q_strlen (const char *str);
-char *Q_strrchr (char *s, char c);
-void Q_strcat (char *dest, const char *src);
-int Q_strcmp (const char *s1, const char *s2);
-int Q_strncmp (const char *s1, const char *s2, int count);
-int Q_strcasecmp (const char *s1, const char *s2);
-int Q_strncasecmp (const char *s1, const char *s2, int n);
-int	Q_atoi (const char *str);
-float Q_atof (const char *str);
+#include <string.h>
+
+//void strcpy (char *dest, const char *src);
+//void strncpy (char *dest, const char *src, int count);
+//int strlen (const char *str);
+//char *strrchr (char *s, char c);
+//void strcat (char *dest, const char *src);
+//int strcmp (const char *s1, const char *s2);
+//int strncmp (const char *s1, const char *s2, int count);
+//int strcasecmp (const char *s1, const char *s2);
+//int strncasecmp (const char *s1, const char *s2, int n);
+//int	atoi (const char *str);
+//float atof (const char *str);
 
 //============================================================================
 

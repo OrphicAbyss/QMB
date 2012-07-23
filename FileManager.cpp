@@ -45,7 +45,7 @@ int FileManager::FindFile(const char *filename, int *handle, FILE **file) {
 			// look through all the pak file elements
 			pak = search->pack;
 			for (i = 0; i < pak->numfiles; i++)
-				if (!Q_strcmp(pak->files[i].name, filename)) { // found it!
+				if (!strcmp(pak->files[i].name, filename)) { // found it!
 					Sys_Printf("PackFile: %s : %s\n", pak->filename, filename);
 					if (handle) {
 						*handle = pak->handle;
@@ -142,7 +142,7 @@ char *FileManager::FileExtension(char *in) {
 }
 
 void FileManager::FileBase(const char *in, char *out) {
-	const char *s = in + Q_strlen(in) - 1;
+	const char *s = in + strlen(in) - 1;
 	while (s != in && *s != '.')
 		s--;
 
@@ -151,16 +151,16 @@ void FileManager::FileBase(const char *in, char *out) {
 		s2--;
 
 	if (s - s2 < 2)
-		Q_strcpy(out, "?model?");
+		strcpy(out, "?model?");
 	else {
 		s--;
-		Q_strncpy(out, s2 + 1, s - s2);
+		strncpy(out, s2 + 1, s - s2);
 		out[s - s2] = 0;
 	}
 }
 
 void FileManager::DefaultExtension(char *path, const char *extension) {
-	char *src = path + Q_strlen(path) - 1;
+	char *src = path + strlen(path) - 1;
 
 	while (*src != '/' && src != path) {
 		if (*src == '.')
@@ -168,7 +168,7 @@ void FileManager::DefaultExtension(char *path, const char *extension) {
 		src--;
 	}
 
-	Q_strcat(path, extension);
+	strcat(path, extension);
 }
 
 void FileManager::PathCmd(void) {
@@ -188,11 +188,11 @@ void FileManager::PathCmd(void) {
 void FileManager::AddGameDirectory(char *dir) {
 	char pakfile[MAX_OSPATH];
 
-	Q_strcpy(com_gamedir, dir);
+	strcpy(com_gamedir, dir);
 
 	// add the directory to the search path
 	searchpath_t *search = (searchpath_t *) Hunk_Alloc(sizeof (searchpath_t));
-	Q_strcpy(search->filename, dir);
+	strcpy(search->filename, dir);
 	search->next = FileManager::searchpaths;
 	FileManager::searchpaths = search;
 
@@ -212,12 +212,12 @@ void FileManager::AddGameDirectory(char *dir) {
 
 void FileManager::AddPackToPath(char *pak) {
 	searchpath_t *search = (searchpath_t *) Hunk_Alloc(sizeof (searchpath_t));
-	if (!Q_strcmp(FileManager::FileExtension(pak), "pak")) {
+	if (!strcmp(FileManager::FileExtension(pak), "pak")) {
 		search->pack = LoadPackFile(pak);
 		if (!search->pack)
 			Sys_Error("Couldn't load packfile: %s", pak);
 	} else
-		Q_strcpy(search->filename, pak);
+		strcpy(search->filename, pak);
 	search->next = FileManager::searchpaths;
 	FileManager::searchpaths = search;
 }
@@ -280,13 +280,13 @@ pack_t *FileManager::LoadPackFile(char *packfile) {
 
 	// parse the directory
 	for (int i = 0; i < numpackfiles; i++) {
-		Q_strcpy(newfiles[i].name, info[i].name);
+		strcpy(newfiles[i].name, info[i].name);
 		newfiles[i].filepos = LittleLong(info[i].filepos);
 		newfiles[i].filelen = LittleLong(info[i].filelen);
 	}
 
 	pack = (pack_t *) Hunk_Alloc(sizeof (pack_t));
-	Q_strcpy(pack->filename, packfile);
+	strcpy(pack->filename, packfile);
 	pack->handle = packhandle;
 	pack->numfiles = numpackfiles;
 	pack->files = newfiles;

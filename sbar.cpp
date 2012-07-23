@@ -415,7 +415,7 @@ void Sbar_SoloScoreboard(void) {
 	Sbar_DrawString(x + 184, 4 + 24, str);
 
 	// draw level name
-	l = Q_strlen(cl.levelname);
+	l = strlen(cl.levelname);
 	Sbar_DrawString(x + 232 - l * 4, 12 + 24, cl.levelname);
 }
 
