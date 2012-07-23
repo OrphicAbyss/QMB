@@ -578,11 +578,6 @@ void COM_CheckRegistered(void) {
 	Con_Printf("Playing registered version.\n");
 }
 
-/*
-================
-COM_InitArgv
-================
- */
 void COM_InitArgv(int argc, char **argv) {
 	// reconstitute the command line for the cmdline externally visible cvar
 	int n = 0;
@@ -633,7 +628,7 @@ void COM_InitArgv(int argc, char **argv) {
 	}
 }
 
-void COM_Init(char *basedir) {
+void COM_Init() {
 	byte swaptest[2] = {1, 0};
 
 	// set the byte swapping variables in a portable manner

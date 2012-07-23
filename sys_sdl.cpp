@@ -21,14 +21,11 @@
 #endif
 
 #include <SDL/SDL.h>
-
 #include "quakedef.h"
 
 bool isDedicated;
 
 int noconinput = 0;
-
-char *basedir = ".";
 
 CVar sys_nostdout("sys_nostdout", "0");
 
@@ -259,7 +256,7 @@ int main(int c, char **v) {
 		parms.memsize = 16 * 1024 * 1024;
 
 	parms.membase = malloc(parms.memsize);
-	parms.basedir = basedir;
+	parms.basedir = ".";
 
 	COM_InitArgv(c, v);
 	parms.argc = com_argc;

@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __COMMON__
 #define __COMMON__
 
+#include <string.h>
+
 #if !defined BYTE_DEFINED
 typedef unsigned char 		byte;
 #define BYTE_DEFINED 1
@@ -111,24 +113,6 @@ char *MSG_ReadString (void);
 float MSG_ReadCoord (void);
 float MSG_ReadAngle (void);
 
-//============================================================================
-
-#include <string.h>
-
-//void strcpy (char *dest, const char *src);
-//void strncpy (char *dest, const char *src, int count);
-//int strlen (const char *str);
-//char *strrchr (char *s, char c);
-//void strcat (char *dest, const char *src);
-//int strcmp (const char *s1, const char *s2);
-//int strncmp (const char *s1, const char *s2, int count);
-//int strcasecmp (const char *s1, const char *s2);
-//int strncasecmp (const char *s1, const char *s2, int n);
-//int	atoi (const char *str);
-//float atof (const char *str);
-
-//============================================================================
-
 extern	char	com_token[1024];
 extern	bool	com_eof;
 
@@ -138,7 +122,7 @@ extern	int		com_argc;
 extern	char	**com_argv;
 
 int COM_CheckParm (const char *parm);
-void COM_Init (char *path);
+void COM_Init ();
 void COM_InitArgv (int argc, char **argv);
 
 char *va(const char *format, ...);

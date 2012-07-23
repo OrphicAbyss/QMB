@@ -286,7 +286,7 @@ CACHE & ZONE MEMORY
 ===============================================================================
  */
 
-MemoryObj::MemoryObj(MemType type, char *name, int size) {
+MemoryObj::MemoryObj(MemType type, const char *name, int size) {
 	memset(this->name, 0, maxNameLength);
 	strncpy(this->name, name, maxNameLength);
 	this->type = type;
@@ -321,7 +321,7 @@ using std::list;
 static list<MemoryObj *> zoneObjects;
 static list<MemoryObj *> cacheObjects;
 
-MemoryObj *MemoryObj::Alloc(MemType type, char* name, int size) {
+MemoryObj *MemoryObj::Alloc(MemType type, const char* name, int size) {
 	MemoryObj *obj = new MemoryObj(type, name, size);
 
 	switch (type) {

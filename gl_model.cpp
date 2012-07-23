@@ -1795,8 +1795,6 @@ void Mod_LoadSpriteModel(model_t *mod, void *buffer) {
 
 	size = sizeof (msprite_t) + (numframes - 1) * sizeof (psprite->frames);
 
-	//psprite = (msprite_t *)Hunk_AllocName (size, loadname);
-
 	mod->cache = MemoryObj::Alloc(MemoryObj::CACHE, loadname, size);
 	psprite = (msprite_t *) mod->cache->getData();
 

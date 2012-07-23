@@ -115,7 +115,7 @@ private:
 	int size;
 	MemType type;
 
-	MemoryObj(MemType type, char *name, int size);
+	MemoryObj(MemType type, const char *name, int size);
 	~MemoryObj();
 public:
 	/**
@@ -142,7 +142,7 @@ public:
      * @param size Size of memory to allocate
      * @return Pointer to a memory object which includes the allocated memory
      */
-	static MemoryObj *Alloc(MemType type, char *name, int size);
+	static MemoryObj *Alloc(MemType type, const char *name, int size);
 	/**
 	 * Used to allocate zone memory.
 	 *
