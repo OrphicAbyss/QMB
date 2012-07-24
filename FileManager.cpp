@@ -129,8 +129,8 @@ void FileManager::StripExtension(const char *in, char *out) {
 	*out = 0;
 }
 
-char *FileManager::FileExtension(char *in) {
-	char *extension = strstr(in, ".");
+const char *FileManager::FileExtension(const char *in) {
+	const char *extension = strstr(in, ".");
 	
 	if (extension) {
 		extension++;
@@ -210,7 +210,7 @@ void FileManager::AddGameDirectory(char *dir) {
 	// add the contents of the parms.txt file to the end of the command line
 }
 
-void FileManager::AddPackToPath(char *pak) {
+void FileManager::AddPackToPath(const char *pak) {
 	searchpath_t *search = (searchpath_t *) Hunk_Alloc(sizeof (searchpath_t));
 	if (!strcmp(FileManager::FileExtension(pak), "pak")) {
 		search->pack = LoadPackFile(pak);
@@ -240,7 +240,7 @@ typedef struct {
 	int dirlen;
 } dpackheader_t;
 
-pack_t *FileManager::LoadPackFile(char *packfile) {
+pack_t *FileManager::LoadPackFile(const char *packfile) {
 	dpackheader_t header;
 	pack_t *pack;
 	int packhandle;

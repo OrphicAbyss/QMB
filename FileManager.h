@@ -48,7 +48,7 @@ public:
 	/**
 	 * Return a pointer to the start of the file extension.
      */
-	static char *FileExtension(char *in);
+	static const char *FileExtension(const char *in);
 	/**
 	 * If the path doesn't contain an extension .EXT then add the provided
 	 * default. 
@@ -68,14 +68,14 @@ public:
 	/**
 	 * Add a pak to our list of places to search for files
      */
-	static void AddPackToPath(char *pak);
+	static void AddPackToPath(const char *pak);
 	/**
      * Takes an explicit (not game tree related) path to a pak file.
      * 
      * Loads the header and directory, adding the files at the beginning of the list
      * so they override previous pack files.
      */
-    static pack_t *LoadPackFile(char *packfile);
+    static pack_t *LoadPackFile(const char *packfile);
 private:
 
 };

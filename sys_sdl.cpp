@@ -122,7 +122,7 @@ int Sys_FileLength(FILE *f) {
 	return end;
 }
 
-int Sys_FileOpenRead(char *path, int *hndl) {
+int Sys_FileOpenRead(const char *path, int *hndl) {
 	int i = findhandle();
 	FILE *f = fopen(path, "rb");
 	if (!f) {
@@ -135,7 +135,7 @@ int Sys_FileOpenRead(char *path, int *hndl) {
 	return Sys_FileLength(f);
 }
 
-int Sys_FileOpenWrite(char *path) {
+int Sys_FileOpenWrite(const char *path) {
 	int i = findhandle();
 	FILE *f = fopen(path, "wb");
 	if (!f)

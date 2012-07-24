@@ -83,6 +83,8 @@ public:
 	static Cmd *findCmd(const char *name);
 	static char *completeCommand(char *partial);
 	static bool consoleCommand();
+	
+	static void Init();
 };
 
 class Alias {
@@ -129,6 +131,5 @@ public:
 	static void setSource(Source src);
 };
 
-void	Cmd_Init (void);
 void	Cmd_Print (char *text);
 

@@ -739,7 +739,7 @@ void Host_Init(quakeparms_t *parms) {
 
 	Memory_Init(parms->membase, parms->memsize);
 	Cbuf_Init();
-	Cmd_Init();
+	Cmd::Init();
 	V_Init();
 	NN_init();
 	Chase_Init();

@@ -288,10 +288,9 @@ void Cbuf_AddText(const char *text) {
  */
 void Cbuf_InsertText(const char *text) {
 	char *temp;
-	int templen;
 
 	// copy off any commands still remaining in the exec buffer
-	templen = cmd_text.cursize;
+	int templen = cmd_text.cursize;
 	if (templen) {
 		temp = (char *) MemoryObj::ZAlloc(templen);
 		memcpy(temp, cmd_text.data, templen);
@@ -426,16 +425,13 @@ void Cmd_StuffCmds_f(void) {
 }
 
 void Cmd_Exec_f(void) {
-	char *f;
-	int mark;
-
 	if (CmdArgs::CmdArgs::getArgCount() != 2) {
 		Con_Printf("exec <filename> : execute a script file\n");
 		return;
 	}
 
-	mark = Hunk_LowMark();
-	f = (char *) COM_LoadHunkFile(CmdArgs::CmdArgs::getArg(1));
+	int mark = Hunk_LowMark();
+	char *f = (char *) COM_LoadHunkFile(CmdArgs::CmdArgs::getArg(1));
 	if (!f) {
 		Con_Printf("couldn't exec %s\n", CmdArgs::CmdArgs::getArg(1));
 		return;
@@ -500,7 +496,7 @@ void Cmd_Alias_f(void) {
 =============================================================================
  */
 
-void Cmd_Init(void) {
+void Cmd::Init(void) {
 	// register our commands
 	Cmd::addCmd("stuffcmds", Cmd_StuffCmds_f);
 	Cmd::addCmd("exec", Cmd_Exec_f);

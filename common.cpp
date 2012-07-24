@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define NUM_SAFE_ARGVS  7
 
-static char *largv[MAX_NUM_ARGVS + NUM_SAFE_ARGVS + 1];
+static const char *largv[MAX_NUM_ARGVS + NUM_SAFE_ARGVS + 1];
 static char *argvdummy = " ";
 static char *safeargvs[NUM_SAFE_ARGVS] = {"-nolan", "-nosound", "-nocdaudio", "-nojoy", "-nomouse"};
 
@@ -35,7 +35,7 @@ void COM_InitFilesystem(void);
 
 char com_token[1024];
 int com_argc;
-char **com_argv;
+const char **com_argv;
 
 //JHL: QMB mod global
 int qmb_mod;

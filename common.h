@@ -119,7 +119,7 @@ extern	bool	com_eof;
 char *COM_Parse(char *data);
 
 extern	int		com_argc;
-extern	char	**com_argv;
+extern	const char **com_argv;
 
 int COM_CheckParm (const char *parm);
 void COM_Init ();
