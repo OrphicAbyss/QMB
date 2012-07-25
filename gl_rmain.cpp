@@ -258,9 +258,6 @@ void R_DrawViewModel(void) {
 	if (!r_drawviewmodel.getBool())
 		return;
 
-	if (chase_active.getBool()) //make sure we are in 1st person view
-		return;
-
 	if (!r_drawentities.getBool()) //make sure we are drawing entities
 		return;
 

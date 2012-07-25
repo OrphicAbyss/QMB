@@ -66,12 +66,12 @@ void CL_ClearState(void) {
 	SZ_Clear(&cls.message);
 
 	// clear other arrays
-	memset(cl_efrags, 0, sizeof (cl_efrags));
-	memset(cl_entities, 0, sizeof (cl_entities));
-	memset(cl_dlights, 0, sizeof (cl_dlights));
-	memset(cl_lightstyle, 0, sizeof (cl_lightstyle));
-	memset(cl_temp_entities, 0, sizeof (cl_temp_entities));
-	memset(cl_beams, 0, sizeof (cl_beams));
+	memset(cl_efrags, 0, sizeof(cl_efrags));
+	memset(cl_entities, 0, sizeof(cl_entities));
+	memset(cl_dlights, 0, sizeof(cl_dlights));
+	memset(cl_lightstyle, 0, sizeof(cl_lightstyle));
+	memset(cl_temp_entities, 0, sizeof(cl_temp_entities));
+	memset(cl_beams, 0, sizeof(cl_beams));
 
 	// allocate the efrags and chain together into a free list
 	cl.free_efrags = cl_efrags;
@@ -484,7 +484,7 @@ void CL_RelinkEntities(void) {
 
 		ent->forcelink = false;
 
-		if (i == cl.viewentity && !chase_active.getBool())
+		if (i == cl.viewentity)
 			continue;
 
 		if (cl_numvisedicts < MAX_VISEDICTS) {

@@ -25,10 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 // 01-22-2000 FrikaC End PASTE
 
-/*
-key up events are sent even if in console mode
- */
-
 #define		MAXCMDLINE	256
 char key_lines[32][MAXCMDLINE];
 int key_linepos;
@@ -44,9 +40,9 @@ int key_count; // incremented every key event
 
 char *keybindings[256];
 bool consolekeys[256]; // if true, can't be rebound while in console
-bool menubound[256]; // if true, can't be rebound while in menu
-int keyshift[256]; // key to map to if shift held down in console
-int key_repeats[256]; // if > 1, it is autorepeating
+bool menubound[256];   // if true, can't be rebound while in menu
+int keyshift[256];     // key to map to if shift held down in console
+int key_repeats[256];  // if > 1, it is autorepeating
 bool keydown[256];
 
 typedef struct {
@@ -64,11 +60,9 @@ keyname_t keynames[] ={
 	{"DOWNARROW", K_DOWNARROW},
 	{"LEFTARROW", K_LEFTARROW},
 	{"RIGHTARROW", K_RIGHTARROW},
-
 	{"ALT", K_ALT},
 	{"CTRL", K_CTRL},
 	{"SHIFT", K_SHIFT},
-
 	{"F1", K_F1},
 	{"F2", K_F2},
 	{"F3", K_F3},
@@ -81,14 +75,12 @@ keyname_t keynames[] ={
 	{"F10", K_F10},
 	{"F11", K_F11},
 	{"F12", K_F12},
-
 	{"INS", K_INS},
 	{"DEL", K_DEL},
 	{"PGDN", K_PGDN},
 	{"PGUP", K_PGUP},
 	{"HOME", K_HOME},
 	{"END", K_END},
-
 	{"MOUSE1", K_MOUSE1},
 	{"MOUSE2", K_MOUSE2},
 	{"MOUSE3", K_MOUSE3},
@@ -105,7 +97,6 @@ keyname_t keynames[] ={
 	{"MOUSE14", K_MOUSE14},
 	{"MOUSE15", K_MOUSE15},
 	{"MOUSE16", K_MOUSE16},
-
 	{"JOY1", K_JOY1},
 	{"JOY2", K_JOY2},
 	{"JOY3", K_JOY3},
@@ -138,11 +129,8 @@ keyname_t keynames[] ={
 	{"JOY30", K_JOY30},
 	{"JOY31", K_JOY31},
 	{"JOY32", K_JOY32},
-
 	{"PAUSE", K_PAUSE},
-
 	{"SEMICOLON", ';'}, // because a raw semicolon seperates commands
-
 	{NULL, 0}
 };
 
@@ -351,14 +339,12 @@ void Key_Message(int key) {
  *  names are matched up.
  */
 int Key_StringToKeynum(char *str) {
-	keyname_t *kn;
-
 	if (!str || !str[0])
 		return -1;
 	if (!str[1])
 		return str[0];
 
-	for (kn = keynames; kn->name; kn++) {
+	for (keyname_t *kn = keynames; kn->name; kn++) {
 		if (!strcasecmp(str, kn->name))
 			return kn->keynum;
 	}
@@ -371,7 +357,6 @@ int Key_StringToKeynum(char *str) {
  * FIXME: handle quote special (general escape sequence?)
  */
 const char *Key_KeynumToString(int keynum) {
-	keyname_t *kn;
 	static char tinystr[2];
 
 	if (keynum == -1)
@@ -382,7 +367,7 @@ const char *Key_KeynumToString(int keynum) {
 		return tinystr;
 	}
 
-	for (kn = keynames; kn->name; kn++)
+	for (keyname_t *kn = keynames; kn->name; kn++)
 		if (keynum == kn->keynum)
 			return kn->name;
 
@@ -390,9 +375,6 @@ const char *Key_KeynumToString(int keynum) {
 }
 
 void Key_SetBinding(int keynum, const char *binding) {
-	char *newKeyBinding;
-	int l;
-
 	if (keynum == -1)
 		return;
 
@@ -403,56 +385,51 @@ void Key_SetBinding(int keynum, const char *binding) {
 	}
 
 	// allocate memory for new binding
-	l = strlen(binding);
-	newKeyBinding = (char *) MemoryObj::ZAlloc(l + 1);
+	int len = strlen(binding);
+	char *newKeyBinding = (char *) MemoryObj::ZAlloc(len + 1);
 	strcpy(newKeyBinding, binding);
 	keybindings[keynum] = newKeyBinding;
 }
 
 void Key_Unbind_f(void) {
-	int b;
-
 	if (CmdArgs::getArgCount() != 2) {
 		Con_Printf("unbind <key> : remove commands from a key\n");
 		return;
 	}
 
-	b = Key_StringToKeynum(CmdArgs::getArg(1));
-	if (b == -1) {
+	int key = Key_StringToKeynum(CmdArgs::getArg(1));
+	if (key == -1) {
 		Con_Printf("\"%s\" isn't a valid key\n", CmdArgs::getArg(1));
 		return;
 	}
 
-	Key_SetBinding(b, "");
+	Key_SetBinding(key, "");
 }
 
 void Key_Unbindall_f(void) {
-	int i;
-
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 		if (keybindings[i])
 			Key_SetBinding(i, "");
 }
 
 void Key_Bind_f(void) {
-	int i, c, b;
 	char cmd[1024];
 
-	c = CmdArgs::getArgCount();
+	int count = CmdArgs::getArgCount();
 
-	if (c != 2 && c != 3) {
+	if (count != 2 && count != 3) {
 		Con_Printf("bind <key> [command] : attach a command to a key\n");
 		return;
 	}
-	b = Key_StringToKeynum(CmdArgs::getArg(1));
-	if (b == -1) {
+	int key = Key_StringToKeynum(CmdArgs::getArg(1));
+	if (key == -1) {
 		Con_Printf("\"%s\" isn't a valid key\n", CmdArgs::getArg(1));
 		return;
 	}
 
-	if (c == 2) {
-		if (keybindings[b])
-			Con_Printf("\"%s\" = \"%s\"\n", CmdArgs::getArg(1), keybindings[b]);
+	if (count == 2) {
+		if (keybindings[key])
+			Con_Printf("\"%s\" = \"%s\"\n", CmdArgs::getArg(1), keybindings[key]);
 		else
 			Con_Printf("\"%s\" is not bound\n", CmdArgs::getArg(1));
 		return;
@@ -460,38 +437,34 @@ void Key_Bind_f(void) {
 
 	// copy the rest of the command line
 	cmd[0] = 0; // start out with a null string
-	for (i = 2; i < c; i++) {
+	for (int i = 2; i < count; i++) {
 		if (i > 2)
 			strcat(cmd, " ");
 		strcat(cmd, CmdArgs::getArg(i));
 	}
 
-	Key_SetBinding(b, cmd);
+	Key_SetBinding(key, cmd);
 }
 
 /**
  * Writes lines containing "bind key value"
  */
 void Key_WriteBindings(FILE *f) {
-	int i;
-
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 		if (keybindings[i])
 			if (*keybindings[i])
 				fprintf(f, "bind \"%s\" \"%s\"\n", Key_KeynumToString(i), keybindings[i]);
 }
 
 void Key_Init(void) {
-	int i;
-
-	for (i = 0; i < 32; i++) {
+	for (int i = 0; i < 32; i++) {
 		key_lines[i][0] = ']';
 		key_lines[i][1] = 0;
 	}
 	key_linepos = 1;
 
 	// init ascii characters in console mode
-	for (i = 32; i < 128; i++)
+	for (int i = 32; i < 128; i++)
 		consolekeys[i] = true;
 	consolekeys[K_ENTER] = true;
 	consolekeys[K_TAB] = true;
@@ -508,9 +481,9 @@ void Key_Init(void) {
 	consolekeys['`'] = false;
 	consolekeys['~'] = false;
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 		keyshift[i] = i;
-	for (i = 'a'; i <= 'z'; i++)
+	for (int i = 'a'; i <= 'z'; i++)
 		keyshift[i] = i - 'a' + 'A';
 	keyshift['1'] = '!';
 	keyshift['2'] = '@';
@@ -535,15 +508,13 @@ void Key_Init(void) {
 	keyshift['\\'] = '|';
 
 	menubound[K_ESCAPE] = true;
-	for (i = 0; i < 12; i++)
+	for (int i = 0; i < 12; i++)
 		menubound[K_F1 + i] = true;
 
 	// register our functions
 	Cmd::addCmd("bind", Key_Bind_f);
 	Cmd::addCmd("unbind", Key_Unbind_f);
 	Cmd::addCmd("unbindall", Key_Unbindall_f);
-
-
 }
 
 /**
@@ -579,9 +550,7 @@ void Key_Event(int key, bool down) {
 	if (key == K_SHIFT)
 		shift_down = down;
 
-	//
 	// handle escape specialy, so the user can never unbind it
-	//
 	if (key == K_ESCAPE) {
 		if (!down)
 			return;
@@ -602,13 +571,11 @@ void Key_Event(int key, bool down) {
 		return;
 	}
 
-	//
 	// key up events only generate commands if the game key binding is
 	// a button command (leading + sign).  These will occur even in console mode,
 	// to keep the character from continuing an action started before a console
 	// switch.  Button commands include the kenum as a parameter, so multiple
 	// downs can be matched with ups
-	//
 	if (!down) {
 		kb = keybindings[key];
 		if (kb && kb[0] == '+') {
@@ -625,17 +592,13 @@ void Key_Event(int key, bool down) {
 		return;
 	}
 
-	//
 	// during demo playback, most keys bring up the main menu
-	//
 	if (cls.demoplayback && down && consolekeys[key] && key_dest == key_game) {
 		M_ToggleMenu_f();
 		return;
 	}
 
-	//
 	// if not a consolekey, send to the interpreter no matter what mode is
-	//
 	if ((key_dest == key_menu && menubound[key])
 			|| (key_dest == key_console && !consolekeys[key])
 			|| (key_dest == key_game && (!con_forcedup || !consolekeys[key]))) {
@@ -676,17 +639,9 @@ void Key_Event(int key, bool down) {
 	}
 }
 
-/*
-===================
-Key_ClearStates
-===================
- */
 void Key_ClearStates(void) {
-	int i;
-
-	for (i = 0; i < 256; i++) {
+	for (int i = 0; i < 256; i++) {
 		keydown[i] = false;
 		key_repeats[i] = 0;
 	}
 }
-

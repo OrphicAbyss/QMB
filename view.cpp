@@ -735,9 +735,6 @@ void V_CalcRefdef(void) {
 		view->origin[2] += oldz - ent->origin[2];
 	} else
 		oldz = ent->origin[2];
-
-	if (chase_active.getBool())
-		Chase_Update();
 }
 
 /**

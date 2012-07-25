@@ -279,15 +279,6 @@ extern int			current_skill;		// skill level for currently loaded level (in case
 extern bool		isDedicated;
 extern int			minimum_memory;
 
-//
-// chase
-//
-extern	CVar	chase_active;
-
-void Chase_Init (void);
-void Chase_Reset (void);
-void Chase_Update (void);
-
 //JHL:QMB;
 extern	int	qmb_mod;
 

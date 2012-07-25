@@ -742,7 +742,6 @@ void Host_Init(quakeparms_t *parms) {
 	Cmd::Init();
 	V_Init();
 	NN_init();
-	Chase_Init();
 	COM_Init();
 	Host_InitLocal();
 	W_LoadWadFile("gfx.wad");

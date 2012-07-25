@@ -51,7 +51,7 @@ RES  = WinQuake_private.res
 OBJ  =	bot.o bot_misc.o bot_setup.o  \
 	cl_demo.o cl_input.o cl_main.o cl_parse.o cl_tent.o \
 	cmd.o console.o cvar.o host.o host_cmd.o \
-	chase.o common.o mathlib.o menu.o sbar.o view.o wad.o world.o zone.o \
+	common.o mathlib.o menu.o sbar.o view.o wad.o world.o zone.o \
 	CRC.o FileManager.o \
 	in_keys.o in_sdl.o \
 	gl_draw.o gl_hud.o \
