@@ -19,16 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // wad.h
 
-//===============
-//   TYPES
-//===============
-
-#define	CMP_NONE		0
-#define	CMP_LZSS		1
-
 #define	TYP_NONE		0
 #define	TYP_LABEL		1
-
 #define	TYP_LUMPY		64				// 64 + grab command number
 #define	TYP_PALETTE		64
 #define	TYP_QTEX		65
@@ -37,7 +29,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	TYP_MIPTEX		68
 
 typedef struct {
-	int			width, height;
+	int			width
+	int			height;
 	byte		data[4];			// variably sized
 } qpic_t;
 
