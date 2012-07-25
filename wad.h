@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	TYP_MIPTEX		68
 
 typedef struct {
-	int			width
+	int			width;
 	int			height;
 	byte		data[4];			// variably sized
 } qpic_t;
