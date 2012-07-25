@@ -139,13 +139,8 @@ __inline void Surf_Reset() {
 }
 
 void Surf_Outline(msurface_t *surfchain) {
-	msurface_t *s, *removelink;
-	float *v;
-	int k;
-
 	glColor4f(0, 0, 0, 1);
 
-	//GL_DisableTMU(GL_TEXTURE0_ARB);
 	Surf_EnableNormal();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glCullFace(GL_BACK);
@@ -154,16 +149,16 @@ void Surf_Outline(msurface_t *surfchain) {
 	glLineWidth(5.5f);
 	glEnable(GL_LINE_SMOOTH);
 
-	for (s = surfchain; s;) {
+	for (msurface_t *s = surfchain; s;) {
 		// Outline the polys
 		glBegin(GL_POLYGON);
-		v = s->polys->verts[0];
-		for (k = 0; k < s->polys->numverts; k++, v += VERTEXSIZE) {
+		float *v = s->polys->verts[0];
+		for (int k = 0; k < s->polys->numverts; k++, v += VERTEXSIZE) {
 			glVertex3fv(v);
 		}
 		glEnd();
 
-		removelink = s;
+		msurface_t *removelink = s;
 		s = s->outline;
 		removelink->outline = NULL;
 	}
@@ -172,7 +167,6 @@ void Surf_Outline(msurface_t *surfchain) {
 	glCullFace(GL_FRONT);
 	glPolygonMode(GL_FRONT, GL_FILL);
 
-	//GL_EnableTMU(GL_TEXTURE0_ARB);
 	Surf_Reset();
 }
 
@@ -214,12 +208,12 @@ void Surf_DrawTextureChainsFour(model_t *model) {
 	glEnable(GL_TEXTURE_2D);
 	Surf_EnableNormal();
 
-	//if (!r_fullbright.getBool()) {
+	if (!r_fullbright.getBool()) {
 		//always a lightmap, so enable tmu
 		glActiveTexture(GL_TEXTURE1_ARB);
 		glEnable(GL_TEXTURE_2D);
 		Surf_EnableLightmap();
-	//}
+	}
 	
 	//could be a fullbright, just setup for them
 	glActiveTexture(GL_TEXTURE2_ARB);

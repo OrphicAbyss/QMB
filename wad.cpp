@@ -62,7 +62,7 @@ void W_LoadWadFile(const char *filename) {
 		Sys_Error("W_LoadWadFile: couldn't load %s", filename);
 
 	wadinfo_t *header = (wadinfo_t *) wad_base;	
-	if (0 == strncmp(WAD_IDENTIFIER, header->identification, 4))
+	if (0 != strncmp(WAD_IDENTIFIER, header->identification, 4))
 		Sys_Error("Wad file %s doesn't have WAD2 id\n", filename);
 
 	wad_numlumps = LittleLong(header->numlumps);
