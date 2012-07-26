@@ -47,10 +47,10 @@ const char *gl_extensions;
 void CheckMultiTextureExtensions(void) {
 	if (strstr(gl_extensions, "GL_ARB_multitexture ")) {
 		glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &gl_textureunits);
-		if (COM_CheckParm("-2tmus"))
-			gl_textureunits = 2;
 		Con_Printf("&c840Multitexture extensions found&r.\n");
 		Con_Printf("&c840Found %i texture unit support&r.\n", gl_textureunits);
+		if (gl_textureunits < 4)
+			Sys_Error("QMB only supports a minimum of 4 texture units.");
 	}
 }
 
