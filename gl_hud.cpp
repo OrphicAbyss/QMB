@@ -144,16 +144,13 @@ void CL_DecodeHudRemove(void) {
 }
 
 void CL_DecodeHudPrint(void) {
-	byte id, len, pos;
 	char *text;
-	float x;
-	float y;
 
-	id = MSG_ReadByte();
-	x = MSG_ReadFloat();
-	y = MSG_ReadFloat();
-	pos = MSG_ReadByte();
-	len = MSG_ReadByte();
+	byte id = MSG_ReadByte();
+	float x = MSG_ReadFloat();
+	float y = MSG_ReadFloat();
+	byte pos = MSG_ReadByte();
+	byte len = MSG_ReadByte();
 
 	text = (char *) malloc(len);
 	strcpy(text, MSG_ReadString());

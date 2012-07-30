@@ -25,30 +25,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // a pixel can be one, two, or four bytes
 typedef byte pixel_t;
 
-typedef struct vrect_s
-{
+typedef struct vrect_s {
 	int				x,y,width,height;
 	struct vrect_s	*pnext;
 } vrect_t;
 
-typedef struct
-{
-	pixel_t			*buffer;		// invisible buffer
+typedef struct {
 	pixel_t			*colormap;		// 256 * VID_GRADES size
-	unsigned short	*colormap16;	// 256 * VID_GRADES size
-	int				fullbright;		// index of first fullbright color
-	unsigned		rowbytes;	// may be > width if displayed in a window
 	unsigned		width;
 	unsigned		height;
 	float			aspect;		// width / height -- < 0 is taller than wide
 	int				numpages;
 	int				recalc_refdef;	// if true, recalc vid-based stuff
-	pixel_t			*conbuffer;
-	int				conrowbytes;
 	unsigned		conwidth;
 	unsigned		conheight;
-	pixel_t			*direct;		// direct drawing to framebuffer, if not
-									//  NULL
 } viddef_t;
 
 extern	viddef_t	vid;				// global video state
@@ -63,7 +53,3 @@ void	VID_Init			(unsigned char *palette);// Called at startup to set up translat
 													 // the palette data will go away after the call, so it must be copied off if
 													 // the video driver will need it again
 void	VID_Shutdown		(void);					 // Called at shutdown
-void	VID_Update			(vrect_t *rects);		 // flushes the given rectangles from the view buffer to the screen
-int		VID_SetMode			(int modenum, unsigned char *palette);
-													 // sets the mode; only used by the Quake engine for resetting to mode 0 (the
-													 // base mode) on memory allocation failures

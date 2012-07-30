@@ -222,11 +222,6 @@ void VID_Init(unsigned char *palette) {
 	vid.numpages = 2;
 
 	vid.colormap = host_colormap;
-	vid.fullbright = 256 - LittleLong(*((int *) vid.colormap + 2048));
-	vid.buffer = (pixel_t *) screen->pixels;
-	vid.rowbytes = screen->pitch;
-	vid.conrowbytes = vid.rowbytes;
-	vid.direct = 0;
 
 	// Initialise the mouse
 	IN_HideMouse();

@@ -29,17 +29,10 @@ int noconinput = 0;
 
 CVar sys_nostdout("sys_nostdout", "0");
 
-// =======================================================================
-// General routines
-// =======================================================================
-
 /**
  * Prints out to the stdout the console text.
  *
  * Removes any colour control codes for cleaner output.
- *
- * @param fmt
- * @param ...
  */
 void Sys_Printf(const char *fmt, ...) {
 	va_list argptr;
@@ -89,14 +82,8 @@ void Sys_Error(const char *error, ...) {
 
 	Host_Shutdown();
 	exit(1);
-
 }
 
-/*
-===============================================================================
-FILE IO
-===============================================================================
- */
 #define	MAX_HANDLES		10
 FILE *sys_handles[MAX_HANDLES];
 
@@ -246,8 +233,6 @@ int main(int c, char **v) {
 	extern int vcrFile;
 	extern int recording;
 	int value;
-
-	//signal(SIGFPE, SIG_IGN);
 
 	value = COM_CheckParm("-mem");
 	if (value)
