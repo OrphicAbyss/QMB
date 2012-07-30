@@ -312,7 +312,3 @@ void V_SetContentsColor (int contents);
 // cl_tent
 void CL_InitTEnts (void);
 void CL_SignonReply (void);
-
-// gl_hud
-void CL_DecodeHudPrint(void);
-void CL_DecodeHudRemove(void);
