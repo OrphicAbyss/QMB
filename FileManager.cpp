@@ -3,8 +3,17 @@
 #include "FileManager.h"
 #include "quakedef.h"
 
-
 searchpath_t *FileManager::searchpaths;
+
+bool FileManager::FileExists(const char *filename) {
+	FILE *f = fopen(filename, "rb");
+	if (f) {
+		fclose(f);
+		return true;
+	}
+
+	return false;
+}
 
 /**
  * If the requested file is inside a packfile, a new FILE * will be opened into
@@ -28,10 +37,8 @@ int FileManager::OpenFile(const char *filename, int *handle) {
  */
 int FileManager::FindFile(const char *filename, int *handle, FILE **file) {
 	char netpath[MAX_OSPATH];
-	//char cachepath[MAX_OSPATH];
 	pack_t *pak;
 	int i;
-	int findtime; //, cachetime;
 
 	if (file && handle)
 		Sys_Error("COM_FindFile: both handle and file set");
@@ -39,12 +46,12 @@ int FileManager::FindFile(const char *filename, int *handle, FILE **file) {
 		Sys_Error("COM_FindFile: neither handle or file set");
 
 	// search through the path, one element at a time
-	for (searchpath_t *search = searchpaths ; search; search = search->next) {
+	for (searchpath_t *search = searchpaths; search; search = search->next) {
 		// is the element a pak file?
 		if (search->pack) {
 			// look through all the pak file elements
 			pak = search->pack;
-			for (i = 0; i < pak->numfiles; i++)
+			for (int i = 0; i < pak->numfiles; i++)
 				if (!strcmp(pak->files[i].name, filename)) { // found it!
 					Sys_Printf("PackFile: %s : %s\n", pak->filename, filename);
 					if (handle) {
@@ -62,8 +69,7 @@ int FileManager::FindFile(const char *filename, int *handle, FILE **file) {
 			// check a file in the directory tree
 			sprintf(netpath, "%s/%s", search->filename, filename);
 
-			findtime = Sys_FileTime(netpath);
-			if (findtime == -1)
+			if (!FileExists(netpath))
 				continue;
 
 			Sys_Printf("FindFile: %s\n", netpath);

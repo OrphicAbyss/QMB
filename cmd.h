@@ -115,11 +115,11 @@ private:
 	static char *cmd_null_string;
 	static MemoryObj *argvMem[maxArgs];
 	static char *argv[maxArgs];
-	static char *cmd_args;
+    static char *cmd_args;
 	static int argumentCount;
 	static Source cmd_source;
 
-	static void tokenizeString(char *text);
+    static void tokenizeString(char *text);
 public:
 	static void executeString(char *text, Source src);
 	static char *getArg(int index);

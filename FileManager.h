@@ -30,6 +30,11 @@ class FileManager {
 public:
 	static searchpath_t *searchpaths;
 
+	/**
+	 * Returns true if the filename passed in points to an existing file.
+     */
+	static bool FileExists(const char *filename);
+	
 	static int OpenFile(const char *filename, int *hndl);
 	static int FOpenFile(const char *filename, FILE **file);
 	static int FindFile(const char *filename, int *handle, FILE **file);

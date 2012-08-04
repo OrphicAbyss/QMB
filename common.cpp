@@ -706,7 +706,6 @@ static int loadsize;
 
 byte *COM_LoadFile(const char *path, int usehunk) {
 	int h;
-	void *buf = NULL;
 	char base[32];
 
 	// look for it in the filesystem or pack files
@@ -714,6 +713,7 @@ byte *COM_LoadFile(const char *path, int usehunk) {
 	if (h == -1)
 		return NULL;
 
+	void *buf = NULL;
 	// extract the filename base name for hunk tag
 	FileManager::FileBase(path, base);
 

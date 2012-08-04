@@ -165,24 +165,6 @@ int Sys_FileWrite(int handle, void *src, int count) {
 	fwrite(src, 1, count, sys_handles[handle]);
 }
 
-int Sys_FileTime(char *path) {
-	FILE *f = fopen(path, "rb");
-	if (f) {
-		fclose(f);
-		return 1;
-	}
-
-	return -1;
-}
-
-void Sys_mkdir(char *path) {
-#ifdef __WIN32__
-	mkdir(path);
-#else
-	mkdir(path, 0777);
-#endif
-}
-
 void Sys_DebugLog(char *file, char *fmt, ...) {
 	va_list argptr;
 	static char data[1024];

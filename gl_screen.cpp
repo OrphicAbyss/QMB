@@ -513,7 +513,7 @@ void SCR_ScreenShot_f(void) {
 		pcxname[6] = '0' + i % 100 / 10;
 		pcxname[7] = '0' + i % 10;
 		snprintf(checkname, MAX_OSPATH, "%s/%s", com_gamedir, pcxname);
-		if (Sys_FileTime(checkname) == -1)
+		if (!FileManager::FileExists(checkname))
 			break; // file doesn't exist
 	}
 	if (i == 1000) {

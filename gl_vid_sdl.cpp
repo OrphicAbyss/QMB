@@ -19,7 +19,6 @@ void (*vid_menudrawfn)(void) = NULL;
 void (*vid_menukeyfn)(int key) = NULL;
 
 /*-----------------------------------------------------------------------*/
-
 //int		texture_mode = GL_NEAREST;
 int texture_mode = GL_NEAREST_MIPMAP_NEAREST;
 //int		texture_mode = GL_NEAREST_MIPMAP_LINEAR;
@@ -177,7 +176,6 @@ void VID_ShiftPalette(unsigned char *palette) {
 void VID_Init(unsigned char *palette) {
 	int pnum;
 	Uint32 flags;
-	char gldir[MAX_OSPATH];
 
 	// Load the SDL library
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_CDROM) < 0)
@@ -227,9 +225,6 @@ void VID_Init(unsigned char *palette) {
 	IN_HideMouse();
 
 	GL_Init();
-
-	sprintf(gldir, "%s/glquake", com_gamedir);
-	Sys_mkdir(gldir);
 }
 
 void VID_Shutdown(void) {
