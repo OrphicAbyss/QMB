@@ -1003,7 +1003,7 @@ void Host_Begin_f(void) {
  * Kicks a user off of the server
  */
 void Host_Kick_f(void) {
-    char *who;
+    const char *who;
     char *message = NULL;
     client_t *save;
     int i;
