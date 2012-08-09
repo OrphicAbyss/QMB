@@ -295,7 +295,10 @@ MemoryObj::MemoryObj(MemType type, const char *name, int size) {
 }
 
 MemoryObj::~MemoryObj() {
-	free(data);
+	if (data)
+		free(data);
+	
+	data = NULL;
 }
 
 void MemoryObj::freeData() {
@@ -359,8 +362,7 @@ void MemoryObj::ZFree(void *data) {
 	for (i = start; i != finish && !found; i++) {
 		MemoryObj *obj = *i;
 		if (obj->data == data) {
-			zoneObjects.erase(i);
-			obj->freeData();
+			i = zoneObjects.erase(i);
 			delete obj;
 			found = true;
 		}

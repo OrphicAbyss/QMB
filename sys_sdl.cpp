@@ -22,6 +22,7 @@
 
 #include <SDL/SDL.h>
 #include "quakedef.h"
+#include "FileManager.h"
 
 bool isDedicated;
 
@@ -82,87 +83,6 @@ void Sys_Error(const char *error, ...) {
 
 	Host_Shutdown();
 	exit(1);
-}
-
-#define	MAX_HANDLES		10
-FILE *sys_handles[MAX_HANDLES];
-
-int findhandle(void) {
-	int i;
-
-	for (i = 1; i < MAX_HANDLES; i++)
-		if (!sys_handles[i])
-			return i;
-	Sys_Error("out of handles");
-	return -1;
-}
-
-int Sys_FileLength(FILE *f) {
-	int pos;
-	int end;
-
-	pos = ftell(f);
-	fseek(f, 0, SEEK_END);
-	end = ftell(f);
-	fseek(f, pos, SEEK_SET);
-
-	return end;
-}
-
-int Sys_FileOpenRead(const char *path, int *hndl) {
-	int i = findhandle();
-	FILE *f = fopen(path, "rb");
-	if (!f) {
-		*hndl = -1;
-		return -1;
-	}
-	sys_handles[i] = f;
-	*hndl = i;
-
-	return Sys_FileLength(f);
-}
-
-int Sys_FileOpenWrite(const char *path) {
-	int i = findhandle();
-	FILE *f = fopen(path, "wb");
-	if (!f)
-		Sys_Error("Error opening %s: %s", path, strerror(errno));
-	sys_handles[i] = f;
-
-	return i;
-}
-
-void Sys_FileClose(int handle) {
-	if (handle >= 0) {
-		fclose(sys_handles[handle]);
-		sys_handles[handle] = NULL;
-	}
-}
-
-void Sys_FileSeek(int handle, int position) {
-	if (handle >= 0)
-		fseek(sys_handles[handle], position, SEEK_SET);
-}
-
-int Sys_FileRead(int handle, void *dst, int count) {
-	int size = 0;
-	if (handle >= 0) {
-		char *data = (char *) dst;
-		while (count > 0) {
-			int done = fread(data, 1, count, sys_handles[handle]);
-			if (done == 0)
-				break;
-
-			data += done;
-			count -= done;
-			size += done;
-		}
-	}
-	return size;
-}
-
-int Sys_FileWrite(int handle, void *src, int count) {
-	fwrite(src, 1, count, sys_handles[handle]);
 }
 
 void Sys_DebugLog(char *file, char *fmt, ...) {

@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 #include "quakedef.h"
+#include "FileManager.h"
 #include "Texture.h"
 #include "Image.h"
 
@@ -66,7 +67,7 @@ void Image::LoadTGA(FILE *file, char *filename, Texture *tex) {
 	int row, column;
 	byte *image_rgba, *fin, *datafile;
 
-	int filesize = Sys_FileLength(file);
+	int filesize = SystemFileManager::FileLength(file);
 	
 	targa_header.id_length = fgetc(file);
 	targa_header.colormap_type = fgetc(file);

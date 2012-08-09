@@ -26,6 +26,24 @@ typedef struct searchpath_s {
 	struct searchpath_s *next;
 } searchpath_t;
 
+class File {
+private:
+	FILE *obj;
+	char *path;
+	char openType[4];
+public:
+	enum FileOpenType { READ, WRITE, APPEND };
+	
+	File(const char *path, FileOpenType mode, bool isBinary);
+	~File();
+	
+	bool isOpen();
+	long getLength();
+	size_t read(void *buffer, size_t size);
+	size_t write(void *buffer, size_t size);
+	void seek(long position);
+};
+
 class FileManager {
 public:
 	static searchpath_t *searchpaths;
@@ -81,8 +99,22 @@ public:
      * so they override previous pack files.
      */
     static pack_t *LoadPackFile(const char *packfile);
-private:
+};
 
+class SystemFileManager {
+public:
+	static int FileLength(FILE *f);
+	static int FileOpenRead(const char *path, int *hndl);
+	static int FileOpenWrite(const char *path);
+	static void FileClose(int handle);
+	static void FileSeek(int handle, long pos);
+	static int FileRead(int handle, void *dest, size_t count);
+	static size_t FileWrite(int handle, void *data, size_t count);
+private:
+	static const int MAX_HANDLES = 10;
+	static File *handles[MAX_HANDLES];
+	static int FindHandle();
+	static File *getFileForHandle(int handle);
 };
 
 #endif	/* FILEMANAGER_H */

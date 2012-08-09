@@ -738,7 +738,7 @@ byte *COM_LoadFile(const char *path, int usehunk) {
 
 	memset(buf, 0, len + 1);
 
-	Sys_FileRead(h, buf, len);
+	SystemFileManager::FileRead(h, buf, len);
 	FileManager::CloseFile(h);
 
 	return (byte *) buf;

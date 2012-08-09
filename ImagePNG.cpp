@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 #include "quakedef.h"
+#include "FileManager.h"
 #include "Texture.h"
 #include "Image.h"
 #include <png.h>
@@ -117,7 +118,7 @@ void Image::LoadPNG(FILE *f, char *filename, Texture *tex) {
 	byte ioBuffer[8192];
 	byte *raw;
 
-	int filesize = Sys_FileLength(f);
+	int filesize = SystemFileManager::FileLength(f);
 	raw = (byte *) malloc(filesize + 1);
 
 	fread(raw, 1, filesize, f);

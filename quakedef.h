@@ -230,15 +230,13 @@ typedef struct
 // command line parms passed to the program, and the amount of memory
 // available for the program to use
 
-typedef struct
-{
+typedef struct {
     const char	*basedir;
 	int		argc;
 	const char	**argv;
 	void	*membase;
 	int		memsize;
 } quakeparms_t;
-
 
 //=============================================================================
 

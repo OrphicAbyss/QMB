@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "net_vcr.h"
+#include "FileManager.h"
 
 qsocket_t	*net_activeSockets = NULL;
 qsocket_t	*net_freeSockets = NULL;
@@ -470,8 +471,8 @@ qsocket_t *NET_CheckNewConnections (void)
                 vcrConnect.time = host_time;
                 vcrConnect.op = VCR_OP_CONNECT;
                 vcrConnect.session = (long)ret;
-                Sys_FileWrite (vcrFile, &vcrConnect, sizeof(vcrConnect));
-                Sys_FileWrite (vcrFile, ret->address, NET_NAMELEN);
+                SystemFileManager::FileWrite (vcrFile, &vcrConnect, sizeof(vcrConnect));
+                SystemFileManager::FileWrite (vcrFile, ret->address, NET_NAMELEN);
             }
             return ret;
         }
@@ -482,7 +483,7 @@ qsocket_t *NET_CheckNewConnections (void)
         vcrConnect.time = host_time;
         vcrConnect.op = VCR_OP_CONNECT;
         vcrConnect.session = 0;
-        Sys_FileWrite (vcrFile, &vcrConnect, sizeof(vcrConnect));
+        SystemFileManager::FileWrite (vcrFile, &vcrConnect, sizeof(vcrConnect));
     }
 
     return NULL;
@@ -579,8 +580,8 @@ int	NET_GetMessage (qsocket_t *sock)
             vcrGetMessage.session = (long)sock;
             vcrGetMessage.ret = ret;
             vcrGetMessage.len = net_message.cursize;
-            Sys_FileWrite (vcrFile, &vcrGetMessage, 24);
-            Sys_FileWrite (vcrFile, net_message.data, net_message.cursize);
+            SystemFileManager::FileWrite (vcrFile, &vcrGetMessage, 24);
+            SystemFileManager::FileWrite (vcrFile, net_message.data, net_message.cursize);
         }
     }
     else
@@ -591,7 +592,7 @@ int	NET_GetMessage (qsocket_t *sock)
             vcrGetMessage.op = VCR_OP_GETMESSAGE;
             vcrGetMessage.session = (long)sock;
             vcrGetMessage.ret = ret;
-            Sys_FileWrite (vcrFile, &vcrGetMessage, 20);
+            SystemFileManager::FileWrite (vcrFile, &vcrGetMessage, 20);
         }
     }
 
@@ -642,7 +643,7 @@ int NET_SendMessage (qsocket_t *sock, sizebuf_t *data)
         vcrSendMessage.op = VCR_OP_SENDMESSAGE;
         vcrSendMessage.session = (long)sock;
         vcrSendMessage.r = r;
-        Sys_FileWrite (vcrFile, &vcrSendMessage, 20);
+        SystemFileManager::FileWrite (vcrFile, &vcrSendMessage, 20);
     }
 
     return r;
@@ -673,7 +674,7 @@ int NET_SendUnreliableMessage (qsocket_t *sock, sizebuf_t *data)
         vcrSendMessage.op = VCR_OP_SENDMESSAGE;
         vcrSendMessage.session = (long)sock;
         vcrSendMessage.r = r;
-        Sys_FileWrite (vcrFile, &vcrSendMessage, 20);
+        SystemFileManager::FileWrite (vcrFile, &vcrSendMessage, 20);
     }
 
     return r;
@@ -708,7 +709,7 @@ bool NET_CanSendMessage (qsocket_t *sock)
         vcrSendMessage.op = VCR_OP_CANSENDMESSAGE;
         vcrSendMessage.session = (long)sock;
         vcrSendMessage.r = r;
-        Sys_FileWrite (vcrFile, &vcrSendMessage, 20);
+        SystemFileManager::FileWrite (vcrFile, &vcrSendMessage, 20);
     }
 
     return r;
@@ -910,7 +911,7 @@ void		NET_Shutdown (void)
     if (vcrFile != -1)
     {
         Con_Printf ("Closing vcrfile.\n");
-        Sys_FileClose(vcrFile);
+        SystemFileManager::FileClose(vcrFile);
     }
 }
 
