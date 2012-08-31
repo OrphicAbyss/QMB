@@ -1,4 +1,5 @@
 #include "quakedef.h"
+#include "FileManager.h"
 
 #include <list>
 
@@ -159,14 +160,16 @@ bool CVar::consoleCommand(void){
 	return true;
 }
 
-void CVar::writeVariables (FILE *f){
+void CVar::writeVariables (int handle){
 	list<CVar *>::iterator i;
 
 	for (i = CVars.begin(); i != CVars.end(); i++){
 		CVar *cvar = *i;
-
-		if (cvar->isArchived())
-			fprintf (f, "%s \"%s\"\n", cvar->getName(), cvar->getString());
+		
+		if (cvar->isArchived()) {
+			char *temp = va("%s \"%s\"\n", cvar->getName(), cvar->getString());
+			SystemFileManager::FileWrite(handle, temp, strlen(temp));	 
+		}
 	}
 }
 

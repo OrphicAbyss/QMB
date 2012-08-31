@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
  */
 #include "quakedef.h"
+#include "FileManager.h"
 
 // 01-22-2000 FrikaC Begin PASTE
 #ifdef _WIN32
@@ -449,11 +450,15 @@ void Key_Bind_f(void) {
 /**
  * Writes lines containing "bind key value"
  */
-void Key_WriteBindings(FILE *f) {
-	for (int i = 0; i < 256; i++)
-		if (keybindings[i])
-			if (*keybindings[i])
-				fprintf(f, "bind \"%s\" \"%s\"\n", Key_KeynumToString(i), keybindings[i]);
+void Key_WriteBindings(int handle) {
+	for (int i = 0; i < 256; i++) {
+		if (keybindings[i]) {
+			if (*keybindings[i]) {
+				char *temp = va("bind \"%s\" \"%s\"\n", Key_KeynumToString(i), keybindings[i]);
+				SystemFileManager::FileWrite(handle, temp, strlen(temp));
+			}
+		}
+	}
 }
 
 void Key_Init(void) {

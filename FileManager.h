@@ -40,7 +40,7 @@ public:
 	bool isOpen();
 	long getLength();
 	size_t read(void *buffer, size_t size);
-	size_t write(void *buffer, size_t size);
+	size_t write(const void *buffer, size_t size);
 	void seek(long position);
 };
 
@@ -109,11 +109,12 @@ public:
 	static void FileClose(int handle);
 	static void FileSeek(int handle, long pos);
 	static int FileRead(int handle, void *dest, size_t count);
-	static size_t FileWrite(int handle, void *data, size_t count);
+	static size_t FileWrite(int handle, const void *data, size_t count);
 private:
 	static const int MAX_HANDLES = 10;
 	static File *handles[MAX_HANDLES];
-	static int FindHandle();
+	
+	static int findHandle();
 	static File *getFileForHandle(int handle);
 };
 

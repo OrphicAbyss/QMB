@@ -300,15 +300,18 @@ pack_t *FileManager::LoadPackFile(const char *packfile) {
 	return pack;
 }
 
-//#define	MAX_HANDLES		10
-//File *sys_handles[MAX_HANDLES];
+File *SystemFileManager::handles[MAX_HANDLES];
 
-int SystemFileManager::FindHandle(void) {
+int SystemFileManager::findHandle(void) {
 	for (int i = 1; i < MAX_HANDLES; i++)
 		if (!handles[i])
 			return i;
 	Sys_Error("out of handles");
 	return -1;
+}
+
+File *SystemFileManager::getFileForHandle(int handle) {
+	return handles[handle];
 }
 
 int SystemFileManager::FileLength(FILE *f) {
@@ -321,11 +324,11 @@ int SystemFileManager::FileLength(FILE *f) {
 }
 
 int SystemFileManager::FileOpenRead(const char *path, int *hndl) {
-	int i = FindHandle();
+	int i = findHandle();
 	File *f = new File(path, File::READ, true);
 	
 	if (f->isOpen()) {
-		sys_handles[i] = f;
+		handles[i] = f;
 		*hndl = i;
 	} else {
 		delete f;
@@ -337,23 +340,23 @@ int SystemFileManager::FileOpenRead(const char *path, int *hndl) {
 }
 
 int SystemFileManager::FileOpenWrite(const char *path) {
-	int i = FindHandle();
+	int i = findHandle();
 	File *f = new File(path, File::WRITE, true);
 	if (!f->isOpen()) {
 		delete f;
 		Sys_Error("Error opening %s: %s", path, strerror(errno));
 	}
-	sys_handles[i] = f;
+	handles[i] = f;
 	return i;
 }
 
 void SystemFileManager::FileClose(int handle) {
 	if (handle >= 0 && handle < MAX_HANDLES) {
-		File *f = sys_handles[handle];
+		File *f = handles[handle];
 		if (f != NULL) {
 			delete f;
 		}
-		sys_handles[handle] = NULL;
+		handles[handle] = NULL;
 	} else {
 		Con_Printf("Tried to close invalid file handle: %i\n", handle);
 	}
@@ -378,7 +381,7 @@ int SystemFileManager::FileRead(int handle, void *dst, size_t count) {
 	}
 }
 
-size_t SystemFileManager::FileWrite(int handle, void *src, size_t count) {
+size_t SystemFileManager::FileWrite(int handle, const void *src, size_t count) {
 	if (handle >= 0 && handle < MAX_HANDLES) {
 		File *f = getFileForHandle(handle);
 		return f->write(src, count);
@@ -443,7 +446,7 @@ size_t File::read(void* buffer, size_t size) {
 	return read;
 }
 
-size_t File::write(void* buffer, size_t size) {
+size_t File::write(const void* buffer, size_t size) {
 	return fwrite(buffer, 1, size, this->obj);
 }
 

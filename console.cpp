@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 #include <fcntl.h>
 #include "quakedef.h"
+#include "FileManager.h"
 
 int con_linewidth;
 float con_cursorspeed = 4;
@@ -267,17 +268,20 @@ void Con_Print(const char *txt) {
 	}
 }
 
-FILE *logfile;
+int logFileHandle;
 void Con_OpenDebugLog(void) {
-	logfile = fopen(va("%s/QMB.log", com_gamedir), "w");
+	logFileHandle = SystemFileManager::FileOpenWrite(va("%s/QMB.log", com_gamedir));
 }
 
 void Con_DebugLog(const char *msg) {
-	fprintf(logfile, msg);
+	if (logFileHandle != -1) {
+		SystemFileManager::FileWrite(logFileHandle, msg, strlen(msg));
+	}
 }
 
 void Con_CloseDebugLog(void) {
-	fclose(logfile);
+	SystemFileManager::FileClose(logFileHandle);
+	logFileHandle = -1;
 }
 
 int Con_Print_Real(const char *msg) {
