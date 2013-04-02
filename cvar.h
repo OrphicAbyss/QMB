@@ -41,6 +41,10 @@ public:
      */
 	void reg();
 	/**
+	 * Unregister the cvar.
+     */
+	void unreg();
+	/**
 	 * Set the value of the cvar.
 	 *
      * @param value to set the cvar to
@@ -160,6 +164,11 @@ public:
 	 */
 	static void writeVariables(FILE *f);
 
+	/**
+	 * Clear out used zone memory, so that we can look for leaking memory more
+	 * easily.
+     */
+	static void shutdown();
 };
 
 #endif	/* CVAR_CPP_H */

@@ -37,7 +37,7 @@ public:
 	static void CloseFile(int h);
 	/**
 	 * Converts any illegal file characeters into legal ones.
-	 * 
+	 *
 	 * @param data to check and fix
 	 */
 	static void MakeFilenameValid(char *data);
@@ -51,7 +51,7 @@ public:
 	static char *FileExtension(char *in);
 	/**
 	 * If the path doesn't contain an extension .EXT then add the provided
-	 * default. 
+	 * default.
 	 */
 	static void DefaultExtension(char *path, const char *extension);
 
@@ -71,7 +71,7 @@ public:
 	static void AddPackToPath(char *pak);
 	/**
      * Takes an explicit (not game tree related) path to a pak file.
-     * 
+     *
      * Loads the header and directory, adding the files at the beginning of the list
      * so they override previous pack files.
      */

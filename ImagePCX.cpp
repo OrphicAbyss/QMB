@@ -89,9 +89,9 @@ void Image::LoadPCX(FILE *f, char *filename, Texture *tex) {
 		}
 	}
 	fclose(f);
-	
+
 	tex->width = pcx->xmax + 1;
 	tex->height = pcx->ymax + 1;
 	tex->bytesPerPixel = 4;
-	tex->data = image_rgba;
+	tex->setData(image_rgba);
 }

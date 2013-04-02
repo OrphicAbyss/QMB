@@ -814,6 +814,12 @@ void Host_Shutdown(void) {
 	IN_Shutdown();
 	NN_deinit();
 
+	TextureManager::clearAllTextures();
+	Alias::shutdown();
+	Cmd::shutdown();
+	CVar::shutdown();
+	MemoryObj::Flush(MemoryObj::ZONE);
+
 	if (cls.state != ca_dedicated) {
 		VID_Shutdown();
 	}

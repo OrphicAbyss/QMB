@@ -33,6 +33,10 @@ Cmd::Cmd(const char* name, xcommand_t func) {
 	this->func = func;
 }
 
+Cmd::~Cmd() {
+	MemoryObj::ZFree(this->name);
+}
+
 char *Cmd::getName() {
 	return this->name;
 }
@@ -74,6 +78,18 @@ Cmd *Cmd::findCmd(const char* name) {
 	}
 
 	return NULL;
+}
+
+void Cmd::shutdown() {
+	list<Cmd *>::iterator i;
+
+	for (i = Cmds.begin(); i != Cmds.end(); ) {
+		Cmd *cmd = *i;
+
+		delete cmd;
+
+		i = Cmds.erase(i);
+	}
 }
 
 bool Cmd::consoleCommand() {
@@ -138,7 +154,7 @@ Alias::Alias(const char* name, const char* cmdString) {
 	Q_strcpy(this->cmdString, cmdString);
 }
 
-void Alias::remove() {
+Alias::~Alias() {
 	MemoryObj::ZFree(this->name);
 	MemoryObj::ZFree(this->cmdString);
 }
@@ -173,6 +189,18 @@ Alias *Alias::findAlias(const char* name) {
 	}
 
 	return NULL;
+}
+
+void Alias::shutdown() {
+	list<Alias *>::iterator i;
+
+	for (i = Aliases.begin(); i != Aliases.end(); ) {
+		Alias *alias = *i;
+
+		delete alias;
+
+		i = Aliases.erase(i);
+	}
 }
 
 char *Alias::completeAlias(const char* partial) {
@@ -342,7 +370,7 @@ void Cbuf_Execute(void) {
 		else {
 			i++;
 			cmd_text.cursize -= i;
-			memcpy(text, text + i, cmd_text.cursize);
+			memmove(text, text + i, cmd_text.cursize);
 		}
 
 		// execute the command line

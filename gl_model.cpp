@@ -49,7 +49,7 @@ texture_t *r_notexture_mip;
 void Mod_Init(void) {
 	CVar::registerCVar(&gl_subdivide_size);
 	memset(mod_novis, 0xff, sizeof (mod_novis));
-	
+
 	// create a simple checkerboard texture for the default
 	r_notexture_mip = (texture_t *) Hunk_AllocName(sizeof (texture_t), "notexture");
 	r_notexture_mip->width = r_notexture_mip->height = 0;
@@ -345,7 +345,7 @@ void Mod_LoadTextures(lump_t *l) {
 					tx->gl_fullbright = TextureManager::LoadExternTexture(texnamefbluma, false, true, false);
 
 					/*if (tx->gl_fullbright == 0){ //no texture _glow
-						sprintf (texnamefb, "textures/%s_glow", mt->name);
+
 						tx->gl_fullbright = GL_LoadTexImage (texnamefb, false, true);
 					}*/
 				} else {
@@ -357,6 +357,7 @@ void Mod_LoadTextures(lump_t *l) {
 				tx->gl_texturenum = TextureManager::LoadInternTexture(mt->name, tx->width, tx->height, (byte *) (tx + 1), true, false, 1, gl_sincity.getBool());
 
 				if (Img_HasFullbrights((byte *) (tx + 1), tx->width * tx->height)) {
+					sprintf (texnamefb, "textures/%s_glow", mt->name);
 					tx->gl_fullbright = TextureManager::LoadInternTexture(texnamefb, tx->width, tx->height, (byte *) (tx + 1), true, true, 1, false);
 				} else {
 					tx->gl_fullbright = 0;
@@ -1205,7 +1206,7 @@ int GL_SkinSplitShirt(byte *in, int width, int height, int bits, char *name) {
 	}
 
 	if (passed) {
-		texnum = TextureManager::LoadInternTexture(name, width, height, out, true, false, 1, gl_sincity.getBool());
+		texnum = TextureManager::LoadInternTexture(name, width, height, data, true, false, 1, gl_sincity.getBool());
 		return texnum;
 	} else {
 		return 0;
@@ -1323,6 +1324,7 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 	for (int i = 0; i < numskins; i++) {
 		if (pskintype->type == ALIAS_SKIN_SINGLE) {
 			Mod_FloodFillSkin(skin, pheader->skinwidth, pheader->skinheight);
+			FileManager::StripExtension(loadmodel->name, model);
 
 			// save 8 bit texels for the player model to remap
 			if (!Q_strcmp(loadmodel->name, "progs/player.mdl")) {
@@ -1333,7 +1335,6 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 			}
 
 			//Tomaz skin naming: blah_0.tga
-			FileManager::StripExtension(loadmodel->name, model);
 			sprintf(model2, "%s_%i", model, i);
 			pheader->gl_texturenum[i][0] =
 					pheader->gl_texturenum[i][1] =

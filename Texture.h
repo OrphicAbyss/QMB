@@ -4,7 +4,7 @@
 #include "quakedef.h"
 
 class Texture {
-public:	
+public:
 	Texture(const char *ident);
 	virtual ~Texture();
 	void calculateHash();
@@ -19,22 +19,30 @@ public:
 
 	bool operator==(const Texture &other) const;
 	bool operator!=(const Texture &other) const;
-	
+
+	void setData(unsigned char *data);
+	void setData(unsigned char *data, bool copy);
+	bool hasData();
+
+
 	char *identifier;
 	int width;
 	int height;
 	int bytesPerPixel;
 	int dataHash;
-	unsigned char *data;
+
 	GLuint textureType;
 	GLuint textureId;
 	GLuint fullbrightTextureId;
 	bool mipmap;
 	bool grayscale;
+
+private:
+	unsigned char *data;
 };
 
 typedef struct {
-	char *name;
+	const char *name;
 	GLuint minimize;
 	GLuint maximize;
 } glFilterMode;
@@ -44,7 +52,7 @@ public:
 	static GLuint glFilterMax;
 	static GLuint glFilterMin;
 	static glFilterMode glFilterModes[];
-	
+
 	static GLuint defaultTexture;
 	static GLuint shinetex_glass;
 	static GLuint shinetex_chrome;
@@ -69,14 +77,15 @@ public:
 	static Texture *findTexture(Texture *find);
 	static void addTexture(Texture *add);
 	static void removeTexture(Texture *remove);
+	static void clearAllTextures();
 
 	static void LoadDefaultTexture();
 	static void LoadMiscTextures();
 	static void LoadCrosshairTextures();
 	static void LoadModelShadingTextures();
-	
+
 	static void Init();
-	
+
 	static GLuint getTextureId();
 	static void delTextureId(GLuint);
 };

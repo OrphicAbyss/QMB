@@ -11,7 +11,7 @@ glFilterMode TextureManager::glFilterModes[] = {
 	{"GL_NEAREST_MIPMAP_NEAREST", GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST},
 	{"GL_NEAREST_MIPMAP_LINEAR", GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST},
 	{"GL_LINEAR_MIPMAP_NEAREST", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR},
-	{"GL_LINEAR_MIPMAP_LINEAR", GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR}	
+	{"GL_LINEAR_MIPMAP_LINEAR", GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR}
 };
 
 GLuint TextureManager::defaultTexture = 0;
@@ -25,7 +25,7 @@ GLuint TextureManager::crosshair_tex[32];
 
 void TextureManager::setTextureModeCMD() {
 		int i;
-		
+
 	if (CmdArgs::getArgCount() == 1) {
 		for (int i = 0; i < 6; i++) {
 			if (glFilterMin == glFilterModes[i].minimize) {
@@ -40,7 +40,7 @@ void TextureManager::setTextureModeCMD() {
 			if (!Q_strcasecmp(glFilterModes[i].name, CmdArgs::getArg(1)))
 				break;
 		}
-		
+
 		if (i == 6) {
 			Con_Printf("bad filter name\n");
 			return;
@@ -56,10 +56,10 @@ void TextureManager::setTextureModeCMD() {
 
 void TextureManager::resetTextureModes() {
 	std::list<Texture *>::iterator i;
-	
+
 	for (i = Textures.begin(); i != Textures.end(); i++) {
 		Texture *t = *i;
-		
+
 		if (t->mipmap) {
 			glBindTexture(GL_TEXTURE_2D, t->textureId);
 			if (t->mipmap)
@@ -73,35 +73,38 @@ void TextureManager::resetTextureModes() {
 }
 
 int TextureManager::LoadExternTexture(const char* filename, bool complain, bool mipmap, bool grayscale) {
+	Texture *t = NULL;
+
 	if (gl_quick_texture_reload.getBool()) {
-		Texture *t = findTexture(filename);
+		t = findTexture(filename);
 		if (t != NULL)
 			return t->textureId;
 	}
 
-	Texture *t = LoadFile(filename, complain);
+
+	t = LoadFile(filename, complain);
 	if (!t)
 		return 0;
-	
-	if (!t->data) {
+
+	if (!t->hasData()) {
 		delete t;
 		return 0;
 	}
-	
+
 	t->mipmap = mipmap;
 	t->bytesPerPixel = 4;
 	t->grayscale = grayscale;
-	
+
 	t = LoadTexture(t);
 	return t->textureId;
 }
 
 int TextureManager::LoadInternTexture(const char *identifier, int width, int height, byte *data, bool mipmap, bool fullbright, int bytesperpixel, bool grayscale) {
 	Texture *t = new Texture(identifier);
-	t->data = data;
 	t->height = height;
 	t->width = width;
 	t->bytesPerPixel = bytesperpixel;
+	t->setData(data, true);
 	t->mipmap = mipmap;
 	t->grayscale = grayscale;
 
@@ -110,9 +113,9 @@ int TextureManager::LoadInternTexture(const char *identifier, int width, int hei
 			delete t;
 			return 0;
 		}
-	
+
 	t = LoadTexture(t);
-	
+
 	return t->textureId;
 }
 
@@ -130,40 +133,44 @@ Texture *TextureManager::LoadTexture(Texture *texture) {
 			return found;
 		}
 	}
-		
-	if (!isDedicated) {		
+
+	if (!isDedicated) {
 		texture->upload();
 	}
-	
+
 	checkGLError("Loading texture");
-	
+
 	addTexture(texture);
 	return texture;
 }
 
 Texture *TextureManager::findTexture(const char *identifier) {
 	std::list<Texture *>::iterator i;
-	
+
 	for (i = Textures.begin(); i != Textures.end(); i++) {
 		Texture *tex = *i;
-		
-		if (0 == Q_strcmp(tex->identifier, identifier))
+
+		if (tex->identifier != NULL && 0 == Q_strcmp(tex->identifier, identifier))
 			return tex;
 	}
-	
+
 	return NULL;
 }
 
 Texture *TextureManager::findTexture(Texture *find) {
 	std::list<Texture *>::iterator i;
-	
+
+	if (find->identifier == NULL) {
+		Con_Printf("Error finding texture\n");
+	}
+
 	for (i = Textures.begin(); i != Textures.end(); i++) {
 		Texture *tex = *i;
-		
+
 		if (find == tex)
 			return tex;
 	}
-	
+
 	return NULL;
 }
 
@@ -173,6 +180,17 @@ void TextureManager::addTexture(Texture *add) {
 
 void TextureManager::removeTexture(Texture *remove) {
 	Textures.remove(remove);
+}
+
+void TextureManager::clearAllTextures() {
+	std::list<Texture *>::iterator i;
+
+	for (i = Textures.begin(); i != Textures.end(); ) {
+		Texture *tex = *i;
+
+		delete(tex);
+		i = Textures.erase(i);
+	}
 }
 
 void TextureManager::delTextureId(GLuint textureId) {
@@ -190,12 +208,12 @@ void TextureManager::LoadDefaultTexture() {
 	int height = 32;
 	unsigned char *data = (unsigned char *)malloc(sizeof(unsigned char) * width * height * 4);
 	unsigned cur = 0;
-	
+
 	for (int i=0; i<32; i++) {
 		for (int j=0; j<32; j++) {
 			bool x = i < 16;
 			bool y = j < 16;
-			
+
 			if ((x && y) || (!x && !y)) {
 				data[cur++] = 255;
 				data[cur++] = 255;
@@ -209,10 +227,10 @@ void TextureManager::LoadDefaultTexture() {
 			}
 		}
 	}
-	
+
 	//default texture
 	Texture *defTex = new Texture("defaultTexture");
-	defTex->data = data;
+	defTex->setData(data);
 	defTex->height = height;
 	defTex->width = width;
 	defTex->bytesPerPixel = 4;
@@ -233,7 +251,7 @@ void TextureManager::LoadMiscTextures() {
 
 void TextureManager::LoadCrosshairTextures() {
 	char crosshairFname[32];
-	
+
 	for (int i = 0; i < 32; i++) {
 		snprintf(&crosshairFname[0],32,"textures/crosshairs/crosshair%02i.tga",i);
 		crosshair_tex[i] = LoadExternTexture((char *)&crosshairFname[0], false, false, false);
@@ -248,14 +266,14 @@ void TextureManager::LoadModelShadingTextures() {
 	for (int i = 0; i < 32; i++) {
 		cellFull[i * 3 + 0] = cellFull[i * 3 + 1] = cellFull[i * 3 + 2] = cellData[i];
 		vertexFull[i * 3 + 0] = vertexFull[i * 3 + 1] = vertexFull[i * 3 + 2] = (unsigned char)((i / 32.0f) * 255);
-	}	
+	}
 
 	//cell shading stuff...
 	Texture *cell = new Texture("celTexture");
-	cell->data = cellFull;
 	cell->height = 1;
 	cell->width = 32;
 	cell->bytesPerPixel = 3;
+	cell->setData(cellFull);
 	cell->mipmap = false;
 	cell->textureType = GL_TEXTURE_1D;
 	LoadTexture(cell);
@@ -263,10 +281,10 @@ void TextureManager::LoadModelShadingTextures() {
 
 	//vertex shading stuff...
 	Texture *vertex = new Texture("vertexTexture");
-	vertex->data = vertexFull;
 	vertex->height = 1;
 	vertex->width = 32;
 	vertex->bytesPerPixel = 3;
+	vertex->setData(vertexFull);
 	vertex->mipmap = false;
 	vertex->textureType = GL_TEXTURE_1D;
 	LoadTexture(vertex);

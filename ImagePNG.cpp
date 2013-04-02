@@ -194,12 +194,13 @@ void Image::LoadPNG(FILE *f, char *filename, Texture *tex) {
 	if (my_png->BitDepth == 8) {
 		tex->width = my_png->Width;
 		tex->height = my_png->Height;
-		tex->data = (byte *) my_png->Data;
+		tex->bytesPerPixel = my_png->BytesPerPixel;
+		tex->setData((byte *) my_png->Data);
 	} else {
 		Con_Printf("Bad png color depth: %s\n", filename);
 		free(my_png->Data);
 	}
-	
+
 	free(raw);
 	mypng_struct_destroy(true);
 

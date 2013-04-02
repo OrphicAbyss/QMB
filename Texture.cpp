@@ -4,7 +4,7 @@
 #include <GL/glu.h>
 
 Texture::Texture(const char *ident) {
-	this->identifier = (char *)MemoryObj::ZAlloc(Q_strlen(ident));
+	this->identifier = (char *)MemoryObj::ZAlloc(Q_strlen(ident) + 1);
 	Q_strcpy(this->identifier, ident);
 	this->textureType = GL_TEXTURE_2D;
 	this->data = NULL;
@@ -44,11 +44,11 @@ void Texture::calculateHash() {
 
 	if (!this->data) {
 		// Setup table
-		for (int i = 0; i < 256; i++) 
+		for (int i = 0; i < 256; i++)
 			lhcsumtable[i] = i + 1;
 		// Calculate hash
 		int size = width * height * bytesPerPixel;
-		for (int i = 0; i < size; i++) 
+		for (int i = 0; i < size; i++)
 			dataHash += (lhcsumtable[data[i] & 255]++);
 	}
 }
@@ -87,7 +87,7 @@ void Texture::convertToGrayscale() {
 		PrintErrorMessage("convertToGrayscale", "Requires 32bit image to convert...");
 		return;
 	}
-	
+
 	//go through data and convert
 	int size = width * height;
 	for (int i = 0; i < size; i++) {
@@ -100,10 +100,10 @@ bool Texture::convert8To32Fullbright() {
 		PrintErrorMessage("convert8To32Fullbright", "Requires 8bit image to convert...");
 		return false;
 	}
-	
+
 	bool hasFullbright = false;
 	unsigned *newData = (unsigned *)malloc(width * height * 4);
-	
+
 	int size = width * height;
 	for (int i=0; i<size; i++) {
 		unsigned char p = data[i];
@@ -114,7 +114,7 @@ bool Texture::convert8To32Fullbright() {
 			hasFullbright = true;
 		}
 	}
-	
+
 	free(this->data);
 	data = (unsigned char *)newData;
 	bytesPerPixel = 4;
@@ -126,14 +126,14 @@ void Texture::convert8To32() {
 		PrintErrorMessage("convert8To32", "Requires 8bit image to convert...");
 		return;
 	}
-	
+
 	unsigned *newData = (unsigned *)malloc(width * height * 4);
-	
+
 	int size = width * height;
 	for (int i=0; i<size; i++) {
 		newData[i] = d_8to24table[data[i]];
 	}
-	
+
 	free(this->data);
 	this->data = (unsigned char *)newData;
 	this->bytesPerPixel = 4;
@@ -141,12 +141,12 @@ void Texture::convert8To32() {
 
 void Texture::convert24To32() {
 	if (bytesPerPixel != 3) {
-		PrintErrorMessage("convert8To32", "Requires 8bit image to convert...");
+		PrintErrorMessage("convert8To32", "Requires 24bit image to convert...");
 		return;
 	}
-	
+
 	unsigned char *newData = (unsigned char *)malloc(width * height * 4);
-	
+
 	int size = width * height;
 	int input = 0;
 	int output = 0;
@@ -156,7 +156,7 @@ void Texture::convert24To32() {
 		newData[output++] = data[input++];
 		newData[output++] = 0xff;
 	}
-	
+
 	free(this->data);
 	this->data = newData;
 	this->bytesPerPixel = 4;
@@ -164,7 +164,7 @@ void Texture::convert24To32() {
 
 void Texture::fixSize() {
 	int scaled_width, scaled_height;
-	
+
 	if (gl_texture_non_power_of_two) {
 		scaled_width = width;
 		scaled_height = height;
@@ -180,7 +180,7 @@ void Texture::fixSize() {
 		scaled_width = min(scaled_width, gl_max_size.getInt()); //make sure its not bigger than the max size
 		scaled_height = min(scaled_height, gl_max_size.getInt()); //make sure its not bigger than the max size
 	}
-	
+
 	if (scaled_width != width || scaled_height != height) {
 		resample(scaled_height, scaled_width);
 		width = scaled_width;
@@ -190,31 +190,31 @@ void Texture::fixSize() {
 
 void Texture::resample(const int scaledHeight, const int scaledWidth) {
 	unsigned char *scaled = (unsigned char *)malloc(scaledHeight * scaledWidth * this->bytesPerPixel);
-	
+
 	Image::resample((void *)this->data, this->width, this->height, (void *)scaled, scaledWidth, scaledHeight, this->bytesPerPixel, 1);
-	
+
 	free(this->data);
 	this->data = scaled;
 }
 
-void Texture::upload() {	
+void Texture::upload() {
 	// Ensure we have a 32bit image to upload
 	if (bytesPerPixel == 1)
 		convert8To32();
 	else if (bytesPerPixel == 3)
 		convert24To32();
-	
+
 	// If we are grayscaling things, do it now
 	if (grayscale && gl_sincity.getBool())
 		convertToGrayscale();
-	
+
 	// Resize the image if we need to (non-power of 2 or over max size)
 	fixSize();
-	
+
 	if (textureId == 0)
 		textureId = TextureManager::getTextureId();
 
-	if (this->textureType == GL_TEXTURE_2D) {		
+	if (this->textureType == GL_TEXTURE_2D) {
 		glBindTexture(GL_TEXTURE_2D, textureId);
 		if (!mipmap) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -244,4 +244,26 @@ void Texture::upload() {
 	} else {
 		Con_Printf("Unknown texture type for texture: %s", identifier);
 	}
+}
+
+void Texture::setData(unsigned char *data) {
+	setData(data, false);
+}
+
+void Texture::setData(unsigned char *data, bool copy) {
+	if (width == 0 || height == 0 || bytesPerPixel == 0) {
+		Sys_Printf("Error texture has a zero width, height or bbp: %s\n", this->identifier);
+	}
+
+	if (copy) {
+		this->data = (unsigned char*)malloc(width * height * bytesPerPixel);
+
+		memcpy(this->data, data, width * height * bytesPerPixel);
+	} else {
+		this->data = data;
+	}
+}
+
+bool Texture::hasData() {
+	return this->data != NULL;
 }

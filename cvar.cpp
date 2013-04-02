@@ -6,17 +6,17 @@ using std::list;
 
 static list<CVar *> CVars;
 
-void CVar::addCVar(CVar *cvar){
+void CVar::addCVar(CVar *cvar) {
 	CVars.push_back(cvar);
 }
 
-CVar *CVar::findCVar (const char *name){
+CVar *CVar::findCVar (const char *name) {
 	list<CVar *>::iterator i;
 
-	for (i = CVars.begin(); i != CVars.end(); i++){
+	for (i = CVars.begin(); i != CVars.end(); i++) {
 		CVar *cvar = *i;
 
-		if (0 == Q_strcmp(cvar->getName(),name)){
+		if (0 == Q_strcmp(cvar->getName(),name)) {
 			return cvar;
 		}
 	}
@@ -24,16 +24,26 @@ CVar *CVar::findCVar (const char *name){
 	return NULL;
 }
 
-CVar *CVar::findNextServerCVar (const char *name){
+void CVar::shutdown() {
+	list<CVar *>::iterator i;
+
+	for (i = CVars.begin(); i != CVars.end(); i++) {
+		CVar *cvar = *i;
+
+		cvar->unreg();
+	}
+}
+
+CVar *CVar::findNextServerCVar (const char *name) {
 	list<CVar *>::iterator i;
 	bool found = false;
 
-	if (name != NULL){
+	if (name != NULL) {
 		//Find the old cvar first
-		for (i = CVars.begin(); i != CVars.end(); i++){
+		for (i = CVars.begin(); i != CVars.end(); i++) {
 			CVar *cvar = *i;
 
-			if (0 == Q_strcmp(cvar->getName(),name)){
+			if (0 == Q_strcmp(cvar->getName(),name)) {
 				found = true;
 			}
 		}
@@ -45,10 +55,10 @@ CVar *CVar::findNextServerCVar (const char *name){
 
 	if (found){
 		//Find the next server cvar
-		for (; i != CVars.end(); i++){
+		for (; i != CVars.end(); i++) {
 			CVar *cvar = *i;
 
-			if (cvar->isServer()){
+			if (cvar->isServer()) {
 				return cvar;
 			}
 		}
@@ -57,7 +67,7 @@ CVar *CVar::findNextServerCVar (const char *name){
 	return NULL;
 }
 
-void CVar::registerCVar(CVar* variable){
+void CVar::registerCVar(CVar* variable) {
 	// first check to see if it has already been defined
 	if (CVar::findCVar(variable->getName())) {
 		Con_Printf ("Can't register variable %s, allready defined\n", variable->name);
@@ -65,7 +75,7 @@ void CVar::registerCVar(CVar* variable){
 	}
 
 	// check for overlap with a command
-	if (Cmd::findCmd(variable->getName())){
+	if (Cmd::findCmd(variable->getName())) {
 		Con_Printf ("Cvar_RegisterVariable: %s is a command\n", variable->name);
 		return;
 	}
@@ -77,38 +87,38 @@ void CVar::registerCVar(CVar* variable){
 	addCVar(variable);
 }
 
-void CVar::setValue(const char *var_name, const char *value){
+void CVar::setValue(const char *var_name, const char *value) {
 	CVar *var = CVar::findCVar(var_name);
 
-	if (var != NULL){
+	if (var != NULL) {
 		var->set(value);
 	}
 }
 
-float CVar::getFloatValue(char *name){
+float CVar::getFloatValue(char *name) {
 	CVar *var = CVar::findCVar(name);
 	if (var != NULL)
 		return var->getFloat();
 	return 0;
 }
 
-const char *CVar::getStringValue(char *name){
+const char *CVar::getStringValue(char *name) {
 	CVar *var = CVar::findCVar(name);
 	if (var != NULL)
 		return var->getString();
 	return "";
 }
 
-const char *CVar::completeVariable(char *partial){
+const char *CVar::completeVariable(char *partial) {
 	list<CVar *>::iterator i;
 	CVar *match = NULL;
 	int sizeOfStr = Q_strlen(partial);
 	bool multiple = false;
 
-	for (i = CVars.begin(); i != CVars.end() && !multiple; i++){
+	for (i = CVars.begin(); i != CVars.end() && !multiple; i++) {
 		CVar *cvar = *i;
 
-		if (0 == Q_strncmp(cvar->getName(),partial,sizeOfStr)){
+		if (0 == Q_strncmp(cvar->getName(),partial,sizeOfStr)) {
 			if (match != NULL){
 				multiple = true;
 			} else {
@@ -117,13 +127,13 @@ const char *CVar::completeVariable(char *partial){
 		}
 	}
 
-	if (multiple){
+	if (multiple) {
 		bool first = true;
 		Con_Printf("CVars: ");
-		for (i = CVars.begin(); i != CVars.end(); i++){
+		for (i = CVars.begin(); i != CVars.end(); i++) {
 			CVar *cvar = *i;
 
-			if (0 == Q_strncmp(cvar->getName(),partial,sizeOfStr)){
+			if (0 == Q_strncmp(cvar->getName(),partial,sizeOfStr)) {
 				if (first){
 					first = false;
 					Con_Printf(cvar->getName());
@@ -142,7 +152,7 @@ const char *CVar::completeVariable(char *partial){
 		return NULL;
 }
 
-bool CVar::consoleCommand(void){
+bool CVar::consoleCommand(void) {
 	CVar *var;
 
 // check variables
@@ -159,10 +169,10 @@ bool CVar::consoleCommand(void){
 	return true;
 }
 
-void CVar::writeVariables (FILE *f){
+void CVar::writeVariables (FILE *f) {
 	list<CVar *>::iterator i;
 
-	for (i = CVars.begin(); i != CVars.end(); i++){
+	for (i = CVars.begin(); i != CVars.end(); i++) {
 		CVar *cvar = *i;
 
 		if (cvar->isArchived())
@@ -170,19 +180,19 @@ void CVar::writeVariables (FILE *f){
 	}
 }
 
-CVar::CVar(const char *name, const char *sValue){
+CVar::CVar(const char *name, const char *sValue) {
 	init(name, sValue, false, false);
 }
 
-CVar::CVar(const char *name, const char *sValue, bool archive){
+CVar::CVar(const char *name, const char *sValue, bool archive) {
 	init(name, sValue, archive, false);
 }
 
-CVar::CVar(const char *name, const char *sValue, bool archive, bool server){
+CVar::CVar(const char *name, const char *sValue, bool archive, bool server) {
 	init(name, sValue, archive, server);
 }
 
-void CVar::init(const char *name, const char *sValue, bool archive, bool server){
+void CVar::init(const char *name, const char *sValue, bool archive, bool server) {
 	this->name = name;
 	this->archive = archive;
 	this->server = server;
@@ -199,7 +209,7 @@ void CVar::init(const char *name, const char *sValue, bool archive, bool server)
 /**
  * Make a copy of the string into temp memory
  */
-void CVar::reg(){
+void CVar::reg() {
 	if (!this->registered){
 		registered = true;
 		const char *value = this->originalValue;
@@ -212,9 +222,16 @@ void CVar::reg(){
 }
 
 /**
+ * Clear out used memory
+ */
+void CVar::unreg() {
+	MemoryObj::ZFree(this->sValue);
+}
+
+/**
  * Parse the string value into the float and integer value fields
  */
-void CVar::parseValue(){
+void CVar::parseValue() {
 	this->fValue = Q_atof(this->sValue);
 	this->iValue = Q_atoi(this->sValue);
 	this->bValue = this->iValue != 0;
@@ -225,7 +242,11 @@ void CVar::parseValue(){
  *
  * @param value The new string value
  */
-void CVar::set(const char *value){
+void CVar::set(const char *value) {
+	if (this->sValue == NULL) {
+		Con_Printf("No string value set for: %s\n",this->name);
+	}
+
 	bool changed = Q_strcmp(this->sValue, value);
 	// If it's a new value
 	if (changed != 0) {
@@ -248,44 +269,44 @@ void CVar::set(const char *value){
 	}
 }
 
-void CVar::set(float value){
+void CVar::set(float value) {
 	char strValue[32];
 
 	snprintf(strValue,32,"%f",value);
 	this->set(strValue);
 }
 
-void CVar::set(bool value){
+void CVar::set(bool value) {
 	if (value)
 		this->set("1");
 	else
 		this->set("0");
 }
 
-const char *CVar::getName(void){
+const char *CVar::getName(void) {
 	return this->name;
 }
 
-char *CVar::getString(void){
+char *CVar::getString(void) {
 	return this->sValue;
 }
 
-bool CVar::getBool(void){
+bool CVar::getBool(void) {
 	return this->bValue;
 }
 
-int CVar::getInt(void){
+int CVar::getInt(void) {
 	return this->iValue;
 }
 
-float CVar::getFloat(void){
+float CVar::getFloat(void) {
 	return this->fValue;
 }
 
-bool CVar::isArchived(void){
+bool CVar::isArchived(void) {
 	return this->archive;
 }
 
-bool CVar::isServer(void){
+bool CVar::isServer(void) {
 	return this->server;
 }

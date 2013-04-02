@@ -61,13 +61,13 @@ int fgetLittleLong(FILE *f) {
 }
 
 void Image::LoadTGA(FILE *file, char *filename, Texture *tex) {
-	int columns, rows, numPixels;
+	int columns, rows;
 	byte *pixbuf;
 	int row, column;
 	byte *image_rgba, *fin, *datafile;
 
 	int filesize = Sys_FileLength(file);
-	
+
 	targa_header.id_length = fgetc(file);
 	targa_header.colormap_type = fgetc(file);
 	targa_header.image_type = fgetc(file);
@@ -94,9 +94,8 @@ void Image::LoadTGA(FILE *file, char *filename, Texture *tex) {
 
 	columns = targa_header.width;
 	rows = targa_header.height;
-	numPixels = columns * rows;
 
-	image_rgba = (byte *) malloc(numPixels * 4);
+	image_rgba = (byte *) malloc(columns * rows * 4);
 	if (!image_rgba) {
 		Con_Printf("&c900LoadTGA:&r not enough memory for %i by %i image: %s\n", columns, rows, filename);
 		return;
@@ -225,8 +224,9 @@ breakOut:
 		}
 	}
 	free(datafile);
-	
+
 	tex->width = columns;
 	tex->height = rows;
-	tex->data = image_rgba;
+	tex->bytesPerPixel = 4;
+	tex->setData(image_rgba);
 }

@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include "FileManager.h"
+#include "CRC.h"
 #include "quakedef.h"
 
 
@@ -15,7 +16,7 @@ int FileManager::FOpenFile(const char *filename, FILE **file) {
 }
 
 /**
- * filename never has a leading slash, but may contain directory walks 
+ * filename never has a leading slash, but may contain directory walks
  * returns a handle and a length
  * it may actually be inside a pak file
  */
@@ -131,7 +132,7 @@ void FileManager::StripExtension(const char *in, char *out) {
 
 char *FileManager::FileExtension(char *in) {
 	char *extension = strstr(in, ".");
-	
+
 	if (extension) {
 		extension++;
 	} else {
@@ -272,7 +273,7 @@ pack_t *FileManager::LoadPackFile(char *packfile) {
 
 	// crc the directory to check for modifications
 	CRC crc;
-	crc.process((byte *)info, header.dirlen);	
+	crc.process((byte *)info, header.dirlen);
 	if (crc.getResult() != PAK0_CRC) {
 		Con_SafeDPrintf("PAK0 modified...");
 //		com_modified = true;

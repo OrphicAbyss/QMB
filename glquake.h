@@ -23,7 +23,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #pragma warning(disable : 4136)     // X86
 #pragma warning(disable : 4051)     // ALPHA
 
-#include <GL/GLee.h>
+// Different Linux OSes seem to put GLee in different spots
+#if 1
+// Fedora / Windows / Correct position based on GLee documentation
+    #include <GL/GLee.h>
+#else
+// Ubuntu (thanks for being different guys)
+    #include <GLee.h>
+#endif
 
 void checkGLError(const char *text);
 

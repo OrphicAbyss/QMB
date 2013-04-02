@@ -74,6 +74,7 @@ private:
 	char *name;
 	xcommand_t func;
 	Cmd(const char *name, xcommand_t func);
+	~Cmd();
 public:
 	char *getName();
 	void call();
@@ -83,6 +84,11 @@ public:
 	static Cmd *findCmd(const char *name);
 	static char *completeCommand(char *partial);
 	static bool consoleCommand();
+	/**
+	 * Clear out used zone memory, so that we can look for leaking memory more
+	 * easily.
+     */
+	static void shutdown();
 };
 
 class Alias {
@@ -90,7 +96,7 @@ private:
 	char *name;
 	char *cmdString;
 	Alias(const char *name, const char *cmdString);
-	void remove();
+	~Alias();
 public:
 	char *getName();
 	char *getCmdString();
@@ -101,6 +107,11 @@ public:
 	static char *completeAlias(const char *partial);
 	static void printAliases();
 	static bool consoleCommand();
+	/**
+	 * Clear out used zone memory, so that we can look for leaking memory more
+	 * easily.
+     */
+	static void shutdown();
 };
 
 class MemoryObj;

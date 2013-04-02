@@ -3,18 +3,18 @@
 #include "FileManager.h"
 
 Texture *TextureManager::LoadFile(const char *filename, bool complain) {
-	FILE *f;
+	FILE *f = NULL;
 	char basename[128], name[128];
 
 	FileManager::StripExtension(filename, basename);
 	FileManager::MakeFilenameValid(basename);
-	
+
 	//png loading
 	sprintf(name, "%s.png", basename);
 	int filesize = FileManager::FOpenFile(name, &f);
 	if (f)
 		return LoadFilePNG(f, basename);
-		
+
 	//tga loading
 	sprintf(name, "%s.tga", basename);
 	filesize = FileManager::FOpenFile(name, &f);

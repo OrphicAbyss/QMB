@@ -1,6 +1,15 @@
 // vid_sdl.h -- sdl video driver
 
-#include <GL/GLee.h>
+
+// Different Linux OSes seem to put GLee in different spots
+#if 1
+// Fedora / Windows / Correct position based on GLee documentation
+    #include <GL/GLee.h>
+#else
+// Ubuntu (thanks for being different guys)
+    #include <GLee.h>
+#endif
+
 #include <SDL/SDL.h>
 #include "quakedef.h"
 #include "input.h"
@@ -242,7 +251,7 @@ void VID_Shutdown(void) {
 }
 
 void Sys_SendKeyEvents(void) {
-	SDL_Event event;
+	SDL_Event event = {};
 	int sym, state;
 	int modstate;
 

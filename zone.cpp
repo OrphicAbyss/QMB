@@ -151,9 +151,9 @@ Hunk_AllocName
 void *Hunk_AllocName(int size, const char *name) {
 	hunk_t *h;
 
-#ifdef PARANOID
+//#ifdef PARANOID
 	Hunk_Check();
-#endif
+//#endif
 
 	if (size < 0)
 		Sys_Error("Hunk_Alloc: bad size: %i", size);
@@ -316,6 +316,7 @@ void *MemoryObj::getData() {
 int MemoryObj::getSize() {
 	return size;
 }
+
 using std::list;
 
 static list<MemoryObj *> zoneObjects;
@@ -359,7 +360,7 @@ void MemoryObj::ZFree(void *data) {
 	for (i = start; i != finish && !found; i++) {
 		MemoryObj *obj = *i;
 		if (obj->data == data) {
-			zoneObjects.erase(i);
+			i = zoneObjects.erase(i);
 			obj->freeData();
 			delete obj;
 			found = true;
@@ -367,7 +368,7 @@ void MemoryObj::ZFree(void *data) {
 	}
 
 	if (!found) {
-		Con_Printf("ZONE: Unable to find memory object pointing to the allocated data.");
+		Con_Printf("ZONE: Unable to find memory object pointing to the allocated data.\n");
 	}
 }
 
