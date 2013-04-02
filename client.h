@@ -19,27 +19,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // client.h
 
-typedef struct
-{
+typedef struct {
 	vec3_t	viewangles;
 
 // intended velocities
 	float	forwardmove;
 	float	sidemove;
 	float	upmove;
-#ifdef QUAKE2
-	byte	lightlevel;
-#endif
 } usercmd_t;
 
-typedef struct
-{
+typedef struct {
 	int		length;
 	char	map[MAX_STYLESTRING];
 } lightstyle_t;
 
-typedef struct
-{
+typedef struct {
 	char	name[MAX_SCOREBOARDNAME];
 	float	entertime;
 	int		frags;
@@ -47,8 +41,7 @@ typedef struct
 	byte	translations[VID_GRADES*256];
 } scoreboard_t;
 
-typedef struct
-{
+typedef struct {
 	int		destcolor[3];
 	int		percent;		// 0-256
 } cshift_t;
@@ -59,38 +52,25 @@ typedef struct
 #define	CSHIFT_POWERUP	3
 #define	NUM_CSHIFTS		4
 
-#define	NAME_LENGTH	64
+#define	NAME_LENGTH		64
 
-
-//
 // client_state_t should hold all pieces of the client state
-//
-
-#define	SIGNONS		4			// signon messages to receive before connected
+#define	SIGNONS			4		// signon messages to receive before connected
 
 #define	MAX_DLIGHTS		32
-typedef struct
-{
+typedef struct {
 	vec3_t	origin;
 	float	radius;
 	float	die;				// stop lighting after this time
 	float	decay;				// drop this each second
 	float	minlight;			// don't add when contributing less
 	int		key;
-#ifdef QUAKE2
-	bool	dark;			// subtracts light instead of adding
-#endif
-	// CDL - epca@powerup.com.au
-	// Add a colour to the dynamic lights
-	float colour[3]; //qmb :coloured lighting
-
-	// CDL
+	float colour[3];			//qmb :coloured lighting
 } dlight_t;
 
 
 #define	MAX_BEAMS	24
-typedef struct
-{
+typedef struct {
 	int		entity;
 	struct	particle_s	*p1, *p2, *p3; //3 trails per lighting
 	float	endtime;
@@ -98,23 +78,19 @@ typedef struct
 } beam_t;
 
 #define	MAX_EFRAGS		640
-
 #define	MAX_MAPSTRING	2048
 #define	MAX_DEMOS		8
 #define	MAX_DEMONAME	16
 
 typedef enum {
-ca_dedicated, 		// a dedicated server with no ability to start a client
-ca_disconnected, 	// full screen console with no connection
-ca_connected		// valid netcon, talking to a server
+	ca_dedicated, 		// a dedicated server with no ability to start a client
+	ca_disconnected, 	// full screen console with no connection
+	ca_connected		// valid netcon, talking to a server
 } cactive_t;
 
-//
 // the client_static_t structure is persistant through an arbitrary number
 // of server connections
-//
-typedef struct
-{
+typedef struct {
 	cactive_t	state;
 
 // personalization data sent to server
@@ -127,33 +103,29 @@ typedef struct
 
 // demo recording info must be here, because record is started before
 // entering a map (and clearing client_state_t)
-	bool	demorecording;
-	bool	demoplayback;
-	bool	timedemo;
+	bool		demorecording;
+	bool		demoplayback;
+	bool		timedemo;
 	int			forcetrack;			// -1 = use normal cd track
 	FILE		*demofile;
 	int			td_lastframe;		// to meter out one message a frame
 	int			td_startframe;		// host_framecount at start
 	float		td_starttime;		// realtime at second frame of timedemo
 
-
 // connection information
 	int			signon;			// 0 to SIGNONS
 	struct qsocket_s	*netcon;
 	sizebuf_t	message;		// writing buffer to send to server
 
-	// CAPTURE <anthony@planetquake.com>
+// CAPTURE <anthony@planetquake.com>
 	bool    capturedemo;
 } client_static_t;
 
 extern client_static_t	cls;
 
-//
 // the client_state_t structure is wiped completely at every
 // server signon
-//
-typedef struct
-{
+typedef struct {
 	int			movemessages;	// since connecting to this server
 								// throw out the first couple, so the player
 								// doesn't accidentally do something the
@@ -186,7 +158,7 @@ typedef struct
 // pitch drifting vars
 	float		idealpitch;
 	float		pitchvel;
-	bool	nodrift;
+	bool		nodrift;
 	float		driftmove;
 	double		laststop;
 
@@ -210,9 +182,7 @@ typedef struct
 
 	float		last_received_message;	// (realtime) for net trouble icon
 
-//
 // information that is static for the entire time connected to a server
-//
 	struct model_s		*model_precache[MAX_MODELS];
 	struct sfx_s		*sound_precache[MAX_SOUNDS];
 
@@ -235,9 +205,7 @@ typedef struct
 } client_state_t;
 
 
-//
 // cvars
-//
 extern	CVar	cl_name;
 extern	CVar	cl_color;
 extern	CVar	cl_upspeed;
@@ -260,7 +228,6 @@ extern	CVar	m_yaw;
 extern	CVar	m_forward;
 extern	CVar	m_side;
 
-
 #define	MAX_TEMP_ENTITIES	64			// lightning bolts, etc
 #define	MAX_STATIC_ENTITIES	128			// torches, etc
 
@@ -277,9 +244,7 @@ extern	beam_t			cl_beams[MAX_BEAMS];
 
 //=============================================================================
 
-//
 // cl_main
-//
 dlight_t *CL_AllocDlight (int key);
 void CL_AllocDlightDP (vec3_t org, float radius, float red, float green, float blue, float decay, float lifetime);
 
@@ -301,11 +266,8 @@ void CL_NextDemo (void);
 extern	int				cl_numvisedicts;
 extern	entity_t		*cl_visedicts[MAX_VISEDICTS];
 
-//
 // cl_input
-//
-typedef struct
-{
+typedef struct {
 	int		down[2];		// key nums holding it down
 	int		state;			// low bit is down state
 } kbutton_t;
@@ -317,59 +279,36 @@ extern 	kbutton_t 	in_speed;
 void CL_InitInput (void);
 void CL_SendCmd (void);
 void CL_SendMove (usercmd_t *cmd);
-
 void CL_ParseTEnt (void);
 void CL_UpdateTEnts (void);
-
 void CL_ClearState (void);
-
-
 int  CL_ReadFromServer (void);
 void CL_WriteToServer (usercmd_t *cmd);
 void CL_BaseMove (usercmd_t *cmd);
-
-
 float CL_KeyState (kbutton_t *key);
 const char *Key_KeynumToString (int keynum);
 
-//
 // cl_demo.c
-//
 void CL_StopPlayback (void);
 int CL_GetMessage (void);
-
 void CL_Stop_f (void);
 void CL_Record_f (void);
 void CL_PlayDemo_f (void);
 void CL_TimeDemo_f (void);
 
-//
 // cl_parse.c
-//
 void CL_ParseServerMessage (void);
 void CL_NewTranslation (int slot);
 
-//
 // view
-//
 void V_StartPitchDrift (void);
 void V_StopPitchDrift (void);
-
 void V_RenderView (void);
 void V_UpdatePalette (void);
 void V_Register (void);
 void V_ParseDamage (void);
 void V_SetContentsColor (int contents);
 
-
-//
 // cl_tent
-//
 void CL_InitTEnts (void);
 void CL_SignonReply (void);
-
-//
-// gl_hud
-//
-void CL_DecodeHudPrint(void);
-void CL_DecodeHudRemove(void);

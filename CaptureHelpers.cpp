@@ -71,7 +71,7 @@ void CaptureHelper_Start_f (void)
     }
     fps = 1/host_framerate.getFloat();
 
-    Q_strcpy(filename, CmdArgs::getArg(1));
+    strcpy(filename, CmdArgs::getArg(1));
 	FileManager::DefaultExtension (filename, Capture_DOTEXTENSION); // currently we capture AVI
 
 	if (shm){

@@ -22,7 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __COMMON__
 #define __COMMON__
 
-#if !defined BYTE_DEFINED
+#include <string.h>
+
+#ifndef BYTE_DEFINED
 typedef unsigned char 		byte;
 #define BYTE_DEFINED 1
 #endif
@@ -48,7 +50,6 @@ void SZ_Print (sizebuf_t *buf, const char *data);	// strcats onto the sizebuf
 typedef struct link_s {
 	struct link_s	*prev, *next;
 } link_t;
-
 
 void ClearLink (link_t *l);
 void RemoveLink (link_t *l);
@@ -97,7 +98,7 @@ void MSG_WriteCoord (sizebuf_t *sb, float f);
 void MSG_WriteDPCoord (sizebuf_t *sb, float f);
 void MSG_WriteAngle (sizebuf_t *sb, float f);
 
-extern	int			msg_readcount;
+extern	int		msg_readcount;
 extern	bool	msg_badread;		// set if a read goes beyond end of message
 
 void MSG_BeginReading (void);
@@ -111,32 +112,16 @@ char *MSG_ReadString (void);
 float MSG_ReadCoord (void);
 float MSG_ReadAngle (void);
 
-//============================================================================
-
-void Q_strcpy (char *dest, const char *src);
-void Q_strncpy (char *dest, const char *src, int count);
-int Q_strlen (const char *str);
-char *Q_strrchr (char *s, char c);
-void Q_strcat (char *dest, const char *src);
-int Q_strcmp (const char *s1, const char *s2);
-int Q_strncmp (const char *s1, const char *s2, int count);
-int Q_strcasecmp (const char *s1, const char *s2);
-int Q_strncasecmp (const char *s1, const char *s2, int n);
-int	Q_atoi (const char *str);
-float Q_atof (const char *str);
-
-//============================================================================
-
 extern	char	com_token[1024];
 extern	bool	com_eof;
 
 char *COM_Parse(char *data);
 
 extern	int		com_argc;
-extern	char	**com_argv;
+extern	const char **com_argv;
 
 int COM_CheckParm (const char *parm);
-void COM_Init (char *path);
+void COM_Init ();
 void COM_InitArgv (int argc, char **argv);
 
 char *va(const char *format, ...);
@@ -146,7 +131,7 @@ char *va(const char *format, ...);
 
 extern int com_filesize;
 
-extern	char	com_gamedir[MAX_OSPATH];
+extern char com_gamedir[MAX_OSPATH];
 
 byte *COM_LoadStackFile (const char *path, void *buffer, int bufsize);
 byte *COM_LoadTempFile (const char *path);

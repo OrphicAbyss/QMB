@@ -229,15 +229,13 @@ typedef struct
 // command line parms passed to the program, and the amount of memory
 // available for the program to use
 
-typedef struct
-{
-	char	*basedir;
+typedef struct {
+    const char	*basedir;
 	int		argc;
-	char	**argv;
+	const char	**argv;
 	void	*membase;
 	int		memsize;
 } quakeparms_t;
-
 
 //=============================================================================
 
@@ -277,15 +275,6 @@ extern int			current_skill;		// skill level for currently loaded level (in case
 										//  running, this reflects the level actually in use)
 extern bool		isDedicated;
 extern int			minimum_memory;
-
-//
-// chase
-//
-extern	CVar	chase_active;
-
-void Chase_Init (void);
-void Chase_Reset (void);
-void Chase_Update (void);
 
 //JHL:QMB;
 extern	int	qmb_mod;

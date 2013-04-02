@@ -84,6 +84,8 @@ public:
 	static Cmd *findCmd(const char *name);
 	static char *completeCommand(char *partial);
 	static bool consoleCommand();
+
+	static void Init();
 	/**
 	 * Clear out used zone memory, so that we can look for leaking memory more
 	 * easily.
@@ -124,11 +126,11 @@ private:
 	static char *cmd_null_string;
 	static MemoryObj *argvMem[maxArgs];
 	static char *argv[maxArgs];
-	static char *cmd_args;
+    static char *cmd_args;
 	static int argumentCount;
 	static Source cmd_source;
 
-	static void tokenizeString(char *text);
+    static void tokenizeString(char *text);
 public:
 	static void executeString(char *text, Source src);
 	static char *getArg(int index);
@@ -140,6 +142,5 @@ public:
 	static void setSource(Source src);
 };
 
-void	Cmd_Init (void);
 void	Cmd_Print (char *text);
 

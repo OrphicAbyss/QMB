@@ -42,7 +42,7 @@ private:
 };
 
 typedef struct {
-	const char *name;
+    const char *name;
 	GLuint minimize;
 	GLuint maximize;
 } glFilterMode;

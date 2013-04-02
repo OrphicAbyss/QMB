@@ -38,10 +38,9 @@ bool pr_trace;
 dfunction_t *pr_xfunction;
 int pr_xstatement;
 
-
 int pr_argc;
 
-char *pr_opnames[] ={
+const char *pr_opnames[] ={
 	"DONE",
 
 	"MUL_F",
@@ -145,7 +144,7 @@ void PR_PrintStatement(dstatement_t *s) {
 
 	if ((unsigned) s->op < sizeof (pr_opnames) / sizeof (pr_opnames[0])) {
 		Con_Printf("%s ", pr_opnames[s->op]);
-		i = Q_strlen(pr_opnames[s->op]);
+		i = strlen(pr_opnames[s->op]);
 		for (; i < 10; i++)
 			Con_Printf(" ");
 	}
@@ -225,14 +224,10 @@ void PR_Profile_f(void) {
 	} while (best);
 }
 
-/*
-============
-PR_RunError
-
-Aborts the currently executing function
-============
+/**
+ * Aborts the currently executing function
  */
-void PR_RunError(char *error, ...) {
+void PR_RunError(const char *error, ...) {
 	va_list argptr;
 	char string[1024];
 
@@ -453,7 +448,7 @@ void PR_ExecuteProgram(func_t fnum) {
 						(a->vector[2] == b->vector[2]);
 				break;
 			case OP_EQ_S: //Logical Strings are equals
-				c->_float = !Q_strcmp(pr_strings + a->string, pr_strings + b->string);
+				c->_float = !strcmp(pr_strings + a->string, pr_strings + b->string);
 				break;
 			case OP_EQ_E: //Logical int equals
 				c->_float = a->_int == b->_int;
@@ -470,7 +465,7 @@ void PR_ExecuteProgram(func_t fnum) {
 						(a->vector[2] != b->vector[2]);
 				break;
 			case OP_NE_S: //Logical string not equals
-				c->_float = Q_strcmp(pr_strings + a->string, pr_strings + b->string);
+				c->_float = strcmp(pr_strings + a->string, pr_strings + b->string);
 				break;
 			case OP_NE_E: //Logical int not equals
 				c->_float = a->_int != b->_int;

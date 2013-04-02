@@ -28,7 +28,7 @@ AliasModel::AliasModel() {
 //	//pointer to the surface list
 //	surf = (md3surface_t*) ((byte *) buffer + header->surface_offs);
 //
-//	Q_strcpy(loading->data->filename, "");
+//	strcpy(loading->data->filename, "");
 //	loading->data->flags = header->flags;	
 //	loading->data->numSurfaces = header->num_surfaces;
 //	loading->data->numFrames = header->num_frames;
@@ -53,7 +53,7 @@ AliasModel::AliasModel() {
 //		md3surface_t *surfDisk = (md3surface_t *)((byte *)header + header->surface_offs);
 //		AliasSurface *surfMem = &loading->data->surfaces[i];
 //		surfMem->flags = surfDisk->flags;
-//		Q_strcpy(surfMem->name, surfDisk->name);
+//		strcpy(surfMem->name, surfDisk->name);
 //		surfMem->numFrames = surfDisk->num_surf_frames;
 //		surfMem->numIndices = surfDisk->num_surf_tris * 3;
 //		surfMem->numVerts = surfDisk->num_surf_verts;

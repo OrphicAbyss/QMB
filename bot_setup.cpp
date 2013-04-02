@@ -165,9 +165,9 @@ void BotConnect(client_t *client, int ClientNo, int color, char *name) {
 	globot.botactive[randombot] = true;
 
 	if (name[0] != '0')
-		Q_strcpy(client->name, name);
+		strcpy(client->name, name);
 	else
-		Q_strcpy(client->name, PickBotName(randombot, nameTemp));
+		strcpy(client->name, PickBotName(randombot, nameTemp));
 
 	if (color != 666) {
 		client->colors = color * 16 + color; // The bot must have a color
@@ -201,10 +201,10 @@ void NextFreeClient(void) {
 	char name[32];
 
 	if (CmdArgs::getArgCount() == 2) {
-		color = Q_atoi(CmdArgs::getArg(1));
+		color = atoi(CmdArgs::getArg(1));
 		sprintf(name, "0");
 	} else if (CmdArgs::getArgCount() == 3) {
-		color = Q_atoi(CmdArgs::getArg(1));
+		color = atoi(CmdArgs::getArg(1));
 		sprintf(name, "%s", CmdArgs::getArg(2));
 	} else {
 		color = 666;

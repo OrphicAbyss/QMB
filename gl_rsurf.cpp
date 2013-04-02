@@ -111,7 +111,6 @@ void GL_VertexLight(vec3_t vertex) {
 =============================================================
  */
 void Surf_DrawTextureChainsFour(model_t *model);
-void Surf_DrawTextureChainsTwo(model_t *model);
 
 void R_RecursiveWorldNode(mnode_t *node, float *modelorg) {
 	int c, side;
@@ -207,9 +206,7 @@ void R_RecursiveWorldNode(mnode_t *node, float *modelorg) {
 					surf->texinfo->texture->texturechain = surf;
 
 					//setup eyecandy chain
-					if ((gl_detail.getBool() && gl_textureunits < 4) ||
-							(surf->flags & SURF_UNDERWATER && gl_caustics.getBool()) ||
-							(surf->texinfo->texture->gl_fullbright != 0 && gl_textureunits < 3) ||
+					if ((surf->flags & SURF_UNDERWATER && gl_caustics.getBool()) ||
 							(surf->flags & SURF_SHINY_METAL && gl_shiny.getBool()) ||
 							(surf->flags & SURF_SHINY_GLASS && gl_shiny.getBool())) {
 						surf->extra = extrachain;
@@ -324,18 +321,12 @@ void R_DrawBrushModel(entity_t *e) {
 }
 
 void R_DrawBrush(model_t *clmodel, float *modelorg) {
-	int i;
-	float dot;
-	mplane_t *pplane;
-
-	msurface_t *surf;
-
-	surf = &clmodel->surfaces[clmodel->firstmodelsurface];
-	//if the chains havnt been made then make them
-	for (i = 0; i < clmodel->nummodelsurfaces; i++, surf++) {
-
+	msurface_t *surf = &clmodel->surfaces[clmodel->firstmodelsurface];
+	//if the chains haven't been made then make them
+	for (int i = 0; i < clmodel->nummodelsurfaces; i++, surf++) {
 		// find which side of the node we are on
-		pplane = surf->plane;
+		mplane_t *pplane = surf->plane;
+		float dot;
 
 		switch (pplane->type) {
 			case PLANE_X:
@@ -368,9 +359,7 @@ void R_DrawBrush(model_t *clmodel, float *modelorg) {
 				surf->texinfo->texture->texturechain = surf;
 
 				//setup eyecandy chain
-				if ((gl_detail.getBool() && gl_textureunits < 4) ||
-						(surf->flags & SURF_UNDERWATER && gl_caustics.getBool()) ||
-						(surf->texinfo->texture->gl_fullbright != 0 && gl_textureunits < 3) ||
+				if ((surf->flags & SURF_UNDERWATER && gl_caustics.getBool()) ||
 						(surf->flags & SURF_SHINY_METAL && gl_shiny.getBool()) ||
 						(surf->flags & SURF_SHINY_GLASS && gl_shiny.getBool())) {
 					if (!R_Skybox) {
@@ -386,10 +375,7 @@ void R_DrawBrush(model_t *clmodel, float *modelorg) {
 		}
 	}
 
-	if (gl_textureunits >= 4)
-		Surf_DrawTextureChainsFour(clmodel);
-	else
-		Surf_DrawTextureChainsTwo(clmodel);
+	Surf_DrawTextureChainsFour(clmodel);
 }
 
 void R_DrawWorld(void) {
@@ -408,11 +394,7 @@ void R_DrawWorld(void) {
 	R_RecursiveWorldNode(cl.worldmodel->nodes, &modelorg[0]);
 
 	//draw the world normally
-	if (gl_textureunits >= 4)
-		Surf_DrawTextureChainsFour(cl.worldmodel);
-	else
-		Surf_DrawTextureChainsTwo(cl.worldmodel);
-
+	Surf_DrawTextureChainsFour(cl.worldmodel);
 }
 
 void R_MarkLeaves(void) {

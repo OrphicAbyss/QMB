@@ -51,25 +51,24 @@ void W_CleanupName(const char *in, char *out) {
 	}
 }
 
+const char *WAD_IDENTIFIER = "WAD2";
+
 void W_LoadWadFile(const char *filename) {
+	int i;
+	lumpinfo_t *lump_p;
+	
 	wad_base = COM_LoadHunkFile(filename);
 	if (!wad_base)
 		Sys_Error("W_LoadWadFile: couldn't load %s", filename);
 
-	wadinfo_t *header = (wadinfo_t *) wad_base;
-
-	if (header->identification[0] != 'W'
-		|| header->identification[1] != 'A'
-		|| header->identification[2] != 'D'
-		|| header->identification[3] != '2')
+	wadinfo_t *header = (wadinfo_t *) wad_base;	
+	if (0 != strncmp(WAD_IDENTIFIER, header->identification, 4))
 		Sys_Error("Wad file %s doesn't have WAD2 id\n", filename);
 
 	wad_numlumps = LittleLong(header->numlumps);
 	int infotableofs = LittleLong(header->infotableofs);
 	wad_lumps = (lumpinfo_t *) (wad_base + infotableofs);
 
-	int i;
-	lumpinfo_t *lump_p;
 	for (i = 0, lump_p = wad_lumps; i < wad_numlumps; i++, lump_p++) {
 		lump_p->filepos = LittleLong(lump_p->filepos);
 		lump_p->size = LittleLong(lump_p->size);
@@ -87,7 +86,7 @@ lumpinfo_t *W_GetLumpinfo(const char *name) {
 	W_CleanupName(name, clean);
 
 	for (lump_p = wad_lumps, i = 0; i < wad_numlumps; i++, lump_p++) {
-		if (!Q_strcmp(clean, lump_p->name))
+		if (!strcmp(clean, lump_p->name))
 			return lump_p;
 	}
 

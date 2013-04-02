@@ -28,7 +28,6 @@ void (*vid_menudrawfn)(void) = NULL;
 void (*vid_menukeyfn)(int key) = NULL;
 
 /*-----------------------------------------------------------------------*/
-
 //int		texture_mode = GL_NEAREST;
 int texture_mode = GL_NEAREST_MIPMAP_NEAREST;
 //int		texture_mode = GL_NEAREST_MIPMAP_LINEAR;
@@ -56,10 +55,10 @@ const char *gl_extensions;
 void CheckMultiTextureExtensions(void) {
 	if (strstr(gl_extensions, "GL_ARB_multitexture ")) {
 		glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &gl_textureunits);
-		if (COM_CheckParm("-2tmus"))
-			gl_textureunits = 2;
 		Con_Printf("&c840Multitexture extensions found&r.\n");
 		Con_Printf("&c840Found %i texture unit support&r.\n", gl_textureunits);
+		if (gl_textureunits < 4)
+			Sys_Error("QMB only supports a minimum of 4 texture units.");
 	}
 }
 
@@ -186,7 +185,6 @@ void VID_ShiftPalette(unsigned char *palette) {
 void VID_Init(unsigned char *palette) {
 	int pnum;
 	Uint32 flags;
-	char gldir[MAX_OSPATH];
 
 	// Load the SDL library
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_CDROM) < 0)
@@ -198,16 +196,16 @@ void VID_Init(unsigned char *palette) {
 	if ((pnum = COM_CheckParm("-winsize"))) {
 		if (pnum >= com_argc - 2)
 			Sys_Error("VID: -winsize <width> <height>\n");
-		vid.width = Q_atoi(com_argv[pnum + 1]);
-		vid.height = Q_atoi(com_argv[pnum + 2]);
+		vid.width = atoi(com_argv[pnum + 1]);
+		vid.height = atoi(com_argv[pnum + 2]);
 		if (!vid.width || !vid.height)
 			Sys_Error("VID: Bad window width/height\n");
 	}
 
 	if ((pnum = COM_CheckParm("-width")) != 0)
-		vid.width = Q_atoi(com_argv[pnum + 1]);
+		vid.width = atoi(com_argv[pnum + 1]);
 	if ((pnum = COM_CheckParm("-height")) != 0)
-		vid.height = Q_atoi(com_argv[pnum + 1]);
+		vid.height = atoi(com_argv[pnum + 1]);
 
 	// Set video width, height and flags
 	flags = (SDL_OPENGL);
@@ -231,19 +229,11 @@ void VID_Init(unsigned char *palette) {
 	vid.numpages = 2;
 
 	vid.colormap = host_colormap;
-	vid.fullbright = 256 - LittleLong(*((int *) vid.colormap + 2048));
-	vid.buffer = (pixel_t *) screen->pixels;
-	vid.rowbytes = screen->pitch;
-	vid.conrowbytes = vid.rowbytes;
-	vid.direct = 0;
 
 	// Initialise the mouse
 	IN_HideMouse();
 
 	GL_Init();
-
-	sprintf(gldir, "%s/glquake", com_gamedir);
-	Sys_mkdir(gldir);
 }
 
 void VID_Shutdown(void) {

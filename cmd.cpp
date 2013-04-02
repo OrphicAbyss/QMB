@@ -28,8 +28,8 @@ using std::list;
 static list<Cmd *> Cmds;
 
 Cmd::Cmd(const char* name, xcommand_t func) {
-	this->name = (char *) MemoryObj::ZAlloc(Q_strlen(name) + 1);
-	Q_strcpy(this->name, name);
+	this->name = (char *) MemoryObj::ZAlloc(strlen(name) + 1);
+	strcpy(this->name, name);
 	this->func = func;
 }
 
@@ -72,7 +72,7 @@ Cmd *Cmd::findCmd(const char* name) {
 	for (i = Cmds.begin(); i != Cmds.end(); i++) {
 		Cmd *cmd = *i;
 
-		if (0 == Q_strcmp(cmd->getName(), name)) {
+		if (0 == strcmp(cmd->getName(), name)) {
 			return cmd;
 		}
 	}
@@ -105,13 +105,13 @@ bool Cmd::consoleCommand() {
 char *Cmd::completeCommand(char* partial) {
 	list<Cmd *>::iterator i;
 	Cmd *match = NULL;
-	int sizeOfStr = Q_strlen(partial);
+	int sizeOfStr = strlen(partial);
 	bool multiple = false;
 
 	for (i = Cmds.begin(); i != Cmds.end() && !multiple; i++) {
 		Cmd *cmd = *i;
 
-		if (0 == Q_strncmp(cmd->getName(), partial, sizeOfStr)) {
+		if (0 == strncmp(cmd->getName(), partial, sizeOfStr)) {
 			if (match != NULL) {
 				multiple = true;
 			} else {
@@ -126,7 +126,7 @@ char *Cmd::completeCommand(char* partial) {
 		for (i = Cmds.begin(); i != Cmds.end(); i++) {
 			Cmd *cmd = *i;
 
-			if (0 == Q_strncmp(cmd->getName(), partial, sizeOfStr)) {
+			if (0 == strncmp(cmd->getName(), partial, sizeOfStr)) {
 				if (first) {
 					first = false;
 					Con_Printf(cmd->getName());
@@ -148,10 +148,10 @@ char *Cmd::completeCommand(char* partial) {
 static list<Alias *> Aliases;
 
 Alias::Alias(const char* name, const char* cmdString) {
-	this->name = (char *) MemoryObj::ZAlloc(Q_strlen(name) + 1);
-	Q_strcpy(this->name, name);
-	this->cmdString = (char *) MemoryObj::ZAlloc(Q_strlen(cmdString) + 1);
-	Q_strcpy(this->cmdString, cmdString);
+	this->name = (char *) MemoryObj::ZAlloc(strlen(name) + 1);
+	strcpy(this->name, name);
+	this->cmdString = (char *) MemoryObj::ZAlloc(strlen(cmdString) + 1);
+	strcpy(this->cmdString, cmdString);
 }
 
 Alias::~Alias() {
@@ -183,7 +183,7 @@ Alias *Alias::findAlias(const char* name) {
 	for (i = Aliases.begin(); i != Aliases.end(); i++) {
 		Alias *alias = *i;
 
-		if (0 == Q_strcmp(alias->getName(), name)) {
+		if (0 == strcmp(alias->getName(), name)) {
 			return alias;
 		}
 	}
@@ -206,13 +206,13 @@ void Alias::shutdown() {
 char *Alias::completeAlias(const char* partial) {
 	list<Alias *>::iterator i;
 	Alias *match = NULL;
-	int sizeOfStr = Q_strlen(partial);
+	int sizeOfStr = strlen(partial);
 	bool multiple = false;
 
 	for (i = Aliases.begin(); i != Aliases.end() && !multiple; i++) {
 		Alias *alias = *i;
 
-		if (0 == Q_strncmp(alias->getName(), partial, sizeOfStr)) {
+		if (0 == strncmp(alias->getName(), partial, sizeOfStr)) {
 			if (match != NULL) {
 				multiple = true;
 			} else {
@@ -227,7 +227,7 @@ char *Alias::completeAlias(const char* partial) {
 		for (i = Aliases.begin(); i != Aliases.end(); i++) {
 			Alias *alias = *i;
 
-			if (0 == Q_strncmp(alias->getName(), partial, sizeOfStr)) {
+			if (0 == strncmp(alias->getName(), partial, sizeOfStr)) {
 				if (first) {
 					first = false;
 					Con_Printf(alias->getName());
@@ -299,14 +299,14 @@ void Cbuf_Init(void) {
 void Cbuf_AddText(const char *text) {
 	int l;
 
-	l = Q_strlen(text);
+	l = strlen(text);
 
 	if (cmd_text.cursize + l >= cmd_text.maxsize) {
 		Con_Printf("Cbuf_AddText: overflow\n");
 		return;
 	}
 
-	SZ_Write(&cmd_text, text, Q_strlen(text));
+	SZ_Write(&cmd_text, text, strlen(text));
 }
 
 /**
@@ -316,10 +316,9 @@ void Cbuf_AddText(const char *text) {
  */
 void Cbuf_InsertText(const char *text) {
 	char *temp;
-	int templen;
 
 	// copy off any commands still remaining in the exec buffer
-	templen = cmd_text.cursize;
+	int templen = cmd_text.cursize;
 	if (templen) {
 		temp = (char *) MemoryObj::ZAlloc(templen);
 		memcpy(temp, cmd_text.data, templen);
@@ -410,7 +409,7 @@ void Cmd_StuffCmds_f(void) {
 	for (i = 1; i < com_argc; i++) {
 		if (!com_argv[i])
 			continue; // NEXTSTEP nulls out -NXHost
-		s += Q_strlen(com_argv[i]) + 1;
+		s += strlen(com_argv[i]) + 1;
 	}
 	if (!s)
 		return;
@@ -420,9 +419,9 @@ void Cmd_StuffCmds_f(void) {
 	for (i = 1; i < com_argc; i++) {
 		if (!com_argv[i])
 			continue; // NEXTSTEP nulls out -NXHost
-		Q_strcat(text, com_argv[i]);
+		strcat(text, com_argv[i]);
 		if (i != com_argc - 1)
-			Q_strcat(text, " ");
+			strcat(text, " ");
 	}
 
 	// pull out the commands
@@ -439,8 +438,8 @@ void Cmd_StuffCmds_f(void) {
 			c = text[j];
 			text[j] = 0;
 
-			Q_strcat(build, text + i);
-			Q_strcat(build, "\n");
+			strcat(build, text + i);
+			strcat(build, "\n");
 			text[j] = c;
 			i = j - 1;
 		}
@@ -454,16 +453,13 @@ void Cmd_StuffCmds_f(void) {
 }
 
 void Cmd_Exec_f(void) {
-	char *f;
-	int mark;
-
 	if (CmdArgs::CmdArgs::getArgCount() != 2) {
 		Con_Printf("exec <filename> : execute a script file\n");
 		return;
 	}
 
-	mark = Hunk_LowMark();
-	f = (char *) COM_LoadHunkFile(CmdArgs::CmdArgs::getArg(1));
+	int mark = Hunk_LowMark();
+	char *f = (char *) COM_LoadHunkFile(CmdArgs::CmdArgs::getArg(1));
 	if (!f) {
 		Con_Printf("couldn't exec %s\n", CmdArgs::CmdArgs::getArg(1));
 		return;
@@ -512,11 +508,11 @@ void Cmd_Alias_f(void) {
 	cmd[0] = 0; // start out with a null string
 	maxArgs = CmdArgs::CmdArgs::getArgCount();
 	for (i = 2; i < maxArgs; i++) {
-		Q_strcat(cmd, CmdArgs::CmdArgs::getArg(i));
+		strcat(cmd, CmdArgs::CmdArgs::getArg(i));
 		if (i != maxArgs)
-			Q_strcat(cmd, " ");
+			strcat(cmd, " ");
 	}
-	Q_strcat(cmd, "\n");
+	strcat(cmd, "\n");
 
 	//Create an alias
 	Alias::addAlias(aliasName, cmd);
@@ -528,7 +524,7 @@ void Cmd_Alias_f(void) {
 =============================================================================
  */
 
-void Cmd_Init(void) {
+void Cmd::Init(void) {
 	// register our commands
 	Cmd::addCmd("stuffcmds", Cmd_StuffCmds_f);
 	Cmd::addCmd("exec", Cmd_Exec_f);
@@ -601,8 +597,8 @@ void CmdArgs::tokenizeString(char *text) {
 			return;
 
 		if (argumentCount < maxArgs) {
-			argv[argumentCount] = (char *) MemoryObj::ZAlloc(Q_strlen(com_token) + 1);
-			Q_strcpy(argv[argumentCount], com_token);
+			argv[argumentCount] = (char *) MemoryObj::ZAlloc(strlen(com_token) + 1);
+			strcpy(argv[argumentCount], com_token);
 			argumentCount++;
 		}
 	}
@@ -645,7 +641,7 @@ void CmdArgs::forwardToServer() {
 		return; // not really connected
 
 	MSG_WriteByte(&cls.message, clc_stringcmd);
-	if (Q_strcasecmp(getArg(0), "cmd") != 0) {
+	if (strcasecmp(getArg(0), "cmd") != 0) {
 		SZ_Print(&cls.message, getArg(0));
 		SZ_Print(&cls.message, " ");
 	}
@@ -664,7 +660,7 @@ int CmdArgs::checkParm(char *parm) {
 		Sys_Error("Cmd_CheckParm: NULL");
 
 	for (int i = 1; i < CmdArgs::getArgCount(); i++)
-		if (!Q_strcasecmp(parm, CmdArgs::getArg(i)))
+		if (!strcasecmp(parm, CmdArgs::getArg(i)))
 			return i;
 
 	return 0;

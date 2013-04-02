@@ -159,10 +159,8 @@ public:
 	/**
 	 * Writes lines containing "set variable value" for all variables with the
 	 *  archive flag set to true.
-	 *
-	 * @param f File to write the variables to
 	 */
-	static void writeVariables(FILE *f);
+	static void writeVariables(int handle);
 
 	/**
 	 * Clear out used zone memory, so that we can look for leaking memory more

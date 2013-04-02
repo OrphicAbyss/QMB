@@ -209,7 +209,7 @@ void CL_ParseServerInfo(void) {
 
 	// parse signon message
 	str = MSG_ReadString();
-	Q_strncpy(cl.levelname, str, sizeof (cl.levelname) - 1);
+	strncpy(cl.levelname, str, sizeof (cl.levelname) - 1);
 
 	// seperate the printfs so the server message can have a color
 	Con_Printf("\n\n\35\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\37\n\n");
@@ -229,7 +229,7 @@ void CL_ParseServerInfo(void) {
 			Con_Printf("Server sent too many model precaches\n");
 			return;
 		}
-		Q_strcpy(model_precache[nummodels], str);
+		strcpy(model_precache[nummodels], str);
 		Mod_TouchModel(str);
 	}
 
@@ -243,7 +243,7 @@ void CL_ParseServerInfo(void) {
 			Con_Printf("Server sent too many sound precaches\n");
 			return;
 		}
-		Q_strcpy(sound_precache[numsounds], str);
+		strcpy(sound_precache[numsounds], str);
 		S_TouchSound(str);
 	}
 
@@ -419,13 +419,11 @@ void CL_ParseUpdate(int bits) {
 }
 
 void CL_ParseBaseline(entity_t *ent) {
-	int i;
-
 	ent->baseline.modelindex = MSG_ReadByte();
 	ent->baseline.frame = MSG_ReadByte();
 	ent->baseline.colormap = MSG_ReadByte();
 	ent->baseline.skin = MSG_ReadByte();
-	for (i = 0; i < 3; i++) {
+	for (int i = 0; i < 3; i++) {
 		ent->baseline.origin[i] = MSG_ReadCoord();
 		ent->baseline.angles[i] = MSG_ReadAngle();
 	}
@@ -517,7 +515,6 @@ void CL_ParseClientdata(int bits) {
 }
 
 void CL_NewTranslation(int slot) {
-	int i, j;
 	int top, bottom;
 	byte *dest, *source;
 
@@ -530,29 +527,26 @@ void CL_NewTranslation(int slot) {
 	bottom = (cl.scores[slot].colors & 15) << 4;
 	R_TranslatePlayerSkin(slot);
 
-	for (i = 0; i < VID_GRADES; i++, dest += 256, source += 256) {
+	for (int i = 0; i < VID_GRADES; i++, dest += 256, source += 256) {
 		if (top < 128) // the artists made some backwards ranges.  sigh.
 			memcpy(dest + TOP_RANGE, source + top, 16);
 		else
-			for (j = 0; j < 16; j++)
+			for (int j = 0; j < 16; j++)
 				dest[TOP_RANGE + j] = source[top + 15 - j];
 
 		if (bottom < 128)
 			memcpy(dest + BOTTOM_RANGE, source + bottom, 16);
 		else
-			for (j = 0; j < 16; j++)
+			for (int j = 0; j < 16; j++)
 				dest[BOTTOM_RANGE + j] = source[bottom + 15 - j];
 	}
 }
 
 void CL_ParseStatic(void) {
-	entity_t *ent;
-	int i;
-
-	i = cl.num_statics;
+	int i = cl.num_statics;
 	if (i >= MAX_STATIC_ENTITIES)
 		Host_Error("Too many static entities");
-	ent = &cl_static_entities[i];
+	entity_t *ent = &cl_static_entities[i];
 	cl.num_statics++;
 	CL_ParseBaseline(ent);
 
@@ -570,14 +564,12 @@ void CL_ParseStatic(void) {
 
 void CL_ParseStaticSound(void) {
 	vec3_t org;
-	int sound_num, vol, atten;
-	int i;
-
-	for (i = 0; i < 3; i++)
+	
+	for (int i = 0; i < 3; i++)
 		org[i] = MSG_ReadCoord();
-	sound_num = MSG_ReadByte();
-	vol = MSG_ReadByte();
-	atten = MSG_ReadByte();
+	int sound_num = MSG_ReadByte();
+	int vol = MSG_ReadByte();
+	int atten = MSG_ReadByte();
 
 	S_StaticSound(cl.sound_precache[sound_num], org, vol, atten);
 }
@@ -585,7 +577,6 @@ void CL_ParseStaticSound(void) {
 #define SHOWNET(x) if(cl_shownet.getInt()==2)Con_Printf ("%3i:%s\n", msg_readcount-1, x);
 
 void CL_ParseServerMessage(void) {
-	int cmd;
 	int i;
 
 	// if recording demos, copy the message out
@@ -595,16 +586,14 @@ void CL_ParseServerMessage(void) {
 		Con_Printf("------------------\n");
 
 	cl.onground = false; // unless the server says otherwise
-	//
 	// parse the message
-	//
 	MSG_BeginReading();
 
 	while (1) {
 		if (msg_badread)
 			Host_Error("CL_ParseServerMessage: Bad server message");
 
-		cmd = MSG_ReadByte();
+		int cmd = MSG_ReadByte();
 
 		if (cmd == -1) {
 			SHOWNET("END OF MESSAGE");
@@ -648,6 +637,7 @@ void CL_ParseServerMessage(void) {
 
 			case svc_disconnect:
 				Host_EndGame("Server disconnected\n");
+				break;
 
 			case svc_print:
 				Con_Printf("%s", MSG_ReadString());
@@ -683,8 +673,8 @@ void CL_ParseServerMessage(void) {
 				i = MSG_ReadByte();
 				if (i >= MAX_LIGHTSTYLES)
 					Sys_Error("svc_lightstyle > MAX_LIGHTSTYLES");
-				Q_strcpy(cl_lightstyle[i].map, MSG_ReadString());
-				cl_lightstyle[i].length = Q_strlen(cl_lightstyle[i].map);
+				strcpy(cl_lightstyle[i].map, MSG_ReadString());
+				cl_lightstyle[i].length = strlen(cl_lightstyle[i].map);
 				break;
 
 			case svc_sound:
@@ -700,7 +690,7 @@ void CL_ParseServerMessage(void) {
 				i = MSG_ReadByte();
 				if (i >= cl.maxclients)
 					Host_Error("CL_ParseServerMessage: svc_updatename > MAX_SCOREBOARD");
-				Q_strcpy(cl.scores[i].name, MSG_ReadString());
+				strcpy(cl.scores[i].name, MSG_ReadString());
 				break;
 
 			case svc_updatefrags:
@@ -736,12 +726,10 @@ void CL_ParseServerMessage(void) {
 
 			case svc_setpause:
 				cl.paused = MSG_ReadByte();
-
-				if (cl.paused) {
+				if (cl.paused)
 					CDAudio_Pause();
-				} else {
+				else
 					CDAudio_Resume();
-				}
 				break;
 
 			case svc_signonnum:
@@ -765,7 +753,6 @@ void CL_ParseServerMessage(void) {
 				if (i < 0 || i >= MAX_CL_STATS)
 					Sys_Error("svc_updatestat: %i is invalid", i);
 				cl.stats[i] = MSG_ReadLong();
-				;
 				break;
 
 			case svc_spawnstaticsound:

@@ -57,7 +57,7 @@ void KeyDown(kbutton_t *b) {
 
 	c = CmdArgs::getArg(1);
 	if (c[0])
-		k = Q_atoi(c);
+		k = atoi(c);
 	else
 		k = -1; // typed manually at the console for continuous down
 
@@ -84,7 +84,7 @@ void KeyUp(kbutton_t *b) {
 
 	c = CmdArgs::getArg(1);
 	if (c[0])
-		k = Q_atoi(c);
+		k = atoi(c);
 	else { // typed manually at the console, assume for unsticking, so clear all
 		b->down[0] = b->down[1] = 0;
 		b->state = 4; // impulse up
@@ -235,7 +235,7 @@ void IN_JumpUp(void) {
 }
 
 void IN_Impulse(void) {
-	in_impulse = Q_atoi(CmdArgs::getArg(1));
+	in_impulse = atoi(CmdArgs::getArg(1));
 }
 
 /**

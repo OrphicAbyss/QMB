@@ -156,13 +156,13 @@ model_t *Mod_FindName(const char *name) {
 
 	// search the currently loaded models
 	for (i = 0, mod = mod_known; i < mod_numknown; i++, mod++)
-		if (!Q_strcmp(mod->name, name))
+		if (!strcmp(mod->name, name))
 			break;
 
 	if (i == mod_numknown) {
 		if (mod_numknown == MAX_MOD_KNOWN)
 			Sys_Error("mod_numknown == MAX_MOD_KNOWN");
-		Q_strcpy(mod->name, name);
+		strcpy(mod->name, name);
 		mod->needload = true;
 		mod_numknown++;
 	}
@@ -332,7 +332,7 @@ void Mod_LoadTextures(lump_t *l) {
 		// the pixels immediately follow the structures
 		memcpy(tx + 1, mt + 1, pixels);
 
-		if (!Q_strncmp(mt->name, "sky", 3)) {
+		if (!strncmp(mt->name, "sky", 3)) {
 			R_InitSky(tx);
 		} else {
 			sprintf(texname, "textures/%s", mt->name);
@@ -399,7 +399,7 @@ void Mod_LoadTextures(lump_t *l) {
 			tx2 = loadmodel->textures[j];
 			if (!tx2 || tx2->name[0] != '+')
 				continue;
-			if (Q_strcmp(tx2->name + 2, tx->name + 2))
+			if (strcmp(tx2->name + 2, tx->name + 2))
 				continue;
 
 			num = tx2->name[1];
@@ -454,9 +454,9 @@ void Mod_LoadLighting(lump_t *l) {
 
 	loadmodel->lightdata = NULL;
 	// LordHavoc: check for a .lit file
-	Q_strcpy(litfilename, loadmodel->name);
+	strcpy(litfilename, loadmodel->name);
 	FileManager::StripExtension(litfilename, litfilename);
-	Q_strcat(litfilename, ".lit");
+	strcat(litfilename, ".lit");
 
 	data = (byte*) COM_LoadHunkFile(litfilename); //, false);
 	if (data) {
@@ -504,9 +504,9 @@ void Mod_LoadEntities(lump_t *l) {
 
 	loadmodel->entities = NULL;
 
-	Q_strcpy(entfilename, loadmodel->name);
+	strcpy(entfilename, loadmodel->name);
 	FileManager::StripExtension(entfilename, entfilename);
-	Q_strcat(entfilename, ".ent");
+	strcat(entfilename, ".ent");
 
 	data = (byte*) COM_LoadHunkFile(entfilename); //, false);
 	if (data) {
@@ -728,13 +728,13 @@ void Mod_LoadFaces(lump_t *l) {
 			out->samples = loadmodel->lightdata + (i * 3); // LordHavoc
 
 		// set the drawing flags flag
-		if (!Q_strncmp(out->texinfo->texture->name, "sky", 3)) { // sky
+		if (!strncmp(out->texinfo->texture->name, "sky", 3)) { // sky
 			out->flags |= (SURF_DRAWSKY | SURF_DRAWTILED);
 			GL_SubdivideSurface(out); // cut up polygon for warps
 			continue;
 		}
 
-		if (!Q_strncmp(out->texinfo->texture->name, "*", 1)) { // turbulent
+		if (!strncmp(out->texinfo->texture->name, "*", 1)) { // turbulent
 			out->flags |= (SURF_DRAWTURB | SURF_DRAWTILED);
 			for (i = 0; i < 2; i++) {
 				out->extents[i] = 16384;
@@ -746,29 +746,29 @@ void Mod_LoadFaces(lump_t *l) {
 
 		//qmb :refections
 		//JHL:ADD; Make thee shine like a glass!
-		if ((!Q_strncmp(out->texinfo->texture->name, "window", 6)
-				&& Q_strncmp(out->texinfo->texture->name, "window03", 8))
-				|| !Q_strncmp(out->texinfo->texture->name, "afloor3_1", 9)
-				|| !Q_strncmp(out->texinfo->texture->name, "wizwin", 6))
+		if ((!strncmp(out->texinfo->texture->name, "window", 6)
+				&& strncmp(out->texinfo->texture->name, "window03", 8))
+				|| !strncmp(out->texinfo->texture->name, "afloor3_1", 9)
+				|| !strncmp(out->texinfo->texture->name, "wizwin", 6))
 			out->flags |= SURF_SHINY_GLASS;
 
 		//JHL:ADD; Make thee shine like the mighty steel!
-		if ((!Q_strncmp(out->texinfo->texture->name, "metal", 5) // iron / steel
-				&& Q_strncmp(out->texinfo->texture->name, "metal4", 6)
-				&& Q_strncmp(out->texinfo->texture->name, "metal5", 6)
-				&& Q_strncmp(out->texinfo->texture->name, "metal1_6", 8)
-				&& Q_strncmp(out->texinfo->texture->name, "metal2_1", 8)
-				&& Q_strncmp(out->texinfo->texture->name, "metal2_2", 8)
-				&& Q_strncmp(out->texinfo->texture->name, "metal2_3", 8)
-				&& Q_strncmp(out->texinfo->texture->name, "metal2_4", 8)
-				&& Q_strncmp(out->texinfo->texture->name, "metal2_5", 8)
-				&& Q_strncmp(out->texinfo->texture->name, "metal2_7", 8)
-				&& Q_strncmp(out->texinfo->texture->name, "metal2_8", 8))
-				|| (!Q_strncmp(out->texinfo->texture->name, "cop", 3) // copper
-				&& Q_strncmp(out->texinfo->texture->name, "cop3_1", 8))
-				|| !Q_strncmp(out->texinfo->texture->name, "rune", 4) // runes
-				|| !Q_strncmp(out->texinfo->texture->name, "met_", 4)
-				|| !Q_strncmp(out->texinfo->texture->name, "met5", 4)) // misc. metal
+		if ((!strncmp(out->texinfo->texture->name, "metal", 5) // iron / steel
+				&& strncmp(out->texinfo->texture->name, "metal4", 6)
+				&& strncmp(out->texinfo->texture->name, "metal5", 6)
+				&& strncmp(out->texinfo->texture->name, "metal1_6", 8)
+				&& strncmp(out->texinfo->texture->name, "metal2_1", 8)
+				&& strncmp(out->texinfo->texture->name, "metal2_2", 8)
+				&& strncmp(out->texinfo->texture->name, "metal2_3", 8)
+				&& strncmp(out->texinfo->texture->name, "metal2_4", 8)
+				&& strncmp(out->texinfo->texture->name, "metal2_5", 8)
+				&& strncmp(out->texinfo->texture->name, "metal2_7", 8)
+				&& strncmp(out->texinfo->texture->name, "metal2_8", 8))
+				|| (!strncmp(out->texinfo->texture->name, "cop", 3) // copper
+				&& strncmp(out->texinfo->texture->name, "cop3_1", 8))
+				|| !strncmp(out->texinfo->texture->name, "rune", 4) // runes
+				|| !strncmp(out->texinfo->texture->name, "met_", 4)
+				|| !strncmp(out->texinfo->texture->name, "met5", 4)) // misc. metal
 			out->flags |= SURF_SHINY_METAL;
 	}
 }
@@ -1085,7 +1085,7 @@ void Mod_LoadBrushModel(model_t *mod, void *buffer) {
 			sprintf(name, "*%i", i + 1);
 			loadmodel = Mod_FindName(name);
 			*loadmodel = *mod;
-			Q_strcpy(loadmodel->name, name);
+			strcpy(loadmodel->name, name);
 			mod = loadmodel;
 		}
 	}
@@ -1114,7 +1114,7 @@ void * Mod_LoadAliasFrame(void * pin, maliasframedesc_t *frame) {
 
 	pdaliasframe = (daliasframe_t *) pin;
 
-	Q_strcpy(frame->name, pdaliasframe->name);
+	strcpy(frame->name, pdaliasframe->name);
 	frame->firstpose = posenum;
 	frame->numposes = 1;
 
@@ -1327,7 +1327,7 @@ void *Mod_LoadAllSkins(int numskins, daliasskintype_t *pskintype) {
 			FileManager::StripExtension(loadmodel->name, model);
 
 			// save 8 bit texels for the player model to remap
-			if (!Q_strcmp(loadmodel->name, "progs/player.mdl")) {
+			if (!strcmp(loadmodel->name, "progs/player.mdl")) {
 				texels = (byte *) Hunk_AllocName(s, loadname);
 				pheader->texels[i] = texels - (byte *) pheader;
 				memcpy(texels, (byte *) (pskintype + 1), s);
@@ -1670,12 +1670,12 @@ void Mod_LoadQ2AliasModel(model_t *mod, void *buffer) {
 
 void Mod_Sprite_StripExtension(char *in, char *out) {
 	char *end;
-	end = in + Q_strlen(in);
+	end = in + strlen(in);
 	if ((end - in) >= 6)
-		if (Q_strcmp(end - 6, ".spr32") == 0)
+		if (strcmp(end - 6, ".spr32") == 0)
 			end -= 6;
 	if ((end - in) >= 4)
-		if (Q_strcmp(end - 4, ".spr") == 0)
+		if (strcmp(end - 4, ".spr") == 0)
 			end -= 4;
 	while (in < end)
 		*out++ = *in++;
@@ -1684,9 +1684,9 @@ void Mod_Sprite_StripExtension(char *in, char *out) {
 
 int Mod_Sprite_Bits(char *in) {
 	char *end;
-	end = in + Q_strlen(in);
+	end = in + strlen(in);
 	if ((end - in) >= 6)
-		if (Q_strcmp(end - 6, ".spr32") == 0)
+		if (strcmp(end - 6, ".spr32") == 0)
 			return 4;
 	return 1;
 }
@@ -1795,8 +1795,6 @@ void Mod_LoadSpriteModel(model_t *mod, void *buffer) {
 	numframes = LittleLong(pin->numframes);
 
 	size = sizeof (msprite_t) + (numframes - 1) * sizeof (psprite->frames);
-
-	//psprite = (msprite_t *)Hunk_AllocName (size, loadname);
 
 	mod->cache = MemoryObj::Alloc(MemoryObj::CACHE, loadname, size);
 	psprite = (msprite_t *) mod->cache->getData();

@@ -128,7 +128,7 @@ void Hunk_Print(bool all) {
 		// print the total
 		//
 		if (next == endlow || next == endhigh ||
-				Q_strncmp(h->name, next->name, 8)) {
+				strncmp(h->name, next->name, 8)) {
 			if (!all)
 				Con_Printf("          :%8i %8s (TOTAL)\n", sum, name);
 			count = 0;
@@ -170,7 +170,7 @@ void *Hunk_AllocName(int size, const char *name) {
 
 	h->size = size;
 	h->sentinal = HUNK_SENTINAL;
-	Q_strncpy(h->name, name, 8);
+	strncpy(h->name, name, 8);
 
 	return (void *) (h + 1);
 }
@@ -249,7 +249,7 @@ void *Hunk_HighAllocName(int size, const char *name) {
 	memset(h, 0, size);
 	h->size = size;
 	h->sentinal = HUNK_SENTINAL;
-	Q_strncpy(h->name, name, 8);
+	strncpy(h->name, name, 8);
 
 	return (void *) (h + 1);
 }
@@ -286,16 +286,19 @@ CACHE & ZONE MEMORY
 ===============================================================================
  */
 
-MemoryObj::MemoryObj(MemType type, char *name, int size) {
+MemoryObj::MemoryObj(MemType type, const char *name, int size) {
 	memset(this->name, 0, maxNameLength);
-	Q_strncpy(this->name, name, maxNameLength);
+	strncpy(this->name, name, maxNameLength);
 	this->type = type;
 	this->data = malloc(size);
 	this->size = size;
 }
 
 MemoryObj::~MemoryObj() {
-	free(data);
+	if (data)
+		free(data);
+
+	data = NULL;
 }
 
 void MemoryObj::freeData() {
@@ -322,7 +325,7 @@ using std::list;
 static list<MemoryObj *> zoneObjects;
 static list<MemoryObj *> cacheObjects;
 
-MemoryObj *MemoryObj::Alloc(MemType type, char* name, int size) {
+MemoryObj *MemoryObj::Alloc(MemType type, const char* name, int size) {
 	MemoryObj *obj = new MemoryObj(type, name, size);
 
 	switch (type) {
@@ -502,7 +505,7 @@ void Memory_Init(void *buf, int size) {
 	p = COM_CheckParm("-zone");
 	if (p) {
 		if (p < com_argc - 1)
-			zonesize = Q_atoi(com_argv[p + 1]) * 1024;
+			zonesize = atoi(com_argv[p + 1]) * 1024;
 		else
 			Sys_Error("Memory_Init: you must specify a size in KB after -zone");
 	}

@@ -21,28 +21,19 @@
 #endif
 
 #include <SDL/SDL.h>
-
 #include "quakedef.h"
+#include "FileManager.h"
 
 bool isDedicated;
 
 int noconinput = 0;
 
-char *basedir = ".";
-
 CVar sys_nostdout("sys_nostdout", "0");
-
-// =======================================================================
-// General routines
-// =======================================================================
 
 /**
  * Prints out to the stdout the console text.
  *
  * Removes any colour control codes for cleaner output.
- *
- * @param fmt
- * @param ...
  */
 void Sys_Printf(const char *fmt, ...) {
 	va_list argptr;
@@ -92,111 +83,6 @@ void Sys_Error(const char *error, ...) {
 
 	Host_Shutdown();
 	exit(1);
-
-}
-
-/*
-===============================================================================
-FILE IO
-===============================================================================
- */
-#define	MAX_HANDLES		10
-FILE *sys_handles[MAX_HANDLES];
-
-int findhandle(void) {
-	int i;
-
-	for (i = 1; i < MAX_HANDLES; i++)
-		if (!sys_handles[i])
-			return i;
-	Sys_Error("out of handles");
-	return -1;
-}
-
-int Sys_FileLength(FILE *f) {
-	int pos;
-	int end;
-
-	pos = ftell(f);
-	fseek(f, 0, SEEK_END);
-	end = ftell(f);
-	fseek(f, pos, SEEK_SET);
-
-	return end;
-}
-
-int Sys_FileOpenRead(char *path, int *hndl) {
-	int i = findhandle();
-	FILE *f = fopen(path, "rb");
-	if (!f) {
-		*hndl = -1;
-		return -1;
-	}
-	sys_handles[i] = f;
-	*hndl = i;
-
-	return Sys_FileLength(f);
-}
-
-int Sys_FileOpenWrite(char *path) {
-	int i = findhandle();
-	FILE *f = fopen(path, "wb");
-	if (!f)
-		Sys_Error("Error opening %s: %s", path, strerror(errno));
-	sys_handles[i] = f;
-
-	return i;
-}
-
-void Sys_FileClose(int handle) {
-	if (handle >= 0) {
-		fclose(sys_handles[handle]);
-		sys_handles[handle] = NULL;
-	}
-}
-
-void Sys_FileSeek(int handle, int position) {
-	if (handle >= 0)
-		fseek(sys_handles[handle], position, SEEK_SET);
-}
-
-int Sys_FileRead(int handle, void *dst, int count) {
-	int size = 0;
-	if (handle >= 0) {
-		char *data = (char *) dst;
-		while (count > 0) {
-			int done = fread(data, 1, count, sys_handles[handle]);
-			if (done == 0)
-				break;
-
-			data += done;
-			count -= done;
-			size += done;
-		}
-	}
-	return size;
-}
-
-int Sys_FileWrite(int handle, void *src, int count) {
-	fwrite(src, 1, count, sys_handles[handle]);
-}
-
-int Sys_FileTime(char *path) {
-	FILE *f = fopen(path, "rb");
-	if (f) {
-		fclose(f);
-		return 1;
-	}
-
-	return -1;
-}
-
-void Sys_mkdir(char *path) {
-#ifdef __WIN32__
-	mkdir(path);
-#else
-	mkdir(path, 0777);
-#endif
 }
 
 void Sys_DebugLog(char *file, char *fmt, ...) {
@@ -208,7 +94,7 @@ void Sys_DebugLog(char *file, char *fmt, ...) {
 	vsprintf(data, fmt, argptr);
 	va_end(argptr);
 	fp = fopen(file, "a");
-	fwrite(data, Q_strlen(data), 1, fp);
+	fwrite(data, strlen(data), 1, fp);
 	fclose(fp);
 }
 
@@ -250,16 +136,14 @@ int main(int c, char **v) {
 	extern int recording;
 	int value;
 
-	//signal(SIGFPE, SIG_IGN);
-
 	value = COM_CheckParm("-mem");
 	if (value)
-		parms.memsize = (int) (Q_atof(com_argv[value + 1]) * 1024 * 1024);
+		parms.memsize = (int) (atof(com_argv[value + 1]) * 1024 * 1024);
 	else
 		parms.memsize = 16 * 1024 * 1024;
 
 	parms.membase = malloc(parms.memsize);
-	parms.basedir = basedir;
+	parms.basedir = ".";
 
 	COM_InitArgv(c, v);
 	parms.argc = com_argc;

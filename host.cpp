@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "input.h"
 #include "NeuralNets.h"
 #include "Texture.h"
+#include "FileManager.h"
 
 /*
 A server can allways be started, even if the system started out as a client
@@ -75,11 +76,6 @@ CVar show_fps("show_fps", "1", true); // set for running times - muff
 
 int fps_count;
 
-/*
-================
-Host_EndGame
-================
- */
 void Host_EndGame(const char *message, ...) {
 	va_list argptr;
 	char string[1024];
@@ -103,12 +99,8 @@ void Host_EndGame(const char *message, ...) {
 	longjmp(host_abortserver, 1);
 }
 
-/*
-================
-Host_Error
-
-This shuts down both the client and server
-================
+/**
+ * This shuts down both the client and server
  */
 void Host_Error(const char *error, ...) {
 	va_list argptr;
@@ -140,22 +132,14 @@ void Host_Error(const char *error, ...) {
 	longjmp(host_abortserver, 1);
 }
 
-/*
-================
-Host_FindMaxClients
-================
- */
 void Host_FindMaxClients(void) {
-	//Qmb :made max clients 16
-	int i;
-
 	svs.maxclients = 1;
 
-	i = COM_CheckParm("-dedicated");
+	int i = COM_CheckParm("-dedicated");
 	if (i) {
 		cls.state = ca_dedicated;
 		if (i != (com_argc - 1)) {
-			svs.maxclients = Q_atoi(com_argv[i + 1]);
+			svs.maxclients = atoi(com_argv[i + 1]);
 		} else
 			svs.maxclients = 8;
 	} else
@@ -168,7 +152,7 @@ void Host_FindMaxClients(void) {
 		if (cls.state == ca_dedicated)
 			Sys_Error("Only one of -dedicated or -listen can be specified");
 		if (i != (com_argc - 1))
-			svs.maxclients = Q_atoi(com_argv[i + 1]);
+			svs.maxclients = atoi(com_argv[i + 1]);
 		else
 			svs.maxclients = 32;
 	}
@@ -188,11 +172,6 @@ void Host_FindMaxClients(void) {
 		deathmatch.set(0.0f);
 }
 
-/*
-=======================
-Host_InitLocal
-======================
- */
 void Host_InitLocal(void) {
 	Host_InitCommands();
 
@@ -218,39 +197,24 @@ void Host_InitLocal(void) {
 	host_time = 1.0; // so a think at time 0 won't get called
 }
 
-/*
-===============
-Host_WriteConfiguration
-
-Writes key bindings and archived cvars to config.cfg
-===============
+/**
+ * Writes key bindings and archived cvars to config.cfg
+ * 
+ * Note: Dedicated servers don't parse and set the config.cfg cvars
  */
 void Host_WriteConfiguration(void) {
-	FILE *f;
-
-	// dedicated servers initialize the host but don't parse and set the
-	// config.cfg cvars
 	if (host_initialized & !isDedicated) {
-		f = fopen(va("%s/config.cfg", com_gamedir), "w");
-		if (!f) {
-			Con_Printf("Couldn't write config.cfg.\n");
-			return;
-		}
-
-		Key_WriteBindings(f);
-		CVar::writeVariables(f);
-
-		fclose(f);
+		int handle = SystemFileManager::FileOpenWrite(va("%s/config.cfg", com_gamedir));
+		Key_WriteBindings(handle);
+		CVar::writeVariables(handle);
+		SystemFileManager::FileClose(handle);
 	}
 }
 
-/*
-=================
-SV_ClientPrintf
-
-Sends text across to be displayed
-FIXME: make this just a stuffed echo?
-=================
+/**
+ * Sends text across to be displayed
+ * 
+ * FIXME: make this just a stuffed echo?
  */
 void SV_ClientPrintf(const char *fmt, ...) {
 	va_list argptr;
@@ -259,17 +223,13 @@ void SV_ClientPrintf(const char *fmt, ...) {
 	va_start(argptr, fmt);
 	vsprintf(string, fmt, argptr);
 	va_end(argptr);
-
+	
 	MSG_WriteByte(&host_client->message, svc_print);
 	MSG_WriteString(&host_client->message, string);
 }
 
-/*
-=================
-SV_BroadcastPrintf
-
-Sends text to all active clients
-=================
+/**
+ * Sends text to all active clients
  */
 void SV_BroadcastPrintf(const char *fmt, ...) {
 	va_list argptr;
@@ -287,12 +247,8 @@ void SV_BroadcastPrintf(const char *fmt, ...) {
 		}
 }
 
-/*
-=================
-Host_ClientCommands
-
-Send text over to the client to be executed
-=================
+/**
+ * Send text over to the client to be executed
  */
 void Host_ClientCommands(const char *fmt, ...) {
 	va_list argptr;
@@ -306,13 +262,10 @@ void Host_ClientCommands(const char *fmt, ...) {
 	MSG_WriteString(&host_client->message, string);
 }
 
-/*
-=====================
-SV_DropClient
-
-Called when the player is getting totally kicked off the host
-if (crash = true), don't bother sending signofs
-=====================
+/**
+ * Called when the player is getting totally kicked off the host
+ * 
+ * if (crash = true), don't bother sending signofs
  */
 void SV_DropClient(bool crash) {
 	int saveSelf;
@@ -364,12 +317,8 @@ void SV_DropClient(bool crash) {
 	}
 }
 
-/*
-==================
-Host_ShutdownServer
-
-This only happens at the end of a game, not between levels
-==================
+/**
+ * This only happens at the end of a game, not between levels
  */
 void Host_ShutdownServer(bool crash) {
 	int i;
@@ -419,20 +368,14 @@ void Host_ShutdownServer(bool crash) {
 		if (host_client->active)
 			SV_DropClient(crash);
 
-	//
 	// clear structures
-	//
 	memset(&sv, 0, sizeof (sv));
 	memset(svs.clients, 0, svs.maxclientslimit * sizeof (client_t));
 }
 
-/*
-================
-Host_ClearMemory
-
-This clears all the memory used by both the client and server, but does
-not reinitialize anything.
-================
+/**
+ * This clears all the memory used by both the client and server, but does not 
+ * reinitialize anything.
  */
 void Host_ClearMemory(void) {
 	Con_DPrintf("Clearing memory\n");
@@ -445,15 +388,10 @@ void Host_ClearMemory(void) {
 	memset(&cl, 0, sizeof (cl));
 }
 
-
 //============================================================================
 
-/*
-===================
-Host_FilterTime
-
-Returns false if the time is too short to run a frame
-===================
+/**
+ * Returns false if the time is too short to run a frame
  */
 bool Host_FilterTime(float time) {
 	realtime += time;
@@ -480,12 +418,8 @@ bool Host_FilterTime(float time) {
 	return true;
 }
 
-/*
-===================
-Host_GetConsoleCommands
-
-Add them exactly as if they had been typed at the console
-===================
+/**
+ * Add them exactly as if they had been typed at the console
  */
 void Host_GetConsoleCommands(void) {
 	char *cmd;
@@ -498,61 +432,6 @@ void Host_GetConsoleCommands(void) {
 	}
 }
 
-
-/*
-==================
-Host_ServerFrame
-
-==================
- */
-#ifdef FPS_20
-
-void _Host_ServerFrame(void) {
-	// run the world state
-	pr_global_struct->frametime = host_frametime;
-
-	// read client messages
-	SV_RunClients();
-
-	// move things around and think
-	// always pause in single player if in console or menus
-	if (!sv.paused && (svs.maxclients > 1 || key_dest == key_game))
-		SV_Physics();
-}
-
-void Host_ServerFrame(void) {
-	float save_host_frametime;
-	float temp_host_frametime;
-
-	// run the world state
-	pr_global_struct->frametime = host_frametime;
-
-	// set the time and clear the general datagram
-	SV_ClearDatagram();
-
-	// check for new clients
-	SV_CheckForNewClients();
-
-	/* DrLabman 2006-1-31 : WTF How did this host time stuff even work */
-	//temp_host_frametime = save_host_frametime = host_frametime;
-	while (temp_host_frametime > (1.0 / 72.0)) {
-		//stop really long frame times from allowing too much to happen (cap at 20 fps min)
-		//if (temp_host_frametime > 0.05){
-		//	host_frametime = 0.05;
-		//} else {
-		//	host_frametime = temp_host_frametime;
-		//}
-		//temp_host_frametime -= host_frametime;
-		_Host_ServerFrame();
-	}
-	//host_frametime = save_host_frametime;
-
-	// send all messages to the clients
-	SV_SendClientMessages();
-}
-
-#else
-
 void Host_ServerFrame(void) {
 	// run the world state
 	pr_global_struct->frametime = host_frametime;
@@ -575,14 +454,8 @@ void Host_ServerFrame(void) {
 	SV_SendClientMessages();
 }
 
-#endif
-
-/*
-==================
-Host_Frame
-
-Runs all active servers
-==================
+/**
+ * Runs all active servers
  */
 void _Host_Frame(float time) {
 	static double time1 = 0;
@@ -616,9 +489,7 @@ void _Host_Frame(float time) {
 		CL_SendCmd();
 
 	//-------------------
-	//
 	// server operations
-	//
 	//-------------------
 
 	// check for commands typed to the host
@@ -628,9 +499,7 @@ void _Host_Frame(float time) {
 		Host_ServerFrame();
 
 	//-------------------
-	//
 	// client operations
-	//
 	//-------------------
 
 	// if running the server remotely, send intentions now after
@@ -712,14 +581,7 @@ void Host_Frame(float time) {
 
 //============================================================================
 
-/*
-====================
-Host_Init
-====================
- */
-//qmb :globot
 void Bot_Init(void);
-
 void Host_Init(quakeparms_t *parms) {
 	if (standard_quake)
 		minimum_memory = MINIMUM_MEMORY;
@@ -739,11 +601,10 @@ void Host_Init(quakeparms_t *parms) {
 
 	Memory_Init(parms->membase, parms->memsize);
 	Cbuf_Init();
-	Cmd_Init();
+	Cmd::Init();
 	V_Init();
 	NN_init();
-	Chase_Init();
-	COM_Init(parms->basedir);
+	COM_Init();
 	Host_InitLocal();
 	W_LoadWadFile("gfx.wad");
 	Key_Init();
@@ -827,4 +688,3 @@ void Host_Shutdown(void) {
 		Con_CloseDebugLog();
 	}
 }
-

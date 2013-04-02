@@ -26,10 +26,33 @@ typedef struct searchpath_s {
 	struct searchpath_s *next;
 } searchpath_t;
 
+class File {
+private:
+	FILE *obj;
+	char *path;
+	char openType[4];
+public:
+	enum FileOpenType { READ, WRITE, APPEND };
+	
+	File(const char *path, FileOpenType mode, bool isBinary);
+	~File();
+	
+	bool isOpen();
+	long getLength();
+	size_t read(void *buffer, size_t size);
+	size_t write(const void *buffer, size_t size);
+	void seek(long position);
+};
+
 class FileManager {
 public:
 	static searchpath_t *searchpaths;
 
+	/**
+	 * Returns true if the filename passed in points to an existing file.
+     */
+	static bool FileExists(const char *filename);
+	
 	static int OpenFile(const char *filename, int *hndl);
 	static int FOpenFile(const char *filename, FILE **file);
 	static int FindFile(const char *filename, int *handle, FILE **file);
@@ -48,7 +71,7 @@ public:
 	/**
 	 * Return a pointer to the start of the file extension.
      */
-	static char *FileExtension(char *in);
+	static const char *FileExtension(const char *in);
 	/**
 	 * If the path doesn't contain an extension .EXT then add the provided
 	 * default.
@@ -68,16 +91,31 @@ public:
 	/**
 	 * Add a pak to our list of places to search for files
      */
-	static void AddPackToPath(char *pak);
+	static void AddPackToPath(const char *pak);
 	/**
      * Takes an explicit (not game tree related) path to a pak file.
      *
      * Loads the header and directory, adding the files at the beginning of the list
      * so they override previous pack files.
      */
-    static pack_t *LoadPackFile(char *packfile);
-private:
+    static pack_t *LoadPackFile(const char *packfile);
+};
 
+class SystemFileManager {
+public:
+	static int FileLength(FILE *f);
+	static int FileOpenRead(const char *path, int *hndl);
+	static int FileOpenWrite(const char *path);
+	static void FileClose(int handle);
+	static void FileSeek(int handle, long pos);
+	static int FileRead(int handle, void *dest, size_t count);
+	static size_t FileWrite(int handle, const void *data, size_t count);
+private:
+	static const int MAX_HANDLES = 10;
+	static File *handles[MAX_HANDLES];
+	
+	static int findHandle();
+	static File *getFileForHandle(int handle);
 };
 
 #endif	/* FILEMANAGER_H */

@@ -96,7 +96,6 @@ void R_AddTextHudItem(byte id, float x, float y, char *string) {
 
 	huds[id].text = string;
 	huds[id].used = 1;
-
 }
 
 void R_AddPicHudItem(byte id, float x, float y, float w, float h, vec3_t colour, float alpha, int gl_texnum) {
@@ -143,82 +142,3 @@ void CL_DecodeHudRemove(void) {
 	R_RemoveHudItem(id);
 }
 
-void CL_DecodeHudPrint(void) {
-	byte id, len, pos;
-	char *text;
-	float x;
-	float y;
-
-	id = MSG_ReadByte();
-	x = MSG_ReadFloat();
-	y = MSG_ReadFloat();
-	pos = MSG_ReadByte();
-	len = MSG_ReadByte();
-
-	text = (char *) malloc(len);
-	Q_strcpy(text, MSG_ReadString());
-
-	//code to position text
-	//0000 - 0 - left top
-	//0001 - 1 - left bottom
-	//0010 - 2 - right top
-	//0011 - 3 - right bottom
-	//0100 - 4 - left centre
-	//0110 - 5 - right centre
-	//---
-	//1000 - 8 - centre top
-	//1010 - 9 - centre bottom
-	if (4 && pos == 4) {
-		y = vid.conheight / 2 + y;
-	} else if (1 && pos == 1) {
-		y = vid.conheight - y;
-	} else {
-		y = y;
-	}
-
-	if (8 && pos == 8) {
-		x = vid.conwidth / 2 + x;
-	} else if (2 && pos == 2) {
-		x = vid.conwidth - x;
-	} else {
-		x = x;
-	}
-
-	R_AddTextHudItem(id, x, y, text);
-}
-
-void CL_DecodeHudPic(void) {
-	byte id, len, pos;
-	char *text;
-	float x;
-	float y;
-
-	len = MSG_ReadByte();
-	pos = MSG_ReadByte();
-	x = MSG_ReadFloat();
-	y = MSG_ReadFloat();
-	id = MSG_ReadByte();
-	text = (char *) malloc(len);
-	Q_strcpy(text, MSG_ReadString());
-
-	//code to position text
-	//0000 - 0 - left top
-	//0001 - 1 - left bottom
-	//0010 - 2 - right top
-	//0011 - 3 - right bottom
-	if (pos = 0) {
-		x = x;
-		y = y;
-	} else if (pos = 1) {
-		x = x;
-		y = vid.conheight - y;
-	} else if (pos = 2) {
-		x = vid.conwidth - x;
-		y = y;
-	} else if (pos = 3) {
-		x = x;
-		y = vid.conheight - y;
-	}
-
-	R_AddTextHudItem(id, x, y, text);
-}

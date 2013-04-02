@@ -1,11 +1,21 @@
 #include <string.h>
+#include <errno.h>
 
 #include "FileManager.h"
 #include "CRC.h"
 #include "quakedef.h"
 
-
 searchpath_t *FileManager::searchpaths;
+
+bool FileManager::FileExists(const char *filename) {
+	FILE *f = fopen(filename, "rb");
+	if (f) {
+		fclose(f);
+		return true;
+	}
+
+	return false;
+}
 
 /**
  * If the requested file is inside a packfile, a new FILE * will be opened into
@@ -29,10 +39,8 @@ int FileManager::OpenFile(const char *filename, int *handle) {
  */
 int FileManager::FindFile(const char *filename, int *handle, FILE **file) {
 	char netpath[MAX_OSPATH];
-	//char cachepath[MAX_OSPATH];
 	pack_t *pak;
 	int i;
-	int findtime; //, cachetime;
 
 	if (file && handle)
 		Sys_Error("COM_FindFile: both handle and file set");
@@ -40,17 +48,17 @@ int FileManager::FindFile(const char *filename, int *handle, FILE **file) {
 		Sys_Error("COM_FindFile: neither handle or file set");
 
 	// search through the path, one element at a time
-	for (searchpath_t *search = searchpaths ; search; search = search->next) {
+	for (searchpath_t *search = searchpaths; search; search = search->next) {
 		// is the element a pak file?
 		if (search->pack) {
 			// look through all the pak file elements
 			pak = search->pack;
-			for (i = 0; i < pak->numfiles; i++)
-				if (!Q_strcmp(pak->files[i].name, filename)) { // found it!
+			for (int i = 0; i < pak->numfiles; i++)
+				if (!strcmp(pak->files[i].name, filename)) { // found it!
 					Sys_Printf("PackFile: %s : %s\n", pak->filename, filename);
 					if (handle) {
 						*handle = pak->handle;
-						Sys_FileSeek(pak->handle, pak->files[i].filepos);
+						SystemFileManager::FileSeek(pak->handle, pak->files[i].filepos);
 					} else { // open a new file on the pakfile
 						*file = fopen(pak->filename, "rb");
 						if (*file)
@@ -63,16 +71,15 @@ int FileManager::FindFile(const char *filename, int *handle, FILE **file) {
 			// check a file in the directory tree
 			sprintf(netpath, "%s/%s", search->filename, filename);
 
-			findtime = Sys_FileTime(netpath);
-			if (findtime == -1)
+			if (!FileExists(netpath))
 				continue;
 
 			Sys_Printf("FindFile: %s\n", netpath);
-			com_filesize = Sys_FileOpenRead(netpath, &i);
+			com_filesize = SystemFileManager::FileOpenRead(netpath, &i);
 			if (handle)
 				*handle = i;
 			else {
-				Sys_FileClose(i);
+				SystemFileManager::FileClose(i);
 				*file = fopen(netpath, "rb");
 			}
 			return com_filesize;
@@ -96,15 +103,15 @@ void FileManager::WriteFile(const char *filename, void *data, int len) {
 
 	sprintf(name, "%s/%s", com_gamedir, filename);
 
-	int handle = Sys_FileOpenWrite(name);
+	int handle = SystemFileManager::FileOpenWrite(name);
 	if (handle == -1) {
 		Sys_Printf("COM_WriteFile: failed on %s\n", name);
 		return;
 	}
 
 	Sys_Printf("COM_WriteFile: %s\n", name);
-	Sys_FileWrite(handle, data, len);
-	Sys_FileClose(handle);
+	SystemFileManager::FileWrite(handle, data, len);
+	SystemFileManager::FileClose(handle);
 }
 
 /**
@@ -115,7 +122,7 @@ void FileManager::CloseFile(int h) {
 		if (s->pack && s->pack->handle == h)
 			return;
 
-	Sys_FileClose(h);
+	SystemFileManager::FileClose(h);
 }
 
 void FileManager::MakeFilenameValid(char *data) {
@@ -130,8 +137,8 @@ void FileManager::StripExtension(const char *in, char *out) {
 	*out = 0;
 }
 
-char *FileManager::FileExtension(char *in) {
-	char *extension = strstr(in, ".");
+const char *FileManager::FileExtension(const char *in) {
+	const char *extension = strstr(in, ".");
 
 	if (extension) {
 		extension++;
@@ -143,7 +150,7 @@ char *FileManager::FileExtension(char *in) {
 }
 
 void FileManager::FileBase(const char *in, char *out) {
-	const char *s = in + Q_strlen(in) - 1;
+	const char *s = in + strlen(in) - 1;
 	while (s != in && *s != '.')
 		s--;
 
@@ -152,16 +159,16 @@ void FileManager::FileBase(const char *in, char *out) {
 		s2--;
 
 	if (s - s2 < 2)
-		Q_strcpy(out, "?model?");
+		strcpy(out, "?model?");
 	else {
 		s--;
-		Q_strncpy(out, s2 + 1, s - s2);
+		strncpy(out, s2 + 1, s - s2);
 		out[s - s2] = 0;
 	}
 }
 
 void FileManager::DefaultExtension(char *path, const char *extension) {
-	char *src = path + Q_strlen(path) - 1;
+	char *src = path + strlen(path) - 1;
 
 	while (*src != '/' && src != path) {
 		if (*src == '.')
@@ -169,7 +176,7 @@ void FileManager::DefaultExtension(char *path, const char *extension) {
 		src--;
 	}
 
-	Q_strcat(path, extension);
+	strcat(path, extension);
 }
 
 void FileManager::PathCmd(void) {
@@ -189,11 +196,11 @@ void FileManager::PathCmd(void) {
 void FileManager::AddGameDirectory(char *dir) {
 	char pakfile[MAX_OSPATH];
 
-	Q_strcpy(com_gamedir, dir);
+	strcpy(com_gamedir, dir);
 
 	// add the directory to the search path
 	searchpath_t *search = (searchpath_t *) Hunk_Alloc(sizeof (searchpath_t));
-	Q_strcpy(search->filename, dir);
+	strcpy(search->filename, dir);
 	search->next = FileManager::searchpaths;
 	FileManager::searchpaths = search;
 
@@ -211,14 +218,14 @@ void FileManager::AddGameDirectory(char *dir) {
 	// add the contents of the parms.txt file to the end of the command line
 }
 
-void FileManager::AddPackToPath(char *pak) {
+void FileManager::AddPackToPath(const char *pak) {
 	searchpath_t *search = (searchpath_t *) Hunk_Alloc(sizeof (searchpath_t));
-	if (!Q_strcmp(FileManager::FileExtension(pak), "pak")) {
+	if (!strcmp(FileManager::FileExtension(pak), "pak")) {
 		search->pack = LoadPackFile(pak);
 		if (!search->pack)
 			Sys_Error("Couldn't load packfile: %s", pak);
 	} else
-		Q_strcpy(search->filename, pak);
+		strcpy(search->filename, pak);
 	search->next = FileManager::searchpaths;
 	FileManager::searchpaths = search;
 }
@@ -228,8 +235,8 @@ void FileManager::AddPackToPath(char *pak) {
 #define PAK0_COUNT              339
 #define PAK0_CRC                32981
 
-
 // on disk
+
 typedef struct {
 	char name[56];
 	int filepos, filelen;
@@ -241,19 +248,18 @@ typedef struct {
 	int dirlen;
 } dpackheader_t;
 
-pack_t *FileManager::LoadPackFile(char *packfile) {
+pack_t *FileManager::LoadPackFile(const char *packfile) {
 	dpackheader_t header;
 	pack_t *pack;
 	int packhandle;
 	dpackfile_t info[MAX_FILES_IN_PACK];
 
-	if (Sys_FileOpenRead(packfile, &packhandle) == -1) {
-		//              Con_Printf ("Couldn't open %s\n", packfile);
+	if (SystemFileManager::FileOpenRead(packfile, &packhandle) == -1) {
+		//Con_Printf ("Couldn't open %s\n", packfile);
 		return NULL;
 	}
-	Sys_FileRead(packhandle, (void *) &header, sizeof (header));
-	if (header.id[0] != 'P' || header.id[1] != 'A'
-			|| header.id[2] != 'C' || header.id[3] != 'K')
+	SystemFileManager::FileRead(packhandle, (void *)&header, sizeof(header));
+	if (header.id[0] != 'P' || header.id[1] != 'A' || header.id[2] != 'C' || header.id[3] != 'K')
 		Sys_Error("%s is not a packfile", packfile);
 	header.dirofs = LittleLong(header.dirofs);
 	header.dirlen = LittleLong(header.dirlen);
@@ -263,35 +269,198 @@ pack_t *FileManager::LoadPackFile(char *packfile) {
 	if (numpackfiles > MAX_FILES_IN_PACK)
 		Sys_Error("%s has %i files", packfile, numpackfiles);
 
-//	if (numpackfiles != PAK0_COUNT)
-//		com_modified = true; // not the original file
+	//	if (numpackfiles != PAK0_COUNT)
+	//		com_modified = true; // not the original file
 
 	packfile_t *newfiles = (packfile_t *) Hunk_AllocName(numpackfiles * sizeof (packfile_t), "packfile");
 
-	Sys_FileSeek(packhandle, header.dirofs);
-	Sys_FileRead(packhandle, (void *) info, header.dirlen);
+	SystemFileManager::FileSeek(packhandle, header.dirofs);
+	SystemFileManager::FileRead(packhandle, (void *) info, header.dirlen);
 
 	// crc the directory to check for modifications
 	CRC crc;
 	crc.process((byte *)info, header.dirlen);
 	if (crc.getResult() != PAK0_CRC) {
 		Con_SafeDPrintf("PAK0 modified...");
-//		com_modified = true;
+		//		com_modified = true;
 	}
 
 	// parse the directory
 	for (int i = 0; i < numpackfiles; i++) {
-		Q_strcpy(newfiles[i].name, info[i].name);
+		strcpy(newfiles[i].name, info[i].name);
 		newfiles[i].filepos = LittleLong(info[i].filepos);
 		newfiles[i].filelen = LittleLong(info[i].filelen);
 	}
 
 	pack = (pack_t *) Hunk_Alloc(sizeof (pack_t));
-	Q_strcpy(pack->filename, packfile);
+	strcpy(pack->filename, packfile);
 	pack->handle = packhandle;
 	pack->numfiles = numpackfiles;
 	pack->files = newfiles;
 
 	Con_Printf("Added packfile %s (%i files)\n", packfile, numpackfiles);
 	return pack;
+}
+
+File *SystemFileManager::handles[MAX_HANDLES];
+
+int SystemFileManager::findHandle(void) {
+	for (int i = 1; i < MAX_HANDLES; i++)
+		if (!handles[i])
+			return i;
+	Sys_Error("out of handles");
+	return -1;
+}
+
+File *SystemFileManager::getFileForHandle(int handle) {
+	return handles[handle];
+}
+
+int SystemFileManager::FileLength(FILE *f) {
+	int pos = ftell(f);
+	fseek(f, 0, SEEK_END);
+	int end = ftell(f);
+	fseek(f, pos, SEEK_SET);
+
+	return end;
+}
+
+int SystemFileManager::FileOpenRead(const char *path, int *hndl) {
+	int i = findHandle();
+	File *f = new File(path, File::READ, true);
+
+	if (f->isOpen()) {
+		handles[i] = f;
+		*hndl = i;
+	} else {
+		delete f;
+		*hndl = -1;
+		return -1;
+	}
+
+	return f->getLength();
+}
+
+int SystemFileManager::FileOpenWrite(const char *path) {
+	int i = findHandle();
+	File *f = new File(path, File::WRITE, true);
+	if (!f->isOpen()) {
+		delete f;
+		Sys_Error("Error opening %s: %s", path, strerror(errno));
+	}
+	handles[i] = f;
+	return i;
+}
+
+void SystemFileManager::FileClose(int handle) {
+	if (handle >= 0 && handle < MAX_HANDLES) {
+		File *f = handles[handle];
+		if (f != NULL) {
+			delete f;
+		}
+		handles[handle] = NULL;
+	} else {
+		Con_Printf("Tried to close invalid file handle: %i\n", handle);
+	}
+}
+
+void SystemFileManager::FileSeek(int handle, long pos) {
+	if (handle >= 0 && handle < MAX_HANDLES) {
+		File *f = getFileForHandle(handle);
+		f->seek(pos);
+	} else {
+		Con_Printf("Tried to seek with invalid file handle: %i\n", handle);
+	}
+}
+
+int SystemFileManager::FileRead(int handle, void *dst, size_t count) {
+	if (handle >= 0 && handle < MAX_HANDLES) {
+		File *f = getFileForHandle(handle);
+		return f->read(dst, count);
+	} else {
+		Con_Printf("Tried to read from invalid file handle: %i\n", handle);
+		return 0;
+	}
+}
+
+size_t SystemFileManager::FileWrite(int handle, const void *src, size_t count) {
+	if (handle >= 0 && handle < MAX_HANDLES) {
+		File *f = getFileForHandle(handle);
+		return f->write(src, count);
+	} else {
+		Con_Printf("Tried to write from invalid file handle: %i\n", handle);
+		return 0;
+	}
+}
+
+File::File(const char *path, FileOpenType mode, bool isBinary) {
+	this->path = (char *)MemoryObj::ZAlloc(strlen(path) + 1);
+	strcpy(this->path, path);
+	memset(&this->openType[0], 0, sizeof(this->openType));
+
+	switch (mode) {
+		case File::READ:
+			this->openType[0] = 'r';
+			break;
+		case File::WRITE:
+			this->openType[0] = 'w';
+			break;
+		case File::APPEND:
+			this->openType[0] = 'a';
+			break;
+	}
+
+	if (isBinary) {
+		this->openType[1] = 'b';
+	}
+
+	this->obj = fopen(this->path, this->openType);
+}
+
+File::~File() {
+	if (this->path != NULL)
+		MemoryObj::ZFree(this->path);
+
+	this->path = NULL;
+	if (this->obj != NULL) {
+		fclose(this->obj);
+		this->obj = NULL;
+	}
+}
+
+bool File::isOpen() {
+	return this->obj != NULL;
+}
+
+size_t File::read(void* buffer, size_t size) {
+	size_t read = 0;
+
+	char *data = (char *) buffer;
+	while (size > 0) {
+		size_t done = fread(data, 1, size, this->obj);
+		if (done == 0)
+			break;
+
+		data += done;
+		size -= done;
+		read += done;
+	}
+	return read;
+}
+
+size_t File::write(const void* buffer, size_t size) {
+	return fwrite(buffer, 1, size, this->obj);
+}
+
+void File::seek(long pos) {
+	fseek(obj, pos, SEEK_SET);
+}
+
+long File::getLength() {
+	long pos = ftell(this->obj);
+	fseek(this->obj, 0, SEEK_END);
+	long end = ftell(this->obj);
+	fseek(this->obj, pos, SEEK_SET);
+
+	return end;
 }

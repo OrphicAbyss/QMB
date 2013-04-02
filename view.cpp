@@ -301,10 +301,10 @@ void V_ParseDamage(void) {
 }
 
 void V_cshift_f(void) {
-	cshift_empty.destcolor[0] = Q_atoi(CmdArgs::getArg(1));
-	cshift_empty.destcolor[1] = Q_atoi(CmdArgs::getArg(2));
-	cshift_empty.destcolor[2] = Q_atoi(CmdArgs::getArg(3));
-	cshift_empty.percent = Q_atoi(CmdArgs::getArg(4));
+	cshift_empty.destcolor[0] = atoi(CmdArgs::getArg(1));
+	cshift_empty.destcolor[1] = atoi(CmdArgs::getArg(2));
+	cshift_empty.destcolor[2] = atoi(CmdArgs::getArg(3));
+	cshift_empty.percent = atoi(CmdArgs::getArg(4));
 }
 
 /**
@@ -735,9 +735,6 @@ void V_CalcRefdef(void) {
 		view->origin[2] += oldz - ent->origin[2];
 	} else
 		oldz = ent->origin[2];
-
-	if (chase_active.getBool())
-		Chase_Update();
 }
 
 /**

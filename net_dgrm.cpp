@@ -132,8 +132,8 @@ void NET_Ban_f (void)
 		case 1:
 			if (((struct in_addr *)&banAddr)->s_addr)
 			{
-				Q_strcpy(addrStr, inet_ntoa(*(struct in_addr *)&banAddr));
-				Q_strcpy(maskStr, inet_ntoa(*(struct in_addr *)&banMask));
+				strcpy(addrStr, inet_ntoa(*(struct in_addr *)&banAddr));
+				strcpy(maskStr, inet_ntoa(*(struct in_addr *)&banMask));
 				print("Banning %s [%s]\n", addrStr, maskStr);
 			}
 			else
@@ -141,7 +141,7 @@ void NET_Ban_f (void)
 			break;
 
 		case 2:
-			if (Q_strcasecmp(CmdArgs::getArg(1), "off") == 0)
+			if (strcasecmp(CmdArgs::getArg(1), "off") == 0)
 				banAddr = 0x00000000;
 			else
 				banAddr = inet_addr(CmdArgs::getArg(1));
@@ -491,7 +491,7 @@ void NET_Stats_f (void)
 		Con_Printf("shortPacketCount           = %i\n", shortPacketCount);
 		Con_Printf("droppedDatagrams           = %i\n", droppedDatagrams);
 	}
-	else if (Q_strcmp(CmdArgs::getArg(1), "*") == 0)
+	else if (strcmp(CmdArgs::getArg(1), "*") == 0)
 	{
 		for (s = net_activeSockets; s; s = s->next)
 			PrintStats(s);
@@ -501,11 +501,11 @@ void NET_Stats_f (void)
 	else
 	{
 		for (s = net_activeSockets; s; s = s->next)
-			if (Q_strcasecmp(CmdArgs::getArg(1), s->address) == 0)
+			if (strcasecmp(CmdArgs::getArg(1), s->address) == 0)
 				break;
 		if (s == NULL)
 			for (s = net_freeSockets; s; s = s->next)
-				if (Q_strcasecmp(CmdArgs::getArg(1), s->address) == 0)
+				if (strcasecmp(CmdArgs::getArg(1), s->address) == 0)
 					break;
 		if (s == NULL)
 			return;
@@ -558,11 +558,11 @@ static void Test_Poll(void)
 			Sys_Error("Unexpected repsonse to Player Info request\n");
 
 		playerNumber = MSG_ReadByte();
-		Q_strcpy(name, MSG_ReadString());
+		strcpy(name, MSG_ReadString());
 		colors = MSG_ReadLong();
 		frags = MSG_ReadLong();
 		connectTime = MSG_ReadLong();
-		Q_strcpy(address, MSG_ReadString());
+		strcpy(address, MSG_ReadString());
 
 		Con_Printf("%s\n  frags:%3i  colors:%u %u  time:%u\n  %s\n", name, frags, colors >> 4, colors & 0x0f, connectTime / 60, address);
 	}
@@ -594,7 +594,7 @@ static void Test_f (void)
 	if (host && hostCacheCount)
 	{
 		for (n = 0; n < hostCacheCount; n++)
-			if (Q_strcasecmp (host, hostcache[n].name) == 0)
+			if (strcasecmp (host, hostcache[n].name) == 0)
 			{
 				if (hostcache[n].driver != myDriverLevel)
 					continue;
@@ -680,10 +680,10 @@ static void Test2_Poll(void)
 	if (MSG_ReadByte() != CCREP_RULE_INFO)
 		goto Error;
 
-	Q_strcpy(name, MSG_ReadString());
+	strcpy(name, MSG_ReadString());
 	if (name[0] == 0)
 		goto Done;
-	Q_strcpy(value, MSG_ReadString());
+	strcpy(value, MSG_ReadString());
 
 	Con_Printf("%-16.16s  %-16.16s\n", name, value);
 
@@ -722,7 +722,7 @@ static void Test2_f (void)
 	if (host && hostCacheCount)
 	{
 		for (n = 0; n < hostCacheCount; n++)
-			if (Q_strcasecmp (host, hostcache[n].name) == 0)
+			if (strcasecmp (host, hostcache[n].name) == 0)
 			{
 				if (hostcache[n].driver != myDriverLevel)
 					continue;
@@ -867,7 +867,7 @@ static qsocket_t *_Datagram_CheckNewConnections (void)
 	command = MSG_ReadByte();
 	if (command == CCREQ_SERVER_INFO)
 	{
-		if (Q_strcmp(MSG_ReadString(), "QUAKE") != 0)
+		if (strcmp(MSG_ReadString(), "QUAKE") != 0)
 			return NULL;
 
 		SZ_Clear(&net_message);
@@ -960,7 +960,7 @@ static qsocket_t *_Datagram_CheckNewConnections (void)
 	if (command != CCREQ_CONNECT)
 		return NULL;
 
-	if (Q_strcmp(MSG_ReadString(), "QUAKE") != 0)
+	if (strcmp(MSG_ReadString(), "QUAKE") != 0)
 		return NULL;
 
 	if (MSG_ReadByte() != NET_PROTOCOL_VERSION)
@@ -1063,7 +1063,7 @@ static qsocket_t *_Datagram_CheckNewConnections (void)
 	sock->socket = newsock;
 	sock->landriver = net_landriverlevel;
 	sock->addr = clientaddr;
-	Q_strcpy(sock->address, dfunc.AddrToString(&clientaddr));
+	strcpy(sock->address, dfunc.AddrToString(&clientaddr));
 
 	// send him back the info about the server connection he has been allocated
 	SZ_Clear(&net_message);
@@ -1154,30 +1154,30 @@ static void _Datagram_SearchForHosts (bool xmit)
 
 		// add it
 		hostCacheCount++;
-		Q_strcpy(hostcache[n].name, MSG_ReadString());
-		Q_strcpy(hostcache[n].map, MSG_ReadString());
+		strcpy(hostcache[n].name, MSG_ReadString());
+		strcpy(hostcache[n].map, MSG_ReadString());
 		hostcache[n].users = MSG_ReadByte();
 		hostcache[n].maxusers = MSG_ReadByte();
 		if (MSG_ReadByte() != NET_PROTOCOL_VERSION)
 		{
-			Q_strcpy(hostcache[n].cname, hostcache[n].name);
+			strcpy(hostcache[n].cname, hostcache[n].name);
 			hostcache[n].cname[14] = 0;
-			Q_strcpy(hostcache[n].name, "*");
-			Q_strcat(hostcache[n].name, hostcache[n].cname);
+			strcpy(hostcache[n].name, "*");
+			strcat(hostcache[n].name, hostcache[n].cname);
 		}
 		memcpy(&hostcache[n].addr, &readaddr, sizeof(struct qsockaddr));
 		hostcache[n].driver = net_driverlevel;
 		hostcache[n].ldriver = net_landriverlevel;
-		Q_strcpy(hostcache[n].cname, dfunc.AddrToString(&readaddr));
+		strcpy(hostcache[n].cname, dfunc.AddrToString(&readaddr));
 
 		// check for a name conflict
 		for (i = 0; i < hostCacheCount; i++)
 		{
 			if (i == n)
 				continue;
-			if (Q_strcasecmp (hostcache[n].name, hostcache[i].name) == 0)
+			if (strcasecmp (hostcache[n].name, hostcache[i].name) == 0)
 			{
-				i = Q_strlen(hostcache[n].name);
+				i = strlen(hostcache[n].name);
 				if (i < 15 && hostcache[n].name[i-1] > '8')
 				{
 					hostcache[n].name[i] = '0';
@@ -1306,7 +1306,7 @@ static qsocket_t *_Datagram_Connect (char *host)
 	{
 		reason = "No Response";
 		Con_Printf("%s\n", reason);
-		Q_strcpy(m_return_reason, reason);
+		strcpy(m_return_reason, reason);
 		goto ErrorReturn;
 	}
 
@@ -1314,7 +1314,7 @@ static qsocket_t *_Datagram_Connect (char *host)
 	{
 		reason = "Network Error";
 		Con_Printf("%s\n", reason);
-		Q_strcpy(m_return_reason, reason);
+		strcpy(m_return_reason, reason);
 		goto ErrorReturn;
 	}
 
@@ -1323,7 +1323,7 @@ static qsocket_t *_Datagram_Connect (char *host)
 	{
 		reason = MSG_ReadString();
 		Con_Printf(reason);
-		Q_strncpy(m_return_reason, reason, 31);
+		strncpy(m_return_reason, reason, 31);
 		goto ErrorReturn;
 	}
 
@@ -1336,7 +1336,7 @@ static qsocket_t *_Datagram_Connect (char *host)
 	{
 		reason = "Bad Response";
 		Con_Printf("%s\n", reason);
-		Q_strcpy(m_return_reason, reason);
+		strcpy(m_return_reason, reason);
 		goto ErrorReturn;
 	}
 
@@ -1350,7 +1350,7 @@ static qsocket_t *_Datagram_Connect (char *host)
 	{
 		reason = "Connect to Game failed";
 		Con_Printf("%s\n", reason);
-		Q_strcpy(m_return_reason, reason);
+		strcpy(m_return_reason, reason);
 		goto ErrorReturn;
 	}
 

@@ -30,7 +30,7 @@ void R_MD3TagRotate(entity_t *e, model_t *tagmodel, char *tagname) {
 
 	for (i = 0; i < model->num_tags; i++) {
 		md3tag_t *tags = (md3tag_t *) ((byte *) model + model->tag_offs);
-		if (Q_strcmp(tags[i].name, tagname) == 0)
+		if (strcmp(tags[i].name, tagname) == 0)
 			if (e->frame > model->num_frames)
 				tag = &tags[(model->num_frames - 1) * model->num_tags + i];
 			else
@@ -288,7 +288,7 @@ void Mod_LoadQ3Model(model_t *mod, void *buffer) {
 
 	Con_DPrintf("Loading md3 model...%s (%s)\n", header->filename, mod->name);
 
-	mod->cache = MemoryObj::Alloc(MemoryObj::CACHE, (char *) &mod->name, mem_size);
+	mod->cache = MemoryObj::Alloc(MemoryObj::CACHE, (const char *)&mod->name, mem_size);
 	mem_head = (md3header_mem_t *) mod->cache->getData();
 	if (!mod->cache->getData()) {
 		Con_Printf("Unable to allocate cache to load model: %s\n", mod->name);
@@ -441,44 +441,44 @@ void Mod_LoadQ3MultiModel(model_t *mod) {
 		//Load player
 		lower = Mod_AddMultiModel(NULL, mod); //Allocate a mmodel
 		lower->model = MemoryObj::ZAlloc(sizeof (model_t));
-		Q_strcpy(lower->model->name, va("%slower.md3", mod->name));
+		strcpy(lower->model->name, va("%slower.md3", mod->name));
 		lower->model->needload = TRUE;
 		Mod_LoadModel(lower->model, 1);
-		Q_strcpy(lower->identifier, "lower");
+		strcpy(lower->identifier, "lower");
 
 		lower->linktype = MULTIMODEL_LINK_STANDARD;
 
 
 		upper = Mod_AddMultiModel(NULL, mod); //Allocate a mmodel
 		upper->model = MemoryObj::ZAlloc(sizeof (model_t));
-		Q_strcpy(upper->model->name, va("%supper.md3", mod->name));
+		strcpy(upper->model->name, va("%supper.md3", mod->name));
 		upper->model->needload = TRUE;
 		Mod_LoadModel(upper->model, 1);
-		Q_strcpy(upper->identifier, "upper");
+		strcpy(upper->identifier, "upper");
 
 		upper->linktype = MULTIMODEL_LINK_TAG;
 		upper->linkedmodel = lower;
-		Q_strcpy(upper->tagname, "tag_torso");
+		strcpy(upper->tagname, "tag_torso");
 
 
 		head = Mod_AddMultiModel(NULL, mod); //Allocate a mmodel
 		head->model = MemoryObj::ZAlloc(sizeof (model_t));
-		Q_strcpy(head->model->name, va("%shead.md3", mod->name));
+		strcpy(head->model->name, va("%shead.md3", mod->name));
 		head->model->needload = TRUE;
 		Mod_LoadModel(head->model, 1);
-		Q_strcpy(head->identifier, "head");
+		strcpy(head->identifier, "head");
 
 		head->linktype = MULTIMODEL_LINK_TAG;
 		head->linkedmodel = upper;
-		Q_strcpy(head->tagname, "tag_head");
+		strcpy(head->tagname, "tag_head");
 
 		return;
 	}
 
 	sprintf(path, "%s", mod->name);
-	Q_strcat(path, Q_strrchr(path, '/'));
-	path[Q_strlen(path) - 1] = '\0';
-	Q_strcat(path, "_hand.md3");
+	strcat(path, strrchr(path, '/'));
+	path[strlen(path) - 1] = '\0';
+	strcat(path, "_hand.md3");
 	Sys_Error("Trying to find weaponmodel %s", path);
 	FileManager::OpenFile(path, &handle);
 	if (handle) { //W_Weapon

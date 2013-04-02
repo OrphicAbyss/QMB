@@ -229,7 +229,6 @@ void Sbar_Init(void) {
 }
 
 //=============================================================================
-
 // drawing routines are relative to the status bar location
 
 void Sbar_DrawPic(int x, int y, qpic_t *pic) {
@@ -249,30 +248,9 @@ void Sbar_DrawString(int x, int y, char *str) {
 }
 
 int Sbar_itoa(int num, char *buf) {
-	char *str;
-	int pow10;
-	int dig;
-
-	str = buf;
-
-	if (num < 0) {
-		*str++ = '-';
-		num = -num;
-	}
-
-	for (pow10 = 10; num >= pow10; pow10 *= 10)
-		;
-
-	do {
-		pow10 /= 10;
-		dig = num / pow10;
-		*str++ = '0' + dig;
-		num -= dig*pow10;
-	} while (pow10 != 1);
-
-	*str = 0;
-
-	return str - buf;
+	snprintf(buf,10,"%d",num);
+	//itoa(num, buf, 10);
+	return strlen(buf);
 }
 
 void Sbar_DrawFade(int x, int y, int height, int side) {
@@ -298,8 +276,7 @@ void Sbar_DrawNum(int x, int y, int num, int digits, int color) {
 	char str[12];
 	char *ptr;
 	int l, frame;
-	vec3_t colour;
-
+	//vec3_t colour;
 	//	colour[0] = hud_r.value;
 	//	colour[1] = hud_g.value;
 	//	colour[2] = hud_b.value;
@@ -338,24 +315,24 @@ int scoreboardcount[MAX_SCOREBOARD];
 int scoreboardlines;
 
 void Sbar_SortFrags(void) {
-	int i, j, k;
-
 	// sort by frags
 	scoreboardlines = 0;
-	for (i = 0; i < cl.maxclients; i++) {
+	for (int i = 0; i < cl.maxclients; i++) {
 		if (cl.scores[i].name[0]) {
 			fragsort[scoreboardlines] = i;
 			scoreboardlines++;
 		}
 	}
 
-	for (i = 0; i < scoreboardlines; i++)
-		for (j = 0; j < scoreboardlines - 1 - i; j++)
+	for (int i = 0; i < scoreboardlines; i++) {
+		for (int j = 0; j < scoreboardlines - 1 - i; j++) {
 			if (cl.scores[fragsort[j]].frags < cl.scores[fragsort[j + 1]].frags) {
-				k = fragsort[j];
+				int k = fragsort[j];
 				fragsort[j] = fragsort[j + 1];
 				fragsort[j + 1] = k;
 			}
+		}
+	}
 }
 
 int Sbar_ColorForMap(int m) {
@@ -363,7 +340,6 @@ int Sbar_ColorForMap(int m) {
 }
 
 void Sbar_UpdateScoreboard(void) {
-	int i, k;
 	int top, bottom;
 	scoreboard_t *s;
 
@@ -372,8 +348,8 @@ void Sbar_UpdateScoreboard(void) {
 	// draw the text
 	memset(scoreboardtext, 0, sizeof (scoreboardtext));
 
-	for (i = 0; i < scoreboardlines; i++) {
-		k = fragsort[i];
+	for (int i = 0; i < scoreboardlines; i++) {
+		int k = fragsort[i];
 		s = &cl.scores[k];
 		sprintf(&scoreboardtext[i][1], "%3i %s", s->frags, s->name);
 
@@ -415,7 +391,7 @@ void Sbar_SoloScoreboard(void) {
 	Sbar_DrawString(x + 184, 4 + 24, str);
 
 	// draw level name
-	l = Q_strlen(cl.levelname);
+	l = strlen(cl.levelname);
 	Sbar_DrawString(x + 232 - l * 4, 12 + 24, cl.levelname);
 }
 
@@ -432,8 +408,7 @@ void Sbar_DrawInventory(void) {
 	char num[6];
 	float time;
 	int flashon;
-	vec3_t colour;
-
+	//vec3_t colour;
 	//	colour[0] = hud_r.value;
 	//	colour[1] = hud_g.value;
 	//	colour[2] = hud_b.value;
@@ -446,8 +421,7 @@ void Sbar_DrawInventory(void) {
 	}
 
 	// weapons
-	if (hud.getInt() >= 3 || sb_showscores) { //JHL - start
-
+	if (hud.getInt() >= 3 || sb_showscores) {
 		//Sbar_DrawFade (vid.conwidth-50, vid.conheight/2 - 24, 112, false);
 		//Draw_AlphaFill(vid.conwidth-50, vid.conheight/2 - 24, 48, 112, colour, hud_a.value);
 
@@ -530,7 +504,6 @@ void Sbar_DrawInventory(void) {
 	}
 
 	if (hud.getInt() >= 2 || sb_showscores) {
-
 		//Sbar_DrawFade (vid.conwidth-96, vid.conheight-40, 16, false);
 		//Draw_AlphaFill(vid.conwidth-96, vid.conheight-40, 96, 16, colour, hud_a.value);
 
