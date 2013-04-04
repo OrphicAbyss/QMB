@@ -354,8 +354,10 @@ void CL_ParseUpdate(int bits) {
 	if (!i)
 		ent->colormap = vid.colormap;
 	else {
-		if (i > cl.maxclients)
+		if (i > cl.maxclients) {
 			Sys_Error("i >= cl.maxclients");
+			return;
+		}
 		ent->colormap = cl.scores[i - 1].translations;
 	}
 
@@ -518,8 +520,10 @@ void CL_NewTranslation(int slot) {
 	int top, bottom;
 	byte *dest, *source;
 
-	if (slot > cl.maxclients)
+	if (slot > cl.maxclients) {
 		Sys_Error("CL_NewTranslation: slot > cl.maxclients");
+		return;
+	}
 	dest = cl.scores[slot].translations;
 	source = vid.colormap;
 	memcpy(dest, vid.colormap, sizeof (cl.scores[slot].translations));
@@ -564,7 +568,7 @@ void CL_ParseStatic(void) {
 
 void CL_ParseStaticSound(void) {
 	vec3_t org;
-	
+
 	for (int i = 0; i < 3; i++)
 		org[i] = MSG_ReadCoord();
 	int sound_num = MSG_ReadByte();
@@ -671,8 +675,10 @@ void CL_ParseServerMessage(void) {
 
 			case svc_lightstyle:
 				i = MSG_ReadByte();
-				if (i >= MAX_LIGHTSTYLES)
+				if (i >= MAX_LIGHTSTYLES) {
 					Sys_Error("svc_lightstyle > MAX_LIGHTSTYLES");
+					return;
+				}
 				strcpy(cl_lightstyle[i].map, MSG_ReadString());
 				cl_lightstyle[i].length = strlen(cl_lightstyle[i].map);
 				break;
@@ -750,8 +756,10 @@ void CL_ParseServerMessage(void) {
 
 			case svc_updatestat:
 				i = MSG_ReadByte();
-				if (i < 0 || i >= MAX_CL_STATS)
+				if (i < 0 || i >= MAX_CL_STATS) {
 					Sys_Error("svc_updatestat: %i is invalid", i);
+					return;
+				}
 				cl.stats[i] = MSG_ReadLong();
 				break;
 

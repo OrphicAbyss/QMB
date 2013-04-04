@@ -12,8 +12,8 @@ public:
 
 class AliasSurfaceFrame {
 public:
-	vec3_t vertices[];
-	vec3_t normals[];
+	vec3_t *vertices;
+	vec3_t *normals;
 };
 
 class AliasTextureCoord {
@@ -31,7 +31,7 @@ public:
 	int		numVerts;
 	int		numIndices;
 	AliasShader *shaders;
-	vec3_t indices[];
+	vec3_t *indices;
 	AliasSurfaceFrame *vertexValues;
 	AliasTextureCoord *texCoords;
 };
@@ -77,7 +77,7 @@ public:
 
 class AliasModel : public Model {
 	AliasHeader *data;
-	
+
 	AliasModel();
 	static AliasModel *LoadMD3(void *buffer);
 };

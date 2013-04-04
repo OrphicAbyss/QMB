@@ -159,19 +159,22 @@ void Resample32Nearest(const void *indata, int inwidth, int inheight, void *outd
 
 void Image::resample(const void *indata, int inwidth, int inheight, void *outdata, int outwidth, int outheight, int bytesperpixel, int quality) {
 	if (resamplerowsize < outwidth * 4) {
-		if (resamplerow1)
+		if (resamplerow1) {
 			free(resamplerow1);
+		}
 		resamplerowsize = outwidth * 4;
 		resamplerow1 = (byte *) malloc(resamplerowsize * 2);
 		resamplerow2 = resamplerow1 + resamplerowsize;
 	}
 	if (bytesperpixel == 4) {
-		if (quality)
+		if (quality) {
 			ResampleLerp(indata, inwidth, inheight, outdata, outwidth, outheight);
-		else
+		} else {
 			Resample32Nearest(indata, inwidth, inheight, outdata, outwidth, outheight);
-	} else
+		}
+	} else {
 		Sys_Error("Image_Resample: unsupported bytesperpixel %i\n", bytesperpixel);
+	}
 }
 
 // in can be the same as out
@@ -179,7 +182,7 @@ void Image::mipReduce(const void *inData, void *outData, int *width, int *height
 	int x, y;
 	byte *in = (byte *)inData;
 	byte *out = (byte *)outData;
-	
+
 	int nextrow = *width * bytesperpixel;
 	if (*width > destwidth) {
 		*width >>= 1;
@@ -209,8 +212,9 @@ void Image::mipReduce(const void *inData, void *outData, int *width, int *height
 					}
 					in += nextrow; // skip a line
 				}
-			} else
+			} else {
 				Sys_Error("Image_MipReduce: unsupported bytesperpixel %i\n", bytesperpixel);
+			}
 		} else {
 			// reduce width
 			if (bytesperpixel == 4) {
@@ -234,8 +238,9 @@ void Image::mipReduce(const void *inData, void *outData, int *width, int *height
 						in += 6;
 					}
 				}
-			} else
+			} else {
 				Sys_Error("Image_MipReduce: unsupported bytesperpixel %i\n", bytesperpixel);
+			}
 		}
 	} else {
 		if (*height > destheight) {
@@ -264,10 +269,12 @@ void Image::mipReduce(const void *inData, void *outData, int *width, int *height
 					}
 					in += nextrow; // skip a line
 				}
-			} else
+			} else {
 				Sys_Error("Image_MipReduce: unsupported bytesperpixel %i\n", bytesperpixel);
-		} else
+			}
+		} else {
 			Sys_Error("Image_MipReduce: desired size already achieved\n");
+		}
 	}
 }
 

@@ -532,57 +532,58 @@ void R_RenderView(void) {
 	double time1, time2;
 	float colors[4] = {0.0, 0.0, 0.0, 1.0};
 
-	if (!r_worldentity.model || !cl.worldmodel)
+	if (!r_worldentity.model || !cl.worldmodel) {
 		Sys_Error("R_RenderView: NULL worldmodel");
+	} else {
+		if (r_speeds.getBool()) {
+			glFinish();
+			time1 = Sys_FloatTime();
+			c_brush_polys = 0;
+			c_alias_polys = 0;
+		}
 
-	if (r_speeds.getBool()) {
-		glFinish();
-		time1 = Sys_FloatTime();
-		c_brush_polys = 0;
-		c_alias_polys = 0;
-	}
-
-	if (gl_finish.getBool())
-		glFinish();
-
-	if (r_errors.getBool() && developer.getBool())
-		checkGLError("Finished:");
-
-	R_Clear();
-
-	if (r_errors.getBool() && developer.getBool())
-		checkGLError("After R_Clear:");
-
-	// render normal view
-
-	if ((gl_fogglobal.getBool()))//&&(CONTENTS_EMPTY==r_viewleaf->contents))
-	{
-		glFogi(GL_FOG_MODE, GL_LINEAR);
-		colors[0] = gl_fogred.getFloat();
-		colors[1] = gl_foggreen.getFloat();
-		colors[2] = gl_fogblue.getFloat();
-		glFogfv(GL_FOG_COLOR, colors);
-		glFogf(GL_FOG_START, gl_fogstart.getFloat());
-		glFogf(GL_FOG_END, gl_fogend.getFloat());
-		glFogf(GL_FOG_DENSITY, 0.2f);
-		glEnable(GL_FOG);
+		if (gl_finish.getBool())
+			glFinish();
 
 		if (r_errors.getBool() && developer.getBool())
-			checkGLError("After fog setup:");
+			checkGLError("Finished:");
+
+		R_Clear();
+
+		if (r_errors.getBool() && developer.getBool())
+			checkGLError("After R_Clear:");
+
+		// render normal view
+
+		if ((gl_fogglobal.getBool()))//&&(CONTENTS_EMPTY==r_viewleaf->contents))
+		{
+			glFogi(GL_FOG_MODE, GL_LINEAR);
+			colors[0] = gl_fogred.getFloat();
+			colors[1] = gl_foggreen.getFloat();
+			colors[2] = gl_fogblue.getFloat();
+			glFogfv(GL_FOG_COLOR, colors);
+			glFogf(GL_FOG_START, gl_fogstart.getFloat());
+			glFogf(GL_FOG_END, gl_fogend.getFloat());
+			glFogf(GL_FOG_DENSITY, 0.2f);
+			glEnable(GL_FOG);
+
+			if (r_errors.getBool() && developer.getBool())
+				checkGLError("After fog setup:");
+		}
+
+		R_RenderScene();
+
+		if (gl_fogglobal.getBool())
+			glDisable(GL_FOG);
+
+		R_PolyBlend();
+
+		if (r_speeds.getBool()) {
+			time2 = Sys_FloatTime();
+			Con_Printf("%3i ms  %4i wpoly %4i epoly\n", (int) ((time2 - time1)*1000), c_brush_polys, c_alias_polys);
+		}
+
+		if (r_errors.getBool() && developer.getBool())
+			checkGLError("After R_RenderScene and R_PolyBlend:");
 	}
-
-	R_RenderScene();
-
-	if (gl_fogglobal.getBool())
-		glDisable(GL_FOG);
-
-	R_PolyBlend();
-
-	if (r_speeds.getBool()) {
-		time2 = Sys_FloatTime();
-		Con_Printf("%3i ms  %4i wpoly %4i epoly\n", (int) ((time2 - time1)*1000), c_brush_polys, c_alias_polys);
-	}
-
-	if (r_errors.getBool() && developer.getBool())
-		checkGLError("After R_RenderScene and R_PolyBlend:");
 }

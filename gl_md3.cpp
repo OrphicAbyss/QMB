@@ -30,11 +30,13 @@ void R_MD3TagRotate(entity_t *e, model_t *tagmodel, char *tagname) {
 
 	for (i = 0; i < model->num_tags; i++) {
 		md3tag_t *tags = (md3tag_t *) ((byte *) model + model->tag_offs);
-		if (strcmp(tags[i].name, tagname) == 0)
-			if (e->frame > model->num_frames)
+		if (strcmp(tags[i].name, tagname) == 0) {
+			if (e->frame > model->num_frames) {
 				tag = &tags[(model->num_frames - 1) * model->num_tags + i];
-			else
+			} else {
 				tag = &tags[e->frame * model->num_tags + i];
+			}
+		}
 	}
 
 	if (!tag) {

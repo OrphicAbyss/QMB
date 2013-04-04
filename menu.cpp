@@ -928,7 +928,7 @@ void M_Setup_Key(int k) {
 			if (setup_cursor == 3)
 				setup_bottom = setup_bottom - 1;
 			break;
-			
+
 		case K_RIGHTARROW:
 			if (setup_cursor < 2)
 				return;
@@ -1855,7 +1855,6 @@ void M_Help_Draw(void) {
 		M_Print(16, y, "  observe your surroundings");
 		y += 8;
 		M_Print(16, y, "  smoothly.");
-		y += 8;
 	} else if (help_page == HELP_SWIMMING) {
 		p = Draw_CachePic("gfx/qmb_menu_help.lmp");
 		M_DrawPic((320 - p->width) / 2, 8, p);
@@ -1890,7 +1889,6 @@ void M_Help_Draw(void) {
 		M_Print(16, y, "  panic button if you become");
 		y += 8;
 		M_Print(16, y, "  disoriented in the water.");
-		y += 8;
 	} else if (help_page == HELP_HAZARDS) {
 		p = Draw_CachePic("gfx/qmb_menu_help.lmp");
 		M_DrawPic((320 - p->width) / 2, 8, p);
@@ -1924,7 +1922,6 @@ void M_Help_Draw(void) {
 		M_Print(16, y, "  opened there is usually a");
 		y += 8;
 		M_Print(16, y, "  message stating the reason.");
-		y += 8;
 	} else if (help_page == HELP_BUTTONS) {
 		p = Draw_CachePic("gfx/qmb_menu_help.lmp");
 		M_DrawPic((320 - p->width) / 2, 8, p);
@@ -1959,7 +1956,6 @@ void M_Help_Draw(void) {
 		y += 8;
 		p = Draw_CachePic("gfx/qmb_menu_help_buttons.lmp");
 		M_DrawTransPic((320 - p->width) / 2, y, p);
-		;
 	} else if (help_page == HELP_SECRETS) {
 		p = Draw_CachePic("gfx/qmb_menu_help.lmp");
 		M_DrawPic((320 - p->width) / 2, 8, p);
@@ -1989,7 +1985,6 @@ void M_Help_Draw(void) {
 		M_Print(16, y, "  shoot it (or hit it with your");
 		y += 8;
 		M_Print(16, y, "  axe)!");
-		y += 8;
 	}
 }
 
@@ -2490,17 +2485,21 @@ forward:
 			}
 	}
 
-	if (DirectConfig && (serialConfig_cursor == 3 || serialConfig_cursor == 4))
-		if (key == K_UPARROW)
+	if (DirectConfig && (serialConfig_cursor == 3 || serialConfig_cursor == 4)) {
+		if (key == K_UPARROW) {
 			serialConfig_cursor = 2;
-		else
+		} else {
 			serialConfig_cursor = 5;
+		}
+	}
 
-	if (SerialConfig && StartingGame && serialConfig_cursor == 4)
-		if (key == K_UPARROW)
+	if (SerialConfig && StartingGame && serialConfig_cursor == 4) {
+		if (key == K_UPARROW) {
 			serialConfig_cursor = 3;
-		else
+		} else {
 			serialConfig_cursor = 5;
+		}
+	}
 }
 
 //=============================================================================
@@ -2828,17 +2827,20 @@ void M_LanConfig_Key(int key) {
 			}
 	}
 
-	if (StartingGame && lanConfig_cursor == 2)
-		if (key == K_UPARROW)
+	if (StartingGame && lanConfig_cursor == 2) {
+		if (key == K_UPARROW) {
 			lanConfig_cursor = 1;
-		else
+		} else {
 			lanConfig_cursor = 0;
+		}
+	}
 
 	l = atoi(lanConfig_portname);
-	if (l > 65535)
+	if (l > 65535) {
 		l = lanConfig_port;
-	else
+	} else {
 		lanConfig_port = l;
+	}
 	sprintf(lanConfig_portname, "%u", lanConfig_port);
 }
 

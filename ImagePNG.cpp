@@ -129,16 +129,21 @@ void Image::LoadPNG(FILE *f, char *filename, Texture *tex) {
 		return;
 	}
 
-	if (png_sig_cmp(raw, 0, 4))
+	if (png_sig_cmp(raw, 0, 4)) {
+		free(raw);
 		return;
+	}
 
 	png = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
-	if (!png)
+	if (!png) {
+		free(raw);
 		return;
+	}
 
 	pnginfo = png_create_info_struct(png);
 
 	if (!pnginfo) {
+		free(raw);
 		png_destroy_read_struct(&png, &pnginfo, 0);
 		return;
 	}

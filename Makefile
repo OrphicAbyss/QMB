@@ -44,8 +44,8 @@ OUTPUT_BIN  = QMB$(EXTENSION)
 
 #===============================================================================
 # Regular variables
-CPP  = g++
-CC   = g++
+#CPP  = gcc
+#CC   = gcc
 WINDRES = windres
 RES  = WinQuake_private.res
 OBJ  =	bot.o bot_misc.o bot_setup.o  \
@@ -77,7 +77,7 @@ ifeq ($(TARGET_PLATFORM),windows)
 	#-mwindows -luser32 -lgdi32  -lwsock32 -lwinmm -lcomctl32 -ldxguid
     INCS = -I"C:/msys/1.0/local/include" -I"C:/MinGW/include"
 else
-    LIBS = -lc -lGL -lGLU -ljpeg -lpng -lSDL $(shell if test -e /usr/lib/libGLee.so; then echo -lGLee; else echo -lglee; fi)
+    LIBS = -lc -lstdc++ -lm -lGL -lGLU -ljpeg -lpng -lSDL $(shell if test -e /usr/lib/libGLee.so; then echo -lGLee; else echo -lglee; fi)
     INCS =
 endif #ifeq ($(TARGET_PLATFORM),windows)
 
@@ -104,7 +104,7 @@ clean: clean-custom
 	rm -f $(OBJ) $(OUTPUT_BIN)
 
 $(OUTPUT_BIN): $(LINKOBJ)
-	$(CPP) $(FLAGS) $(LINKOBJ) -o "$(OUTPUT_BIN)" $(LIBS)
+	$(CC) $(FLAGS) $(LINKOBJ) -o "$(OUTPUT_BIN)" $(LIBS)
 
 all-after: $(OUTPUT_BIN)
 	cp $(OUTPUT_BIN) $(OUTPUT_DIR)
@@ -116,7 +116,7 @@ all-before: $(OUTPUT_BIN)
 	$(CC) -c $(CFLAGS) $(FLAGS) -o $@ $<
 
 %.o : %.cpp
-	$(CPP) -c $(CXXFLAGS) $(FLAGS) -o $@ $<
+	$(CC) -c $(CXXFLAGS) $(FLAGS) -o $@ $<
 
 WinQuake_private.res: WinQuake_private.rc winquake.rc
 	$(WINDRES) -i WinQuake_private.rc -I rc -o WinQuake_private.res -O coff

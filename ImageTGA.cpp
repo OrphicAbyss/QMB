@@ -112,6 +112,7 @@ void Image::LoadTGA(FILE *file, char *filename, Texture *tex) {
 	datafile = (byte *) malloc(filesize);
 	if (!datafile) {
 		Con_Printf("&c900LoadTGA:&r not enough memory for %i by %i image: %s\n", columns, rows, filename);
+		free(image_rgba);
 		return;
 	}
 

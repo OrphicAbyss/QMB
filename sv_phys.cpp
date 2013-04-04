@@ -80,7 +80,7 @@ void SV_CheckVelocity(edict_t *ent) {
 		}
 	}
 
-	float wishspeed = Length(ent->v.velocity);
+	float wishspeed = VectorLength(ent->v.velocity);
 	if (wishspeed > sv_maxvelocity.getFloat()) {
 		VectorScale(ent->v.velocity, sv_maxvelocity.getFloat() / wishspeed, ent->v.velocity);
 		wishspeed = sv_maxvelocity.getFloat();
@@ -275,7 +275,12 @@ int SV_FlyMove(edict_t *ent, float time, trace_t *steptrace) {
 				VectorCopy(vec3_origin, ent->v.velocity);
 				return 7;
 			}
-			CrossProduct(planes[0], planes[1], dir);
+			vec3_t inA;
+			vec3_t inB;
+			VectorCopy(planes[0], inA);
+			VectorCopy(planes[1], inB);
+
+			VectorCrossProduct(inA, inB, dir);
 			d = DotProduct(dir, ent->v.velocity);
 			VectorScale(dir, d, ent->v.velocity);
 		}
@@ -566,9 +571,9 @@ void SV_WallFriction(edict_t *ent, trace_t *trace) {
 /**
  * Player has come to a dead stop, possibly due to the problem with limited
  * float precision at some angle joins in the BSP hull.
- * 
+ *
  * Try fixing by pushing one pixel in each direction.
- * 
+ *
  * This is a hack, but in the interest of good gameplay...
  */
 int SV_TryUnstick(edict_t *ent, vec3_t oldvel) {
@@ -767,7 +772,7 @@ void SV_Physics_Client(edict_t *ent, int num) {
 	pr_global_struct->time = sv.time;
 	pr_global_struct->self = EDICT_TO_PROG(ent);
 	PR_ExecuteProgram(pr_global_struct->PlayerPreThink);
-	
+
 	if (ent->bot.isbot)
 		BotPreFrame(&svs.clients[num - 1]);
 	// do a move
@@ -822,7 +827,7 @@ void SV_Physics_Client(edict_t *ent, int num) {
 	pr_global_struct->time = sv.time;
 	pr_global_struct->self = EDICT_TO_PROG(ent);
 	PR_ExecuteProgram(pr_global_struct->PlayerPostThink);
-	
+
 	if (ent->bot.isbot)
 		BotPostFrame(&svs.clients[num - 1]);
 }
@@ -943,7 +948,7 @@ STEPPING MOVEMENT
 /**
  * Monsters freefall when they don't have a ground entity, otherwise
  * all movement is done with discrete steps.
- * 
+ *
  * This is also used for objects that have become still on the ground, but
  * will fall if the floor is pulled out from under them.
  */

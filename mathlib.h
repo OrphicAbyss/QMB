@@ -18,7 +18,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // mathlib.h
-// Tomaz - Whole File Redone
 
 struct	mplane_s;
 
@@ -32,32 +31,7 @@ typedef vec_t vec5_t[5];
 #endif
 
 #define	IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
-#define Length(v) (sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]))
 #define DEG2RAD(a) (a * degRadScalar)
-
-#define VectorNegate(a,b) ((b)[0]=-((a)[0]),(b)[1]=-((a)[1]),(b)[2]=-((a)[2]))
-#define VectorSet(a,b,c,d) ((a)[0]=(b),(a)[1]=(c),(a)[2]=(d))
-#define VectorClear(a) ((a)[0]=(a)[1]=(a)[2]=0)
-#define DotProduct(a,b) ((a)[0]*(b)[0]+(a)[1]*(b)[1]+(a)[2]*(b)[2])
-#define VectorSubtract(a,b,c) ((c)[0]=(a)[0]-(b)[0],(c)[1]=(a)[1]-(b)[1],(c)[2]=(a)[2]-(b)[2])
-#define VectorAdd(a,b,c) ((c)[0]=(a)[0]+(b)[0],(c)[1]=(a)[1]+(b)[1],(c)[2]=(a)[2]+(b)[2])
-#define VectorCopy(a,b) ((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2])
-#define CrossProduct(a,b,c) ((c)[0]=(a)[1]*(b)[2]-(a)[2]*(b)[1],(c)[1]=(a)[2]*(b)[0]-(a)[0]*(b)[2],(c)[2]=(a)[0]*(b)[1]-(a)[1]*(b)[0])
-#define VectorNormalize2(v,dest) {float ilength = 1.0f / (float) sqrt(DotProduct(v,v));dest[0] = v[0] * ilength;dest[1] = v[1] * ilength;dest[2] = v[2] * ilength;}
-#define VectorNormalizeDouble(v) {double ilength = 1.0 / sqrt(DotProduct(v,v));v[0] *= ilength;v[1] *= ilength;v[2] *= ilength;}
-#define VectorDistance2(a, b) (((a)[0] - (b)[0]) * ((a)[0] - (b)[0]) + ((a)[1] - (b)[1]) * ((a)[1] - (b)[1]) + ((a)[2] - (b)[2]) * ((a)[2] - (b)[2]))
-#define VectorDistance(a, b) (sqrt(VectorDistance2(a,b)))
-#define VectorLength(a) sqrt(DotProduct(a, a))
-#define VectorScale(in, _scale, out) { float scale = (_scale); (out)[0] = (in)[0] * scale; (out)[1] = (in)[1] * scale; (out)[2] = (in)[2] * scale; }
-#define VectorCompare(a,b) (((a)[0]==(b)[0])&&((a)[1]==(b)[1])&&((a)[2]==(b)[2]))
-#define VectorMA(a, scale, b, c) ((c)[0] = (a)[0] + (scale) * (b)[0],(c)[1] = (a)[1] + (scale) * (b)[1],(c)[2] = (a)[2] + (scale) * (b)[2])
-
-#define VectorInverse(v)									\
-(															\
-	v[0]	= -v[0],										\
-	v[1]	= -v[1],										\
-	v[2]	= -v[2]											\
-)
 
 #define BOX_ON_PLANE_SIDE(emins, emaxs, p)	\
 	(((p)->type < 3)?						\
@@ -80,6 +54,24 @@ extern	float	degRadScalar;
 extern	double	angleModScalar1;
 extern	double	angleModScalar2;
 extern	vec3_t	vec3_origin;
+
+void	VectorNegate(const vec3_t in, vec3_t out);
+void	VectorSet(vec3_t vec, const float x, const float y, const float z);
+void	VectorClear(vec3_t vec);
+double	DotProduct(const vec3_t a, const vec3_t b);
+void	VectorSubtract(const vec3_t a, const vec3_t b, vec3_t out);
+void	VectorAdd(const vec3_t a, const vec3_t b, vec3_t out);
+void	VectorCopy(const vec3_t in, vec3_t out);
+void	VectorCrossProduct(const vec3_t a, const vec3_t b, vec3_t out);
+float	VectorNormalize(vec3_t v);
+void	VectorNormalize2(const vec3_t in, vec3_t out);
+void	VectorNormalizeDouble(vec3_t v);
+float	VectorDistance(const vec3_t a, const vec3_t b);
+float	VectorDistance2(const vec3_t a, const vec3_t b);
+float	VectorLength(const vec3_t a);
+void	VectorScale(const vec3_t in, const float scale, vec3_t out);
+bool	VectorCompare(const vec3_t a, const vec3_t b);
+void	VectorMA(const vec3_t a, const float scale, const vec3_t b, vec3_t out);
 
 int		BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct mplane_s *plane);
 void	Math_Init();

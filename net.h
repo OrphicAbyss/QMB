@@ -181,14 +181,13 @@ typedef struct
 extern int 				net_numlandrivers;
 extern net_landriver_t	net_landrivers[MAX_NET_DRIVERS];
 
-typedef struct
-{
-	char		*name;
+typedef struct {
+	const char	*name;
 	bool	initialized;
 	int			(*Init) (void);
 	void		(*Listen) (bool state);
 	void		(*SearchForHosts) (bool xmit);
-	qsocket_t	*(*Connect) (char *host);
+	qsocket_t	*(*Connect) (const char *host);
 	qsocket_t 	*(*CheckNewConnections) (void);
 	int			(*QGetMessage) (qsocket_t *sock);
 	int			(*QSendMessage) (qsocket_t *sock, sizebuf_t *data);
@@ -272,7 +271,7 @@ void		NET_Shutdown (void);
 struct qsocket_s	*NET_CheckNewConnections (void);
 // returns a new connection number if there is one pending, else -1
 
-struct qsocket_s	*NET_Connect (char *host);
+struct qsocket_s	*NET_Connect (const char *host);
 // called by client to connect to a host.  Returns -1 if not able to
 
 bool NET_CanSendMessage (qsocket_t *sock);

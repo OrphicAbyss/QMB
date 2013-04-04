@@ -42,10 +42,11 @@ int FileManager::FindFile(const char *filename, int *handle, FILE **file) {
 	pack_t *pak;
 	int i;
 
-	if (file && handle)
+	if (file && handle) {
 		Sys_Error("COM_FindFile: both handle and file set");
-	if (!file && !handle)
+	} else if (!file && !handle) {
 		Sys_Error("COM_FindFile: neither handle or file set");
+	}
 
 	// search through the path, one element at a time
 	for (searchpath_t *search = searchpaths; search; search = search->next) {
@@ -87,10 +88,12 @@ int FileManager::FindFile(const char *filename, int *handle, FILE **file) {
 	}
 
 	//Sys_Printf ("FindFile: can't find %s\n", filename);
-	if (handle)
+	if (handle) {
 		*handle = -1;
-	else
+	} else {
 		*file = NULL;
+	}
+
 	com_filesize = -1;
 	return -1;
 }
@@ -222,10 +225,13 @@ void FileManager::AddPackToPath(const char *pak) {
 	searchpath_t *search = (searchpath_t *) Hunk_Alloc(sizeof (searchpath_t));
 	if (!strcmp(FileManager::FileExtension(pak), "pak")) {
 		search->pack = LoadPackFile(pak);
-		if (!search->pack)
+		if (!search->pack) {
 			Sys_Error("Couldn't load packfile: %s", pak);
-	} else
+			return;
+		}
+	} else {
 		strcpy(search->filename, pak);
+	}
 	search->next = FileManager::searchpaths;
 	FileManager::searchpaths = search;
 }
@@ -259,15 +265,18 @@ pack_t *FileManager::LoadPackFile(const char *packfile) {
 		return NULL;
 	}
 	SystemFileManager::FileRead(packhandle, (void *)&header, sizeof(header));
-	if (header.id[0] != 'P' || header.id[1] != 'A' || header.id[2] != 'C' || header.id[3] != 'K')
+	if (header.id[0] != 'P' || header.id[1] != 'A' || header.id[2] != 'C' || header.id[3] != 'K') {
 		Sys_Error("%s is not a packfile", packfile);
+	}
+
 	header.dirofs = LittleLong(header.dirofs);
 	header.dirlen = LittleLong(header.dirlen);
 
 	int numpackfiles = header.dirlen / sizeof (dpackfile_t);
 
-	if (numpackfiles > MAX_FILES_IN_PACK)
+	if (numpackfiles > MAX_FILES_IN_PACK) {
 		Sys_Error("%s has %i files", packfile, numpackfiles);
+	}
 
 	//	if (numpackfiles != PAK0_COUNT)
 	//		com_modified = true; // not the original file
@@ -347,9 +356,10 @@ int SystemFileManager::FileOpenWrite(const char *path) {
 	if (!f->isOpen()) {
 		delete f;
 		Sys_Error("Error opening %s: %s", path, strerror(errno));
+	} else {
+		handles[i] = f;
+		return i;
 	}
-	handles[i] = f;
-	return i;
 }
 
 void SystemFileManager::FileClose(int handle) {

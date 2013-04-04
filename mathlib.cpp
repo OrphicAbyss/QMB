@@ -38,6 +38,108 @@ void Math_Init() {
 	angleModScalar2 = (65536.0 / 360.0);
 }
 
+void VectorNegate(const vec3_t in, vec3_t out) {
+	out[0] = -in[0];
+	out[1] = -in[1];
+	out[2] = -in[2];
+}
+
+void VectorSet(vec3_t vec, const float x, const float y, const float z) {
+	vec[0] = x;
+	vec[1] = y;
+	vec[2] = z;
+}
+
+void VectorClear(vec3_t vec) {
+	vec[0] = vec[1] = vec[2] = 0;
+}
+
+double DotProduct(const vec3_t a, const vec3_t b) {
+	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+void VectorSubtract(const vec3_t a, const vec3_t b, vec3_t out) {
+	out[0] = a[0] - b[0];
+	out[1] = a[1] - b[1];
+	out[2] = a[2] - b[2];
+}
+
+void VectorAdd(const vec3_t a, const vec3_t b, vec3_t out) {
+	out[0] = a[0] + b[0];
+	out[1] = a[1] + b[1];
+	out[2] = a[2] + b[2];
+}
+
+void VectorCopy(const vec3_t in, vec3_t out) {
+	out[0] = in[0];
+	out[1] = in[1];
+	out[2] = in[2];
+}
+
+void VectorCrossProduct(const vec3_t a, const vec3_t b, vec3_t out) {
+	out[0] = a[1] * b[2] - a[2] * b[1];
+	out[1] = a[2] * b[0] - a[0] * b[2];
+	out[2] = a[0] * b[1] - a[1] * b[0];
+}
+
+float VectorNormalize(vec3_t v) {
+	float length = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
+
+	if (length) {
+		float ilength;
+		length = sqrt(length); // FIXME
+		ilength = 1 / length;
+		v[0] *= ilength;
+		v[1] *= ilength;
+		v[2] *= ilength;
+	}
+
+	return length;
+}
+
+void VectorNormalize2(const vec3_t in, vec3_t out) {
+	float ilength = 1.0f / (float) sqrt(DotProduct(in,in));
+	out[0] = in[0] * ilength;
+	out[1] = in[1] * ilength;
+	out[2] = in[2] * ilength;
+}
+void VectorNormalizeDouble(vec3_t v) {
+	double ilength = 1.0 / sqrt(DotProduct(v,v));
+	v[0] *= ilength;
+	v[1] *= ilength;
+	v[2] *= ilength;
+}
+
+float VectorDistance(const vec3_t a, const vec3_t b) {
+	return sqrt(VectorDistance2(a,b));
+}
+
+float VectorDistance2(const vec3_t a, const vec3_t b) {
+	return  ((a)[0] - (b)[0]) * ((a)[0] - (b)[0]) +
+			((a)[1] - (b)[1]) * ((a)[1] - (b)[1]) +
+			((a)[2] - (b)[2]) * ((a)[2] - (b)[2]);
+}
+
+float VectorLength(const vec3_t a) {
+	return sqrt(DotProduct(a, a));
+}
+
+void VectorScale(const vec3_t in, const float scale, vec3_t out) {
+	out[0] = in[0] * scale;
+	out[1] = in[1] * scale;
+	out[2] = in[2] * scale;
+}
+
+bool VectorCompare(const vec3_t a, const vec3_t b) {
+	return a[0] == b[0] && a[1] == b[1] && a[2] == b[2];
+}
+
+void VectorMA(const vec3_t a, const float scale, const vec3_t b, vec3_t out) {
+	out[0] = a[0] + scale * b[0];
+	out[1] = a[1] + scale * b[1];
+	out[2] = a[2] + scale * b[2];
+}
+
 void ProjectPointOnPlane(vec3_t dst, const vec3_t p, const vec3_t normal) {
 	vec3_t n;
 
@@ -87,7 +189,7 @@ void VectorVectors(const vec3_t forward, vec3_t right, vec3_t up) {
 	right[1] -= d * forward[1];
 	right[2] -= d * forward[2];
 	VectorNormalize(right);
-	CrossProduct(right, forward, up);
+	VectorCrossProduct(right, forward, up);
 }
 
 void RotatePointAroundVector(vec3_t dst, const vec3_t dir, const vec3_t point, float degrees) {
@@ -201,21 +303,6 @@ void AngleVectors(vec3_t angles, vec3_t forward, vec3_t right, vec3_t up) {
 	up[0] = (cr * sp * cy + -sr*-sy);
 	up[1] = (cr * sp * sy + -sr * cy);
 	up[2] = cr*cp;
-}
-
-float VectorNormalize(vec3_t v) {
-	float length = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
-
-	if (length) {
-		float ilength;
-		length = sqrt(length); // FIXME
-		ilength = 1 / length;
-		v[0] *= ilength;
-		v[1] *= ilength;
-		v[2] *= ilength;
-	}
-
-	return length;
 }
 
 #ifndef WIN32

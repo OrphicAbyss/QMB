@@ -263,7 +263,7 @@ void R_DrawBrushModel(entity_t *e) {
 		for (lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
 			if (cl_dlights[lnum].die >= cl.time) {
 				VectorSubtract(e->origin, cl_dlights[lnum].origin, dist);
-				add = cl_dlights[lnum].radius - Length(dist);
+				add = cl_dlights[lnum].radius - VectorLength(dist);
 				if (add > 0) {
 					lightcolor[0] += add * cl_dlights[lnum].colour[0];
 					lightcolor[1] += add * cl_dlights[lnum].colour[1];
@@ -494,7 +494,7 @@ void BuildSurfaceDisplayList(model_t *m, msurface_t *fa) {
 		poly->verts[i][7] = s;
 		poly->verts[i][8] = t;
 	}
-	
+
 	// remove co-linear points - Ed
 	if (!gl_keeptjunctions.getBool() && !(fa->flags & SURF_UNDERWATER)) {
 		for (i = 0; i < lnumverts; ++i) {

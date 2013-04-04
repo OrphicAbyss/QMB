@@ -149,7 +149,7 @@ bool bot_walkmove(edict_t *ent, float yaw, float dist) {
 
 	if (!((int) ent->v.flags & (FL_ONGROUND | FL_FLY | FL_SWIM)))
 		return false;
-	
+
 	yaw = yaw * M_PI / 180;
 
 	move[0] = cos(yaw) * dist;
@@ -342,7 +342,7 @@ void AttackMoveBot(client_t *client, bool fire, bool move, bool strafe, edict_t 
 		if (move) {
 			VectorSubtract(enemy->v.origin, client->edict->v.origin, origin);
 
-			if (Length(origin) > 200 || // If further away then 200 units from enemy
+			if (VectorLength(origin) > 200 || // If further away then 200 units from enemy
 					(int) client->edict->v.weapon & 4096) // or is using the axe
 				client->cmd.forwardmove = 400; // Then chase after the enemy
 			else // If closer then 200 units to enemy and not using the axe
@@ -364,9 +364,9 @@ void AttackMoveBot(client_t *client, bool fire, bool move, bool strafe, edict_t 
 		VectorSubtract(enemy->v.origin, client->edict->v.origin, origin);
 
 		if (move) {
-			if (Length(origin) > 80)
+			if (VectorLength(origin) > 80)
 				client->cmd.forwardmove = 400; // Let him run
-			else if (Length(origin) < 60)
+			else if (VectorLength(origin) < 60)
 				client->cmd.forwardmove = -400; // Let him run
 		}
 		client->cmd.sidemove = 0; // Let him run stright
@@ -398,7 +398,7 @@ void AttackMoveBot(client_t *client, bool fire, bool move, bool strafe, edict_t 
 			break;
 	}
 
-	if (!bot_walkmove(client->edict, client->edict->v.angles[1], Length(client->edict->v.velocity)))
+	if (!bot_walkmove(client->edict, client->edict->v.angles[1], VectorLength(client->edict->v.velocity)))
 		client->cmd.forwardmove = 0;
 }
 

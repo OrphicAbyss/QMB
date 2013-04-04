@@ -587,11 +587,12 @@ void Host_Loadgame_f(void) {
         }
         if (i == sizeof (str) - 1)
             Sys_Error("Loadgame buffer overflow");
+
         str[i] = 0;
-        start = str;
         start = COM_Parse(str);
         if (!com_token[0])
             break; // end of file
+		
         if (strcmp(com_token, "{"))
             Sys_Error("First token isn't a brace");
 
@@ -758,7 +759,7 @@ void Host_Tell_f(void) {
 
     // check length & truncate if necessary
     size_t spaceLeft = sizeof(text) - 2 - strlen(text); // -2 for /n and null terminator
-    if ((int)strlen(p) > spaceLeft)
+    if (strlen(p) > spaceLeft)
         p[spaceLeft] = 0;
 
     strcat(text, p);

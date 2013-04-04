@@ -362,8 +362,7 @@ NET_Connect
 int hostCacheCount = 0;
 hostcache_t hostcache[HOSTCACHESIZE];
 
-qsocket_t *NET_Connect (char *host)
-{
+qsocket_t *NET_Connect (const char *host) {
     qsocket_t		*ret;
     int				n;
     int				numdrivers = net_numdrivers;
@@ -373,61 +372,61 @@ qsocket_t *NET_Connect (char *host)
     if (host && *host == 0)
         host = NULL;
 
-    if (host)
-    {
-        if (strcasecmp (host, "local") == 0)
-        {
+    if (host) {
+        if (strcasecmp (host, "local") == 0) {
             numdrivers = 1;
             goto JustDoIt;
         }
 
-        if (hostCacheCount)
-        {
+        if (hostCacheCount) {
             for (n = 0; n < hostCacheCount; n++)
-                if (strcasecmp (host, hostcache[n].name) == 0)
-                {
+                if (strcasecmp (host, hostcache[n].name) == 0) {
                     host = hostcache[n].cname;
                     break;
                 }
-            if (n < hostCacheCount)
+            if (n < hostCacheCount) {
                 goto JustDoIt;
+			}
         }
     }
 
     slistSilent = host ? true : false;
     NET_Slist_f ();
 
-    while(slistInProgress)
+    while(slistInProgress) {
         NET_Poll();
+	}
 
-    if (host == NULL)
-    {
-        if (hostCacheCount != 1)
+    if (host == NULL) {
+        if (hostCacheCount != 1) {
             return NULL;
+		}
+
         host = hostcache[0].cname;
         Con_Printf("Connecting to...\n%s @ %s\n\n", hostcache[0].name, host);
     }
 
-    if (hostCacheCount)
-        for (n = 0; n < hostCacheCount; n++)
-            if (strcasecmp (host, hostcache[n].name) == 0)
-            {
+    if (hostCacheCount) {
+        for (n = 0; n < hostCacheCount; n++) {
+            if (strcasecmp (host, hostcache[n].name) == 0) {
                 host = hostcache[n].cname;
                 break;
             }
+		}
+	}
 
 JustDoIt:
-    for (net_driverlevel=0 ; net_driverlevel<numdrivers; net_driverlevel++)
-    {
-        if (net_drivers[net_driverlevel].initialized == false)
+    for (net_driverlevel=0 ; net_driverlevel<numdrivers; net_driverlevel++) {
+        if (net_drivers[net_driverlevel].initialized == false) {
             continue;
+		}
         ret = dfunc.Connect (host);
-        if (ret)
+        if (ret) {
             return ret;
+		}
     }
 
-    if (host)
-    {
+    if (host) {
         Con_Printf("\n");
         PrintSlistHeader();
         PrintSlist();
@@ -444,8 +443,7 @@ NET_CheckNewConnections
 ===================
 */
 
-struct
-{
+struct sVcrConnect {
     double	time;
     int		op;
     long	session;
@@ -523,8 +521,7 @@ returns -1 if connection is invalid
 =================
 */
 
-struct
-{
+struct sVcrGetMessage {
     double	time;
     int		op;
     long	session;
@@ -611,8 +608,7 @@ returns 1 if the message was sent properly
 returns -1 if the connection died
 ==================
 */
-struct
-{
+struct sVcrSendMessage {
     double	time;
     int		op;
     long	session;

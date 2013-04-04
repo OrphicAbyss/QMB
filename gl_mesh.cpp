@@ -32,7 +32,7 @@ ALIAS MODEL DISPLAY LIST GENERATION
 model_t *aliasmodel;
 aliashdr_t *paliashdr;
 
-bool used[8192];
+byte used[8192];
 
 // the command list holds counts and s/t values that are valid for
 // every frame
@@ -101,9 +101,11 @@ nexttri:
 done:
 
     // clear the temp used flags
-    for (j = starttri + 1; j < pheader->numtris; j++)
-        if (used[j] == 2)
+    for (j = starttri + 1; j < pheader->numtris; j++) {
+        if (used[j] == 2) {
             used[j] = 0;
+		}
+	}
 
     return stripcount;
 }
@@ -156,9 +158,11 @@ nexttri:
 done:
 
     // clear the temp used flags
-    for (j = starttri + 1; j < pheader->numtris; j++)
-        if (used[j] == 2)
+    for (j = starttri + 1; j < pheader->numtris; j++) {
+        if (used[j] == 2) {
             used[j] = 0;
+		}
+	}
 
     return stripcount;
 }
@@ -810,7 +814,7 @@ void R_DrawAliasModel(entity_t *e) {
         if (cl_dlights[lnum].die >= cl.time) {
             //work out the distance to the light
             VectorSubtract(e->origin, cl_dlights[lnum].origin, dist);
-            add = cl_dlights[lnum].radius - Length(dist);
+            add = cl_dlights[lnum].radius - VectorLength(dist);
             //if its close enough add light from it
             if (add > 0) {
                 lightcolor[0] += add * cl_dlights[lnum].colour[0];

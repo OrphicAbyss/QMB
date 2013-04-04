@@ -230,10 +230,10 @@ void TextureManager::LoadDefaultTexture() {
 
 	//default texture
 	Texture *defTex = new Texture("defaultTexture");
-	defTex->setData(data);
 	defTex->height = height;
 	defTex->width = width;
 	defTex->bytesPerPixel = 4;
+	defTex->setData(data);
 	LoadTexture(defTex);
 	defaultTexture = defTex->textureId;
 

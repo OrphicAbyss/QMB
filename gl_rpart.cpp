@@ -215,11 +215,11 @@ void R_ClearParticles(void) {
     AddParticleType(GL_SRC_ALPHA, GL_ONE, pm_die, pg_none, p_fire, 0, part_tex, 1); //fire
     AddParticleType(GL_SRC_ALPHA, GL_ONE, pm_bounce, pg_grav_high, p_sparks, 0, spark_tex, 1); //sparks
     AddParticleType(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, pm_normal, pg_grav_normal, p_blood, 0, blood_tex, 1); //blood
-    AddParticleType(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, pm_nophysics, pg_rise_low, p_smoke, 0, smoke_tex, 0.75f); //smoke
+    AddParticleType(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, pm_normal, pg_rise_low, p_smoke, 0, smoke_tex, 0.75f); //smoke
     AddParticleType(GL_SRC_ALPHA, GL_ONE, pm_bounce_fast, pg_grav_normal, p_chunks, 0, part_tex, 1); //chunks
     AddParticleType(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, pm_float, pg_rise, p_bubble, 0, bubble_tex, 1); //bubble
-    AddParticleType(GL_SRC_ALPHA, GL_ONE, pm_static, pg_none, p_trail, 0, trail_tex, 1); //trail
-    AddParticleType(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, pm_static, pg_none, p_lightning, 0, lightning_tex, 1); //lightning
+    AddParticleType(GL_SRC_ALPHA, GL_ONE, pm_nophysics, pg_none, p_trail, 0, trail_tex, 1); //trail
+    AddParticleType(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, pm_nophysics, pg_none, p_lightning, 0, lightning_tex, 1); //lightning
 
     AddParticleType(GL_SRC_ALPHA, GL_ONE, pm_decal, pg_grav_high, p_decal, 0, part_tex, 1);
     //FIXME: add QC function call to reset the QC Custom particles
@@ -391,7 +391,7 @@ void R_UpdateEmitters(void) {
     particle_emitter_t *p;
     double frametime;
 
-    if ((cl.time == cl.oldtime))
+    if (cl.time == cl.oldtime)
         return;
 
     frametime = (cl.time - cl.oldtime);
@@ -1151,7 +1151,7 @@ void R_UpdateAll(void) {
 
             VectorCopy(p->org, oldOrg);
 
-            if (pt->move != pm_static && p->hit == 0) {
+            if (pt->move != pm_nophysics && p->hit == 0) {
                 //find new position
                 p->org[0] += p->vel[0] * frametime + 0.5 * p->acc[0] * frametime * frametime;
                 p->org[1] += p->vel[1] * frametime + 0.5 * p->acc[1] * frametime * frametime;
@@ -1164,7 +1164,6 @@ void R_UpdateAll(void) {
             }
 
             switch (pt->move) {
-                case (pm_static):
                 case (pm_nophysics):
                     //do nothing :)
                     break;
@@ -1174,7 +1173,7 @@ void R_UpdateAll(void) {
                     //to seperate decal and particle systems
                     if (CONTENTS_SOLID == CL_TruePointContents(p->org)) {
                         TraceLineN(oldOrg, p->org, stop, normal, 1);
-                        if ((stop != p->org) && (Length(stop) != 0)) {
+                        if ((stop != p->org) && (VectorLength(stop) != 0)) {
                             p->hit = 1;
                             //work out exactly where we hit and what the normal was
 
@@ -1213,7 +1212,7 @@ void R_UpdateAll(void) {
                     //make the particle bounce off walls
                     if (CONTENTS_SOLID == CL_TruePointContents(p->org)) {
                         TraceLineN(oldOrg, p->org, stop, normal, 0);
-                        if ((stop != p->org) && (Length(stop) != 0)) {
+                        if ((stop != p->org) && (VectorLength(stop) != 0)) {
                             dist = DotProduct(p->vel, normal) * -1.3;
 
                             VectorMA(p->vel, dist, normal, p->vel);
@@ -1225,7 +1224,7 @@ void R_UpdateAll(void) {
                     //make it bounce higher
                     if (CONTENTS_SOLID == CL_TruePointContents(p->org)) {
                         TraceLineN(oldOrg, p->org, stop, normal, 0);
-                        if ((stop != p->org) && (Length(stop) != 0)) {
+                        if ((stop != p->org) && (VectorLength(stop) != 0)) {
                             dist = DotProduct(p->vel, normal) * -1.4;
 
                             VectorMA(p->vel, dist, normal, p->vel);
@@ -1241,10 +1240,6 @@ void R_UpdateAll(void) {
                     if (CONTENTS_SOLID == CL_TruePointContents(p->org))
                         p->die = 0;
 
-                    break;
-                case (pm_shrink):
-                    //this should never happen
-                    p->size -= 6 * (cl.time - cl.oldtime);
                     break;
             }
 
@@ -1470,7 +1465,7 @@ void AddParticleColor(vec3_t org, vec3_t org2, int count, float size, float time
                 }
                 //make sure the particle is inside the world
                 TraceLineN(org, p->org, stop, normal, 0);
-                if (Length(stop) != 0)
+                if (VectorLength(stop) != 0)
                     VectorCopy(stop, p->org);
 
                 //velocity
@@ -1623,7 +1618,7 @@ void AddFire(vec3_t org, float size) {
     int i, count;
 
 
-    if ((cl.time == cl.oldtime))
+    if (cl.time == cl.oldtime)
         return;
 
     for (pt = particle_type_active; (pt) && (pt->id != p_fire); pt = pt->next);
@@ -1730,9 +1725,8 @@ void AddTrail(vec3_t start, vec3_t end, int type, float time, float size, vec3_t
  */
 particle_t *AddTrailColor(vec3_t start, vec3_t end, int type, float time, float size, vec3_t color, vec3_t dir) {
     particle_tree_t *pt, *bubbles;
-    particle_t *p;
+    particle_t *p = NULL;
     int i, typetemp, bubble = 0;
-    double count;
     vec3_t point;
     double frametime;
     vec3_t StartVelocity;
@@ -1740,25 +1734,29 @@ particle_t *AddTrailColor(vec3_t start, vec3_t end, int type, float time, float 
     //work out vector for trail
     VectorSubtract(start, end, point);
     //work out the length and therefore the amount of particles
-    count = Length(point);
+    double count = VectorLength(point);
     //make sure its at least 1 long
     //quater the amount of particles (speeds it up a bit)
-    if (count == 0)
+    if (count == 0) {
         return NULL;
-    else
+    } else {
         count = count / 8;
+	}
 
     //find correct particle tree to add too...
-    if (type == p_smoke)
+    if (type == p_smoke) {
         typetemp = p_trail;
-    else
+    } else {
         typetemp = type;
+	}
 
     //work out Velocity
     frametime = -1 / (cl.time - cl.oldtime) / 8;
     VectorMA(zerodir, frametime, point, StartVelocity);
 
+	// Find the particle type
     for (pt = particle_type_active; (pt) && (pt->id != typetemp); pt = pt->next);
+	// Also find the bubble particle type
     for (bubbles = particle_type_active; (bubbles) && (bubbles->id != p_bubble); bubbles = bubbles->next);
 
     if (((typetemp == p_trail) || (typetemp == p_lightning)) && (free_particles) && (pt)) {

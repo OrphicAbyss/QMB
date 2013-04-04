@@ -121,7 +121,7 @@ bool checkextension(char *name) {
 
 /**
  * returns true if the extension is supported by the server
- * 
+ *
  * checkextension(extensionname)
  */
 void PF_checkextension(void) {
@@ -130,7 +130,7 @@ void PF_checkextension(void) {
 
 /**
  * This is a TERMINAL error, which will kill off the entire server. Dumps self.
- * 
+ *
  * error(value)
  */
 void PF_error(void) {
@@ -146,9 +146,9 @@ void PF_error(void) {
 }
 
 /**
- * Dumps out self, then an error message.  The program is aborted and self is 
+ * Dumps out self, then an error message.  The program is aborted and self is
  * removed, but the level can continue.
- * 
+ *
  * objerror(value)
  */
 void PF_objerror(void) {
@@ -164,7 +164,7 @@ void PF_objerror(void) {
 
 /**
  * Writes new values for v_forward, v_up, and v_right based on angles
- * 
+ *
  * makevectors(vector)
  */
 void PF_makevectors(void) {
@@ -173,10 +173,10 @@ void PF_makevectors(void) {
 
 /**
  * This is the only valid way to move an object without using the physics of the
- * world (setting velocity and waiting).  Directly changing origin will not set 
- * internal links correctly, so clipping would be messed up.  This should be 
+ * world (setting velocity and waiting).  Directly changing origin will not set
+ * internal links correctly, so clipping would be messed up.  This should be
  * called when an object is spawned, and then only if it is teleported.
- * 
+ *
  * setorigin (entity, origin)
  */
 void PF_setorigin(void) {
@@ -263,7 +263,7 @@ void SetMinMaxSize(edict_t *e, float *min, float *max, bool rotate) {
 
 /**
  * the size box is rotated by the current angle
- * 
+ *
  * setsize (entity, minvector, maxvector)
  */
 void PF_setsize(void) {
@@ -310,7 +310,7 @@ void PF_setmodel(void) {
 
 /**
  * broadcast print to everyone on server
- * 
+ *
  * bprint(value)
  */
 void PF_bprint(void) {
@@ -322,7 +322,7 @@ void PF_bprint(void) {
 
 /**
  * single print to a specific client
- * 
+ *
  * sprint(clientent, value)
  */
 void PF_sprint(void) {
@@ -353,7 +353,7 @@ void PF_sprint(void) {
 
 /**
  * single print to a specific client
- * 
+ *
  * centerprint(clientent, value)
  */
 void PF_centerprint(void) {
@@ -475,7 +475,7 @@ void PF_vectoangles(void) {
 
 /**
  * Returns a number from 0<= num < 1
- * 
+ *
  * random()
  */
 void PF_random(void) {
@@ -535,12 +535,12 @@ void PF_ambientsound(void) {
 }
 
 /**
- * Each entity can have eight independant sound sources, like voice, weapon, 
+ * Each entity can have eight independant sound sources, like voice, weapon,
  * feet, etc.
- * 
+ *
  * Channel 0 is an auto-allocate channel, the others override anything already
  * running on that entity/channel pair.
- * 
+ *
  * An attenuation of 0 will play full volume everywhere in the level.
  * Larger attenuations will drop off.
 
@@ -581,10 +581,10 @@ void PF_break(void) {
 
 /**
  * Used for use tracing and shot targeting
- * 
- * Traces are blocked by bbox and exact bsp entityes, and also slide box 
+ *
+ * Traces are blocked by bbox and exact bsp entityes, and also slide box
  * entities if the tryents flag is set.
- * 
+ *
  * traceline (vector1, vector2, tryents)
  */
 void PF_traceline(void) {
@@ -617,7 +617,7 @@ void PF_traceline(void) {
 /**
  * Returns true if the given entity can move to the given position from it's
  * current position by walking or rolling.
- * 
+ *
  * FIXME: make work...
  * scalar checkpos (entity, vector)
  */
@@ -677,14 +677,14 @@ int PF_newcheckclient(int check) {
 }
 
 /**
- * Returns a client (or object that has a client enemy) that would be a valid 
+ * Returns a client (or object that has a client enemy) that would be a valid
  * target.
- * 
+ *
  * If there are more than one valid options, they are cycled each frame
- * 
- * If (self.origin + self.viewofs) is not in the PVS of the current target, it 
+ *
+ * If (self.origin + self.viewofs) is not in the PVS of the current target, it
  * is not returned at all.
- * 
+ *
  * name checkclient ()
  */
 #define	MAX_CHECK	16
@@ -729,7 +729,7 @@ void PF_checkclient(void) {
 
 /**
  * Sends text over to the client's execution buffer
- * 
+ *
  *stuffcmd (clientent, value)
  */
 void PF_stuffcmd(void) {
@@ -756,7 +756,7 @@ void PF_stuffcmd(void) {
 
 /**
  * Sends text over to the client's execution buffer
- * 
+ *
  * localcmd (string)
  */
 void PF_localcmd(void) {
@@ -785,7 +785,7 @@ void PF_cvar_set(void) {
 
 /**
  * Returns a chain of entities that have origins within a spherical area
- * 
+ *
  * findradius (origin, radius)
  */
 void PF_findradius(void) {
@@ -805,7 +805,7 @@ void PF_findradius(void) {
             continue;
         for (int j = 0; j < 3; j++)
             eorg[j] = org[j] - (ent->v.origin[j] + (ent->v.mins[j] + ent->v.maxs[j])*0.5);
-        if (Length(eorg) > rad)
+        if (VectorLength(eorg) > rad)
             continue;
 
         ent->v.chain = EDICT_TO_PROG(chain);
@@ -1094,7 +1094,7 @@ void PF_nextent(void) {
 
 /**
  * Pick a vector for the player to shoot along
- * 
+ *
  * vector aim(entity, missilespeed)
  */
 CVar sv_aim("sv_aim", "2.0", true);
@@ -1243,7 +1243,7 @@ bool isBot() {
 
     if (G_FLOAT(OFS_PARM0) == MSG_ONE && ent->bot.isbot)
 		return true;
-	
+
 	return false;
 }
 
@@ -1372,7 +1372,7 @@ void PF_sqrt(void) {
 
 /**
  * copies data from one entity to another
- * 
+ *
  * copyentity(src, dst)
  */
 void PF_copyentity(void) {
@@ -1384,7 +1384,7 @@ void PF_copyentity(void) {
 
 /**
  * sets the color of a client and broadcasts the update to all connected clients
- * 
+ *
  * setcolor(clientent, value)
  */
 void PF_setcolor(void) {
@@ -1410,7 +1410,7 @@ void PF_setcolor(void) {
 
 /**
  * chained search for strings in entity fields
- * 
+ *
  * entity(.string field, string match) findchain = #402;
  */
 void PF_findchain(void) {
@@ -1445,7 +1445,7 @@ void PF_findchain(void) {
 
 /**
  * LordHavoc: chained search for float, int, and entity reference fields
- * 
+ *
  * entity(.string field, float match) findchainfloat = #403;
  */
 void PF_findchainfloat(void) {
@@ -1915,7 +1915,7 @@ void PF_fgets(void) {
     p = pr_string_temp;
     SystemFileManager::FileRead(h, p, 1);
     while (p && p[0] != '\n') {
-        *p++;
+        p++;
         test = SystemFileManager::FileRead(h, p, 1);
         if (p[0] == 13) // carriage return
             SystemFileManager::FileRead(h, p, 1); // skip

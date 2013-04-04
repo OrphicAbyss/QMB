@@ -789,8 +789,9 @@ void SV_SendReconnect(void) {
     MSG_WriteString(&msg, "reconnect\n");
     NET_SendToAll(&msg, 5);
 
-    if (cls.state != ca_dedicated)
+    if (cls.state != ca_dedicated) {
         CmdArgs::executeString("reconnect\n", CmdArgs::COMMAND);
+	}
 }
 
 /**

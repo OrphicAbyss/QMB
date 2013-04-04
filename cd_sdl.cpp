@@ -27,11 +27,16 @@ static void CDAudio_Eject() {
 
 void CDAudio_Play(byte track, bool looping) {
 	CDstatus cd_stat;
+
 	if (!cd_id || !enabled)
 		return;
 
+	cd_stat = SDL_CDStatus(cd_id);
+
 	if (!cdValid) {
-		if (!CD_INDRIVE(cd_stat = SDL_CDStatus(cd_id)) || (!cd_id->numtracks)) return;
+		if (!CD_INDRIVE(cd_stat) || (!cd_id->numtracks))
+			return;
+
 		cdValid = true;
 	}
 
@@ -39,9 +44,12 @@ void CDAudio_Play(byte track, bool looping) {
 		Con_DPrintf("CDAudio: Bad track number: %d\n", track);
 		return;
 	}
+
 	track--; /* Convert track from person to SDL value */
 	if (cd_stat == CD_PLAYING) {
-		if (cd_id->cur_track == track) return;
+		if (cd_id->cur_track == track)
+			return;
+
 		CDAudio_Stop();
 	}
 
@@ -50,16 +58,16 @@ void CDAudio_Play(byte track, bool looping) {
 		Con_DPrintf("CDAudio_Play: Unable to play track: %d\n", track + 1);
 		return;
 	}
-	
+
 	playLooping = looping;
 }
 
 void CDAudio_Stop() {
-	if (!cd_id || !enabled) 
+	if (!cd_id || !enabled)
 		return;
-	
+
 	int cdstate = SDL_CDStatus(cd_id);
-	if ((cdstate != CD_PLAYING) && (cdstate != CD_PAUSED)) 
+	if ((cdstate != CD_PLAYING) && (cdstate != CD_PAUSED))
 		return;
 
 	if (SDL_CDStop(cd_id))
@@ -86,7 +94,7 @@ void CDAudio_Resume() {
 void CDAudio_Update() {
 	if (!cd_id || !enabled)
 		return;
-	
+
 	if (bgmvolume.getFloat() != cdvolume) {
 		if (cdvolume) {
 			bgmvolume.set(0.0f);
@@ -98,7 +106,7 @@ void CDAudio_Update() {
 		cdvolume = bgmvolume.getFloat();
 		return;
 	}
-	
+
 	if (playLooping && (SDL_CDStatus(cd_id) != CD_PLAYING)
 			&& (SDL_CDStatus(cd_id) != CD_PAUSED))
 		CDAudio_Play(cd_id->cur_track + 1, true);
@@ -134,7 +142,7 @@ int CDAudio_Init() {
 void CDAudio_Shutdown() {
 	if (!cd_id)
 		return;
-	
+
 	CDAudio_Stop();
 	SDL_CDClose(cd_id);
 	cd_id = NULL;
@@ -155,7 +163,7 @@ static void CD_f() {
 		enabled = false;
 		return;
 	}
-	
+
 	if (!strcasecmp(command, "play")) {
 		CDAudio_Play(atoi(CmdArgs::getArg(2)), false);
 		return;

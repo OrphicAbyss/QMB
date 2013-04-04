@@ -23,6 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <unistd.h>
 #endif
 #include <fcntl.h>
+#include <stdarg.h>
+
 #include "quakedef.h"
 #include "FileManager.h"
 
@@ -286,7 +288,7 @@ void Con_CloseDebugLog(void) {
 
 int Con_Print_Real(const char *msg) {
 	static bool inupdate;
-		
+
 	// also echo to debugging console
 	Sys_Printf("%s", msg); // also echo to debugging console
 
@@ -313,7 +315,7 @@ int Con_Print_Real(const char *msg) {
 			inupdate = false;
 		}
 	}
-	return 0;	
+	return 0;
 }
 
 /**
@@ -377,7 +379,7 @@ void Con_SafePrint(const char *msg) {
 void Con_SafePrintf(const char *fmt, ...) {
 	va_list argptr;
 	char msg[MAXPRINTMSG];
-	
+
 	va_start(argptr, fmt);
 	vsnprintf(msg, MAXPRINTMSG, fmt, argptr);
 	va_end(argptr);
@@ -399,7 +401,7 @@ void Con_SafeDPrintf(const char *fmt, ...) {
 	va_start(argptr, fmt);
 	vsnprintf(msg, MAXPRINTMSG, fmt, argptr);
 	va_end(argptr);
-	
+
 	Con_SafePrint(msg);
 }
 

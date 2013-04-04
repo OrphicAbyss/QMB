@@ -16,8 +16,12 @@ typedef enum {
 
 //custom movement effects
 typedef enum {
-	pm_static, pm_normal, pm_float, pm_bounce, pm_bounce_fast, pm_shrink, pm_die, pm_grow, pm_nophysics, pm_decal
+	pm_normal, pm_float, pm_bounce, pm_bounce_fast, pm_die, pm_nophysics, pm_decal
 } part_move_t;
+
+typedef enum {
+	pm_static, pm_grow, pm_shrink
+} part_size_change_t;
 
 //gravity effects
 typedef enum {
@@ -43,8 +47,7 @@ typedef struct particle_s
 	float		start;				//start time of the particle
 	int			hit;				//if the particle has hit the world (used for physics)
 	float		size;				//size of the particle
-	part_move_t	type;				//gravity for particle (Used for shrink and grow)
-									//FIXME: change shrink/grow to a special particle type
+	part_size_change_t	type;		//type for size change for particle (Used for shrink and grow)
 	float		dist;				//distance from viewer
 	int			decal_texture;
 } particle_t;

@@ -612,8 +612,8 @@ void Mod_LoadTexinfo(lump_t *l) {
 	for (i = 0; i < count; i++, in++, out++) {
 		for (j = 0; j < 8; j++)
 			out->vecs[0][j] = LittleFloat(in->vecs[0][j]);
-		len1 = Length(out->vecs[0]);
-		len2 = Length(out->vecs[1]);
+		len1 = VectorLength(out->vecs[0]);
+		len2 = VectorLength(out->vecs[1]);
 		len1 = (len1 + len2) / 2;
 		if (len1 < 0.32)
 			out->mipadjust = 4;
@@ -1018,7 +1018,7 @@ float RadiusFromBounds(vec3_t mins, vec3_t maxs) {
 		corner[i] = fabs(mins[i]) > fabs(maxs[i]) ? fabs(mins[i]) : fabs(maxs[i]);
 	}
 
-	return Length(corner);
+	return VectorLength(corner);
 }
 
 void Mod_LoadBrushModel(model_t *mod, void *buffer) {
@@ -1229,8 +1229,8 @@ int GL_SkinSplit(byte *in, int width, int height, int bits, char *name) {
 			*out = *in;
 		} else
 			*out = 0;
-		*in++;
-		*out++;
+		in++;
+		out++;
 	}
 
 	if (passed) {

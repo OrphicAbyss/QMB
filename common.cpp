@@ -19,14 +19,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 // common.c -- misc functions used in client and server
 
+#include <stdarg.h>
+
 #include "quakedef.h"
 #include "FileManager.h"
 
 #define NUM_SAFE_ARGVS  7
 
 static const char *largv[MAX_NUM_ARGVS + NUM_SAFE_ARGVS + 1];
-static char *argvdummy = " ";
-static char *safeargvs[NUM_SAFE_ARGVS] = {"-nolan", "-nosound", "-nocdaudio", "-nojoy", "-nomouse"};
+static const char *argvdummy = " ";
+static const char *safeargvs[NUM_SAFE_ARGVS] = {"-nolan", "-nosound", "-nocdaudio", "-nojoy", "-nomouse"};
 
 CVar registered("registered", "0");
 CVar cmdline("cmdline", "0", false, true);
@@ -48,37 +50,37 @@ bool standard_quake = true, rogue, hipnotic;
 /*
  * All of Quake's data access is through a hierchal file system, but the
  * contents of the file system can be transparently merged from several sources.
- * 
+ *
  * The "base directory" is the path to the directory holding the quake.exe and
  *  all game directories.  The sys_* files pass this to host_init in
  *  quakeparms_t->basedir.  This can be overridden with the "-basedir" command
  *  line parm to allow code debugging in a different directory.
- * 
+ *
  *   The base directory is only used during filesystem initialization.
- * 
+ *
  * The "game directory" is the first tree on the search path and directory that
  * all generated files (savegames, screenshots, demos, config files) will be
  * saved to.
- * 
+ *
  * This can be overridden with the "-game" command line parameter.
- * 
+ *
  * The game directory can never be changed while quake is executing.
- * 
+ *
  * This is a precacution against having a malicious server instruct clients to
  * write files over areas they shouldn't.
- * 
+ *
  * The "cache directory" is only used during development to save network
  * bandwidth, especially over ISDN / T1 lines.
- * 
+ *
  * If there is a cache directory specified, when a file is found by the normal
  *  search path, it will be mirrored into the cache directory, then opened there.
- * 
+ *
  * FIXME: The file "parms.txt" will be read out of the game directory and
  * appended to the current command line arguments to allow different games to
  * initialize startup parms differently.
- * 
+ *
  * This could be used to add a "-sspeed 22050" for the high quality sound edition.
- * 
+ *
  * Because they are added at the end, they will not override an explicit setting
  * on the original command line.
  */
@@ -295,10 +297,11 @@ void MSG_WriteFloat(sizebuf_t *sb, float f) {
 }
 
 void MSG_WriteString(sizebuf_t *sb, const char *s) {
-	if (!s)
+	if (!s) {
 		SZ_Write(sb, "", 1);
-	else
+	} else {
 		SZ_Write(sb, s, strlen(s) + 1);
+	}
 }
 
 void MSG_WriteCoord(sizebuf_t *sb, float f) {
@@ -454,15 +457,15 @@ void *SZ_GetSpace(sizebuf_t *buf, int length) {
 	void *data;
 
 	if (buf->cursize + length > buf->maxsize) {
-		if (!buf->allowoverflow)
+		if (!buf->allowoverflow) {
 			Sys_Error("SZ_GetSpace: overflow without allowoverflow set");
-
-		if (length > buf->maxsize)
+		} else if (length > buf->maxsize) {
 			Sys_Error("SZ_GetSpace: %i is > full buffer size", length);
-
-		buf->overflowed = true;
-		Con_Printf("SZ_GetSpace: overflow");
-		SZ_Clear(buf);
+		} else {
+			buf->overflowed = true;
+			Con_Printf("SZ_GetSpace: overflow");
+			SZ_Clear(buf);
+		}
 	}
 
 	data = buf->data + buf->cursize;
@@ -725,16 +728,21 @@ byte *COM_LoadFile(const char *path, int usehunk) {
 		buf = MemoryObj::ZAlloc(len + 1);
 	else if (usehunk == 3) {
 		Sys_Error("Trying to load file to cache: %s\n", path);
+		return NULL;
 	} else if (usehunk == 4) {
 		if (len + 1 > loadsize)
 			buf = Hunk_TempAlloc(len + 1);
 		else
 			buf = loadbuf;
-	} else
+	} else {
 		Sys_Error("COM_LoadFile: bad usehunk");
+		return NULL;
+	}
 
-	if (!buf)
+	if (!buf) {
 		Sys_Error("COM_LoadFile: not enough space for %s", path);
+		return NULL;
+	}
 
 	memset(buf, 0, len + 1);
 
@@ -765,7 +773,7 @@ byte *COM_LoadStackFile(const char *path, void *buffer, int bufsize) {
 
 void COM_InitFilesystem(void) {
 	char basedir[MAX_OSPATH];
-	
+
 	// -basedir <path>
 	// Overrides the system supplied base directory (under GAMENAME)
 	int i = COM_CheckParm("-basedir");

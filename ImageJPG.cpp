@@ -86,6 +86,7 @@ void Image::LoadJPG(FILE *f, char *filename, Texture *tex) {
 
 	tex->width = cinfo.image_width;
 	tex->height = cinfo.image_height;
+	tex->bytesPerPixel = 4;
 	tex->setData(image_rgba);
 
 	// finish decompression and destroy the jpeg

@@ -253,14 +253,14 @@ void Texture::setData(unsigned char *data) {
 void Texture::setData(unsigned char *data, bool copy) {
 	if (width == 0 || height == 0 || bytesPerPixel == 0) {
 		Sys_Printf("Error texture has a zero width, height or bbp: %s\n", this->identifier);
-	}
-
-	if (copy) {
-		this->data = (unsigned char*)malloc(width * height * bytesPerPixel);
-
-		memcpy(this->data, data, width * height * bytesPerPixel);
 	} else {
-		this->data = data;
+		if (copy) {
+			this->data = (unsigned char*)malloc(width * height * bytesPerPixel);
+
+			memcpy(this->data, data, width * height * bytesPerPixel);
+		} else {
+			this->data = data;
+		}
 	}
 }
 

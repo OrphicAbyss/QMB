@@ -656,12 +656,16 @@ void CmdArgs::forwardToServer() {
  *  given parameter appears, or 0 if not present
  */
 int CmdArgs::checkParm(char *parm) {
-	if (!parm)
+	if (!parm) {
 		Sys_Error("Cmd_CheckParm: NULL");
+		return 0;
+	}
 
-	for (int i = 1; i < CmdArgs::getArgCount(); i++)
-		if (!strcasecmp(parm, CmdArgs::getArg(i)))
+	for (int i = 1; i < CmdArgs::getArgCount(); i++) {
+		if (!strcasecmp(parm, CmdArgs::getArg(i))) {
 			return i;
+		}
+	}
 
 	return 0;
 }
