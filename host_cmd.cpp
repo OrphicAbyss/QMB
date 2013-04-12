@@ -26,16 +26,9 @@ extern CVar pausable;
 
 int current_skill;
 
-void Mod_Print(void);
-
-/*
-==================
-Host_Quit_f
-==================
- */
-extern void M_Menu_Quit_f(void);
-
 void Host_Quit_f(void) {
+	extern void M_Menu_Quit_f(void);
+
     if (key_dest != key_console && cls.state != ca_dedicated) {
         M_Menu_Quit_f();
         return;
@@ -46,17 +39,7 @@ void Host_Quit_f(void) {
     Sys_Quit();
 }
 
-/*
-==================
-Host_Status_f
-==================
- */
 void Host_Status_f(void) {
-    client_t *client;
-    int seconds;
-    int minutes;
-    int hours = 0;
-    int j;
     void (*print)(const char *fmt, ...);
 
     if (CmdArgs::getSource() == CmdArgs::COMMAND) {
@@ -70,35 +53,38 @@ void Host_Status_f(void) {
 
     print("host:    %s\n", hostname.getString());
     print("version: %4.2f\n", VERSION);
-    if (tcpipAvailable)
+    if (tcpipAvailable) {
         print("tcp/ip:  %s\n", my_tcpip_address);
-    if (ipxAvailable)
+	}
+    if (ipxAvailable) {
         print("ipx:     %s\n", my_ipx_address);
+	}
     print("map:     %s\n", sv.name);
     print("players: %i active (%i max)\n\n", net_activeconnections, svs.maxclients);
+
+	int j;
+    client_t *client;
     for (j = 0, client = svs.clients; j < svs.maxclients; j++, client++) {
         if (!client->active)
             continue;
-        seconds = (int) (net_time - client->netconnection->connecttime);
-        minutes = seconds / 60;
+        int seconds = (int) (net_time - client->netconnection->connecttime);
+        int minutes = seconds / 60;
+		int hours = 0;
         if (minutes) {
             seconds -= (minutes * 60);
             hours = minutes / 60;
             if (hours)
                 minutes -= (hours * 60);
-        } else
+        } else {
             hours = 0;
+		}
         print("#%-2u %-16.16s  %3i  %2i:%02i:%02i\n", j + 1, client->name, (int) client->edict->v.frags, hours, minutes, seconds);
         print("   %s\n", client->netconnection->address);
     }
 }
 
-/*
-==================
-Host_God_f
-
-Sets client to godmode
-==================
+/**
+ * Sets client to godmode
  */
 void Host_God_f(void) {
     if (CmdArgs::getSource() == CmdArgs::COMMAND) {
@@ -180,15 +166,9 @@ void Host_Fly_f(void) {
 }
 
 
-/*
-==================
-Host_Snowboard_f
-
-Sets client to snowboard mode
-==================
+/**
+ * Sets client to snowboard mode
  */
-//qmb: snowboard
-
 void Host_Snowboard_f(void) {
     if (CmdArgs::getSource() == CmdArgs::COMMAND) {
         CmdArgs::forwardToServer();
@@ -207,12 +187,6 @@ void Host_Snowboard_f(void) {
     }
 }
 
-/*
-==================
-Host_Ping_f
-
-==================
- */
 void Host_Ping_f(void) {
     int i, j;
     float total;
@@ -237,20 +211,14 @@ void Host_Ping_f(void) {
 
 /*
 ===============================================================================
-
 SERVER TRANSITIONS
-
 ===============================================================================
  */
 
-/*
-======================
-Host_Map_f
-
-handle a
-map <servername>
-command from the console.  Active clients are kicked off.
-======================
+/**
+ * handle a
+ * map <servername>
+ * command from the console.  Active clients are kicked off.
  */
 void Host_Map_f(void) {
     int i;
@@ -292,12 +260,8 @@ void Host_Map_f(void) {
     }
 }
 
-/*
-==================
-Host_Changelevel_f
-
-Goes to a new map, taking all clients along
-==================
+/**
+ * Goes to a new map, taking all clients along
  */
 void Host_Changelevel_f(void) {
     char level[MAX_QPATH];
@@ -315,53 +279,34 @@ void Host_Changelevel_f(void) {
     SV_SpawnServer(level);
 }
 
-/*
-==================
-Host_Restart_f
-
-Restarts the current server for a dead player
-==================
+/**
+ * Restarts the current server for a dead player
  */
 void Host_Restart_f(void) {
     char mapname[MAX_QPATH];
-#ifdef QUAKE2
-    char startspot[MAX_QPATH];
-#endif
 
     if (cls.demoplayback || !sv.active)
         return;
 
     if (CmdArgs::getSource() != CmdArgs::COMMAND)
         return;
+
     strcpy(mapname, sv.name); // must copy out, because it gets cleared
     // in sv_spawnserver
-#ifdef QUAKE2
-    strcpy(startspot, sv.startspot);
-    SV_SpawnServer(mapname, startspot);
-#else
     SV_SpawnServer(mapname);
-#endif
 }
 
-/*
-==================
-Host_Reconnect_f
-
-This command causes the client to wait for the signon messages again.
-This is sent just before a server changes levels
-==================
+/**
+ * This command causes the client to wait for the signon messages again.
+ * This is sent just before a server changes levels
  */
 void Host_Reconnect_f(void) {
     SCR_BeginLoadingPlaque();
     cls.signon = 0; // need new connection messages
 }
 
-/*
-=====================
-Host_Connect_f
-
-User command to connect to server
-=====================
+/**
+ * User command to connect to server
  */
 void Host_Connect_f(void) {
     char name[MAX_QPATH];
@@ -379,20 +324,14 @@ void Host_Connect_f(void) {
 
 /*
 ===============================================================================
-
 LOAD / SAVE GAME
-
 ===============================================================================
  */
 
 #define	SAVEGAME_VERSION	5
 
-/*
-===============
-Host_SavegameComment
-
-Writes a SAVEGAME_COMMENT_LENGTH character comment describing the current
-===============
+/**
+ * Writes a SAVEGAME_COMMENT_LENGTH character comment describing the current
  */
 void Host_SavegameComment(char *text) {
     int i;
@@ -410,11 +349,6 @@ void Host_SavegameComment(char *text) {
     text[SAVEGAME_COMMENT_LENGTH] = '\0';
 }
 
-/*
-===============
-Host_Savegame_f
-===============
- */
 void Host_Savegame_f(void) {
     char name[256];
     FILE *f;
@@ -494,11 +428,6 @@ void Host_Savegame_f(void) {
     Con_Printf("done.\n");
 }
 
-/*
-===============
-Host_Loadgame_f
-===============
- */
 void Host_Loadgame_f(void) {
     char name[MAX_OSPATH];
     FILE *f;
@@ -1268,6 +1197,7 @@ void Host_Stopdemo_f(void) {
 }
 
 //=============================================================================
+void Mod_Print(void);
 
 void Host_InitCommands(void) {
     Cmd::addCmd("status", Host_Status_f);
