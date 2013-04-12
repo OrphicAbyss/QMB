@@ -46,6 +46,7 @@ OUTPUT_BIN  = QMB$(EXTENSION)
 # Regular variables
 #CPP  = gcc
 #CC   = gcc
+
 WINDRES = windres
 RES  = WinQuake_private.res
 OBJ  =	bot.o bot_misc.o bot_setup.o  \
@@ -55,7 +56,7 @@ OBJ  =	bot.o bot_misc.o bot_setup.o  \
 	CRC.o FileManager.o \
 	in_keys.o in_sdl.o \
 	gl_draw.o \
-	gl_md3.o gl_mesh.o gl_model.o gl_sprite.o \
+	gl_md2.o gl_md3.o gl_mesh.o gl_model.o gl_sprite.o \
 	ModelAlias.o \
 	Image.o ImageJPG.o ImagePCX.o ImagePNG.o ImageTGA.o \
 	Texture.o TextureManager.o TextureFile.o \
@@ -77,7 +78,7 @@ ifeq ($(TARGET_PLATFORM),windows)
 	#-mwindows -luser32 -lgdi32  -lwsock32 -lwinmm -lcomctl32 -ldxguid
     INCS = -I"C:/msys/1.0/local/include" -I"C:/MinGW/include"
 else
-    LIBS = -lc -lstdc++ -lm -lGL -lGLU -ljpeg -lpng -lSDL $(shell if test -e /usr/lib/libGLee.so; then echo -lGLee; else echo -lglee; fi)
+    LIBS = -lc -lstdc++ -lm -lGL -lGLU -ljpeg -lpng -lSDL $(shell if test -e /usr/lib/libGLee.so; then echo -lGLee; else echo -lGLee; fi)
     INCS =
 endif #ifeq ($(TARGET_PLATFORM),windows)
 

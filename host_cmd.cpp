@@ -557,6 +557,7 @@ void Host_Loadgame_f(void) {
     SV_SpawnServer(mapname);
 
     if (!sv.active) {
+		fclose(f);
         Con_Printf("Couldn't load map\n");
         return;
     }
@@ -585,16 +586,21 @@ void Host_Loadgame_f(void) {
                 break;
             }
         }
-        if (i == sizeof (str) - 1)
-            Sys_Error("Loadgame buffer overflow");
+
+        if (i == sizeof (str) - 1) {
+			fclose(f);
+			Sys_Error("Loadgame buffer overflow");
+		}
 
         str[i] = 0;
         start = COM_Parse(str);
         if (!com_token[0])
             break; // end of file
-		
-        if (strcmp(com_token, "{"))
+
+        if (strcmp(com_token, "{")) {
+			fclose(f);
             Sys_Error("First token isn't a brace");
+		}
 
         if (entnum == -1) { // parse the global vars
             ED_ParseGlobals(start);
@@ -617,8 +623,9 @@ void Host_Loadgame_f(void) {
 
     fclose(f);
 
-    for (int i = 0; i < NUM_SPAWN_PARMS; i++)
+    for (int i = 0; i < NUM_SPAWN_PARMS; i++) {
         svs.clients->spawn_parms[i] = spawn_parms[i];
+	}
 
     if (cls.state != ca_dedicated) {
         CL_EstablishConnection("local");

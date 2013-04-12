@@ -120,6 +120,10 @@ void Image::LoadPNG(FILE *f, char *filename, Texture *tex) {
 
 	int filesize = SystemFileManager::FileLength(f);
 	raw = (byte *) malloc(filesize + 1);
+	if (raw == NULL) {
+		Sys_Error("Out of memory to load PNG: %s\n", filename);
+		return;
+	}
 
 	fread(raw, 1, filesize, f);
 	fclose(f);

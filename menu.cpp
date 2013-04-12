@@ -209,21 +209,17 @@ void PrintWhite(int cx, int cy, const char *str) {
 	}
 }
 
-void M_Main_ButtonList(const char *buttons[], int cursor_location, int in_main) {
-	int x, y,
-			x_mod,
-			x_length,
-			i;
-
-	x_length = 0;
+void M_Main_ButtonList(const char *buttons[], int cursor_location, bool in_main) {
+	int i;
+	int x_length = 0;
 
 	for (i = 0; buttons[i] != 0; i++) {
 		x_length = x_length + (strlen(buttons[i])*8);
 	}
 
-	x_mod = (vid.conwidth - x_length) / (i + 1);
-	y = vid.conheight / 14;
-	x = 0;
+	int x_mod = (vid.conwidth - x_length) / (i + 1);
+	int y = vid.conheight / 14;
+	int x = 0;
 
 	for (i = 0; buttons[i] != 0; i++) { // center on point origin
 		x = x + x_mod;
@@ -231,13 +227,14 @@ void M_Main_ButtonList(const char *buttons[], int cursor_location, int in_main) 
 			PrintWhite(x, y, buttons[i]);
 			if (in_main == true)
 				Draw_Character(x - 10, y, 12 + ((int) (realtime * 4)&1));
-		} else
+		} else {
 			PrintRed(x, y, buttons[i]);
+		}
 		x = x + (strlen(buttons[i])*8);
 	}
 }
 
-void M_Main_Layout(int f_cursor, int f_inmenu) {
+void M_Main_Layout(int f_cursor, bool f_inmenu) {
 	const char *names[] ={
 		"Single",
 		"Multiplayer",
@@ -269,26 +266,29 @@ byte identityTable[256];
 byte translationTable[256];
 
 void M_BuildTranslationTable(int top, int bottom) {
-	int j;
-	byte *dest, *source;
-
-	for (j = 0; j < 256; j++)
+	for (int j = 0; j < 256; j++) {
 		identityTable[j] = j;
-	dest = translationTable;
-	source = identityTable;
+	}
+
+	byte *dest = translationTable;
+	byte *source = identityTable;
 	memcpy(dest, source, 256);
 
-	if (top < 128) // the artists made some backwards ranges.  sigh.
+	if (top < 128) { // the artists made some backwards ranges.  sigh.
 		memcpy(dest + TOP_RANGE, source + top, 16);
-	else
-		for (j = 0; j < 16; j++)
+	} else {
+		for (int j = 0; j < 16; j++) {
 			dest[TOP_RANGE + j] = source[top + 15 - j];
+		}
+	}
 
-	if (bottom < 128)
+	if (bottom < 128) {
 		memcpy(dest + BOTTOM_RANGE, source + bottom, 16);
-	else
-		for (j = 0; j < 16; j++)
+	} else {
+		for (int j = 0; j < 16; j++) {
 			dest[BOTTOM_RANGE + j] = source[bottom + 15 - j];
+		}
+	}
 }
 
 void M_DrawTransPicTranslate(int x, int y, qpic_t *pic) {
@@ -469,7 +469,7 @@ int game_cursor_table[] = {BUTTON_START,
 	BUTTON_START + BUTTON_HEIGHT * 5};
 int m_singleplayer_cursor;
 
-int dim_load, dim_save; //JHL:check if available
+bool dim_load, dim_save; //JHL:check if available
 
 void M_Menu_SinglePlayer_f(void) {
 	key_dest = key_menu;
@@ -2664,7 +2664,7 @@ int lanConfig_cursor = -1;
 int lanConfig_cursor_table [] = {72, 92, 124};
 #define NUM_LANCONFIG_CMDS	3
 
-int lanConfig_port;
+unsigned int lanConfig_port;
 char lanConfig_portname[6];
 char lanConfig_joinname[22];
 

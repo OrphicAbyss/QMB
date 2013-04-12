@@ -113,57 +113,6 @@ void InsertLinkAfter(link_t *l, link_t *after) {
 
 /*
 ============================================================================
-					LIBRARY REPLACEMENT FUNCTIONS
-============================================================================
- */
-
-
-//void strcpy(char *dest, const char *src) {
-//	strcpy(dest, src);
-//}
-//
-//void strncpy(char *dest, const char *src, int count) {
-//	strncpy(dest, src, count);
-//}
-//
-//int strlen(const char *str) {
-//	return strlen(str);
-//}
-//
-//char *strrchr(char *s, char c) {
-//	return strrchr(s, c);
-//}
-//
-//void strcat(char *dest, const char *src) {
-//	strcat(dest, src);
-//}
-//
-//int strcmp(const char *s1, const char *s2) {
-//	return strcmp(s1, s2);
-//}
-//
-//int strncmp(const char *s1, const char *s2, int count) {
-//	return strncmp(s1, s2, count);
-//}
-//
-//int strncasecmp(const char *s1, const char *s2, int n) {
-//	return strncasecmp(s1, s2, n);
-//}
-//
-//int strcasecmp(const char *s1, const char *s2) {
-//	return strcasecmp(s1, s2);
-//}
-//
-//int atoi(const char *str) {
-//	return atoi(str);
-//}
-//
-//float atof(const char *str) {
-//	return atof(str);
-//}
-
-/*
-============================================================================
 					BYTE ORDER FUNCTIONS
 ============================================================================
  */
@@ -233,8 +182,6 @@ Handles byte ordering and avoids alignment errors
  */
 
 // writing functions
-#define MSG_ReadVector(v) {(v)[0] = MSG_ReadCoord();(v)[1] = MSG_ReadCoord();(v)[2] = MSG_ReadCoord();}
-
 void MSG_WriteChar(sizebuf_t *sb, int c) {
 	byte *buf;
 
@@ -433,6 +380,12 @@ char *MSG_ReadString(void) {
 
 float MSG_ReadCoord(void) {
 	return MSG_ReadShort() * (1.0 / 8);
+}
+
+void MSG_ReadVector(vec3_t &v) {
+	v[0] = MSG_ReadCoord();
+	v[1] = MSG_ReadCoord();
+	v[2] = MSG_ReadCoord();
 }
 
 float MSG_ReadAngle(void) {

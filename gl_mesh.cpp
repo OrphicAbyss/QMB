@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "Texture.h"
+#include "gl_md2.h"
 #include "gl_md3.h"
 
 /*
@@ -548,42 +549,6 @@ void GL_DrawAliasBlendedFrame(aliashdr_t *paliashdr, int pose1, int pose2, float
     }
 }
 
-void R_SetupQ3AliasFrame(int frame, aliashdr_t *paliashdr, int shell) {
-    int pose, numposes;
-    float interval;
-    //md3 stuff
-    float *texcoos, *vertices;
-    int *indecies;
-
-    if ((frame >= paliashdr->numframes) || (frame < 0)) {
-        Con_DPrintf("R_AliasSetupFrame: no such frame %d\n", frame);
-        frame = 0;
-    }
-
-    pose = paliashdr->frames[frame].firstpose;
-    numposes = paliashdr->frames[frame].numposes;
-
-    if (numposes > 1) {
-        interval = paliashdr->frames[frame].interval;
-        pose += (int) (cl.time / interval) % numposes;
-    }
-
-    glDisable(GL_DEPTH);
-    texcoos = (float *) ((byte *) paliashdr + paliashdr->texcoords);
-    indecies = (int *) ((byte *) paliashdr + paliashdr->indecies);
-    vertices = (float *) ((byte *) (paliashdr + paliashdr->posedata + pose * paliashdr->poseverts));
-    glVertexPointer(3, GL_FLOAT, 0, vertices);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glTexCoordPointer(2, GL_FLOAT, 0, texcoos);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-    glDrawElements(GL_TRIANGLES, paliashdr->numtris * 3, GL_UNSIGNED_INT, indecies);
-
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glEnable(GL_DEPTH);
-}
-
 void R_SetupAliasBlendedFrame(int frame, aliashdr_t *paliashdr, entity_t* e, int shell, int cell) {
     float blend;
 
@@ -637,111 +602,6 @@ void R_SetupAliasBlendedFrame(int frame, aliashdr_t *paliashdr, entity_t* e, int
         glDisable(GL_BLEND);
         glCullFace(GL_FRONT);
     }
-}
-
-void GL_DrawQ2AliasFrame(entity_t *e, md2_t *pheader, int lastpose, int pose, float lerp) {
-    float ilerp;
-    int *order, count;
-    md2trivertx_t *verts1, *verts2;
-    vec3_t scale1, translate1, scale2, translate2, d;
-    md2frame_t *frame1, *frame2;
-
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-    //		glBlendFunc(GL_ONE, GL_ZERO);
-    //		glDisable(GL_BLEND);
-    glDepthMask(1);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-    ilerp = 1.0 - lerp;
-
-    //new version by muff - fixes bug, easier to read, faster (well slightly)
-    frame1 = (md2frame_t *) ((char *) pheader + pheader->ofs_frames + (pheader->framesize * lastpose));
-    frame2 = (md2frame_t *) ((char *) pheader + pheader->ofs_frames + (pheader->framesize * pose));
-
-    VectorCopy(frame1->scale, scale1);
-    VectorCopy(frame1->translate, translate1);
-    VectorCopy(frame2->scale, scale2);
-    VectorCopy(frame2->translate, translate2);
-    verts1 = &frame1->verts[0];
-    verts2 = &frame2->verts[0];
-    order = (int *) ((char *) pheader + pheader->ofs_glcmds);
-
-    glColor4f(1, 1, 1, 1); // FIXME - temporary shading for tutorial - NOT LordHavoc's original code
-
-    while (1) {
-        // get the vertex count and primitive type
-        count = *order++;
-        if (!count)
-            break; // done
-        if (count < 0) {
-            count = -count;
-            glBegin(GL_TRIANGLE_FAN);
-        } else
-            glBegin(GL_TRIANGLE_STRIP);
-
-        do {
-            // normals and vertexes come from the frame list
-            // blend the light intensity from the two frames together
-            d[0] = d[1] = d[2] = shadedots[verts1->lightnormalindex] * ilerp + shadedots[verts2->lightnormalindex] * lerp;
-            //d[0] = (shadedots[verts2->lightnormalindex] + shadedots[verts1->lightnormalindex])/2;
-            d[0] *= lightcolor[0];
-            d[1] *= lightcolor[1];
-            d[2] *= lightcolor[2];
-            glColor3f(d[0], d[1], d[2]);
-
-            glTexCoord2f(((float *) order)[0], ((float *) order)[1]);
-            glVertex3f((verts1[order[2]].v[0] * scale1[0] + translate1[0]) * ilerp + (verts2[order[2]].v[0] * scale2[0] + translate2[0]) * lerp,
-                    (verts1[order[2]].v[1] * scale1[1] + translate1[1]) * ilerp + (verts2[order[2]].v[1] * scale2[1] + translate2[1]) * lerp,
-                    (verts1[order[2]].v[2] * scale1[2] + translate1[2]) * ilerp + (verts2[order[2]].v[2] * scale2[2] + translate2[2]) * lerp);
-
-            order += 3;
-        } while (--count);
-
-        glEnd();
-    }
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // normal alpha blend
-    glDisable(GL_BLEND);
-    glDepthMask(1);
-    //	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-}
-
-void R_SetupQ2AliasFrame(entity_t *e, md2_t *pheader) {
-    int frame;
-    float lerp; //, lerpscale;
-
-    frame = e->frame;
-
-    glPushMatrix();
-    R_RotateForEntity(e);
-
-    if ((frame >= pheader->num_frames) || (frame < 0)) {
-        Con_DPrintf("R_SetupQ2AliasFrame: no such frame %d\n", frame);
-        frame = 0;
-    }
-
-    if (e->draw_lastmodel == e->model) {
-        if (frame != e->draw_pose) {
-            e->draw_lastpose = e->draw_pose;
-            e->draw_pose = frame;
-            e->draw_lerpstart = cl.time;
-            lerp = 0;
-        } else
-            lerp = (cl.time - e->draw_lerpstart) * 20.0;
-    } else // uninitialized
-    {
-        e->draw_lastmodel = e->model;
-        e->draw_lastpose = e->draw_pose = frame;
-        e->draw_lerpstart = cl.time;
-        lerp = 0;
-    }
-    if (lerp > 1) lerp = 1;
-
-    GL_DrawQ2AliasFrame(e, pheader, e->draw_lastpose, frame, lerp);
-    glPopMatrix();
 }
 
 int quadtexture;

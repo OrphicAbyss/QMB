@@ -32,11 +32,14 @@ typedef struct glRect_s {
 
 int lightmap_bytes; // 1, 2, or 4
 int lightmap_textures[MAX_LIGHTMAPS];
-int active_lightmaps;
-unsigned blocklights[BLOCK_WIDTH*BLOCK_HEIGHT * 3];
-glpoly_t *lightmap_polys[MAX_LIGHTMAPS];
 bool lightmap_modified[MAX_LIGHTMAPS];
+glpoly_t *lightmap_polys[MAX_LIGHTMAPS];
 glRect_t lightmap_rectchange[MAX_LIGHTMAPS];
+
+int active_lightmaps;
+
+unsigned blocklights[BLOCK_WIDTH*BLOCK_HEIGHT * 3];
+
 int allocated[MAX_LIGHTMAPS][BLOCK_WIDTH];
 // the lightmap texture data needs to be kept in
 // main memory so texsubimage can update properly
@@ -46,7 +49,7 @@ msurface_t *skychain = NULL;
 msurface_t *waterchain = NULL;
 msurface_t *extrachain = NULL;
 msurface_t *outlinechain = NULL;
-//qmb :detail texture
+
 int detailtexture;
 int detailtexture2;
 

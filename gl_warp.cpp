@@ -380,6 +380,7 @@ int R_LoadSky(char *newname) {
     int i;
     char name[96];
     char dirname[64];
+	char spacer[2] = {0, 0};
 
     oldsky = false;
 
@@ -400,23 +401,24 @@ int R_LoadSky(char *newname) {
     }
 
     sprintf(dirname, "gfx/env/");
-    sprintf(name, "%s%s%s", dirname, skyname, suf[0]);
+	sprintf(spacer, "");
+    sprintf(name, "%s%s%s%s", dirname, skyname, spacer, suf[0]);
 
-    //find where the sky is
-    //some are in /env others /gfx/ernv
-    //some have skyname?? others skyname_??
+    // find where the sky is
+    // some are in /env others /gfx/env
+    // some have skyname?? others skyname_??
     skytex[0] = TextureManager::LoadExternTexture(name, false, false, gl_sincity.getBool());
     if (skytex[0] == 0) {
         sprintf(dirname, "env/");
-        sprintf(name, "%s%s%s", dirname, skyname, suf[0]);
+        sprintf(name, "%s%s%s%s", dirname, skyname, spacer, suf[0]);
         skytex[0] = TextureManager::LoadExternTexture(name, false, false, gl_sincity.getBool());
         if (skytex[0] == 0) {
-            sprintf(skyname, "%s_", skyname);
-            sprintf(name, "%s%s%s", dirname, skyname, suf[0]);
+			sprintf(spacer, "_");
+            sprintf(name, "%s%s%s%s", dirname, skyname, spacer, suf[0]);
             skytex[0] = TextureManager::LoadExternTexture(name, false, false, gl_sincity.getBool());
             if (skytex[0] == 0) {
                 sprintf(dirname, "gfx/env/");
-                sprintf(name, "%s%s%s", dirname, skyname, suf[0]);
+                sprintf(name, "%s%s%s%s", dirname, skyname, spacer, suf[0]);
                 skytex[0] = TextureManager::LoadExternTexture(name, false, false, gl_sincity.getBool());
                 if (skytex[0] == 0) {
                     oldsky = true;
@@ -426,8 +428,9 @@ int R_LoadSky(char *newname) {
         }
     }
 
+	// load the sky
     for (i = 1; i < 6; i++) {
-        sprintf(name, "gfx/env/%s%s", skyname, suf[i]);
+        sprintf(name, "%s%s%s%s", dirname, skyname, spacer, suf[0]);
 
         skytex[i] = TextureManager::LoadExternTexture(name, false, false, false);
         if (skytex[i] == 0) {
@@ -651,7 +654,7 @@ void R_DrawSkyChain(msurface_t *s) {
 void R_InitSky(texture_t *mt) {
     int p;
     unsigned trans[128 * 128];
-    unsigned transpix;
+    unsigned char transpix[4];
     unsigned *rgba;
     char name[64];
 
@@ -670,10 +673,10 @@ void R_InitSky(texture_t *mt) {
             b += ((byte *) rgba)[2];
         }
 
-    ((byte *) & transpix)[0] = r / (128 * 128);
-    ((byte *) & transpix)[1] = g / (128 * 128);
-    ((byte *) & transpix)[2] = b / (128 * 128);
-    ((byte *) & transpix)[3] = 0;
+    transpix[0] = r / (128 * 128);
+    transpix[1] = g / (128 * 128);
+    transpix[2] = b / (128 * 128);
+    transpix[3] = 0;
 
     sprintf(name, "%ssolid", mt->name);
     mt->gl_texturenum = TextureManager::LoadInternTexture(name, 128, 128, (byte *) & trans[0], false, false, 4, false);
@@ -682,7 +685,7 @@ void R_InitSky(texture_t *mt) {
         for (int j = 0; j < 128; j++) {
             p = src[i * 256 + j];
             if (p == 0)
-                trans[(i * 128) + j] = transpix;
+                trans[(i * 128) + j] = *((unsigned *)&transpix);
             else
                 trans[(i * 128) + j] = d_8to24table[p];
         }

@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#include "quakedef.h"
+
 #include "Texture.h"
 #include "gl_md3.h"
 
@@ -62,6 +62,42 @@ void R_MD3TagRotate(entity_t *e, model_t *tagmodel, char *tagname) {
 	m[15] = 1;
 
 	glMultMatrixf(m);
+}
+
+void R_SetupQ3AliasFrame(int frame, aliashdr_t *paliashdr, int shell) {
+    int pose, numposes;
+    float interval;
+    //md3 stuff
+    float *texcoos, *vertices;
+    int *indecies;
+
+    if ((frame >= paliashdr->numframes) || (frame < 0)) {
+        Con_DPrintf("R_AliasSetupFrame: no such frame %d\n", frame);
+        frame = 0;
+    }
+
+    pose = paliashdr->frames[frame].firstpose;
+    numposes = paliashdr->frames[frame].numposes;
+
+    if (numposes > 1) {
+        interval = paliashdr->frames[frame].interval;
+        pose += (int) (cl.time / interval) % numposes;
+    }
+
+    glDisable(GL_DEPTH);
+    texcoos = (float *) ((byte *) paliashdr + paliashdr->texcoords);
+    indecies = (int *) ((byte *) paliashdr + paliashdr->indecies);
+    vertices = (float *) ((byte *) (paliashdr + paliashdr->posedata + pose * paliashdr->poseverts));
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glTexCoordPointer(2, GL_FLOAT, 0, texcoos);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+    glDrawElements(GL_TRIANGLES, paliashdr->numtris * 3, GL_UNSIGNED_INT, indecies);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glEnable(GL_DEPTH);
 }
 
 void R_DrawQ3Model(entity_t *e, int shell, int outline) {
@@ -147,10 +183,11 @@ void R_DrawQ3Model(entity_t *e, int shell, int outline) {
 	glPushMatrix();
 
 	//interpolate unless its the viewmodel
-	if (e != &cl.viewent)
+	if (e != &cl.viewent) {
 		R_BlendedRotateForEntity(e);
-	else
+	} else {
 		R_RotateForEntity(e);
+	}
 
 	surf = (md3surface_mem_t *) ((byte *) model + model->offs_surfaces);
 	for (i = 0; i < model->num_surfaces; i++) {

@@ -166,7 +166,7 @@ void SV_SendServerinfo(client_t *client) {
     char message[2048];
 
     MSG_WriteByte(&client->message, svc_print);
-    sprintf(message, "%c\nVERSION %4.2f SERVER (%i CRC)", 2, VERSION, pr_crc);
+    sprintf(message, "%c\nVERSION %4.2f SERVER (%u CRC)", 2, VERSION, pr_crc);
     MSG_WriteString(&client->message, message);
 
     MSG_WriteByte(&client->message, svc_serverinfo);

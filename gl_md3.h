@@ -15,34 +15,34 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifndef __GL_MD3__
+#define __GL_MD3__ 1
+
+#include "quakedef.h"
+
 #define MD3IDHEADER		(('3'<<24)+('P'<<16)+('D'<<8)+'I')
 
 //**** md3 disk format ****//
-typedef struct
-{
+typedef struct {
     short vec[3];
     short normal;
 } md3vert_t;
 
-typedef struct
-{
+typedef struct {
 	char	name[64];
 	int		index;		//not used
 } md3shader_t;
 
-typedef struct
-{
+typedef struct {
 	float	s;
 	float	t;
 } md3st_t;
 
-typedef struct
-{
+typedef struct {
 	int		tri[3];
 } md3tri_t;
 
-typedef struct
-{
+typedef struct {
 	char	id[4];
 	char	name[64];
 	int		flags;		//not used
@@ -57,15 +57,13 @@ typedef struct
 	int		end_offs;
 } md3surface_t;
 
-typedef struct
-{
+typedef struct {
     char	name[64];
     vec3_t	pos;
     vec3_t	rot[3];
 } md3tag_t;
 
-typedef struct
-{
+typedef struct {
     vec3_t		mins;
 	vec3_t		maxs;
     vec3_t		pos;
@@ -73,8 +71,7 @@ typedef struct
     char		name[16];
 } md3frame_t;
 
-typedef struct
-{
+typedef struct {
 	char	id[4];
 	int		version;
 	char	filename[64];
@@ -92,36 +89,31 @@ typedef struct
 //**** md3 memory format ****//
 
 //different size
-typedef struct
-{
+typedef struct {
     vec3_t	vec;
 	vec3_t	normal;
 } md3vert_mem_t;
 
 //same
-typedef struct
-{
+typedef struct {
 	float	s;
 	float	t;
 } md3st_mem_t;
 
 //same
-typedef struct
-{
+typedef struct {
 	int		tri[3];
 } md3tri_mem_t;
 
 //extra
-typedef struct
-{
+typedef struct {
 	char	name[64];
 	int		index;		//not used
 	int		texnum;
 } md3shader_mem_t;
 
 //different
-typedef struct md3surface_mem_s
-{
+typedef struct md3surface_mem_s {
 	char	id[4];	//should be IDP3
 	char	name[64];	//name of this surface
 	int		flags;		//not used yet
@@ -138,16 +130,14 @@ typedef struct md3surface_mem_s
 } md3surface_mem_t;
 
 //same - not used yet
-typedef struct
-{
+typedef struct {
     char	name[64];
     vec3_t	pos;
     vec3_t	rot[3];
 } md3tag_mem_t;
 
 //same
-typedef struct
-{
+typedef struct {
     vec3_t		mins;
 	vec3_t		maxs;
     vec3_t		pos;
@@ -156,8 +146,7 @@ typedef struct
 } md3frame_mem_t;
 
 //same
-typedef struct
-{
+typedef struct {
 	char	id[4];			//should be MDP3
 	int		version;		//should be 15
 	char	filename[64];	//the name inside md3
@@ -166,13 +155,15 @@ typedef struct
 	int		num_tags;		//number of tags
 	int		num_surfaces;	//number of surfaces
 	int		num_skins;		//old model format leftovers, not used
-	//conver these to new offsets
+	//convert these to new offsets
 	int		offs_frames;		//offset to frame
 	int		offs_tags;			//offset to tags
 	int		offs_surfaces;		//offset to surfaces
 } md3header_mem_t;
 
 //**** end ****//
+void R_MD3TagRotate(entity_t *e, model_t *tagmodel, char *tagname);
 void R_DrawQ3Model(entity_t *e, int shell, int outline);
 void Mod_LoadQ3Model(model_t *mod, void *buffer);
-extern int Q_strlcmp (char *s1, char *s2);
+
+#endif

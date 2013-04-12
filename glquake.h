@@ -139,5 +139,3 @@ extern bool gl_n_patches;
 
 extern void GL_EnableTMU(int tmu);
 extern void GL_DisableTMU(int tmu);
-
-void   Mod_LoadMd3Model (model_t *mod, void *buffer);

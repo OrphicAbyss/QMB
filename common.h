@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __COMMON__
 #define __COMMON__
 
+#include "mathlib.h"
+
 #include <string.h>
 
 #ifndef BYTE_DEFINED
@@ -108,8 +110,8 @@ int MSG_ReadShort (void);
 int MSG_ReadLong (void);
 float MSG_ReadFloat (void);
 char *MSG_ReadString (void);
-
 float MSG_ReadCoord (void);
+void MSG_ReadVector(vec3_t &v);
 float MSG_ReadAngle (void);
 
 extern	char	com_token[1024];
@@ -140,10 +142,6 @@ byte *COM_LoadHunkFile (const char *path);
 extern	struct CVar registered;
 
 extern bool		standard_quake, rogue, hipnotic;
-
-//QMB :read vector
-//Lord Havoc define
-#define MSG_ReadVector(v) {(v)[0] = MSG_ReadCoord();(v)[1] = MSG_ReadCoord();(v)[2] = MSG_ReadCoord();}
 
 #define bound(a,b,c) ((a) >= (c) ? (a) : \
 					(b) < (a) ? (a) : (b) > (c) ? (c) : (b))
